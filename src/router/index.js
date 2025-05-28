@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     // TODO: 이 형식으로 라우터 추가
@@ -9,10 +9,20 @@ const routes = [
     //     component: () => import('../views/CounselingReport.vue'),
     //     props: true
     // },
+    {
+        path: '/test/list',
+        name: 'ListView',
+        component: () => import('@/components/common/ListView.vue')
+    },
+    {
+        path: '/',
+        name: 'MainPage',
+        component: () => import('@/pages/MainPage.vue')
+    }
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes
 });
 
