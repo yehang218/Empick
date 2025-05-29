@@ -179,9 +179,11 @@ textarea {
   width: 35px;
   height: 24px;
   padding: 2px;
-  text-align: right;
+  
+  text-align: center;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 /* 총점 영역 */
@@ -215,8 +217,20 @@ textarea {
   width: 35px;
   height: 24px;
   padding: 2px;
-  text-align: right;
+  text-align: center;
   border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* 🔻 number input의 위아래 스핀 버튼 제거 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
 }
 </style>
