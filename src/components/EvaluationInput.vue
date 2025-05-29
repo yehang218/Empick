@@ -19,7 +19,7 @@
             </div>
           </div>
 
-          <!-- 입력 블록 (테두리 없음) -->
+          <!-- 입력 블록 -->
           <div class="criteria-input">
             <div class="textarea-wrapper">
               <textarea
@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <!-- 총점 평가만 별도 박스 유지 -->
+    <!-- 총점 평가 -->
     <div class="total-score">
       <div class="total-header">
         <h3>테스트 / 면접 총 평가</h3>
@@ -68,6 +68,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 
+// ✅ 바뀌는 값들만 관리하면 됨
 const criteria = reactive([
   {
     title: '자신감',
@@ -80,6 +81,13 @@ const criteria = reactive([
     title: '기술력',
     question: '기술에 대한 이해도가 높은가?',
     weight: 40,
+    score: null,
+    comment: '',
+  },
+  {
+    title: '협업능력',
+    question: '팀과 잘 협력할 수 있는가?',
+    weight: 30,
     score: null,
     comment: '',
   },
@@ -97,21 +105,18 @@ const comment = ref('')
   font-size: 0.95rem;
 }
 
-/* 전체 묶는 큰 박스 */
 .all-criteria-wrapper {
   border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #fff; /* 흰색 배경 */
+  background-color: #fff;
   padding: 1rem;
   margin-bottom: 2rem;
 }
 
-/* 개별 항목 묶음 */
 .criteria-group {
   margin-bottom: 2rem;
 }
 
-/* 상단 설명 칸: 회색 배경 유지 */
 .criteria-info {
   background-color: #f5f5f5;
   border-radius: 8px;
@@ -141,13 +146,11 @@ const comment = ref('')
   border-radius: 12px;
 }
 
-/* 입력 칸 (하단): 흰색 배경 */
 .criteria-input {
   margin-top: 0.5rem;
   background-color: #fff;
 }
 
-/* 입력 박스 내부 */
 .textarea-wrapper {
   position: relative;
 }
@@ -179,14 +182,12 @@ textarea {
   width: 35px;
   height: 24px;
   padding: 2px;
-  
   text-align: center;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9rem;
 }
 
-/* 총점 영역 */
 .total-score {
   background-color: #fff;
   border-radius: 6px;
@@ -223,7 +224,7 @@ textarea {
   font-size: 0.9rem;
 }
 
-/* 🔻 number input의 위아래 스핀 버튼 제거 */
+/* number input 스핀 제거 */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -231,6 +232,6 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
+  -moz-appearance: textfield;
 }
 </style>
