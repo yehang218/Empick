@@ -9,6 +9,19 @@ const routes = [
     //     component: () => import('../views/CounselingReport.vue'),
     //     props: true
     // },
+
+    // {
+    //     path: '/employees/list',
+    //     name: 'EmployeesList',
+    //     component: () => import('@/pages/EmployeeList.vue'),
+    //     props: true
+    // },
+    {
+        path: '/employment/jobtests',
+        name: 'EmploymentJobtests',
+        component: () => import('../views/employment/JobtestPage.vue'),
+        props: true
+    },
 ];
 
 const router = createRouter({
