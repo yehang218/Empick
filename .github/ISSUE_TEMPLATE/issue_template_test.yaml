@@ -1,8 +1,8 @@
 name: "🧪 Test"
 description: "테스트 관련 이슈"
-title : "[] "
+title: "[] "
 labels: [":test_tube: test"]
-projects: ["Pive-Guyz/1"]
+projects: ["Pive-Guyz/4"]
 body:
   - type: textarea
     attributes:

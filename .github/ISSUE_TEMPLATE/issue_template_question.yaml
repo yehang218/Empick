@@ -1,8 +1,8 @@
 name: "❓ Question"
 description: "프로젝트 관련 질문"
-title : "[] "
+title: "[] "
 labels: [":question: question"]
-projects: ["Pive-Guyz/1"]
+projects: ["Pive-Guyz/4"]
 body:
   - type: textarea
     attributes:
