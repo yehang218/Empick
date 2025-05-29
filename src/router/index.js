@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 const routes = [
     {
         path: '/test/mj',
-        name: 'MJTestPage',
+        name: 'MJTestMainPage',
         component: () => import('../views/test/MJTestMainPage.vue'),
         props: true
     },
@@ -13,7 +13,12 @@ const routes = [
         component: () => import('../views/test/MJCalendarTestPage.vue'),
         props: true
     },
-
+    {
+        path: '/test/mj/evaluationCriteriaList',
+        name: 'MJTestPage',
+        component: () => import('../views/test/MJEvaluationCriteriaListTestPage.vue'),
+        props: true
+    },
     {
         path: '/test/list',
         name: 'ListView',
