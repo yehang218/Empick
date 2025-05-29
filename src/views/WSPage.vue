@@ -1,0 +1,20 @@
+<template>
+  <div>
+    <h2>우석이 공통 컴포넌트 모음ㅎ_ㅎ</h2>
+    <!-- <MyButton /> -->
+    <Search />
+    <!-- <EvaluationInput /> -->
+  </div>
+</template>
+
+<script setup>
+import Search from '@/components/Search.vue'
+// import MyModal from '@/components/MyModal.vue'
+// import EvaluationInput from '@/components/EvaluationInput.vue'
+</script>
+
+<style scoped>
+h2 {
+  margin-bottom: 1rem;
+}
+</style>
