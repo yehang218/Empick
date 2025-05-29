@@ -33,8 +33,13 @@ const routes = [
         path: '/counter',
         name: 'CounterPage',
         component: () => import('@/views/CounterPage.vue')
-    }
-
+    },
+    {
+        path: '/employment/jobtests',
+        name: 'EmploymentJobtests',
+        component: () => import('@/views/test/JobTestPage.vue'),
+        props: true
+    },
 ];
 
 const router = createRouter({
