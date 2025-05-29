@@ -1,14 +1,14 @@
 <template>
-<<<<<<< HEAD
+
   <div>
     init frontend project
     <router-view/>
   </div>
-=======
+
   <v-app>
     <RouterView />
   </v-app>
->>>>>>> develop
+
 </template>
 
 <script setup>
