@@ -2,6 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/test/mj',
+        name: 'MJTestPage',
+        component: () => import('../views/test/MJTestMainPage.vue'),
+        props: true
+    },
+    {
+        path: '/test/mj/calendar',
+        name: 'MJCalendarTestPage',
+        component: () => import('../views/test/MJCalendarTestPage.vue'),
+        props: true
+    },
+
+    {
         path: '/test/list',
         name: 'ListView',
         component: () => import('@/components/common/ListView.vue')
@@ -16,6 +29,7 @@ const routes = [
         name: 'CounterPage',
         component: () => import('@/views/CounterPage.vue')
     }
+
 ];
 
 const router = createRouter({
