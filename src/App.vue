@@ -1,11 +1,11 @@
 <template>
-  <div id="app">
-    <EvaluationInput />
-  </div>
+  <v-app>
+    <RouterView />
+  </v-app>
 </template>
 
 <script setup>
-import EvaluationInput from './components/EvaluationInput.vue'
+import { RouterView } from 'vue-router';
 </script>
 
 <style scoped></style>

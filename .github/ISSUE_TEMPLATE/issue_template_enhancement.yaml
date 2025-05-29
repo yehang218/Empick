@@ -1,8 +1,8 @@
 name: "✨ Enhancement"
 description: "새로운 기능 추가"
-title : "[] "
+title: "[] "
 labels: [":sparkles: enhancement"]
-projects: ["Pive-Guyz/1"]
+projects: ["Pive-Guyz/5"]
 body:
   - type: textarea
     attributes:
