@@ -2,7 +2,7 @@ name: "👚 style"
 description: "코드 formatting, 세미콜론 누락, 코드 자체의 변경이 없는 경우"
 title : "[] "
 labels: [":womans_clothes: style"]
-projects: ["Pive-Guyz/1"]
+projects: ["Pive-Guyz/4"]
 body:
   - type: textarea
     attributes:

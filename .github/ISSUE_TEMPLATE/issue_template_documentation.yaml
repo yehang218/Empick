@@ -2,7 +2,7 @@ name: "📄 documentation"
 description: "문서 작업한 내용"
 title : "[] "
 labels: [":page_facing_up: documentation"]
-projects: ["Pive-Guyz/1"]
+projects: ["Pive-Guyz/4"]
 body:
   - type: textarea
     attributes:
