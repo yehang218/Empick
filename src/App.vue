@@ -7,9 +7,15 @@
     @confirm="handleYes"
     @cancel="handleNo"
   />
+
+    <v-app>
+    <RouterView />
+  </v-app>
+
 </template>
 
 <script setup>
+import { RouterView } from 'vue-router';
 import { ref } from 'vue'
 import Modal from './components/Modal.vue'
 

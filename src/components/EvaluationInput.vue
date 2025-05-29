@@ -4,9 +4,9 @@
       <h3>{{ index + 1 }}. {{ item.title }}</h3>
       <p>{{ item.question }}</p>
 
-      <div class="criteria-meta">
+      <div class="score-input">
         <span class="weight">가중치 {{ item.weight }}%</span>
-        <div class="score-input">
+        <div class="score-row">
           <input
             type="number"
             v-model.number="item.score"
@@ -27,14 +27,17 @@
     <div class="total-score">
       <h3>테스트 / 면접 총 평가</h3>
       <div class="score-input">
-        <input
-          type="number"
-          v-model.number="totalScore"
-          min="0"
-          max="100"
-          placeholder="0"
-        />
-        <span class="out-of">/ 100</span>
+        <span class="weight">총점</span>
+        <div class="score-row">
+          <input
+            type="number"
+            v-model.number="totalScore"
+            min="0"
+            max="100"
+            placeholder="0"
+          />
+          <span class="out-of">/ 100</span>
+        </div>
       </div>
       <textarea
         v-model="comment"
@@ -70,7 +73,7 @@ const comment = ref('')
 
 <style scoped>
 .evaluation-form {
-  max-width: 600px;
+  max-width: 1500px;
   margin: 0 auto;
   padding: 1.5rem;
   border-radius: 8px;
@@ -85,20 +88,25 @@ const comment = ref('')
   background-color: #fff;
 }
 
-.criteria-meta {
+.score-input {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   margin-bottom: 0.5rem;
 }
 
-.score-input {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+.score-input .weight {
+  font-weight: bold;
+  color: #1a8917;
+  margin-bottom: 4px;
 }
 
-.score-input input {
+.score-input .score-row {
+  display: flex;
+  align-items: center;
+}
+
+.score-row input {
   width: 60px;
   padding: 4px;
   text-align: right;
@@ -107,11 +115,6 @@ const comment = ref('')
 .out-of {
   margin-left: 6px;
   color: #999;
-}
-
-.weight {
-  font-weight: bold;
-  color: #1a8917;
 }
 
 textarea {
