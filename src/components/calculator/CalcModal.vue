@@ -4,6 +4,7 @@
       <v-card-title>
         {{ type === 'add' ? '더하기' : '빼기' }} 계산
       </v-card-title>
+
       <v-card-text>
         <v-text-field v-model.number="a" label="숫자 A" type="number" />
         <v-text-field v-model.number="b" label="숫자 B" type="number" />
@@ -11,6 +12,7 @@
           {{ store.error }}
         </v-alert>
       </v-card-text>
+
       <v-card-actions>
         <v-spacer />
         <v-btn color="grey" @click="close">닫기</v-btn>
@@ -37,20 +39,22 @@ const b = ref(0);
 
 const calculate = async () => {
   await store.calculate(props.type, a.value, b.value);
-  if (!store.error) close();
+  if (!store.error) {
+    close(); // 계산 성공 시 닫기 (❗result는 유지됨)
+  }
 };
 
 const close = () => {
   emit('update:show', false);
-  store.resetResult();
+  // ❌ 여기선 result 초기화하지 않음 (화면 반영 위해 유지)
 };
 
-// 모달 열릴 때 초기화
+// 모달 열릴 때만 초기화
 watch(() => props.show, (val) => {
   if (val) {
     a.value = 0;
     b.value = 0;
-    store.resetResult();
+    store.resetResult(); // ✅ 여기에만 유지
   }
 });
 </script>

@@ -1,6 +1,6 @@
+// src/stores/calculatorStore.js
 import { defineStore } from 'pinia';
 import { add, subtract } from '@/services/calculatorService';
-import { useApiHandler } from '@/composables/useApiHandler';
 
 export const useCalculatorStore = defineStore('calculator', {
     state: () => ({
@@ -10,18 +10,21 @@ export const useCalculatorStore = defineStore('calculator', {
     }),
     actions: {
         async calculate(type, a, b) {
-            const { execute, loading, error } = useApiHandler();
-            const result = await execute(() =>
-                type === 'add' ? add(a, b) : subtract(a, b)
-            );
+            this.loading = true;
+            this.error = null;
 
-            if (result !== null) {
+            try {
+                const result = await (type === 'add' ? add(a, b) : subtract(a, b));
+                console.log('[STORE] calculate() - result:', result);
                 this.result = result;
+            } catch (err) {
+                this.error = err?.response?.data?.message || '계산 중 오류 발생';
+                console.error('[STORE] calculate() - 실패:', this.error);
+            } finally {
+                this.loading = false;
             }
-
-            this.loading = loading.value;
-            this.error = error.value;
         },
+
         resetResult() {
             this.result = null;
             this.error = null;
