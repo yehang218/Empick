@@ -1,5 +1,8 @@
 <template>
   <v-container fluid>
+    <v-btn color="primary" @click="goBack" class="mb-4">
+      ← 뒤로가기
+    </v-btn>
     <v-row>
       <!-- 달력 (왼쪽 영역) -->
       <v-col cols="7">
@@ -35,6 +38,14 @@
 <script setup>
 import { ref } from 'vue'
 import Calendar from '@/components/Calendar.vue'
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goBack = () => {
+  router.push('/test/mj')
+}
 
 const selectedDate = ref('')
 const dataForSelectedDate = ref(null)

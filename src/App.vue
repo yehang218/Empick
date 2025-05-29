@@ -2,10 +2,11 @@
 
   <div>
     init frontend project
-
-    <router-view/>
   </div>
 
+  <v-app>
+    <RouterView />
+  </v-app>
 </template>
 
 <script setup>

@@ -4,7 +4,13 @@ const routes = [
     {
         path: '/test/mj',
         name: 'MJTestPage',
-        component: () => import('../views/test/MJTestPage.vue'),
+        component: () => import('../views/test/MJTestMainPage.vue'),
+        props: true
+    },
+    {
+        path: '/test/mj/calendar',
+        name: 'MJCalendarTestPage',
+        component: () => import('../views/test/MJCalendarTestPage.vue'),
         props: true
     },
 
