@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
+<<<<<<< HEAD
     // TODO: 이 형식으로 라우터 추가
     // {
     //     // 상담 일지 페이지
@@ -15,6 +16,23 @@ const routes = [
         component: () => import('../views/test/MJTestPage.vue'),
         props: true
     },
+=======
+    {
+        path: '/test/list',
+        name: 'ListView',
+        component: () => import('@/components/common/ListView.vue')
+    },
+    {
+        path: '/',
+        name: 'MainPage',
+        component: () => import('@/views/MainPage.vue')
+    },
+    {
+        path: '/counter',
+        name: 'CounterPage',
+        component: () => import('@/views/CounterPage.vue')
+    }
+>>>>>>> develop
 ];
 
 const router = createRouter({
