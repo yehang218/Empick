@@ -2,7 +2,7 @@ name: "🐛 Bug"
 description: "에러나 오류가 나타나는 내용"
 title : "[] "
 labels: [":bug: bug"]
-projects: ["Pive-Guyz/1"]
+projects: ["Pive-Guyz/4"]
 body:
   - type: textarea
     attributes:
