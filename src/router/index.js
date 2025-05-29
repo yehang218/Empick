@@ -8,6 +8,12 @@ const routes = [
         props: true
     },
     {
+        path: '/test/mj/calendar',
+        name: 'MJCalendarTestPage',
+        component: () => import('../views/test/MJCalendarTestPage.vue'),
+        props: true
+    },
+    {
         path: '/test/mj/evaluationCriteriaList',
         name: 'MJTestPage',
         component: () => import('../views/test/MJEvaluationCriteriaListTestPage.vue'),
@@ -28,6 +34,7 @@ const routes = [
         name: 'CounterPage',
         component: () => import('@/views/CounterPage.vue')
     }
+
 ];
 
 const router = createRouter({
