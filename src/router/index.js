@@ -2,6 +2,18 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/test/mj',
+        name: 'MJTestMainPage',
+        component: () => import('../views/test/MJTestMainPage.vue'),
+        props: true
+    },
+    {
+        path: '/test/mj/evaluationCriteriaList',
+        name: 'MJTestPage',
+        component: () => import('../views/test/MJEvaluationCriteriaListTestPage.vue'),
+        props: true
+    },
+    {
         path: '/test/list',
         name: 'ListView',
         component: () => import('@/components/common/ListView.vue')
