@@ -14,48 +14,32 @@ export const useCounterStore = defineStore('counter', {
     }),
     actions: {
         async fetchCount() {
-            this.loading = true;
-            this.error = null;
-
-            try {
-                const result = await getCounter();
-                console.log('[STORE] fetchCount() - result:', result);
-                this.count = result;
-            } catch (err) {
-                this.error = err?.response?.data?.message || '서버 오류';
-                console.error('[STORE] fetchCount() - 실패:', this.error);
-            } finally {
-                this.loading = false;
-            }
+            await this._handle(async () => {
+                this.count = await getCounter();
+            });
         },
 
         async increment() {
-            this.loading = true;
-            this.error = null;
-
-            try {
-                const result = await incrementCounter();
-                console.log('[STORE] increment() - result:', result);
-                this.count = result;
-            } catch (err) {
-                this.error = err?.response?.data?.message || '서버 오류';
-                console.error('[STORE] increment() - 실패:', this.error);
-            } finally {
-                this.loading = false;
-            }
+            await this._handle(async () => {
+                this.count = await incrementCounter();
+            });
         },
 
         async decrement() {
+            await this._handle(async () => {
+                this.count = await decrementCounter();
+            });
+        },
+
+        // ✅ 내부 전용 공통 처리 메서드
+        async _handle(fn) {
             this.loading = true;
             this.error = null;
 
             try {
-                const result = await decrementCounter();
-                console.log('[STORE] decrement() - result:', result);
-                this.count = result;
+                await fn();
             } catch (err) {
-                this.error = err?.response?.data?.message || '서버 오류';
-                console.error('[STORE] decrement() - 실패:', this.error);
+                this.error = err?.response?.data?.message || '오류가 발생했습니다.';
             } finally {
                 this.loading = false;
             }

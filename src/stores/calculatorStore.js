@@ -14,12 +14,11 @@ export const useCalculatorStore = defineStore('calculator', {
             this.error = null;
 
             try {
-                const result = await (type === 'add' ? add(a, b) : subtract(a, b));
-                console.log('[STORE] calculate() - result:', result);
-                this.result = result;
+                this.result = type === 'add'
+                    ? await add(a, b)
+                    : await subtract(a, b);
             } catch (err) {
-                this.error = err?.response?.data?.message || '계산 중 오류 발생';
-                console.error('[STORE] calculate() - 실패:', this.error);
+                this.error = err?.response?.data?.message || '오류가 발생했습니다.';
             } finally {
                 this.loading = false;
             }
