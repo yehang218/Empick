@@ -1,35 +1,47 @@
 <template>
   <div class="evaluation-form">
-    <div class="evaluation-box">
-      <div v-for="(item, index) in criteria" :key="index" class="criteria-block">
-        <div class="criteria-header">
-          <div>
-            <h3>{{ index + 1 }}. {{ item.title }}</h3>
-            <p>{{ item.question }}</p>
+    <!-- 전체 항목 묶는 큰 박스 -->
+    <div class="all-criteria-wrapper">
+      <div class="evaluation-box">
+        <div
+          v-for="(item, index) in criteria"
+          :key="index"
+          class="criteria-group"
+        >
+          <!-- 상단 정보 블록 -->
+          <div class="criteria-info">
+            <div class="left">
+              <h3>{{ index + 1 }}. {{ item.title }}</h3>
+              <p class="question">{{ item.question }}</p>
+            </div>
+            <div class="right">
+              <span class="weight">가중치 <strong>{{ item.weight }}%</strong></span>
+            </div>
           </div>
-          <span class="weight">가중치 {{ item.weight }}%</span>
-        </div>
 
-        <div class="criteria-body">
-          <div class="textarea-wrapper">
-            <textarea
-              v-model="item.comment"
-              placeholder="해당 항목에 대한 평가 의견을 작성해주세요."
-            ></textarea>
-            <div class="score-overlay">
-              <input
-                type="number"
-                v-model.number="item.score"
-                min="0"
-                max="100"
-              />
-              <span>/ 100</span>
+          <!-- 입력 블록 (테두리 없음) -->
+          <div class="criteria-input">
+            <div class="textarea-wrapper">
+              <textarea
+                v-model="item.comment"
+                placeholder="제시된 평가 기준을 바탕으로 지원자를 평가해 주세요."
+              ></textarea>
+              <div class="score-overlay">
+                <input
+                  type="number"
+                  v-model.number="item.score"
+                  min="0"
+                  max="100"
+                />
+                <span>/100</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- 총점 평가만 별도 박스 유지 -->
     <div class="total-score">
       <div class="total-header">
         <h3>테스트 / 면접 총 평가</h3>
@@ -41,9 +53,8 @@
             v-model.number="totalScore"
             min="0"
             max="100"
-            placeholder=""
           />
-          <span>/ 100</span>
+          <span>/100</span>
         </div>
         <textarea
           v-model="comment"
@@ -86,59 +97,76 @@ const comment = ref('')
   font-size: 0.95rem;
 }
 
-.evaluation-box {
+/* 전체 묶는 큰 박스 */
+.all-criteria-wrapper {
   border: 1px solid #ddd;
   border-radius: 8px;
+  background-color: #fff; /* 흰색 배경 */
   padding: 1rem;
-  background-color: #f8f9fa;
   margin-bottom: 2rem;
 }
 
-.criteria-block {
-  background-color: #f1f3f5;
-  border-radius: 6px;
+/* 개별 항목 묶음 */
+.criteria-group {
+  margin-bottom: 2rem;
+}
+
+/* 상단 설명 칸: 회색 배경 유지 */
+.criteria-info {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
   padding: 1rem;
-  margin-bottom: 1rem;
-}
-
-.criteria-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
+  align-items: flex-start;
 }
 
-.weight {
+.criteria-info .left h3 {
+  margin: 0;
   font-weight: bold;
+}
+
+.criteria-info .left .question {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.criteria-info .right .weight {
+  font-size: 0.9rem;
   color: #1a8917;
+  background: #eef6ee;
+  padding: 4px 8px;
+  border-radius: 12px;
 }
 
-.criteria-body {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
+/* 입력 칸 (하단): 흰색 배경 */
+.criteria-input {
+  margin-top: 0.5rem;
+  background-color: #fff;
 }
 
+/* 입력 박스 내부 */
 .textarea-wrapper {
   position: relative;
-  flex: 1;
 }
 
 textarea {
   width: 100%;
   height: 70px;
   padding: 0.5rem;
-  padding-right: 90px; /* 점수 입력칸 공간 확보 */
+  padding-right: 90px;
   resize: none;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 0.9rem;
   box-sizing: border-box;
 }
 
 .score-overlay {
   position: absolute;
-  top: 50%; /* 바닥 말고 중앙으로! */
+  top: 50%;
   right: 10px;
   transform: translateY(-50%);
   display: flex;
@@ -149,14 +177,14 @@ textarea {
 
 .score-overlay input {
   width: 35px;
-  height: 24px; /* 숫자와 높이 맞춤 */
+  height: 24px;
   padding: 2px;
   text-align: right;
   border: 1px solid #ccc;
   border-radius: 4px;
-  font-size: 0.9rem;
 }
 
+/* 총점 영역 */
 .total-score {
   background-color: #fff;
   border-radius: 6px;
@@ -185,6 +213,7 @@ textarea {
 
 .total-body .score-box.total-align-right input {
   width: 35px;
+  height: 24px;
   padding: 2px;
   text-align: right;
   border: 1px solid #ccc;
