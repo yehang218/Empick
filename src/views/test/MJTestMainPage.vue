@@ -17,7 +17,7 @@ const goEvaluationCriteriaListTest = () => {
 
 const goCalendarTest = () => {
   router.push('/test/mj/calendar')
-
+}
 }
 
 </script>
