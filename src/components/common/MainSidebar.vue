@@ -11,20 +11,38 @@
             </v-list-subheader>
 
             <template v-for="(section, i) in menu[headerTitle]" :key="i">
-                <v-list-group no-action :model-value="isGroupOpen(section)">
-                    <template #activator="{ props }">
-                        <v-list-item v-bind="props">
-                            <v-list-item-title class="menu-group-title"
-                                :class="{ 'highlighted-group': isGroupOpen(section) }">
-                                {{ section.label }}
-                            </v-list-item-title>
-                        </v-list-item>
-                    </template>
+                <!-- children이 있을 때: 그룹 토글 가능 -->
+                <template v-if="section.children && section.children.length > 0">
+                    <v-list-group no-action :model-value="isGroupOpen(section)">
+                        <template #activator="{ props }">
+                            <v-list-item v-bind="props">
+                                <v-list-item-title class="menu-group-title"
+                                    :class="{ 'highlighted-group': isGroupOpen(section) }">
+                                    {{ section.label }}
+                                </v-list-item-title>
+                            </v-list-item>
+                        </template>
 
-                    <v-list-item v-for="(subItem, j) in section.children" :key="j" :title="subItem.label"
-                        :to="subItem.path" link :active="route.path === subItem.path" class="menu-item"
-                        active-class="active-item" />
-                </v-list-group>
+                        <v-list-item v-for="(subItem, j) in section.children" :key="j" :title="subItem.label"
+                            :to="subItem.path" link :active="route.path === subItem.path" class="menu-item"
+                            active-class="active-item" />
+                    </v-list-group>
+                </template>
+
+                <!-- children은 없지만 path가 있음: 바로 이동 가능한 단일 항목 -->
+                <template v-else-if="section.path">
+                    <v-list-item :to="section.path" link :active="route.path === section.path" class="menu-item"
+                        active-class="active-item">
+                        <v-list-item-title class="menu-group-title">{{ section.label }}</v-list-item-title>
+                    </v-list-item>
+                </template>
+
+                <!-- children도 없고 path도 없음: 단순 텍스트 항목 -->
+                <template v-else>
+                    <v-list-item>
+                        <v-list-item-title class="menu-group-title">{{ section.label }}</v-list-item-title>
+                    </v-list-item>
+                </template>
             </template>
         </v-list>
 
@@ -60,6 +78,7 @@ const headerTitle = computed(() => {
     if (route.path.startsWith('/approval')) return '결재'
     if (route.path.startsWith('/employment')) return '채용'
     if (route.path.startsWith('/schedule')) return '일정'
+    if (route.path.startsWith('/myinfo')) return '내정보'
     return '내정보'
 })
 
