@@ -1,11 +1,8 @@
 <template>
-<v-app>
+  <v-app>
     <Sidebar />
     <v-main>
       <router-view />
-      <div>
-        init frontend project
-      </div>
     </v-main>
   </v-app>
 </template>
