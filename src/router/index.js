@@ -45,11 +45,15 @@ const routes = [
         name: 'CounterPage',
         component: () => import('@/views/CounterPage.vue')
     },
-    // 테스트용 채용 페이지
     {
         path: '/employment/recruitment',
         name: 'RecruitmentPage',
         component: () => import('@/views/employment/RecruitmentPage.vue')
+    },
+    {
+        path: '/WSPage',
+        name: 'WSPage',
+        component: () => import('@/views/WSPage.vue')
     }
 ];
 
