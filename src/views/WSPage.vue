@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import Search from '@/components/Search.vue'
+import Search from '@/components/common/Search.vue'
 // import MyModal from '@/components/MyModal.vue'
 // import EvaluationInput from '@/components/EvaluationInput.vue'
 </script>
