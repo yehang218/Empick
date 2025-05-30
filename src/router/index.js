@@ -2,6 +2,25 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/test/list',
+        name: 'ListView',
+        component: () => import('@/components/common/ListView.vue')
+    },
+    {
+        path: '/',
+        name: 'MainPage',
+        component: () => import('@/views/MainPage.vue')
+    },
+    {
+        path: '/counter',
+        name: 'CounterPage',
+        component: () => import('@/views/CounterPage.vue')
+    },
+
+    
+    // 서민종 - 컴포넌트 테스트 페이지용 주소
+
+    {
         path: '/test/mj',
         name: 'MJTestMainPage',
         component: () => import('../views/test/MJTestMainPage.vue'),
@@ -19,26 +38,16 @@ const routes = [
         component: () => import('../views/test/MJEvaluationCriteriaListTestPage.vue'),
         props: true
     },
-      {
+    {
         path: '/test/mj/evaluationScore',
         name: 'MJEvaluationScoreTestPage',
         component: () => import('../views/test/MJEvaluationScoreTestPage.vue'),
-      },
-    {
-        path: '/test/list',
-        name: 'ListView',
-        component: () => import('@/components/common/ListView.vue')
     },
     {
-        path: '/',
-        name: 'MainPage',
-        component: () => import('@/views/MainPage.vue')
+        path: '/test/mj/mailReceiverList',
+        name: 'MJMailReceiverListTestPage',
+        component: () => import('../views/test/MJMailReceiverListTestPage.vue'),
     },
-    {
-        path: '/counter',
-        name: 'CounterPage',
-        component: () => import('@/views/CounterPage.vue')
-    }
 
 ];
 
