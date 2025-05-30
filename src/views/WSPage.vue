@@ -10,7 +10,7 @@
 <script setup>
 // import MyButton from '@/components/MyButton.vue'
 // import MyModal from '@/components/MyModal.vue'
-import EvaluationInput from '@/components/EvaluationInput.vue'
+import EvaluationInput from '@/components/common/EvaluationInput.vue'
 </script>
 
 <style scoped>
