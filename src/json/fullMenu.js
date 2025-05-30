@@ -4,11 +4,13 @@ export const fullMenu = {
         {
             label: "기본 정보",
             role: ["사원", "인사팀"],
+            path: "/myinfo/profile",
             children: []
         },
         {
             label: "근태 기록",
             role: ["사원", "인사팀"],
+            path: "/myinfo/attendance",
             children: []
         },
         {
@@ -42,6 +44,7 @@ export const fullMenu = {
         {
             label: "전체 사원 근태 기록",
             role: ["인사팀"],
+            path: "/attendance/all",
             children: []
         }
     ],
