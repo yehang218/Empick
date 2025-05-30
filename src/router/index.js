@@ -55,6 +55,11 @@ const routes = [
         component: () => import('../views/test/MJMailReceiverListTestPage.vue'),
     },
     {
+        path: '/employment/recruitment',
+        name: 'RecruitmentPage',
+        component: () => import('@/views/employment/RecruitmentPage.vue')
+    },
+    {
         path: '/WSPage',
         name: 'WSPage',
         component: () => import('@/views/WSPage.vue')
