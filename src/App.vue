@@ -7,7 +7,6 @@
         init frontend project
       </div>
     </v-main>
-    <RouterView />
   </v-app>
 </template>
 

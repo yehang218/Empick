@@ -2,6 +2,24 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/',
+        name: 'MainPage',
+        component: () => import('@/views/MainPage.vue')
+    },
+    {
+        path: '/counter',
+        name: 'CounterPage',
+        component: () => import('@/views/CounterPage.vue')
+    },
+    {
+
+        path: '/employment/jobtests',
+        name: 'EmploymentJobtests',
+        component: () => import('../views/employment/JobtestPage.vue'),
+        props: true
+    },
+      // 서민종 - 컴포넌트 테스트 페이지용 주소
+    {
         path: '/test/mj',
         name: 'MJTestMainPage',
         component: () => import('../views/test/MJTestMainPage.vue'),
@@ -30,14 +48,9 @@ const routes = [
         component: () => import('@/components/common/ListView.vue')
     },
     {
-        path: '/',
-        name: 'MainPage',
-        component: () => import('@/views/MainPage.vue')
-    },
-    {
-        path: '/counter',
-        name: 'CounterPage',
-        component: () => import('@/views/CounterPage.vue')
+        path: '/test/mj/mailReceiverList',
+        name: 'MJMailReceiverListTestPage',
+        component: () => import('../views/test/MJMailReceiverListTestPage.vue'),
     },
     {
         path: '/employment/jobtests',
@@ -54,7 +67,7 @@ const routes = [
         path: '/WSPage',
         name: 'WSPage',
         component: () => import('@/views/WSPage.vue')
-    }
+    },
 ];
 
 const router = createRouter({
