@@ -11,13 +11,6 @@ const routes = [
         name: 'CounterPage',
         component: () => import('@/views/CounterPage.vue')
     },
-    {
-
-        path: '/employment/jobtests',
-        name: 'EmploymentJobtests',
-        component: () => import('../views/employment/JobtestPage.vue'),
-        props: true
-    },
       // 서민종 - 컴포넌트 테스트 페이지용 주소
     {
         path: '/test/mj',
