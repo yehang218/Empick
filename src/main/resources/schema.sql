@@ -15,7 +15,7 @@ CREATE TABLE `member` (
                           `created_member_id`	INT	NULL,
                           `deleted_member_id`	INT	NULL,
                           `updated_at`	DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                          `updated_member_id`	INT	NOT NULL,
+                          `updated_member_id`	INT	NULL,
                           `last_login_at`	DATETIME	NULL,
                           `status`	TINYINT NOT NULL CHECK (status IN (0, 1)),
 --                           `department_id`	INT	NULL,
