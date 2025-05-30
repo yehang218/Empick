@@ -54,6 +54,11 @@ const routes = [
         name: 'MJMailReceiverListTestPage',
         component: () => import('../views/test/MJMailReceiverListTestPage.vue'),
     },
+    {
+        path: '/WSPage',
+        name: 'WSPage',
+        component: () => import('@/views/WSPage.vue')
+    },
 ];
 
 const router = createRouter({
