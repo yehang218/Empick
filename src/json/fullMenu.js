@@ -16,6 +16,7 @@ export const fullMenu = {
         {
             label: "일정 확인",
             role: ["사원", "인사팀"],
+            path: "/myinfo/schedule",
             children: []
         },
     ],
