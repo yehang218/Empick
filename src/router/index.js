@@ -19,6 +19,11 @@ const routes = [
         component: () => import('../views/test/MJEvaluationCriteriaListTestPage.vue'),
         props: true
     },
+      {
+        path: '/test/mj/evaluationScore',
+        name: 'MJEvaluationScoreTestPage',
+        component: () => import('../views/test/MJEvaluationScoreTestPage.vue'),
+      },
     {
         path: '/test/list',
         name: 'ListView',
