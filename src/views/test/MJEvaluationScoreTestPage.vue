@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import EvaluationScore from '@/components/EvaluationScore.vue'
+import EvaluationScore from '@/components/common/EvaluationScore.vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
