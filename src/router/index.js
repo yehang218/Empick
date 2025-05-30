@@ -46,10 +46,16 @@ const routes = [
         component: () => import('@/views/CounterPage.vue')
     },
     {
-        path: '/WSPage',
-        name: 'WSPage', 
-        component: () => import('@/views/WSPage.vue')
+
+        path: '/employment/recruitment',
+        name: 'RecruitmentPage',
+        component: () => import('@/views/employment/RecruitmentPage.vue')
     },
+    {
+        path: '/WSPage',
+        name: 'WSPage',
+        component: () => import('@/views/WSPage.vue')
+    }
 ];
 
 const router = createRouter({
