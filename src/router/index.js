@@ -2,6 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/employment/jobtests',
+        name: 'EmploymentJobtests',
+        component: () => import('../views/employment/JobtestPage.vue'),
+        props: true
+    },
+    {
         path: '/test/mj',
         name: 'MJTestMainPage',
         component: () => import('../views/test/MJTestMainPage.vue'),
@@ -45,6 +51,16 @@ const routes = [
         component: () => import('@/views/test/JobTestPage.vue'),
         props: true
     },
+    {
+        path: '/employment/recruitment',
+        name: 'RecruitmentPage',
+        component: () => import('@/views/employment/RecruitmentPage.vue')
+    },
+    {
+        path: '/WSPage',
+        name: 'WSPage',
+        component: () => import('@/views/WSPage.vue')
+    }
 ];
 
 const router = createRouter({
