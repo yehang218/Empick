@@ -2,6 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
+        path: '/employment/jobtests',
+        name: 'EmploymentJobtests',
+        component: () => import('../views/employment/JobtestPage.vue'),
+        props: true
+    },
+    {
         path: '/test/mj',
         name: 'MJTestMainPage',
         component: () => import('../views/test/MJTestMainPage.vue'),
