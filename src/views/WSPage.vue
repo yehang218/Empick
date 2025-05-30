@@ -17,7 +17,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import Modal from '@/components/Modal.vue' // 경로 확인 필요
+import Modal from '@/components/common/Modal.vue' // 경로 확인 필요
 
 const show = ref(false)
 const dynamicMessage = ref('템플릿을 사용하시겠습니까?')
