@@ -7,7 +7,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import EvaluationCriteriaList from '@/components/EvaluationCriteriaList.vue'
+import EvaluationCriteriaList from '@/components/common/EvaluationCriteriaList.vue'
 
 const router = useRouter()
 const goBack = () => {
