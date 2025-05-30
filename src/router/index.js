@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
-
         path: '/test/list',
         name: 'ListView',
         component: () => import('@/components/common/ListView.vue')
