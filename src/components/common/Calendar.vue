@@ -174,5 +174,6 @@ const nextMonth = () => {
 .v-btn.default {
   color: black;
   background-color: #f0f0f0;
+  
 }
 </style>

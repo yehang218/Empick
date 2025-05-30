@@ -37,7 +37,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import Calendar from '@/components/Calendar.vue'
+import Calendar from '@/components/common/Calendar.vue'
 
 import { useRouter } from 'vue-router'
 
