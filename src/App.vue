@@ -1,4 +1,9 @@
 <template>
+
+  <div>
+    init frontend project
+  </div>
+
   <v-app>
     <RouterView />
   </v-app>
