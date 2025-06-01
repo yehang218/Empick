@@ -20,18 +20,9 @@ public class MailTemplateEntity {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "sheet_id")
-    private Integer sheetId;
+    @Column(name = "title")
+    private String title;
 
-    @Column(name = "criteria_id")
-    private Integer criteriaId;
-
-    @Column(name = "weight")
-    private Integer weight;
-
-    @Column(name = "member_id")
-    private Integer memberId;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "content")
+    private String content;
 }

@@ -20,18 +20,9 @@ public class MailEntity {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "sheet_id")
-    private Integer sheetId;
+    @Column(name = "applicant_id")
+    private Integer applicantId;
 
-    @Column(name = "criteria_id")
-    private Integer criteriaId;
-
-    @Column(name = "weight")
-    private Integer weight;
-
-    @Column(name = "member_id")
-    private Integer memberId;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "template_id")
+    private Integer templateId;
 }

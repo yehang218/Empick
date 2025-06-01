@@ -13,9 +13,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class MailTemplateCommandDTO {
     private Integer id;
-    private Integer sheetId;
-    private Integer criteriaId;
-    private Integer weight;
-    private Integer memberId;
-    private LocalDateTime updatedAt;
+    private String title;
+    private String content;
 }
