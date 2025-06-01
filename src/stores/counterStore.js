@@ -1,48 +1,56 @@
-// src/stores/counterStore.js
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import {
     getCounter,
     incrementCounter,
     decrementCounter,
 } from '@/services/counterService';
 
-export const useCounterStore = defineStore('counter', {
-    state: () => ({
-        count: 0,
-        error: null,
-        loading: false,
-    }),
-    actions: {
-        async fetchCount() {
-            await this._handle(async () => {
-                this.count = await getCounter();
-            });
-        },
+export const useCounterStore = defineStore('counter', () => {
+    // ✅ 상태 정의
+    const count = ref(0);
+    const error = ref(null);
+    const loading = ref(false);
 
-        async increment() {
-            await this._handle(async () => {
-                this.count = await incrementCounter();
-            });
-        },
+    // ✅ 공통 핸들러
+    const handle = async (fn) => {
+        loading.value = true;
+        error.value = null;
 
-        async decrement() {
-            await this._handle(async () => {
-                this.count = await decrementCounter();
-            });
-        },
+        try {
+            await fn();
+        } catch (err) {
+            error.value = err?.response?.data?.message || '오류가 발생했습니다.';
+        } finally {
+            loading.value = false;
+        }
+    };
 
-        // ✅ 내부 전용 공통 처리 메서드
-        async _handle(fn) {
-            this.loading = true;
-            this.error = null;
+    // ✅ 액션 정의
+    const fetchCount = async () => {
+        await handle(async () => {
+            count.value = await getCounter();
+        });
+    };
 
-            try {
-                await fn();
-            } catch (err) {
-                this.error = err?.response?.data?.message || '오류가 발생했습니다.';
-            } finally {
-                this.loading = false;
-            }
-        },
-    },
+    const increment = async () => {
+        await handle(async () => {
+            count.value = await incrementCounter();
+        });
+    };
+
+    const decrement = async () => {
+        await handle(async () => {
+            count.value = await decrementCounter();
+        });
+    };
+
+    return {
+        count,
+        error,
+        loading,
+        fetchCount,
+        increment,
+        decrement,
+    };
 });
