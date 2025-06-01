@@ -12,7 +12,7 @@
         <v-list-item
           v-for="(item, index) in items"
           :key="index"
-          @click="selected = index"
+           @click="selectItem(index)"
           :class="{ 'selected-item': selected === index }"
         >
           <v-list-item-title>{{ item }}</v-list-item-title>
@@ -25,8 +25,8 @@
 <script setup>
 import { ref } from 'vue'
 
-// Props 받아오기
-defineProps({
+// props 정의
+const props = defineProps({
   title: {
     type: String,
     required: true
@@ -37,7 +37,18 @@ defineProps({
   }
 })
 
+
+// emit 선언
+const emit = defineEmits(['update:selectedItem'])
+
 const selected = ref(0)
+
+// 선택 시 emit 호출
+const selectItem = (index) => {
+  selected.value = index
+  emit('update:selectedItem', props.items[index])
+}
+
 </script>
 
 <style scoped>
