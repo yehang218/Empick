@@ -1,4 +1,7 @@
 <template>
+    <v-btn color="primary" @click="goBack" class="mb-4">
+      ← 뒤로가기
+    </v-btn>
   <div class="page-wrapper">
     <OneColumnList 
     :title="listTitle" 
@@ -10,6 +13,13 @@
 
 <script setup>
 import OneColumnList from '@/components/OneColumnList.vue' // 경로는 실제 위치에 맞게 수정
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goBack = () => {
+  router.push('/test/mj')
+}
 
 // 이 페이지에서 사용할 데이터 정의
 const listTitle = '직무 목록'
