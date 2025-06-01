@@ -1,8 +1,8 @@
 name: "🔧 refactoring"
 description: "코드 리팩토링한 내용"
-title : "[] "
+title: "[] "
 labels: ["🔧 refactoring"]
-projects: ["Pive-Guyz/1"]
+projects: ["Pive-Guyz/5"]
 body:
   - type: textarea
     attributes:

@@ -1,15 +1,15 @@
 <template>
-  <MessageInputBox ref="msgRef" />
-
-  <v-btn color="primary" class="mt-4" @click="sendMessage">
-    메시지 전송
-  </v-btn>
-  <!-- 이 버튼은 나중에 위치 조정할 예정 -->
+  <v-app>
+    <Sidebar />
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import MessageInputBox from '@/components/MessageInputBox.vue'
+import Sidebar from '@/components/common/MainSidebar.vue'
+import { RouterView } from 'vue-router';
 
 const msgRef = ref()
 
