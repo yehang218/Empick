@@ -52,7 +52,7 @@ CREATE TABLE `rank`
 
 CREATE TABLE `mail_template` (
  `id`	INT	NOT NULL PRIMARY KEY  AUTO_INCREMENT COMMENT 'id',
- `title`	LONGTEXT	NOT NULL COMMENT '제목',
+ `title`	VARCHAR(255)	NOT NULL COMMENT '제목',
  `content`	LONGTEXT	NOT NULL COMMENT '내용'
 )
     COMMENT = '안내 메일 템플릿';

@@ -1,7 +1,7 @@
 CREATE TABLE `interview_sheet` (
                                    `id`	INT	NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
                                    `name`	LONGTEXT	NOT NULL COMMENT '이름',
-                                   `is_deleted`	VARCHAR(5)	NOT NULL	DEFAULT 'N' COMMENT '삭제 여부',
+                                   `is_deleted`	VARCHAR(4)	NOT NULL	DEFAULT 'N' COMMENT '삭제 여부',
                                    `member_id`	INT	NOT NULL COMMENT '수정자 id',
                                    `updated_at`	DATETIME	NULL COMMENT '수정 일시',
                                    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
@@ -11,7 +11,7 @@ CREATE TABLE `interview_criteria` (
                                       `id`	INT	NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
                                       `content`	LONGTEXT	NOT NULL COMMENT '내용',
                                       `detail_content`	LONGTEXT	NULL COMMENT '상세 내용',
-                                      `is_deleted`	VARCHAR(5)	NOT NULL	DEFAULT 'N' COMMENT '삭제 여부',
+                                      `is_deleted`	VARCHAR(4)	NOT NULL	DEFAULT 'N' COMMENT '삭제 여부',
                                       `member_id`	INT	NOT NULL COMMENT '수정자 id',
                                       `updated_at`	DATETIME	NULL COMMENT '수정 일시',
                                       FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
