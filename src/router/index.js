@@ -23,8 +23,12 @@ const routes = [
         component: () => import('../views/employment/JobtestPage.vue'),
         props: true
     },
-  
-      // 서민종 - 컴포넌트 테스트 페이지용 주소
+    {
+        path: '/test/list-view-test-page',
+        name: 'ListViewTestPage',
+        component: () => import('@/views/test/ListViewTestPage.vue')
+    },
+    // 서민종 - 컴포넌트 테스트 페이지용 주소
     {
         path: '/test/mj',
         name: 'MJTestMainPage',
