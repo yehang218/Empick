@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.jobtest.command.domain.aggregate;
 
+import com.piveguyz.empickbackend.employment.jobtest.command.application.dto.UpdateQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtest.command.domain.aggregate.enums.JobtestDifficulty;
 import com.piveguyz.empickbackend.employment.jobtest.command.domain.aggregate.enums.JobtestType;
 import jakarta.persistence.*;
@@ -49,4 +50,25 @@ public class QuestionEntity {
 
     @Column(name = "updated_member_id", nullable = true)
     private Integer updatedMemberId;
+
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateQuestionEntity(UpdateQuestionCommandDTO dto) {
+        this.content = dto.getContent();
+        this.detailContent = dto.getDetailContent();
+        this.type = dto.getType();
+        this.difficulty = dto.getDifficulty();
+        this.answer = dto.getAnswer();
+        this.updatedMemberId = dto.getUpdatedMemberId();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
