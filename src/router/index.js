@@ -43,7 +43,7 @@ const routes = [
     },
     {
         path: '/test/mj/evaluationCriteriaList',
-        name: 'MJTestPage',
+        name: 'MJEvaluationCriteriaListTestPage',
         component: () => import('../views/test/MJEvaluationCriteriaListTestPage.vue'),
         props: true
     },
@@ -58,14 +58,9 @@ const routes = [
         component: () => import('../views/test/MJMailReceiverListTestPage.vue'),
     },
     {
-        path: '/',
-        name: 'MainPage',
-        component: () => import('@/views/MainPage.vue')
-    },
-    {
-        path: '/counter',
-        name: 'CounterPage',
-        component: () => import('@/views/CounterPage.vue')
+        path: '/test/mj/oneColumnList',
+        name: 'MJOneColumnListTestPage',
+        component: () => import('../views/test/MJOneColumnListTestPage.vue'),
     },
     {
 
