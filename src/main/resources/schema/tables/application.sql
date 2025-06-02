@@ -1,7 +1,20 @@
 DROP TABLE IF EXISTS application_response;
+DROP TABLE IF EXISTS applicant;
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS applicant_bookmark;
-DROP TABLE IF EXISTS applicant;
+DROP TABLE IF EXISTS mail;
+
+CREATE TABLE applicant
+(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '지원자 ID',
+    name VARCHAR(255) NOT NULL COMMENT '이름',
+    phone VARCHAR(255) NOT NULL COMMENT '연락처',
+    email VARCHAR(255) NOT NULL COMMENT '이메일',
+    profile_url VARCHAR(255) NOT NULL COMMENT '사진',
+    birth VARCHAR(255) NOT NULL COMMENT '생년월일',
+    address VARCHAR(255) NOT NULL COMMENT '주소'
+)
+    COMMENT = '지원자 테이블';
 
 CREATE TABLE application
 (
@@ -32,18 +45,6 @@ CREATE TABLE application_response
     FOREIGN KEY (application_item_id) REFERENCES application_item(id)
 );
 
-CREATE TABLE applicant
-(
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '지원자 ID',
-    name VARCHAR(255) NOT NULL COMMENT '이름',
-    phone VARCHAR(255) NOT NULL COMMENT '연락처',
-    email VARCHAR(255) NOT NULL COMMENT '이메일',
-    profile_url VARCHAR(255) NOT NULL COMMENT '사진',
-    birth VARCHAR(255) NOT NULL COMMENT '생년월일',
-    address VARCHAR(255) NOT NULL COMMENT '주소'
-)
-    COMMENT = '지원자 테이블';
-
 CREATE TABLE applicant_bookmark
 (
     member_id INT NOT NULL COMMENT '사용자 ID',
@@ -53,3 +54,10 @@ CREATE TABLE applicant_bookmark
 )
     COMMENT = '북마크 지원자 테이블';
 
+CREATE TABLE `mail` (
+     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
+     `applicant_id` INT NOT NULL COMMENT '지원자 id',
+     `email` VARCHAR(255) NOT NULL COMMENT '이메일',
+     `content` LONGTEXT NOT NULL COMMENT '내용',
+      FOREIGN KEY (`applicant_id`) REFERENCES `applicant`(`id`)
+);
