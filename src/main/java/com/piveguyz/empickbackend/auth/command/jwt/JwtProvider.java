@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.auth.command.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -42,5 +43,13 @@ public class JwtProvider {
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenValidity))
                 .signWith(key)
                 .compact();
+    }
+
+    public Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
