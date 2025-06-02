@@ -26,7 +26,7 @@ const routes = [
     },
     {
         path: '/test/mj/evaluationCriteriaList',
-        name: 'MJTestPage',
+        name: 'MJEvaluationCriteriaListTestPage',
         component: () => import('../views/test/MJEvaluationCriteriaListTestPage.vue'),
         props: true
     },
@@ -52,6 +52,12 @@ const routes = [
         props: true
     },
     {
+        path: '/test/mj/oneColumnList',
+        name: 'MJOneColumnListTestPage',
+        component: () => import('../views/test/MJOneColumnListTestPage.vue'),
+    },
+    {
+
         path: '/employment/recruitment',
         name: 'RecruitmentPage',
         component: () => import('@/views/employment/RecruitmentPage.vue')
