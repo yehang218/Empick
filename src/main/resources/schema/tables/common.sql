@@ -1,3 +1,8 @@
+DROP TABLE IF EXISTS `department`;
+DROP TABLE IF EXISTS `position`;
+DROP TABLE IF EXISTS `job`;
+DROP TABLE IF EXISTS `rank`;
+
 CREATE TABLE `department`
 (
     `id`          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '부서 id',
