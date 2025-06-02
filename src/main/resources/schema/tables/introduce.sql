@@ -5,7 +5,10 @@ DROP TABLE IF EXISTS introduce;
 DROP TABLE IF EXISTS introduce_standard_item;
 DROP TABLE IF EXISTS introduce_template;
 DROP TABLE IF EXISTS introduce_template_item;
+DROP TABLE IF EXISTS applicant_bookmark;
 DROP TABLE IF EXISTS applicant;
+
+
 
 -- introduce_template_item
 CREATE TABLE introduce_template_item
@@ -73,14 +76,24 @@ CREATE TABLE introduce_rating_result
     FOREIGN KEY (introduce_standard_id) REFERENCES introduce_standard(id)
 );
 
--- 지원자
 CREATE TABLE applicant
 (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 지원자 ID,
-    name VARCHAR(255) NOT NULL COMMENT 이름,
-    phone VARCHAR(255) NOT NULL COMMENT 연락처,
-    email VARCHAR(255) NOT NULL COMMENT 이메일,
-    profile_url VARCHAR(255) NOT NULL COMMENT 사진,
-    birth VARCHAR(255) NOT NULL COMMENT 생년월일,
-    address VARCHAR(255) NOT NULL COMMENT 주소,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '지원자 ID',
+    name VARCHAR(255) NOT NULL COMMENT '이름',
+    phone VARCHAR(255) NOT NULL COMMENT '연락처',
+    email VARCHAR(255) NOT NULL COMMENT '이메일',
+    profile_url VARCHAR(255) NOT NULL COMMENT '사진',
+    birth VARCHAR(255) NOT NULL COMMENT '생년월일',
+    address VARCHAR(255) NOT NULL COMMENT '주소'
 )
+    COMMENT = '지원자 테이블';
+
+CREATE TABLE applicant_bookmark
+(
+    member_id INT NOT NULL COMMENT '사용자 ID',
+    applicant_id INT NOT NULL COMMENT '지원자 ID',
+    FOREIGN KEY (member_id) REFERENCES member(id),
+    FOREIGN KEY (applicant_id) REFERENCES applicant(id)
+)
+    COMMENT = '북마크 지원자 테이블';
+
