@@ -24,7 +24,12 @@ public class AuthCommandController {
 
     @Operation(
             summary = "로그인",
-            description = "사번과 비밀번호를 통해 로그인을 수행하고 AccessToken 및 RefreshToken을 발급합니다."
+            description = """
+                    - 사번과 비밀번호를 통해 로그인을 수행하고 AccessToken 및 RefreshToken을 발급합니다.
+                    더미 회원 정보
+                    - employeeNumber : 100001, pwd :  password1234@@
+                    - employeeNumber : 100002, pwd :  password5678@@
+                    """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
@@ -33,6 +38,7 @@ public class AuthCommandController {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO requestDTO) {
         LoginResponseDTO responseDTO = authCommandService.login(requestDTO);
