@@ -58,6 +58,11 @@ const routes = [
         component: () => import('../views/test/MJMailReceiverListTestPage.vue'),
     },
     {
+        path: '/test/mj/messageInputBox',
+        name: 'MJMessageInputBoxTestPage',
+        component: () => import('../views/test/MJMessageInputBoxTestPage.vue'),
+    },
+    {
         path: '/test/mj/oneColumnList',
         name: 'MJOneColumnListTestPage',
         component: () => import('../views/test/MJOneColumnListTestPage.vue'),
