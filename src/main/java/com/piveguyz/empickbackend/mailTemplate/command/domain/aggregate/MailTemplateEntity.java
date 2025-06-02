@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="interview_sheet_item")
+@Table(name="mail_template")
 public class MailTemplateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement

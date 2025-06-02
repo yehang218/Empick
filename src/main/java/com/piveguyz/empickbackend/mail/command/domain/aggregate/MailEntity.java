@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="interview_sheet_item")
+@Table(name="mail")
 public class MailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // autoincrement
@@ -23,6 +23,9 @@ public class MailEntity {
     @Column(name = "applicant_id")
     private Integer applicantId;
 
-    @Column(name = "template_id")
-    private Integer templateId;
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "content")
+    private String content;
 }

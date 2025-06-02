@@ -14,5 +14,6 @@ import java.time.LocalDateTime;
 public class MailCommandDTO {
     private Integer id;
     private Integer applicantId;
-    private Integer templateId;
+    private String email;
+    private String content;
 }
