@@ -1,4 +1,4 @@
-package com.pive.empickbackend.member.command.domain.aggregate;
+package com.piveguyz.empickbackend.member.command.domain.aggregate;
 
 import jakarta.persistence.*;
 import lombok.*;

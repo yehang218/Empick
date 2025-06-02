@@ -1,4 +1,4 @@
-package com.pive.empickbackend.common.config;
+package com.piveguyz.empickbackend.common.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

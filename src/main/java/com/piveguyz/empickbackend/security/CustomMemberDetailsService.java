@@ -1,7 +1,7 @@
-package com.pive.empickbackend.security;
+package com.piveguyz.empickbackend.security;
 
-import com.pive.empickbackend.member.command.domain.aggregate.Member;
-import com.pive.empickbackend.member.command.domain.repository.MemberRepository;
+import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
+import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,6 +1,6 @@
-package com.pive.empickbackend.member.command.domain.repository;
+package com.piveguyz.empickbackend.member.command.domain.repository;
 
-import com.pive.empickbackend.member.command.domain.aggregate.Member;
+import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

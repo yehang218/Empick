@@ -1,12 +1,10 @@
-package com.pive.empickbackend.security;
+package com.piveguyz.empickbackend.security;
 
-import com.pive.empickbackend.member.command.domain.aggregate.Member;
+import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class CustomMemberDetails implements UserDetails {

@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.common.config;
 
-import com.pive.empickbackend.security.CustomMemberDetailsService;
+import com.piveguyz.empickbackend.security.CustomMemberDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
