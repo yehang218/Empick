@@ -10,6 +10,7 @@
 <script setup>
 import Sidebar from '@/components/common/MainSidebar.vue'
 import { RouterView } from 'vue-router';
+
 </script>
 
 <style scoped></style>
