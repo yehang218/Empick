@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS `job_test_evaluation_resul`;
+DROP TABLE IF EXISTS `job_test_evaluation_result`;
 DROP TABLE IF EXISTS `job_test_evaluation_criteria`;
 DROP TABLE IF EXISTS `grading_result`;
 DROP TABLE IF EXISTS `question_grading_criteria`;
