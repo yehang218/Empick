@@ -9,5 +9,9 @@ import java.util.List;
 public interface MailTemplateMapper {
     List<MailTemplateQueryDTO> findAll();
 
-    List<MailTemplateQueryDTO> findByTitle(String title);
+    MailTemplateQueryDTO findByTitle(String title);
+
+    List<MailTemplateQueryDTO> searchByTitle(String title);
+
+    MailTemplateQueryDTO findById(Integer id);
 }

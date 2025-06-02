@@ -28,4 +28,10 @@ public class MailEntity {
 
     @Column(name = "content")
     private String content;
+
+    @Column(name = "sender_id")
+    private Integer senderId;
+
+    @Column(name = "sended_at")
+    private LocalDateTime sendedAt;
 }

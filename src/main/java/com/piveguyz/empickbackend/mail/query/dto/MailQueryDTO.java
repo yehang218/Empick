@@ -16,4 +16,6 @@ public class MailQueryDTO {
     private Integer applicantId;
     private String email;
     private String content;
+    private Integer senderId;
+    private LocalDateTime sendedAt;
 }

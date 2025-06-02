@@ -7,5 +7,9 @@ import java.util.List;
 public interface MailTemplateQueryService {
     List<MailTemplateQueryDTO> findAll();
 
-    List<MailTemplateQueryDTO> findByTitle(String title);
+    MailTemplateQueryDTO findByTitle(String title);
+
+    List<MailTemplateQueryDTO> searchByTitle(String title);
+
+    MailTemplateQueryDTO findById(Integer id);
 }

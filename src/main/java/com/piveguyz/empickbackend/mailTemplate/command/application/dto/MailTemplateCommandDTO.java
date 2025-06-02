@@ -15,4 +15,7 @@ public class MailTemplateCommandDTO {
     private Integer id;
     private String title;
     private String content;
+    private String isDeleted;
+    private Integer memberId;
+    private LocalDateTime updatedAt;
 }

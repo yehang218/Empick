@@ -23,8 +23,8 @@ public enum ResponseCode {
 
 
 
-    // 채용 오류 -  2000 ~ 2999
-    //  채용 공고 - 2000 ~ 2099
+    // 채용 오류 - 2000 ~ 2999
+    // 채용 공고 - 2000 ~ 2099
 
 
     //  지원자 - 2100 ~ 2199
@@ -37,13 +37,18 @@ public enum ResponseCode {
 
 
     //  실무테스트 - 2400 ~ 2499
-    EMPLOYMENT_JOBTEST_QUESTION_FAIL(false, 2300, "실무테스트 문제 등록에 실패했습니다.");
+    EMPLOYMENT_JOBTEST_QUESTION_FAIL(false, 2300, "실무테스트 문제 등록에 실패했습니다."),
 
 
     //  면접 일정 - 2500 ~ 2599
 
 
     //  안내 메일 - 2600 ~ 2699
+    EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE(false, 2600, "이름이 중복된 템플릿이 존재합니다."),
+    EMPLOYMENT_MAIL_TEMPLATE_NO_TITLE(false, 2601, "제목을 입력하지 않았습니다."),
+    EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT(false, 2602, "내용을 입력하지 않았습니다."),
+    EMPLOYMENT_MAIL_NO_EFFECT_EMAIL(false, 2603, "유효하지 않은 이메일입니다.");
+
 
 
 

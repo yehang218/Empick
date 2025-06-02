@@ -17,15 +17,25 @@ public class MailTemplateQueryServiceImpl implements MailTemplateQueryService {
 
     @Override
     public List<MailTemplateQueryDTO> findAll() {
-        List<MailTemplateQueryDTO> mailTemplateQueryDTOList = new ArrayList<>();
-        mailTemplateQueryDTOList = mailTemplateMapper.findAll();
+        List<MailTemplateQueryDTO> mailTemplateQueryDTOList = mailTemplateMapper.findAll();
         return mailTemplateQueryDTOList;
     }
 
     @Override
-    public List<MailTemplateQueryDTO> findByTitle(String title) {
-        List<MailTemplateQueryDTO> mailTemplateQueryDTOList = new ArrayList<>();
-        mailTemplateQueryDTOList = mailTemplateMapper.findByTitle(title);
-        return mailTemplateQueryDTOList;
+    public MailTemplateQueryDTO findByTitle(String title) {
+        MailTemplateQueryDTO mailTemplateQueryDTO = mailTemplateMapper.findByTitle(title);
+        return mailTemplateQueryDTO;
+    }
+
+    @Override
+    public List<MailTemplateQueryDTO> searchByTitle(String title) {
+        List<MailTemplateQueryDTO> mailTemplateQueryDTOList = mailTemplateMapper.searchByTitle(title);
+        return List.of();
+    }
+
+    @Override
+    public MailTemplateQueryDTO findById(Integer id) {
+        MailTemplateQueryDTO mailTemplateQueryDTO = mailTemplateMapper.findById(id);
+        return mailTemplateQueryDTO;
     }
 }

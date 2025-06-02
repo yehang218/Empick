@@ -25,4 +25,13 @@ public class MailTemplateEntity {
 
     @Column(name = "content")
     private String content;
+
+    @Column(name = "is_deleted")
+    private String isDeleted;
+
+    @Column(name = "member_id")
+    private Integer memberId;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }
