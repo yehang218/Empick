@@ -49,3 +49,10 @@ CREATE TABLE `rank`
     `salary_band` INT          NULL COMMENT '급여 밴드'
 )
     COMMENT = '직급 테이블';
+
+CREATE TABLE `mail_template` (
+ `id`	INT	NOT NULL PRIMARY KEY  AUTO_INCREMENT COMMENT 'id',
+ `title`	LONGTEXT	NOT NULL COMMENT '제목',
+ `content`	LONGTEXT	NOT NULL COMMENT '내용'
+)
+    COMMENT = '안내 메일 템플릿';
