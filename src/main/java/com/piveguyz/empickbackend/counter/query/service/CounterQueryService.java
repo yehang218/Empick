@@ -1,5 +1,5 @@
 // counter/query/service/CounterQueryService.java
-package com.pive.empickbackend.counter.query.service;
+package com.piveguyz.empickbackend.counter.query.service;
 
 import org.springframework.stereotype.Service;
 

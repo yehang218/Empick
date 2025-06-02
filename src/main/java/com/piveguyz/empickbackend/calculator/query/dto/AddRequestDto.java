@@ -1,5 +1,5 @@
 // calculator/query/dto/AddRequestDto.java
-package com.pive.empickbackend.calculator.query.dto;
+package com.piveguyz.empickbackend.calculator.query.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

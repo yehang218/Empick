@@ -1,4 +1,4 @@
-package com.pive.empickbackend;
+package com.piveguyz.empickbackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

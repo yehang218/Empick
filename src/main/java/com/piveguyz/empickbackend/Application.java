@@ -1,4 +1,4 @@
-package com.pive.empickbackend;
+package com.piveguyz.empickbackend;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

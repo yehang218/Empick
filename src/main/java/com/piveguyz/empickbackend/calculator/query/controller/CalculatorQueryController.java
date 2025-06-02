@@ -1,9 +1,9 @@
 // calculator/query/controller/CalculatorQueryController.java
-package com.pive.empickbackend.calculator.query.controller;
+package com.piveguyz.empickbackend.calculator.query.controller;
 
-import com.pive.empickbackend.calculator.query.dto.AddRequestDto;
-import com.pive.empickbackend.calculator.query.dto.SubtractRequestDto;
-import com.pive.empickbackend.calculator.query.service.CalculatorQueryService;
+import com.piveguyz.empickbackend.calculator.query.dto.AddRequestDto;
+import com.piveguyz.empickbackend.calculator.query.dto.SubtractRequestDto;
+import com.piveguyz.empickbackend.calculator.query.service.CalculatorQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

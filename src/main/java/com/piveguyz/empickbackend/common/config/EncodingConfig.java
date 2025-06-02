@@ -1,4 +1,4 @@
-package com.pive.empickbackend.common.config;
+package com.piveguyz.empickbackend.common.config;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

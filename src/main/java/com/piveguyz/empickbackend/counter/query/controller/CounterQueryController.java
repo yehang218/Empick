@@ -1,7 +1,7 @@
 // counter/query/controller/CounterQueryController.java
-package com.pive.empickbackend.counter.query.controller;
+package com.piveguyz.empickbackend.counter.query.controller;
 
-import com.pive.empickbackend.counter.query.service.CounterQueryService;
+import com.piveguyz.empickbackend.counter.query.service.CounterQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,8 @@
 // calculator/query/service/CalculatorQueryService.java
-package com.pive.empickbackend.calculator.query.service;
+package com.piveguyz.empickbackend.calculator.query.service;
 
-import com.pive.empickbackend.calculator.query.dto.AddRequestDto;
-import com.pive.empickbackend.calculator.query.dto.SubtractRequestDto;
+import com.piveguyz.empickbackend.calculator.query.dto.AddRequestDto;
+import com.piveguyz.empickbackend.calculator.query.dto.SubtractRequestDto;
 import org.springframework.stereotype.Service;
 
 @Service
