@@ -1,3 +1,7 @@
+DROP TABLE IF EXISTS `department_head`;
+DROP TABLE IF EXISTS `member_edit`;
+DROP TABLE IF EXISTS `member`;
+
 CREATE TABLE `member`
 (
     `id`                INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '사원 테이블 ID',
