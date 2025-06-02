@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.piveguyz.empickbackend.query.mapper.InterviewMapper">
+    <resultMap id="InterviewResultMap" type="com.piveguyz.empickbackend.query.query.dto.InterviewQueryDTO">
+        <id column="id" property="id"/>
+        <result column="applicant_id" property="applicantId"/>
+        <result column="criteria_id" property="criteriaId"/>
+        <result column="interviewer_id" property="interviewerId"/>
+        <result column="date" property="date"/>
+        <result column="place" property="place"/>
+        <result column="score" property="score"/>
+        <result column="interview_review" property="interviewReview"/>
+    </resultMap>
+
+    <select id="findAllInterview" resultMap="InterviewResultMap">
+        SELECT
+            id,
+            applicant_id,
+            criteria_id,
+            interviewer_id,
+            date,
+            place,
+            score,
+            interview_review
+        FROM interview;
+    </select>
+
+    <select id="findInterviewById" resultMap="InterviewResultMap">
+        SELECT
+            id,
+            applicant_id,
+            criteria_id,
+            interviewer_id,
+            date,
+            place,
+            score,
+            interview_review
+        FROM interview
+        WHERE id = #{id}
+    </select>
+
+    <select id="findInterviewByApplicantId" resultMap="InterviewResultMap">
+        SELECT
+            id,
+            applicant_id,
+            criteria_id,
+            interviewer_id,
+            date,
+            place,
+            score,
+            interview_review
+        FROM interview
+        WHERE applicant_id = #{applicantId}
+    </select>
+
+    <select id="findInterviewByDate" resultMap="InterviewResultMap">
+        SELECT
+            id,
+            applicant_id,
+            criteria_id,
+            interviewer_id,
+            date,
+            place,
+            score,
+            interview_review
+        FROM interview
+        WHERE date = #{date}
+    </select>
+
+</mapper>
