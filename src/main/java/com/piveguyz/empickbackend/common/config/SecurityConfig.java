@@ -50,20 +50,18 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-                        // ⬇️ 아래 두 줄 중 상황에 맞게 선택 (개발/배포)
-
-                        // ✅ 인증이 필요 없는 로그인/회원가입 경로 (배포 시 주석 해제 X, 개발 시 주석 해제 O)
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // 🔒 인증이 필요한 나머지 API 경로 (배포 시 주석 해제 O, 개발 시 주석처리 O)
-//                        .requestMatchers("/api/**").authenticated()
+                        // ✅ 로그인/회원가입 경로는 인증 필요 없음
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        // 🔒 그 외 모든 /api/** 경로는 JWT 인증 필터 작동
+                        .requestMatchers("/api/**").authenticated()
+                        // 🔒 나머지 경로는 기본 인증
+                        .anyRequest().authenticated()
                 )
                 // JWT 인증 필터 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

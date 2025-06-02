@@ -20,16 +20,17 @@ public class CustomMemberDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        int empNum;
+        int memberId;
         try {
-            empNum = Integer.parseInt(username);
+            memberId = Integer.parseInt(username);
         } catch (NumberFormatException e) {
-            throw new UsernameNotFoundException("유효하지 않은 사번입니다: " + username);
+            throw new UsernameNotFoundException("유효하지 않은 사원 ID입니다: " + username);
         }
 
-        Member member = memberRepository.findByEmployeeNumber(empNum)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new UsernameNotFoundException("사원이 존재하지 않습니다."));
 
         return new CustomMemberDetails(member);
     }
+
 }
