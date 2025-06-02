@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS `dept_change_history`;
+
 CREATE TABLE `dept_change_history`
 (
     `id`            INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '부서이동내역 id',
