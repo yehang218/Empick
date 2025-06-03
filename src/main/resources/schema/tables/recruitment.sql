@@ -18,9 +18,9 @@ CREATE TABLE IF NOT EXISTS recruitment_request (
     responsibilities VARCHAR(255),
     employment_type VARCHAR(255) NOT NULL,
     work_location VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     member_id INT NOT NULL,
     department_id INT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT pk_recruitment_request PRIMARY KEY (id),
     CONSTRAINT fk_recruitment_request_member_id FOREIGN KEY (member_id) REFERENCES member(id),
