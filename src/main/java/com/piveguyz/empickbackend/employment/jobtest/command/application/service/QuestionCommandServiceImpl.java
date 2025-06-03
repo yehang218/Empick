@@ -9,6 +9,7 @@ import com.piveguyz.empickbackend.employment.jobtest.command.application.mapper.
 import com.piveguyz.empickbackend.employment.jobtest.command.domain.aggregate.QuestionEntity;
 import com.piveguyz.empickbackend.employment.jobtest.command.domain.repository.QuestionRepository;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,7 +47,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     // 실무 테스트 문제 수정
     @Override
     public UpdateQuestionCommandDTO updateQuestion(int id, UpdateQuestionCommandDTO updateQuestionCommandDTO) {
-        // 없는 문제라면
+        // 문제 있는지 확인
         QuestionEntity question = questionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND));
 
@@ -54,7 +55,6 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         if (!memberRepository.existsById(updateQuestionCommandDTO.getUpdatedMemberId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_INVALID_UPDATED_MEMBER);
         }
-
 
         question.updateQuestionEntity(updateQuestionCommandDTO);
 
@@ -66,10 +66,16 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     // 실무 테스트 문제 삭제
     @Override
     public DeleteQuestionCommandDTO deleteQuestion(int id) {
+        // 문제 있는지 확인
         QuestionEntity question = questionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND));
 
-        questionRepository.delete(question);
+        try {
+            questionRepository.delete(question);
+        } catch (DataIntegrityViolationException e) {
+            // 참조중이라면 EMPLOYMENT_QUESTION_DELETE_CONFLICT 에러 발생
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_DELETE_CONFLICT);
+        }
 
         return QuestionMapper.toDeleteDto(question);
     }

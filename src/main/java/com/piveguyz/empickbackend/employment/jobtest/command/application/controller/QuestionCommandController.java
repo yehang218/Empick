@@ -23,13 +23,14 @@ public class QuestionCommandController {
         this.questionCommandService = questionCommandService;
     }
 
+    // 실무 테스트 문제 등록
     @Operation(
             summary = "실무테스트 문제 등록",
             description = """
-     실무 테스트 문제를 등록합니다.
-    - type : MULTIPLE / SUBJECTIVE / DESCRIPTIVE,
-    - difficulty : EASY / MEDIUM / HARD
-    """
+                     실무 테스트 문제를 등록합니다.
+                    - type : MULTIPLE / SUBJECTIVE / DESCRIPTIVE,
+                    - difficulty : EASY / MEDIUM / HARD
+                    """
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2400", description = "유효하지 않은 난이도입니다."),
@@ -44,12 +45,13 @@ public class QuestionCommandController {
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newQuestionDTO));
     }
 
+    // 실무 테스트 문제 수정
     @Operation(
             summary = "실무테스트 문제 수정",
             description = """
-     실무 테스트 문제를 수정합니다.
-     - updatedMemberId는 필수로 있어야 함
-    """
+                     실무 테스트 문제를 수정합니다.
+                     - updatedMemberId는 필수로 있어야 함
+                    """
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2414", description = "요청한 문제를 찾을 수 없습니다."),
@@ -65,6 +67,16 @@ public class QuestionCommandController {
     }
 
     // 실무 테스트 문제 삭제
+    @Operation(
+            summary = "실무테스트 문제 삭제",
+            description = """
+                     실무 테스트 문제를 삭제합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2414", description = "요청한 문제를 찾을 수 없습니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2415", description = "이 문제는 다른 곳에서 사용 중이므로 삭제할 수 없습니다."),
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<CustomApiResponse<DeleteQuestionCommandDTO>> deleteQuestion(@PathVariable int id) {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
