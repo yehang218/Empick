@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.common.config;
 
+import com.piveguyz.empickbackend.auth.command.jwt.JwtAuthenticationFilter;
 import com.piveguyz.empickbackend.security.CustomMemberDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -35,11 +37,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .cors(Customizer.withDefaults()) // CORS 적용
-                .csrf(csrf -> csrf.disable())   // 개발 환경에서 CSRF 끄기
+                .csrf(csrf -> csrf.disable())    // CSRF 끄기
                 .authorizeHttpRequests(auth -> auth
+                        // ✅ 인증이 필요 없는 경로
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -47,9 +50,15 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-                        .requestMatchers("/api/**").permitAll()
+                        // ✅ 로그인/회원가입 경로는 인증 필요 없음
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        // 🔒 그 외 모든 /api/** 경로는 JWT 인증 필터 작동
+                        .requestMatchers("/api/**").authenticated()
+                        // 🔒 나머지 경로는 기본 인증
                         .anyRequest().authenticated()
-                );
+                )
+                // JWT 인증 필터 추가
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

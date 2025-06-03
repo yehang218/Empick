@@ -109,8 +109,10 @@ CREATE TABLE IF NOT EXISTS application_item_category (
     name VARCHAR(255) NOT NULL,
     input_type TINYINT NOT NULL,
     display_order INT NOT NULL,
+    application_item_category_id INT DEFAULT NULL,
 
-    CONSTRAINT pk_application_item_category PRIMARY KEY (id)
+    CONSTRAINT pk_application_item_category PRIMARY KEY (id),
+    CONSTRAINT fk_application_item_category_parent FOREIGN KEY (application_item_category_id) REFERENCES application_item_category(id)
 );
 
 -- 지원서 항목

@@ -1,0 +1,4 @@
+package com.piveguyz.empickbackend.employment.jobtest.query.service;
+
+public interface JobtestTypeQueryService {
+}
