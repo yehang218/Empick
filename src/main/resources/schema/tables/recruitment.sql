@@ -1,3 +1,4 @@
+# SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS application_item;
 DROP TABLE IF EXISTS application_item_category;
 DROP TABLE IF EXISTS recruitment_template_copy;
@@ -6,6 +7,7 @@ DROP TABLE IF EXISTS recruitment_process;
 DROP TABLE IF EXISTS recruitment;
 DROP TABLE IF EXISTS recruitment_template;
 DROP TABLE IF EXISTS recruitment_request;
+# SET FOREIGN_KEY_CHECKS = 1;
 
 -- 채용요청서
 CREATE TABLE IF NOT EXISTS recruitment_request (
@@ -15,7 +17,7 @@ CREATE TABLE IF NOT EXISTS recruitment_request (
     ended_at DATETIME NOT NULL,
     qualification VARCHAR(255),
     preference VARCHAR(255),
-    responsibilities VARCHAR(255),
+    responsibility VARCHAR(255),
     employment_type VARCHAR(255) NOT NULL,
     work_location VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
