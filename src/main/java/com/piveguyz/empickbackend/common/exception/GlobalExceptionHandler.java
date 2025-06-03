@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Enum 파싱 실패 처리 (type, difficulty)
+     * Enum 파싱 실패 처리
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<CustomApiResponse<Void>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
