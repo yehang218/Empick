@@ -14,27 +14,27 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ApiResponse<T> {
+public class CustomApiResponse<T> {
     private boolean success;
     private int code;
     private String message;
     private T data;
 
-    public ApiResponse() {
+    public CustomApiResponse() {
     }
 
-    public ApiResponse(boolean success, int code, String message, T data) {
+    public CustomApiResponse(boolean success, int code, String message, T data) {
         this.success = success;
         this.code = code;
         this.message = message;
         this.data = data;
     }
 
-    public static <T> ApiResponse<T> of(ResponseCode code, T data) {
-        return new ApiResponse<>(code.isSuccess(), code.getCode(), code.getMessage(), data);
+    public static <T> CustomApiResponse<T> of(ResponseCode code, T data) {
+        return new CustomApiResponse<>(code.isSuccess(), code.getCode(), code.getMessage(), data);
     }
 
-    public static <T> ApiResponse<T> of(ResponseCode code) {
-        return new ApiResponse<>(code.isSuccess(), code.getCode(), code.getMessage(), null);
+    public static <T> CustomApiResponse<T> of(ResponseCode code) {
+        return new CustomApiResponse<>(code.isSuccess(), code.getCode(), code.getMessage(), null);
     }
 }

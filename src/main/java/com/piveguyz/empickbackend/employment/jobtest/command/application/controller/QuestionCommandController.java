@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.employment.jobtest.command.application.controller;
 
-import com.piveguyz.empickbackend.common.response.ApiResponse;
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.jobtest.command.application.dto.CreateQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtest.command.application.dto.DeleteQuestionCommandDTO;
@@ -22,23 +22,23 @@ public class QuestionCommandController {
 
     // 실무 테스트 문제 등록
     @PostMapping
-    public ResponseEntity<ApiResponse<CreateQuestionCommandDTO>> createQuestion(@RequestBody CreateQuestionCommandDTO createQuestionCommandDTO) {
+    public ResponseEntity<CustomApiResponse<CreateQuestionCommandDTO>> createQuestion(@RequestBody CreateQuestionCommandDTO createQuestionCommandDTO) {
         CreateQuestionCommandDTO newQuestionDTO = questionCommandService.createQuestion(createQuestionCommandDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.of(ResponseCode.SUCCESS, newQuestionDTO));
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, newQuestionDTO));
     }
 
     // 실무 테스트 문제 수정
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<UpdateQuestionCommandDTO>> updateQuestion(
+    public ResponseEntity<CustomApiResponse<UpdateQuestionCommandDTO>> updateQuestion(
             @PathVariable int id,
             @RequestBody UpdateQuestionCommandDTO updateQuestionCommandDTO) {
-        return ResponseEntity.ok(ApiResponse.of(ResponseCode.SUCCESS, questionCommandService.updateQuestion(updateQuestionCommandDTO)));
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, questionCommandService.updateQuestion(updateQuestionCommandDTO)));
     }
 
     // 실무 테스트 문제 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<DeleteQuestionCommandDTO>> deleteQuestion(@PathVariable int id) {
-        return ResponseEntity.ok(ApiResponse.of(ResponseCode.SUCCESS, questionCommandService.deleteQuestion(id)));
+    public ResponseEntity<CustomApiResponse<DeleteQuestionCommandDTO>> deleteQuestion(@PathVariable int id) {
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, questionCommandService.deleteQuestion(id)));
     }
 }
