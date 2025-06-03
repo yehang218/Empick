@@ -36,9 +36,14 @@ public enum ResponseCode {
 
 
     //  실무테스트 - 2400 ~ 2499
-    EMPLOYMENT_QUESTION_FAIL(false, 2400, "실무테스트 문제 등록에 실패했습니다."),
-    EMPLOYMENT_QUESTION_DUPLICATE(false, 2401, "동일한 문제가 이미 등록되어 있습니다"),
-    EMPLOYMENT_QUESTION_NOT_FOUND(false, 2402, "요청한 문제를 찾을 수 없습니다.");
+    EMPLOYMENT_INVALID_DIFFICULTY(false, 2400, "유효하지 않은 난이도입니다."),
+    EMPLOYMENT_INVALID_TYPE(false, 2401, "유효하지 않은 실무 테스트 유형입니다."),
+
+    //   1) 실무테스트 문제
+    EMPLOYMENT_QUESTION_FAIL(false, 2410, "실무테스트 문제 등록에 실패했습니다."),
+    EMPLOYMENT_QUESTION_DUPLICATE(false, 2411, "동일한 문제가 이미 등록되어 있습니다."),
+    EMPLOYMENT_QUESTION_INVALID_MEMBER(false, 2412, "작성자가 존재하지 않습니다."),
+    EMPLOYMENT_QUESTION_NOT_FOUND(false, 2413, "요청한 문제를 찾을 수 없습니다.");
 
     //  면접 일정 - 2500 ~ 2599
 
