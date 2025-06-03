@@ -20,7 +20,7 @@ CREATE TABLE application
 (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '지원서 번호',
     recruitment_id INT NOT NULL COMMENT '채용 공고 id',
-    created_at DATETIME NOT NULL COMMENT '작성일자',
+    created_at DATETIME NOT NULL COMMENT '작성일자' DEFAULT CURRENT_TIMESTAMP,
     status TINYINT NOT NULL COMMENT '처리상태: 0(서류제외대기중), 1(서류합격), 2(실무합격), 3(1차면접합격), 4(2차면접합격), 5(최종합격), 6(불합격)',
     applicant_id INT NOT NULL COMMENT '지원자 id',
     introduce_rating_result_id INT NULL COMMENT '자기소개서 평가 결과 id',
