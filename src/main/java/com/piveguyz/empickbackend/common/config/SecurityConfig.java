@@ -48,11 +48,12 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/api/v1/**"                // 테스트용으로 모든 경로 sequrity 처리 안되게
                         ).permitAll()
                         // ✅ 로그인/회원가입 경로는 인증 필요 없음
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        // 🔒 그 외 모든 /api/** 경로는 JWT 인증 필터 작동
+                         // 🔒 그 외 모든 /api/** 경로는 JWT 인증 필터 작동
                         .requestMatchers("/api/**").authenticated()
                         // 🔒 나머지 경로는 기본 인증
                         .anyRequest().authenticated()
