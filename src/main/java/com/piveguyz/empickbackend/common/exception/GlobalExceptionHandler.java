@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<CustomApiResponse<Void>> handleBusinessException(BusinessException ex) {
         return ResponseEntity
-                .status(HttpStatus.valueOf(ex.getCode().getCode()))
+                .status(ex.getCode().getHttpStatus())
                 .body(CustomApiResponse.of(ex.getCode()));
     }
 
@@ -52,12 +52,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidFormatException.class)
     public ResponseEntity<CustomApiResponse<Void>> handleInvalidFormat(InvalidFormatException ex) {
         String field = ex.getPath().get(0).getFieldName();
+
         if ("type".equals(field)) {
-            return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_TYPE));
+            return ResponseEntity
+                    .status(ResponseCode.EMPLOYMENT_QUESTION_INVALID_TYPE.getHttpStatus())
+                    .body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_QUESTION_INVALID_TYPE));
         } else if ("difficulty".equals(field)) {
-            return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY));
+            return ResponseEntity
+                    .status(ResponseCode.EMPLOYMENT_QUESTION_INVALID_DIFFICULTY.getHttpStatus())
+                    .body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_QUESTION_INVALID_DIFFICULTY));
         }
-        return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.BAD_REQUEST));
+
+        return ResponseEntity
+                .status(ResponseCode.BAD_REQUEST.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.BAD_REQUEST));
     }
 
     /**
