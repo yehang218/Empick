@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS recruitment (
     started_at DATETIME NOT NULL,
     ended_at DATETIME NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at DATETIME,
     member_id INT NOT NULL,
     recruitment_template_id INT,
