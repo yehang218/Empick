@@ -22,7 +22,7 @@ public class Member {
     private String password;
 
     @Column(name = "employee_number", nullable = false)
-    private int employeeNumber;
+    private Integer employeeNumber;
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
