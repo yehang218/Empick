@@ -30,10 +30,10 @@
                 <!-- 일반 항목 -->
                 <div v-else class="card-content">
                     <div class="text-section">
-                        <div class="title-row">
+                        <div class="title-row d-flex justify-space-between align-center">
                             <span class="criteria-title mb-1 mt-3"><strong>{{ index + 1 }}. {{ item.title
                                     }}</strong></span>
-                            <div class="plain-weight ml-3 d-flex justify-end">{{ item.weight }}%</div>
+                            <div class="plain-weight mr-3 d-flex justify-end">{{ item.weight }}%</div>
                         </div>
                         <div class="criteria-desc">{{ item.description }}</div>
                     </div>
@@ -225,6 +225,8 @@ const resetForm = () => {
     font-weight: 700;
     color: #2e7d32;
     margin-top: 2px;
+    text-align: right;
+
 }
 
 .weight-input-group {
