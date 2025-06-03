@@ -3,7 +3,7 @@ CREATE TABLE `interview_sheet` (
    `name`	VARCHAR(255)	NOT NULL COMMENT '이름',
    `is_deleted`	VARCHAR(4)	NOT NULL	DEFAULT 'N' COMMENT '삭제 여부',
    `member_id`	INT NULL COMMENT '수정자 id',
-   `updated_at`	DATETIME	NULL COMMENT '수정 일시',
+   `updated_at`	DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
 )
 COMMENT = '면접 평가 기준표';
@@ -14,7 +14,7 @@ CREATE TABLE `interview_criteria` (
   `detail_content`	LONGTEXT	NOT NULL COMMENT '상세 내용',
   `is_deleted`	VARCHAR(4)	NOT NULL	DEFAULT 'N' COMMENT '삭제 여부',
   `member_id`	INT	NULL COMMENT '수정자 id',
-  `updated_at`	DATETIME	NULL COMMENT '수정 일시',
+  `updated_at`	DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
   FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
 )
 COMMENT = '면접 평가 기준';
@@ -25,7 +25,7 @@ CREATE TABLE `interview_sheet_item` (
     `criteria_id`	INT	NOT NULL COMMENT '면접 평가 기준 id',
     `weight`	INT	NOT NULL COMMENT '가중치',
     `member_id`	INT NULL COMMENT '수정자 id',
-    `updated_at`	DATETIME	NULL COMMENT '수정 일시',
+    `updated_at`	DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
     FOREIGN KEY (`sheet_id`) REFERENCES `interview_sheet`(`id`),
     FOREIGN KEY (`criteria_id`) REFERENCES `interview_criteria`(`id`),
     FOREIGN KEY (`member_id`) REFERENCES `member`(`id`)
