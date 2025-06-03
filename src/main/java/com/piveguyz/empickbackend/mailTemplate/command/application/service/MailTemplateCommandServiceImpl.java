@@ -1,7 +1,9 @@
 package com.piveguyz.empickbackend.mailTemplate.command.application.service;
 
+import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.mailTemplate.command.application.dto.MailTemplateCommandDTO;
+import com.piveguyz.empickbackend.mailTemplate.command.application.mapper.MailTemplateCommandMapper;
 import com.piveguyz.empickbackend.mailTemplate.command.domain.aggregate.MailTemplateEntity;
 import com.piveguyz.empickbackend.mailTemplate.command.domain.repository.MailTemplateRepository;
 import com.piveguyz.empickbackend.mailTemplate.query.dto.MailTemplateQueryDTO;
@@ -18,57 +20,50 @@ public class MailTemplateCommandServiceImpl implements MailTemplateCommandServic
     private final MailTemplateQueryService mailTemplateQueryService;
     private final MailTemplateRepository mailTemplateRepository;
     private ModelMapper modelMapper;
+    private MailTemplateCommandMapper mailTemplateCommandMapper;
 
     @Override
     public MailTemplateCommandDTO createTemplate(MailTemplateCommandDTO mailTemplateCommandDTO) {
         String title = mailTemplateCommandDTO.getTitle();
         String content = mailTemplateCommandDTO.getContent();
         if(title == null){
-            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_DUPLICATE);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_TITLE);
         }
         if(content == null){
-            return ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT;
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT);
         }
-        MailTemplateQueryDTO foundDTO = mailTemplateQueryService.findByTitle(title);
-        if(foundDTO.getTitle().equals(title)){
-            return ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE;
+        if(mailTemplateRepository.existsByTitle(title)){
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE);
         }
-        MailTemplateEntity mailTemplateEntity = modelMapper.map(mailTemplateCommandDTO, MailTemplateEntity.class);
-        // 저장 시도
-        try {
-            mailTemplateRepository.save(mailTemplateEntity);
-            return ResponseCode.SUCCESS;
-        } catch (Exception e) {
-            return ResponseCode.BAD_REQUEST;
-        }
+
+        MailTemplateEntity mailTemplateEntity = mailTemplateCommandMapper.toEntity(mailTemplateCommandDTO);
+        MailTemplateEntity createdMailTemplateEntity = mailTemplateRepository.save(mailTemplateEntity);
+        MailTemplateCommandDTO createdMailTemplateCommandDTO = mailTemplateCommandMapper.toDTO(createdMailTemplateEntity);
+        return createdMailTemplateCommandDTO;
     }
 
     @Override
-    public ResponseCode updateTemplate(MailTemplateCommandDTO mailTemplateCommandDTO) {
+    public MailTemplateCommandDTO updateTemplate(MailTemplateCommandDTO mailTemplateCommandDTO) {
         String title = mailTemplateCommandDTO.getTitle();
         String content = mailTemplateCommandDTO.getContent();
         if(title == null){
-            return ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_TITLE;
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_TITLE);
         }
         if(content == null){
-            return ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT;
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT);
         }
-        MailTemplateQueryDTO foundDTO = mailTemplateQueryService.findByTitle(title);
-        if(foundDTO.getTitle().equals(title)){
-            return ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE;
+        if(mailTemplateRepository.existsByTitle(title)){
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE);
         }
-        MailTemplateEntity mailTemplateEntity = modelMapper.map(mailTemplateCommandDTO, MailTemplateEntity.class);
-        // 수정 시도
-        try {
-            mailTemplateRepository.save(mailTemplateEntity);
-            return ResponseCode.SUCCESS;
-        } catch (Exception e) {
-            return ResponseCode.BAD_REQUEST;
-        }
+
+        MailTemplateEntity mailTemplateEntity = mailTemplateCommandMapper.toEntity(mailTemplateCommandDTO);
+        MailTemplateEntity updatedMailTemplateEntity = mailTemplateRepository.save(mailTemplateEntity);
+        MailTemplateCommandDTO updatedMailTemplateCommandDTO = mailTemplateCommandMapper.toDTO(updatedMailTemplateEntity);
+        return updatedMailTemplateCommandDTO;
     }
 
     @Override
-    public ResponseCode deleteTemplate(Integer id) {
+    public MailTemplateCommandDTO deleteTemplate(Integer id) {
         MailTemplateQueryDTO foundDTO = mailTemplateQueryService.findById(id);
         if(foundDTO == null){
             return ResponseCode.BAD_REQUEST;

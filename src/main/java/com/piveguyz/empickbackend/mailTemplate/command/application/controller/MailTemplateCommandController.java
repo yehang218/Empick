@@ -28,25 +28,16 @@ public class MailTemplateCommandController {
 
     @PostMapping("/update")
     public ResponseEntity<ApiResponse<MailTemplateCommandDTO>> updateTemplate(@RequestBody MailTemplateCommandDTO mailTemplateCommandDTO) {
-        ResponseCode result = mailTemplateCommandService.updateTemplate(mailTemplateCommandDTO);
-        if(result.isSuccess()){
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(ApiResponse.of(result, mailTemplateCommandDTO));
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.of(result, null));
-        }
+        MailTemplateCommandDTO updatedMailTemplateCommandDTO = mailTemplateCommandService.updateTemplate(mailTemplateCommandDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.of(ResponseCode.SUCCESS, updatedMailTemplateCommandDTO));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<Integer>> deleteTemplate(@RequestParam("id") Integer id) {
-        ResponseCode result = mailTemplateCommandService.deleteTemplate(id);
-        if(result.isSuccess()){
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(ApiResponse.of(result, id));
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.of(result, null));
-        }
+    public ResponseEntity<ApiResponse<MailTemplateCommandDTO>> deleteTemplate(@RequestParam("id") Integer id) {
+        MailTemplateCommandDTO deletedMailTemplateCommandDTO = mailTemplateCommandService.deleteTemplate(id);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.of(ResponseCode.SUCCESS, deletedMailTemplateCommandDTO));
+    }
     }
 }
