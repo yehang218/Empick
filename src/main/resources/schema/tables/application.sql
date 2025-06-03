@@ -2,7 +2,6 @@ DROP TABLE IF EXISTS application_response;
 DROP TABLE IF EXISTS applicant;
 DROP TABLE IF EXISTS application;
 DROP TABLE IF EXISTS applicant_bookmark;
-DROP TABLE IF EXISTS mail;
 
 CREATE TABLE applicant
 (
@@ -54,10 +53,3 @@ CREATE TABLE applicant_bookmark
 )
     COMMENT = '북마크 지원자 테이블';
 
-CREATE TABLE `mail` (
-     `id` INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
-     `applicant_id` INT NOT NULL COMMENT '지원자 id',
-     `email` VARCHAR(255) NOT NULL COMMENT '이메일',
-     `content` LONGTEXT NOT NULL COMMENT '내용',
-      FOREIGN KEY (`applicant_id`) REFERENCES `applicant`(`id`)
-);

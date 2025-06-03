@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS member;
 DROP TABLE IF EXISTS introduce_template_item;
 DROP TABLE IF EXISTS introduce_template;
 DROP TABLE IF EXISTS introduce;
