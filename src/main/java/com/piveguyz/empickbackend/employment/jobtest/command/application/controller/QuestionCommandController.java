@@ -26,15 +26,16 @@ public class QuestionCommandController {
     @Operation(
             summary = "실무테스트 문제 등록",
             description = """
-    - 실무 테스트 문제를 등록합니다.
+     실무 테스트 문제를 등록합니다.
     - type : MULTIPLE / SUBJECTIVE / DESCRIPTIVE,
     - difficulty : EASY / MEDIUM / HARD
     """
     )
     @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2400", description = "실무테스트 문제 등록에 실패했습니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2401", description = "동일한 문제가 이미 등록되어 있습니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2402", description = "회원 정보를 찾을 수 없음")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2400", description = "유효하지 않은 난이도입니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2401", description = "유효하지 않은 실무 테스트 유형입니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2411", description = "동일한 문제가 이미 등록되어 있습니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2412", description = "작성자 정보가 유효하지 않습니다.")
     })
     @PostMapping
     public ResponseEntity<CustomApiResponse<CreateQuestionCommandDTO>> createQuestion(@RequestBody @Valid CreateQuestionCommandDTO createQuestionCommandDTO) {
@@ -43,13 +44,24 @@ public class QuestionCommandController {
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newQuestionDTO));
     }
 
-    // 실무 테스트 문제 수정
-    @PutMapping("/{id}")
+    @Operation(
+            summary = "실무테스트 문제 수정",
+            description = """
+     실무 테스트 문제를 수정합니다.
+     - updatedMemberId는 필수로 있어야 함
+    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2414", description = "요청한 문제를 찾을 수 없습니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2413", description = "수정자 정보가 유효하지 않습니다."),
+    })
+    @PatchMapping("/{id}")
     public ResponseEntity<CustomApiResponse<UpdateQuestionCommandDTO>> updateQuestion(
             @PathVariable int id,
             @RequestBody UpdateQuestionCommandDTO updateQuestionCommandDTO) {
+        UpdateQuestionCommandDTO updatedQuestionDTO = questionCommandService.updateQuestion(id, updateQuestionCommandDTO);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
-                .body((CustomApiResponse.of(ResponseCode.SUCCESS, questionCommandService.updateQuestion(updateQuestionCommandDTO))));
+                .body((CustomApiResponse.of(ResponseCode.SUCCESS, updatedQuestionDTO)));
     }
 
     // 실무 테스트 문제 삭제

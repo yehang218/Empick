@@ -37,7 +37,6 @@ public class QuestionMapper {
     // Entity → 문제 수정 DTO
     public static UpdateQuestionCommandDTO toUpdateDto(QuestionEntity entity) {
         return UpdateQuestionCommandDTO.builder()
-                .id(entity.getId())
                 .content(entity.getContent())
                 .detailContent(entity.getDetailContent())
                 .type(entity.getType())

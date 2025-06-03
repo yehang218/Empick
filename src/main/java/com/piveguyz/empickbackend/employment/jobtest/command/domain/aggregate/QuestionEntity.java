@@ -63,11 +63,21 @@ public class QuestionEntity {
     }
 
     public void updateQuestionEntity(UpdateQuestionCommandDTO dto) {
-        this.content = dto.getContent();
-        this.detailContent = dto.getDetailContent();
-        this.type = dto.getType();
-        this.difficulty = dto.getDifficulty();
-        this.answer = dto.getAnswer();
+        if (dto.getContent() != null) {
+            this.content = dto.getContent();
+        }
+        if (dto.getDetailContent() != null) {
+            this.detailContent = dto.getDetailContent();
+        }
+        if (dto.getType() != null) {
+            this.type = dto.getType();
+        }
+        if (dto.getDifficulty() != null) {
+            this.difficulty = dto.getDifficulty();
+        }
+        if (dto.getAnswer() != null) {
+            this.answer = dto.getAnswer();
+        }
         this.updatedMemberId = dto.getUpdatedMemberId();
         this.updatedAt = LocalDateTime.now();
     }

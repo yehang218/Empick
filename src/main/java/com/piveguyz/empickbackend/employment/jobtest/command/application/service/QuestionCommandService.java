@@ -7,7 +7,7 @@ import com.piveguyz.empickbackend.employment.jobtest.command.application.dto.Upd
 public interface QuestionCommandService {
     CreateQuestionCommandDTO createQuestion(CreateQuestionCommandDTO createQuestionCommandDTO);
 
-    UpdateQuestionCommandDTO updateQuestion(UpdateQuestionCommandDTO updateQuestionCommandDTO);
+    UpdateQuestionCommandDTO updateQuestion(int id, UpdateQuestionCommandDTO updateQuestionCommandDTO);
 
     DeleteQuestionCommandDTO deleteQuestion(int id);
 }

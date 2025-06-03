@@ -11,7 +11,6 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class UpdateQuestionCommandDTO {
-    private int id;
     private String content;
     private String detailContent;
     private JobtestType type;
@@ -20,9 +19,8 @@ public class UpdateQuestionCommandDTO {
     private int updatedMemberId;
 
     @Builder
-    public UpdateQuestionCommandDTO(int id, String content, String detailContent, JobtestType type,
+    public UpdateQuestionCommandDTO(String content, String detailContent, JobtestType type,
                                     JobtestDifficulty difficulty, String answer, int updatedMemberId) {
-        this.id = id;
         this.content = content;
         this.detailContent = detailContent;
         this.type = type;

@@ -31,13 +31,10 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
             throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_DUPLICATE);
         }
 
-        //
-
         // 작성자가 없는 회원인 경우
         if (!memberRepository.existsById(createQuestionCommandDTO.getCreatedMemberId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_INVALID_MEMBER);
         }
-
 
         QuestionEntity questionEntity = QuestionMapper.toEntity(createQuestionCommandDTO);
         QuestionEntity saved = questionRepository.save(questionEntity);
@@ -48,9 +45,16 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
 
     // 실무 테스트 문제 수정
     @Override
-    public UpdateQuestionCommandDTO updateQuestion(UpdateQuestionCommandDTO updateQuestionCommandDTO) {
-        QuestionEntity question = questionRepository.findById(updateQuestionCommandDTO.getId())
+    public UpdateQuestionCommandDTO updateQuestion(int id, UpdateQuestionCommandDTO updateQuestionCommandDTO) {
+        // 없는 문제라면
+        QuestionEntity question = questionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND));
+
+        // 수정자가 없는 회원이라면
+        if (!memberRepository.existsById(updateQuestionCommandDTO.getUpdatedMemberId())) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_INVALID_UPDATED_MEMBER);
+        }
+
 
         question.updateQuestionEntity(updateQuestionCommandDTO);
 
