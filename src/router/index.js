@@ -14,7 +14,7 @@ const routes = [
     {
         path: '/counter',
         name: 'CounterPage',
-        component: () => import('@/views/CounterPage.vue')
+        component: () => import('@/views/test/CounterPage.vue')
     },
     {
 
@@ -69,6 +69,12 @@ const routes = [
     },
     {
 
+        path: '/counter',
+        name: 'CounterPage',
+        component: () => import('@/views/test/CounterPage.vue')
+    },
+
+    {
         path: '/employment/recruitment',
         name: 'RecruitmentPage',
         component: () => import('@/views/employment/RecruitmentPage.vue')
@@ -76,7 +82,7 @@ const routes = [
     {
         path: '/WSPage',
         name: 'WSPage',
-        component: () => import('@/views/WSPage.vue')
+        component: () => import('@/views/test/WSPage.vue')
     },
 ];
 
