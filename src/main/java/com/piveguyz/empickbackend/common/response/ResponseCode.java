@@ -48,10 +48,9 @@ public enum ResponseCode {
     //   1) 실무테스트 문제
     EMPLOYMENT_QUESTION_FAIL(false, HttpStatus.INTERNAL_SERVER_ERROR, 2410, "실무테스트 문제 등록에 실패했습니다."),
     EMPLOYMENT_QUESTION_DUPLICATE(false, HttpStatus.CONFLICT, 2411, "동일한 문제가 이미 등록되어 있습니다."),
-    EMPLOYMENT_QUESTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2412, "요청한 문제를 찾을 수 없습니다."),
-    EMPLOYMENT_QUESTION_INVALID_TYPE(false, HttpStatus.BAD_REQUEST, 2413, "유효하지 않은 실무 테스트 유형입니다."),
-    EMPLOYMENT_QUESTION_INVALID_DIFFICULTY(false, HttpStatus.BAD_REQUEST, 2414, "유효하지 않은 난이도입니다."),
-    EMPLOYMENT_QUESTION_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2415, "작성자 정보가 유효하지 않습니다.");
+    EMPLOYMENT_QUESTION_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2412, "작성자 정보가 유효하지 않습니다."),
+    EMPLOYMENT_QUESTION_INVALID_UPDATED_MEMBER(false, HttpStatus.BAD_REQUEST, 2413, "수정자 정보가 유효하지 않습니다."),
+    EMPLOYMENT_QUESTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2414, "요청한 문제를 찾을 수 없습니다.");
 
     //  면접 일정 - 2500 ~ 2599
 
