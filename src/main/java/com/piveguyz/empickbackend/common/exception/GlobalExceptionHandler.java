@@ -47,6 +47,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Enum 유효성 검사
+     */
+    @ExceptionHandler(InvalidFormatException.class)
+    public ResponseEntity<CustomApiResponse<Void>> handleInvalidFormat(InvalidFormatException ex) {
+        String field = ex.getPath().get(0).getFieldName();
+        if ("type".equals(field)) {
+            return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_TYPE));
+        } else if ("difficulty".equals(field)) {
+            return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY));
+        }
+        return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.BAD_REQUEST));
+    }
+
+    /**
      * 그 외 모든 예외 처리 (예기치 않은 에러)
      */
     @ExceptionHandler(Exception.class)
