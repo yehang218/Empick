@@ -8,23 +8,36 @@ import com.piveguyz.empickbackend.employment.jobtest.command.application.dto.Upd
 import com.piveguyz.empickbackend.employment.jobtest.command.application.mapper.QuestionMapper;
 import com.piveguyz.empickbackend.employment.jobtest.command.domain.aggregate.QuestionEntity;
 import com.piveguyz.empickbackend.employment.jobtest.command.domain.repository.QuestionRepository;
+import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class QuestionCommandServiceImpl implements QuestionCommandService {
 
     private final QuestionRepository questionRepository;
+    private final MemberRepository memberRepository;
 
-    public QuestionCommandServiceImpl(QuestionRepository questionRepository) {
+    public QuestionCommandServiceImpl(QuestionRepository questionRepository,
+                                      MemberRepository memberRepository) {
         this.questionRepository = questionRepository;
+        this.memberRepository = memberRepository;
     }
 
     // 실무 테스트 문제 등록
     @Override
     public CreateQuestionCommandDTO createQuestion(CreateQuestionCommandDTO createQuestionCommandDTO) {
+        // 이미 존재할 경우
         if (questionRepository.existsByContent(createQuestionCommandDTO.getContent())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_DUPLICATE);
         }
+
+        //
+
+        // 작성자가 없는 회원인 경우
+        if (!memberRepository.existsById(createQuestionCommandDTO.getCreatedMemberId())) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_INVALID_MEMBER);
+        }
+
 
         QuestionEntity questionEntity = QuestionMapper.toEntity(createQuestionCommandDTO);
         QuestionEntity saved = questionRepository.save(questionEntity);
