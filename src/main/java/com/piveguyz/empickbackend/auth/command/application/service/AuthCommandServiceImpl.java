@@ -35,7 +35,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
             throw new BusinessException(ResponseCode.MEMBER_RESIGNED);
         }
 
-        if (member.getStatus() == 1) {
+        if (member.getStatus() != 0) {
             throw new BusinessException(ResponseCode.MEMBER_STATUS_SUSPENDED);
         }
 
