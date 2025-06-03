@@ -3,6 +3,8 @@ package com.piveguyz.empickbackend.auth.command.application.controller;
 import com.piveguyz.empickbackend.auth.command.application.dto.LoginRequestDTO;
 import com.piveguyz.empickbackend.auth.command.application.dto.LoginResponseDTO;
 import com.piveguyz.empickbackend.auth.command.application.service.AuthCommandService;
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,8 +43,8 @@ public class AuthCommandController {
     })
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO requestDTO) {
+    public ResponseEntity<CustomApiResponse<LoginResponseDTO>> login(@Valid @RequestBody LoginRequestDTO requestDTO) {
         LoginResponseDTO responseDTO = authCommandService.login(requestDTO);
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
     }
 }
