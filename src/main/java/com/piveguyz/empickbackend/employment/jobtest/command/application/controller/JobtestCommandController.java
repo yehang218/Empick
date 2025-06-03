@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/employment/jobtest")
+//@RequestMapping("/api/v1/employment/jobtest")
 public class JobtestCommandController {
 
 

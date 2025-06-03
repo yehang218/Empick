@@ -2,6 +2,7 @@ package com.piveguyz.empickbackend.common.exception;
 
 import com.piveguyz.empickbackend.common.response.ApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +12,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Objects;
 
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * ApiResponse 기반 커스텀 예외 핸들러
+     *  ApiResponse 기반 커스텀 예외 핸들러
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {

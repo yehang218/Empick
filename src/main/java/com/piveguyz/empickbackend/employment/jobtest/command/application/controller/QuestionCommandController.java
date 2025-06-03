@@ -33,15 +33,6 @@ public class QuestionCommandController {
     public ResponseEntity<ApiResponse<UpdateQuestionCommandDTO>> updateQuestion(
             @PathVariable int id,
             @RequestBody UpdateQuestionCommandDTO updateQuestionCommandDTO) {
-        updateQuestionCommandDTO = UpdateQuestionCommandDTO.builder()
-                .id(id)
-                .content(updateQuestionCommandDTO.getContent())
-                .detailContent(updateQuestionCommandDTO.getDetailContent())
-                .type(updateQuestionCommandDTO.getType())
-                .difficulty(updateQuestionCommandDTO.getDifficulty())
-                .answer(updateQuestionCommandDTO.getAnswer())
-                .updatedMemberId(updateQuestionCommandDTO.getUpdatedMemberId())
-                .build();
         return ResponseEntity.ok(ApiResponse.of(ResponseCode.SUCCESS, questionCommandService.updateQuestion(updateQuestionCommandDTO)));
     }
 
