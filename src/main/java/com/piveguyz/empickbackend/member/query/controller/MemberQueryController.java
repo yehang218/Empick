@@ -1,13 +1,20 @@
 package com.piveguyz.empickbackend.member.query.controller;
 
+import com.piveguyz.empickbackend.common.constants.ApiExamples;
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.query.dto.MemberResponseDTO;
 import com.piveguyz.empickbackend.member.query.service.MemberQueryService;
 import com.piveguyz.empickbackend.security.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +31,13 @@ public class MemberQueryController {
 
     @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다. (JWT 토큰 필요)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공"),
-            @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 필요)"),
-            @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없음")
+            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공", content = @Content(schema = @Schema(implementation = MemberResponseDTO.class))),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 필요)", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_401_EXAMPLE))),
+            @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE)))
     })
     @GetMapping("/me")
-    public ResponseEntity<MemberResponseDTO> getCurrentMember(@AuthenticationPrincipal CustomMemberDetails memberDetails) {
-        MemberResponseDTO dto = memberQueryService.getMemberInfo(memberDetails.getMember().getId());
-        return ResponseEntity.ok(dto);
+    public ResponseEntity<CustomApiResponse<MemberResponseDTO>> getCurrentMember(@AuthenticationPrincipal CustomMemberDetails memberDetails) {
+        MemberResponseDTO responseDTO = memberQueryService.getMemberInfo(memberDetails.getMember().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
     }
 }
