@@ -9,7 +9,7 @@ import com.piveguyz.empickbackend.employment.jobtest.command.application.service
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +37,9 @@ public class QuestionCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2402", description = "회원 정보를 찾을 수 없음")
     })
     @PostMapping
-    public ResponseEntity<CustomApiResponse<CreateQuestionCommandDTO>> createQuestion(@RequestBody CreateQuestionCommandDTO createQuestionCommandDTO) {
+    public ResponseEntity<CustomApiResponse<CreateQuestionCommandDTO>> createQuestion(@RequestBody @Valid CreateQuestionCommandDTO createQuestionCommandDTO) {
         CreateQuestionCommandDTO newQuestionDTO = questionCommandService.createQuestion(createQuestionCommandDTO);
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newQuestionDTO));
     }
 
@@ -48,12 +48,14 @@ public class QuestionCommandController {
     public ResponseEntity<CustomApiResponse<UpdateQuestionCommandDTO>> updateQuestion(
             @PathVariable int id,
             @RequestBody UpdateQuestionCommandDTO updateQuestionCommandDTO) {
-        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, questionCommandService.updateQuestion(updateQuestionCommandDTO)));
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body((CustomApiResponse.of(ResponseCode.SUCCESS, questionCommandService.updateQuestion(updateQuestionCommandDTO))));
     }
 
     // 실무 테스트 문제 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<CustomApiResponse<DeleteQuestionCommandDTO>> deleteQuestion(@PathVariable int id) {
-        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, questionCommandService.deleteQuestion(id)));
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, questionCommandService.deleteQuestion(id)));
     }
 }
