@@ -29,7 +29,11 @@ public class MemberQueryController {
 
     private final MemberQueryService memberQueryService;
 
-    @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 조회합니다. (JWT 토큰 필요)")
+    @Operation(summary = "내 정보 조회", description = """
+            - 로그인한 사용자의 정보를 조회합니다. (JWT 토큰 필요)
+            - 스웨거의 Authorize 버튼이 작동하지 않는 관계로, 아래의 curl 명령어로 테스트 바랍니다. \\
+            curl -X GET http://localhost:5001/api/v1/member/me -H "ACCESS_TOKEN_VALUE"
+            """)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공", content = @Content(schema = @Schema(implementation = MemberResponseDTO.class))),
             @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 필요)", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_401_EXAMPLE))),

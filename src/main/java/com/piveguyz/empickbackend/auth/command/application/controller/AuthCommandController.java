@@ -33,6 +33,7 @@ public class AuthCommandController {
                     - 사번과 비밀번호를 통해 로그인을 수행하고 AccessToken 및 RefreshToken을 발급합니다.
                     - employeeNumber : 100001, pwd :  password1234@@
                     - employeeNumber : 100002, pwd :  password5678@@
+                    - employeeNumber : 100003, pwd :  password9876@@ (퇴사)
                     """
     )
     @ApiResponses(value = {
@@ -42,6 +43,12 @@ public class AuthCommandController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(examples = @ExampleObject(
                                     value = ApiExamples.ERROR_400_EXAMPLE))),
+
+            @ApiResponse(responseCode = "1001", description = "삭제된 사원",
+                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_1001_EXAMPLE))),
+
+            @ApiResponse(responseCode = "1004", description = "차단된 사원",
+                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_1004_EXAMPLE))),
 
             @ApiResponse(responseCode = "401", description = "인증 실패",
                     content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_401_EXAMPLE))),

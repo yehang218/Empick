@@ -58,4 +58,21 @@ public class ApiExamples {
               "data": null
             }
             """;
+
+    public static final String ERROR_1004_EXAMPLE =
+            """
+            {
+              "success": false,
+              "code": 1004,
+              "message": "사원 상태가 차단되었습니다."
+            }
+            """;
+
+    public static final String ERROR_1001_EXAMPLE =
+            """
+            {
+              "success": false,
+              "code": 1001,
+              "message": "삭제된 사원 정보입니다."
+            """;
 }

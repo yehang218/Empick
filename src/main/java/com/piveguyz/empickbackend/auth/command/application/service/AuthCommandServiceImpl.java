@@ -31,6 +31,14 @@ public class AuthCommandServiceImpl implements AuthCommandService {
             throw new BusinessException(ResponseCode.BAD_REQUEST); // 로그인 실패의 정확한 원인을 밝히지 않기 위함
         }
 
+        if (member.getResignAt() != null) {
+            throw new BusinessException(ResponseCode.MEMBER_RESIGNED);
+        }
+
+        if (member.getStatus() == 1) {
+            throw new BusinessException(ResponseCode.MEMBER_STATUS_SUSPENDED);
+        }
+
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber());
         String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmployeeNumber());
 
