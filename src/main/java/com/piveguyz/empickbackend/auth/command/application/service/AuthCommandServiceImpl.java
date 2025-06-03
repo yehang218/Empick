@@ -7,9 +7,12 @@ import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
+import com.piveguyz.empickbackend.member.query.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +21,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final MemberMapper memberMapper;
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO requestDTO) {
@@ -39,7 +43,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
             throw new BusinessException(ResponseCode.MEMBER_STATUS_SUSPENDED);
         }
 
-        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber());
+        List<String> roles = memberMapper.findRolesByEmployeeNumber(member.getEmployeeNumber());
+
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber(), roles);
         String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmployeeNumber());
 
         return LoginResponseDTO.builder()
