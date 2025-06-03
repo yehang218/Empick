@@ -63,18 +63,4 @@ public enum ResponseCode {
     private final HttpStatus httpStatus;        // HTTP 상태 코드
     private final int code;                     // 비지니스 로직
     private final String message;
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public HttpStatus getHttpStatus() { return httpStatus; }
 }
