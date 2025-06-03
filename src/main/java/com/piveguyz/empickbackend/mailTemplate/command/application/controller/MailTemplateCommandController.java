@@ -21,14 +21,9 @@ public class MailTemplateCommandController {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<MailTemplateCommandDTO>> createTemplate(@RequestBody MailTemplateCommandDTO mailTemplateCommandDTO) {
-        ResponseCode result = mailTemplateCommandService.createTemplate(mailTemplateCommandDTO);
-        if(result.isSuccess()){
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.of(result, mailTemplateCommandDTO));
-        } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.of(result, null));
-        }
+        MailTemplateCommandDTO createdMailTemplateCommandDTO = mailTemplateCommandService.createTemplate(mailTemplateCommandDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.of(ResponseCode.SUCCESS, createdMailTemplateCommandDTO));
     }
 
     @PostMapping("/update")

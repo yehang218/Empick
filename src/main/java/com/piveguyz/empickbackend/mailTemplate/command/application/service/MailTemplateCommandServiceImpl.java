@@ -20,11 +20,11 @@ public class MailTemplateCommandServiceImpl implements MailTemplateCommandServic
     private ModelMapper modelMapper;
 
     @Override
-    public ResponseCode createTemplate(MailTemplateCommandDTO mailTemplateCommandDTO) {
+    public MailTemplateCommandDTO createTemplate(MailTemplateCommandDTO mailTemplateCommandDTO) {
         String title = mailTemplateCommandDTO.getTitle();
         String content = mailTemplateCommandDTO.getContent();
         if(title == null){
-            return ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_TITLE;
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_DUPLICATE);
         }
         if(content == null){
             return ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT;
