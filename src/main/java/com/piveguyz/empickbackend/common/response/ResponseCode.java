@@ -48,7 +48,8 @@ public enum ResponseCode {
     EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE(false, 2600, "이름이 중복된 템플릿이 존재합니다."),
     EMPLOYMENT_MAIL_TEMPLATE_NO_TITLE(false, 2601, "제목을 입력하지 않았습니다."),
     EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT(false, 2602, "내용을 입력하지 않았습니다."),
-    EMPLOYMENT_MAIL_NO_EFFECT_EMAIL(false, 2603, "유효하지 않은 이메일입니다.");
+    EMPLOYMENT_MAIL_TEMPLATE_NOT_FOUND(false, 2603, "존재하지 않는 템플릿입니다."),
+    EMPLOYMENT_MAIL_INADEQUATE_EMAIL(false, 2604, "유효하지 않은 형태의 이메일입니다.");
 
 
 

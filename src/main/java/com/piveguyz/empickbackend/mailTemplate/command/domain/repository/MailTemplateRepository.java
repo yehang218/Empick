@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface MailTemplateRepository extends JpaRepository<MailTemplateEntity, Integer> {
     boolean existsByTitle(String title);
+
+    boolean existsByTitleAndIdNot(String title, Integer id);
 }

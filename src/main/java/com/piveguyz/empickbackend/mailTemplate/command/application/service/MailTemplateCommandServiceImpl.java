@@ -17,10 +17,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class MailTemplateCommandServiceImpl implements MailTemplateCommandService {
-    private final MailTemplateQueryService mailTemplateQueryService;
     private final MailTemplateRepository mailTemplateRepository;
-    private ModelMapper modelMapper;
-    private MailTemplateCommandMapper mailTemplateCommandMapper;
+    private final MailTemplateCommandMapper mailTemplateCommandMapper;
 
     @Override
     public MailTemplateCommandDTO createTemplate(MailTemplateCommandDTO mailTemplateCommandDTO) {
@@ -52,7 +50,7 @@ public class MailTemplateCommandServiceImpl implements MailTemplateCommandServic
         if(content == null){
             throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT);
         }
-        if(mailTemplateRepository.existsByTitle(title)){
+        if (mailTemplateRepository.existsByTitleAndIdNot(title, mailTemplateCommandDTO.getId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE);
         }
 
@@ -64,17 +62,15 @@ public class MailTemplateCommandServiceImpl implements MailTemplateCommandServic
 
     @Override
     public MailTemplateCommandDTO deleteTemplate(Integer id) {
-        MailTemplateQueryDTO foundDTO = mailTemplateQueryService.findById(id);
-        if(foundDTO == null){
-            return ResponseCode.BAD_REQUEST;
+        if(!mailTemplateRepository.existsById(id)){
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NOT_FOUND);
         }
-        MailTemplateEntity mailTemplateEntity = modelMapper.map(foundDTO, MailTemplateEntity.class);
+        MailTemplateEntity mailTemplateEntity = mailTemplateRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_NOT_FOUND));
+
         mailTemplateEntity.setIsDeleted("Y");
-        try {
-            mailTemplateRepository.save(mailTemplateEntity);
-            return ResponseCode.SUCCESS;
-        } catch (Exception e) {
-            return ResponseCode.BAD_REQUEST;
-        }
+        mailTemplateEntity = mailTemplateRepository.save(mailTemplateEntity);
+        MailTemplateCommandDTO deletedMailTemplateCommandDTO = mailTemplateCommandMapper.toDTO(mailTemplateEntity);
+        return deletedMailTemplateCommandDTO;
     }
 }

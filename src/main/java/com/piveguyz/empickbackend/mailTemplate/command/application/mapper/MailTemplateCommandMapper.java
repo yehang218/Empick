@@ -2,7 +2,9 @@ package com.piveguyz.empickbackend.mailTemplate.command.application.mapper;
 
 import com.piveguyz.empickbackend.mailTemplate.command.application.dto.MailTemplateCommandDTO;
 import com.piveguyz.empickbackend.mailTemplate.command.domain.aggregate.MailTemplateEntity;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public class MailTemplateCommandMapper {
     public static MailTemplateCommandDTO toDTO(MailTemplateEntity mailTemplateEntity) {
         MailTemplateCommandDTO mailTemplateCommandDTO = new MailTemplateCommandDTO();

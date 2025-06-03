@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.mailTemplate.command.application.controller;
 
-import com.piveguyz.empickbackend.common.response.ApiResponse;
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.mailTemplate.command.application.dto.MailTemplateCommandDTO;
 import com.piveguyz.empickbackend.mailTemplate.command.application.service.MailTemplateCommandService;
@@ -20,24 +20,23 @@ public class MailTemplateCommandController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<MailTemplateCommandDTO>> createTemplate(@RequestBody MailTemplateCommandDTO mailTemplateCommandDTO) {
+    public ResponseEntity<CustomApiResponse<MailTemplateCommandDTO>> createTemplate(@RequestBody MailTemplateCommandDTO mailTemplateCommandDTO) {
         MailTemplateCommandDTO createdMailTemplateCommandDTO = mailTemplateCommandService.createTemplate(mailTemplateCommandDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.of(ResponseCode.SUCCESS, createdMailTemplateCommandDTO));
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, createdMailTemplateCommandDTO));
     }
 
     @PostMapping("/update")
-    public ResponseEntity<ApiResponse<MailTemplateCommandDTO>> updateTemplate(@RequestBody MailTemplateCommandDTO mailTemplateCommandDTO) {
+    public ResponseEntity<CustomApiResponse<MailTemplateCommandDTO>> updateTemplate(@RequestBody MailTemplateCommandDTO mailTemplateCommandDTO) {
         MailTemplateCommandDTO updatedMailTemplateCommandDTO = mailTemplateCommandService.updateTemplate(mailTemplateCommandDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.of(ResponseCode.SUCCESS, updatedMailTemplateCommandDTO));
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, updatedMailTemplateCommandDTO));
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<MailTemplateCommandDTO>> deleteTemplate(@RequestParam("id") Integer id) {
+    public ResponseEntity<CustomApiResponse<MailTemplateCommandDTO>> deleteTemplate(@RequestParam("id") Integer id) {
         MailTemplateCommandDTO deletedMailTemplateCommandDTO = mailTemplateCommandService.deleteTemplate(id);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.of(ResponseCode.SUCCESS, deletedMailTemplateCommandDTO));
-    }
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, deletedMailTemplateCommandDTO));
     }
 }

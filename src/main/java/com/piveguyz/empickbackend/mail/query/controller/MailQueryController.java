@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.mail.query.controller;
 
-import com.piveguyz.empickbackend.common.response.ApiResponse;
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.mail.query.dto.MailQueryDTO;
 import com.piveguyz.empickbackend.mail.query.service.MailQueryService;
@@ -25,38 +25,38 @@ public class MailQueryController {
     }
 
     @GetMapping("/findAll")
-    public ResponseEntity<ApiResponse<List<MailQueryDTO>>> findAll() {
+    public ResponseEntity<CustomApiResponse<List<MailQueryDTO>>> findAll() {
         try {
             List<MailQueryDTO> mailQueryDTOList = mailQueryService.findAll();
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(ApiResponse.of(ResponseCode.SUCCESS, mailQueryDTOList));
+                    .body(CustomApiResponse.of(ResponseCode.SUCCESS, mailQueryDTOList));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.of(ResponseCode.NOT_FOUND, null));
+                    .body(CustomApiResponse.of(ResponseCode.NOT_FOUND, null));
         }
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<ApiResponse<MailQueryDTO>> findById(@RequestParam("id") Integer id){
+    public ResponseEntity<CustomApiResponse<MailQueryDTO>> findById(@RequestParam("id") Integer id){
         try {
             MailQueryDTO mailQueryDTO = mailQueryService.findById(id);
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(ApiResponse.of(ResponseCode.SUCCESS, mailQueryDTO));
+                    .body(CustomApiResponse.of(ResponseCode.SUCCESS, mailQueryDTO));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.of(ResponseCode.NOT_FOUND, null));
+                    .body(CustomApiResponse.of(ResponseCode.NOT_FOUND, null));
         }
     }
 
     @GetMapping("/findByEmail")
-    public ResponseEntity<ApiResponse<List<MailQueryDTO>>> findByEmail(@RequestParam("email") String email){
+    public ResponseEntity<CustomApiResponse<List<MailQueryDTO>>> findByEmail(@RequestParam("email") String email){
         try {
             List<MailQueryDTO> mailQueryDTOList = mailQueryService.findByEmail(email);
             return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(ApiResponse.of(ResponseCode.SUCCESS, mailQueryDTOList));
+                    .body(CustomApiResponse.of(ResponseCode.SUCCESS, mailQueryDTOList));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.of(ResponseCode.NOT_FOUND, null));
+                    .body(CustomApiResponse.of(ResponseCode.NOT_FOUND, null));
         }
     }
 }
