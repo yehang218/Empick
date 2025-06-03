@@ -1,0 +1,4 @@
+package com.piveguyz.empickbackend.employment.introduce.command.domain.repository;
+
+public class IntroduceStandardRepository {
+}
