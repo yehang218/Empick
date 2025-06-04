@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.applicant.query.mapper.ApplicantBookmarkMapper">
+    <resultMap id="ApplicantBookmarkResultMap" type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantBookmarkQueryDTO">
+        <result property="memberId" column="member_id"/>
+        <result property="applicantId" column="applicant_id"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="profileUrl" column="profile_url"/>
+        <result property="birth" column="birth"/>
+        <result property="address" column="address"/>
+    </resultMap>
+
+    <select id="findAllApplicantBookmark" resultMap="ApplicantBookmarkResultMap">
+        SELECT
+        ab.member_id,
+        a.id AS applicant_id,
+        a.name,
+        a.phone,
+        a.email,
+        a.profile_url,
+        a.birth,
+        a.address
+        FROM applicant_bookmark ab
+        JOIN applicant a ON ab.applicant_id = a.id
+
+    </select>
+</mapper>
