@@ -7,5 +7,5 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class InterviewSheetItemQueryServiceImpl {
+public class InterviewSheetItemQueryServiceImpl implements InterviewSheetItemQueryService {
 }
