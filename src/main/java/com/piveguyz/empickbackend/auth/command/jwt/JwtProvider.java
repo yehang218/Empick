@@ -54,4 +54,15 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
+    public int getMemberIdFromToken(String refreshToken) {
+        Claims claims = parseClaims(refreshToken);
+        Object memberIdObj = claims.get("memberId");
+
+        if (memberIdObj != null) {
+            return (int) claims.get("memberId");
+        } else {
+            return Integer.parseInt(claims.getSubject());
+        }
+    }
 }
