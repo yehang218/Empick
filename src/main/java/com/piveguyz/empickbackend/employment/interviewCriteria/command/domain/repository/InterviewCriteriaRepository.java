@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InterviewCriteriaRepository extends JpaRepository<InterviewCriteriaEntity, Integer> {
+    boolean existsByContent(String content);
+
+    boolean existsByContentAndIdNot(String content, Integer id);
 }
