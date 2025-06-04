@@ -56,6 +56,9 @@ public enum ResponseCode {
     EMPLOYMENT_QUESTION_INVALID_DIFFICULTY(false, HttpStatus.BAD_REQUEST, 2414, "유효하지 않은 난이도입니다."),
     EMPLOYMENT_QUESTION_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2415, "작성자 정보가 유효하지 않습니다."),
 
+    EMPLOYMENT_OPTION_COUNT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2416, "선택지는 최대 5개까지만 등록할 수 있습니다."),
+    EMPLOYMENT_QUESTION_OPTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2417, "선택지를 찾을 수 없습니다."),
+
     //  면접 일정 - 2500 ~ 2599
 
 

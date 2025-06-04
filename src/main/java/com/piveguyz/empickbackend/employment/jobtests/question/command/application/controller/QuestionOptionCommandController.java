@@ -1,0 +1,77 @@
+package com.piveguyz.empickbackend.employment.jobtests.question.command.application.controller;
+
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionOptionCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionOptionResponse;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.UpdateQuestionOptionCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.application.service.QuestionOptionCommandService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@Tag(name = "실무 테스트 문제 선택지 API", description = "실무테스트 문제 선택지 등록, 수정, 삭제 API")
+@RestController
+@RequestMapping("/api/v1/employment/jobtest/question-option")
+public class QuestionOptionCommandController {
+    private final QuestionOptionCommandService questionOptionCommandService;
+
+    public QuestionOptionCommandController(QuestionOptionCommandService questionOptionCommandService) {
+        this.questionOptionCommandService = questionOptionCommandService;
+    }
+
+
+    @Operation(
+            summary = "실무테스트 문제 선택지 등록",
+            description = """
+                     실무 테스트 선택지를 등록합니다.
+                     실무 테스트 당 최대 5개까지 가능합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "2416", description = "선택지는 최대 5개까지만 등록할 수 있습니다."),
+    })
+    @PostMapping
+    public ResponseEntity<CustomApiResponse<CreateQuestionOptionResponse>> createQuestion(@RequestBody @Valid CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO) {
+        CreateQuestionOptionResponse newOptionDTO = questionOptionCommandService.createQuestionOption(createQuestionOptionCommandDTO);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, newOptionDTO));
+    }
+
+    @Operation(
+            summary = "실무테스트 문제 선택지 수정",
+            description = """
+                     실무 테스트 선택지를 수정합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "2417", description = "선택지를 찾을 수 없습니다."),
+    })
+    @PatchMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<UpdateQuestionOptionCommandDTO>> updateOption(
+            @PathVariable int id,
+            @RequestBody UpdateQuestionOptionCommandDTO updateQuestionOptionCommandDTO) {
+        var updated = questionOptionCommandService.updateQuestionOption(id, updateQuestionOptionCommandDTO);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, updated));
+    }
+
+    @Operation(
+            summary = "실무테스트 문제 선택지 삭제",
+            description = """
+                     실무 테스트 선택지를 삭제합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "2417", description = "선택지를 찾을 수 없습니다."),
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<Integer>> deleteOption(
+            @PathVariable int id) {
+        int deleteId = questionOptionCommandService.deleteQuestionOption(id);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, deleteId));
+    }
+}
