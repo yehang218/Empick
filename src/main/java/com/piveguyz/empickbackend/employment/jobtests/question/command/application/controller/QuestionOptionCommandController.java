@@ -50,6 +50,7 @@ public class QuestionOptionCommandController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "2417", description = "선택지를 찾을 수 없습니다."),
+            @ApiResponse(responseCode = "2418", description = "선택지는 5번을 초과할 수 없습니다."),
     })
     @PatchMapping("/{id}")
     public ResponseEntity<CustomApiResponse<UpdateQuestionOptionCommandDTO>> updateOption(

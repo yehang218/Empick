@@ -41,6 +41,11 @@ public class QuestionOptionCommandServiceImpl implements QuestionOptionCommandSe
         QuestionOptionEntity option = questionOptionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_OPTION_NOT_FOUND));
 
+        int optionNumber = updateQuestionOptionCommandDTO.getOptionNumber();
+        if (optionNumber > 5) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_OPTION_MAX_NUMBER);
+        }
+
         option.updateQuestionOptionEntity(updateQuestionOptionCommandDTO);
         QuestionOptionEntity optionEntity = questionOptionRepository.save(option);
 

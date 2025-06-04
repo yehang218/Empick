@@ -58,6 +58,7 @@ public enum ResponseCode {
 
     EMPLOYMENT_OPTION_COUNT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2416, "선택지는 최대 5개까지만 등록할 수 있습니다."),
     EMPLOYMENT_QUESTION_OPTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2417, "선택지를 찾을 수 없습니다."),
+    EMPLOYMENT_QUESTION_OPTION_MAX_NUMBER(false, HttpStatus.BAD_REQUEST, 2418, "선택지는 5번을 초과할 수 없습니다."),
 
     //  면접 일정 - 2500 ~ 2599
 
