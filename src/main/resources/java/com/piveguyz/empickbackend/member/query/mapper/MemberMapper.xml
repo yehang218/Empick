@@ -1,5 +1,8 @@
-<!-- src/main/resources/mapper/MemberMapper.xml -->
-<mapper namespace="com.piveguyz.empickbackend.member.query.MemberMapper">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.piveguyz.empickbackend.member.query.mapper.MemberMapper">
 
     <select id="findRolesByEmployeeNumber" parameterType="int" resultType="string">
         SELECT r.code
