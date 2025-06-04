@@ -78,4 +78,23 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NO_MEMBER_ID);
 		}
 	}
+
+	@Override
+	public void updateStatus(int id, int status) {
+		Recruitment recruitment = recruitmentRepository.findById(id)
+			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NOT_FOUND));
+
+		int currentStatus = recruitment.getStatus();
+
+		boolean valid =
+			(currentStatus == 0 && status == 1) || // 대기 → 승인
+				(currentStatus == 1 && status == 2) || // 승인 → 게시
+				(currentStatus == 2 && status == 3);   // 게시 → 종료
+
+		if (!valid) {
+			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_INVALID_STATUS_TRANSITION);
+		}
+
+		recruitment.setStatus(status);
+	}
 }

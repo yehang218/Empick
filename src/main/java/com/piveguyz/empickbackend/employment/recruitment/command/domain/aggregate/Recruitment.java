@@ -27,6 +27,7 @@ public class Recruitment {
 	@Column(name = "recruit_type")
 	private int recruitType;
 
+	@Setter
 	private int status;
 
 	@Column(name = "image_url")
@@ -67,4 +68,5 @@ public class Recruitment {
 		this.introduceTemplateId = dto.getIntroduceTemplateId();
 		this.recruitmentRequestId = dto.getRecruitmentRequestId();
 	}
+
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
@@ -50,6 +51,20 @@ public class RecruitmentCommandController {
 	@PutMapping("/{id}")
 	public ResponseEntity<CustomApiResponse<Void>> update(@PathVariable int id, @RequestBody RecruitmentCommandDTO dto) {
 		recruitmentCommandService.updateRecruitment(id, dto);
+		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+			.body(CustomApiResponse.of(ResponseCode.SUCCESS));
+	}
+
+	@Operation(summary = "채용 공고 상태 변경", description = "채용 공고의 상태를 승인/게시/종료로 변경합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "상태 변경이 성공적으로 처리되었습니다."),
+		@ApiResponse(responseCode = "2030", description = "요청한 채용 공고를 찾을 수 없습니다."),
+		@ApiResponse(responseCode = "2043", description = "잘못된 상태 전환입니다."),
+		@ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
+	})
+	@PutMapping("/status/{id}")
+	public ResponseEntity<CustomApiResponse<Void>> updateStatus(@PathVariable int id, @RequestParam int status) {
+		recruitmentCommandService.updateStatus(id, status);
 		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS));
 	}

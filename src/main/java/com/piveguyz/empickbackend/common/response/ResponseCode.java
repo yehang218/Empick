@@ -48,6 +48,7 @@ public enum ResponseCode {
     EMPLOYMENT_RECRUITMENT_NO_INTRODUCE_TEMPLATE(false, HttpStatus.BAD_REQUEST, 2040, "자기소개서 템플릿이 지정되지 않았습니다."),
     EMPLOYMENT_RECRUITMENT_NO_MEMBER_ID(false, HttpStatus.BAD_REQUEST, 2041, "작성자 정보가 누락되었습니다."),
     EMPLOYMENT_RECRUITMENT_DUPLICATE_TITLE(false, HttpStatus.CONFLICT, 2042, "같은 제목의 채용 공고가 이미 존재합니다."),
+    EMPLOYMENT_RECRUITMENT_INVALID_STATUS_TRANSITION(false, HttpStatus.CONFLICT, 2043, "잘못된 상태 전환입니다. 승인 대기 → 승인 → 게시 → 종료 순으로만 변경 가능합니다."),
     //  지원자 - 2100 ~ 2199
 
 
