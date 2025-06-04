@@ -2,6 +2,7 @@ package com.piveguyz.empickbackend.auth.command.application.controller;
 
 import com.piveguyz.empickbackend.auth.command.application.dto.LoginRequestDTO;
 import com.piveguyz.empickbackend.auth.command.application.dto.LoginResponseDTO;
+import com.piveguyz.empickbackend.auth.command.application.dto.LogoutRequestDTO;
 import com.piveguyz.empickbackend.auth.command.application.dto.RefreshTokenRequestDTO;
 import com.piveguyz.empickbackend.auth.command.application.service.AuthCommandService;
 import com.piveguyz.empickbackend.auth.command.application.service.RefreshTokenService;
@@ -67,6 +68,25 @@ public class AuthCommandController {
     public ResponseEntity<CustomApiResponse<LoginResponseDTO>> login(@Valid @RequestBody LoginRequestDTO request) {
         LoginResponseDTO responseDTO = authCommandService.login(request);
         return ResponseEntity.status(HttpStatus.OK).body(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
+    }
+
+    @Operation(
+            summary = "로그아웃",
+            description = "Refresh Token을 Redis에서 삭제하여 로그아웃 처리"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청",
+                    content = @Content(examples = @ExampleObject(
+                            value = ApiExamples.ERROR_400_EXAMPLE))),
+            @ApiResponse(responseCode = "500", description = "서버 오류",
+                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_500_EXAMPLE)))
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<CustomApiResponse<Void>> logout(@RequestBody LogoutRequestDTO request) {
+        int memberId = jwtProvider.getMemberIdFromToken(request.getRefreshToken());
+        refreshTokenService.deleteRefreshToken(memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(CustomApiResponse.of(ResponseCode.SUCCESS, null));
     }
 
 //    @PostMapping("/logout")
