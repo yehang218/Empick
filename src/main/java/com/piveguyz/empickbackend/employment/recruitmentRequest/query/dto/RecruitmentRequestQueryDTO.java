@@ -18,4 +18,6 @@ public class RecruitmentRequestQueryDTO {
 	private LocalDateTime createdAt;
 	private int memberId;
 	private int departmentId;
+	private String memberName;
+	private String departmentName;
 }

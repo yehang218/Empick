@@ -18,42 +18,52 @@
         <result column="created_at" property="createdAt"/>
         <result column="member_id" property="memberId"/>
         <result column="department_id" property="departmentId"/>
+        <result column="member_name" property="memberName"/>
+        <result column="department_name" property="departmentName"/>
     </resultMap>
 
     <select id="findAll" resultMap="RecruitmentRequestResultMap">
         SELECT
-            id,
-            headcount,
-            started_at,
-            ended_at,
-            qualification,
-            preference,
-            responsibility,
-            employment_type,
-            work_location,
-            created_at,
-            member_id,
-            department_id
-        FROM recruitment_request
-        ORDER BY created_at DESC
+               rr.id,
+               rr.headcount,
+               rr.started_at,
+               rr.ended_at,
+               rr.qualification,
+               rr.preference,
+               rr.responsibility,
+               rr.employment_type,
+               rr.work_location,
+               rr.created_at,
+               rr.member_id,
+               rr.department_id,
+               m.name AS member_name,
+               d.name AS department_name
+          FROM recruitment_request rr
+          LEFT JOIN member m ON rr.member_id = m.id
+          LEFT JOIN department d ON rr.department_id = d.id
+         ORDER BY rr.created_at DESC
     </select>
 
     <select id="findById" resultMap="RecruitmentRequestResultMap">
         SELECT
-            id,
-            headcount,
-            started_at,
-            ended_at,
-            qualification,
-            preference,
-            responsibility,
-            employment_type,
-            work_location,
-            created_at,
-            member_id,
-            department_id
-        FROM recruitment_request
-        WHERE id = #{id}
+               rr.id,
+               rr.headcount,
+               rr.started_at,
+               rr.ended_at,
+               rr.qualification,
+               rr.preference,
+               rr.responsibility,
+               rr.employment_type,
+               rr.work_location,
+               rr.created_at,
+               rr.member_id,
+               rr.department_id,
+               m.name AS member_name,
+               d.name AS department_name
+          FROM recruitment_request rr
+          LEFT JOIN member m ON rr.member_id = m.id
+          LEFT JOIN department d ON rr.department_id = d.id
+         WHERE rr.id = #{id}
     </select>
 
 </mapper>
