@@ -8,14 +8,14 @@ import lombok.Data;
 public class RecruitmentRequestQueryDTO {
 	private int id;
 	private int headcount;
-	private LocalDateTime started_at;
-	private LocalDateTime ended_at;
+	private LocalDateTime startedAt;
+	private LocalDateTime endedAt;
 	private String qualification;
 	private String preference;
 	private String responsibility;
-	private String employment_type;
-	private String work_location;
-	private LocalDateTime created_at;
-	private int member_id;
-	private int department_id;
+	private String employmentType;
+	private String workLocation;
+	private LocalDateTime createdAt;
+	private int memberId;
+	private int departmentId;
 }

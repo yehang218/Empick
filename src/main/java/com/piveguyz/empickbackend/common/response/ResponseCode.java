@@ -31,7 +31,7 @@ public enum ResponseCode {
 
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
-
+    EMPLOYMENT_REQUEST_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2000, "채용 요청서를 찾을 수 없습니다."),
 
     //  지원자 - 2100 ~ 2199
 

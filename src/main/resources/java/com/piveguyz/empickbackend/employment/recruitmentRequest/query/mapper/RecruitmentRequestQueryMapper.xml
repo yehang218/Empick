@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.recruitmentRequest.query.mapper.RecruitmentRequestQueryMapper">
+
+    <resultMap id="RecruitmentRequestResultMap" type="com.piveguyz.empickbackend.employment.recruitmentRequest.query.dto.RecruitmentRequestQueryDTO">
+        <id column="id" property="id"/>
+        <result column="headcount" property="headcount"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="ended_at" property="endedAt"/>
+        <result column="qualification" property="qualification"/>
+        <result column="preference" property="preference"/>
+        <result column="responsibility" property="responsibility"/>
+        <result column="employment_type" property="employmentType"/>
+        <result column="work_location" property="workLocation"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="member_id" property="memberId"/>
+        <result column="department_id" property="departmentId"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="RecruitmentRequestResultMap">
+        SELECT
+            id,
+            headcount,
+            started_at,
+            ended_at,
+            qualification,
+            preference,
+            responsibility,
+            employment_type,
+            work_location,
+            created_at,
+            member_id,
+            department_id
+        FROM recruitment_request
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findById" resultMap="RecruitmentRequestResultMap">
+        SELECT
+            id,
+            headcount,
+            started_at,
+            ended_at,
+            qualification,
+            preference,
+            responsibility,
+            employment_type,
+            work_location,
+            created_at,
+            member_id,
+            department_id
+        FROM recruitment_request
+        WHERE id = #{id}
+    </select>
+
+</mapper>
