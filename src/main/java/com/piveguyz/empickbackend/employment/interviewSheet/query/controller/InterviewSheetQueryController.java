@@ -16,16 +16,16 @@ import java.util.List;
 @RestController
 @RequestMapping("api/v1/employment/interviewSheet")
 public class InterviewSheetQueryController {
-    private final InterviewSheetQueryService interviewSheetQueryService;
+    private final InterviewSheetQueryService service;
 
     @Autowired
-    public InterviewSheetQueryController(InterviewSheetQueryService interviewSheetQueryService) {
-        this.interviewSheetQueryService = interviewSheetQueryService;
+    public InterviewSheetQueryController(InterviewSheetQueryService service) {
+        this.service = service;
     }
 
     @GetMapping("/findAll")
     public ResponseEntity<CustomApiResponse<List<InterviewSheetQueryDTO>>> findAll() {
-        List<InterviewSheetQueryDTO> dtoList = interviewSheetQueryService.findAll();
+        List<InterviewSheetQueryDTO> dtoList = service.findAll();
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, dtoList));
@@ -33,7 +33,7 @@ public class InterviewSheetQueryController {
 
     @GetMapping("/findById")
     public ResponseEntity<CustomApiResponse<InterviewSheetQueryDTO>> findById(@RequestParam("id") Integer id) {
-        InterviewSheetQueryDTO dto = interviewSheetQueryService.findById(id);
+        InterviewSheetQueryDTO dto = service.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, dto));
@@ -41,7 +41,7 @@ public class InterviewSheetQueryController {
 
     @GetMapping("/searchByName")
     public ResponseEntity<CustomApiResponse<List<InterviewSheetQueryDTO>>> searchByName(@RequestParam("name") String name) {
-        List<InterviewSheetQueryDTO> dtoList = interviewSheetQueryService.searchByName(name);
+        List<InterviewSheetQueryDTO> dtoList = service.searchByName(name);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, dtoList));
