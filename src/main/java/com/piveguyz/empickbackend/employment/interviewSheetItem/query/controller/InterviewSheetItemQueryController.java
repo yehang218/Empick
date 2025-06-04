@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class InterviewSheetItemQueryController {
     }
 
     @GetMapping("/findById")
-    public ResponseEntity<CustomApiResponse<InterviewSheetItemQueryDTO>> findById(Integer id) {
+    public ResponseEntity<CustomApiResponse<InterviewSheetItemQueryDTO>> findById(@RequestParam("id") Integer id) {
         InterviewSheetItemQueryDTO dto = service.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
@@ -39,7 +40,7 @@ public class InterviewSheetItemQueryController {
     }
 
     @GetMapping("/findBySheetId")
-    public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findBySheetId(Integer sheetId) {
+    public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findBySheetId(@RequestParam("sheetId") Integer sheetId) {
         List<InterviewSheetItemQueryDTO> dtoList = service.findBySheetId(sheetId);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
@@ -47,4 +48,10 @@ public class InterviewSheetItemQueryController {
     }
 
     @GetMapping("/findByCriteriaId")
+    public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findByCriteriaId(@RequestParam("criteriaId") Integer criteriaId) {
+        List<InterviewSheetItemQueryDTO> dtoList = service.findByCriteriaId(criteriaId);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dtoList));
+    }
 }

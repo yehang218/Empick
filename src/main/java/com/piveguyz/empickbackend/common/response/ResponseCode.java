@@ -57,6 +57,7 @@ public enum ResponseCode {
     EMPLOYMENT_QUESTION_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2415, "작성자 정보가 유효하지 않습니다."),
 
     //  면접 일정 - 2500 ~ 2599
+    EMPLOYMENT_INTERVIEW_SHEET_ITEM_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2530, "존재하지 않는 항목입니다."),
 
 
     //  안내 메일 - 2600 ~ 2699
