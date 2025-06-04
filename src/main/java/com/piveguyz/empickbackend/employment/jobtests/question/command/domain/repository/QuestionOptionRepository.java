@@ -9,8 +9,4 @@ import java.util.Optional;
 @Repository
 public interface QuestionOptionRepository extends JpaRepository<QuestionOptionEntity, Integer> {
     int countByQuestionId(int questionId);
-
-    // 문제별 가장 큰 선택지 번호
-    Optional<QuestionOptionEntity> findTopByQuestionIdOrderByOptionNumberDesc(int questionId);
-
 }
