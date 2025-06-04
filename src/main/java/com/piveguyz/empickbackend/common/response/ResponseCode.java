@@ -58,6 +58,7 @@ public enum ResponseCode {
 
     //  면접 일정 - 2500 ~ 2599
     EMPLOYMENT_INTERVIEW_SHEET_ITEM_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2530, "존재하지 않는 항목입니다."),
+    EMPLOYMENT_INTERVIEW_SHEET_ITEM_DUPLICATE(false, HttpStatus.BAD_REQUEST, 2531, "이미 존재하는 항목입니다."),
 
 
     //  안내 메일 - 2600 ~ 2699
