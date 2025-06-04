@@ -1,3 +1,4 @@
+# SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS application_item;
 DROP TABLE IF EXISTS application_item_category;
 DROP TABLE IF EXISTS recruitment_template_copy;
@@ -6,6 +7,7 @@ DROP TABLE IF EXISTS recruitment_process;
 DROP TABLE IF EXISTS recruitment;
 DROP TABLE IF EXISTS recruitment_template;
 DROP TABLE IF EXISTS recruitment_request;
+# SET FOREIGN_KEY_CHECKS = 1;
 
 -- 채용요청서
 CREATE TABLE IF NOT EXISTS recruitment_request (
@@ -15,12 +17,12 @@ CREATE TABLE IF NOT EXISTS recruitment_request (
     ended_at DATETIME NOT NULL,
     qualification VARCHAR(255),
     preference VARCHAR(255),
-    responsibilities VARCHAR(255),
+    responsibility VARCHAR(255),
     employment_type VARCHAR(255) NOT NULL,
     work_location VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     member_id INT NOT NULL,
     department_id INT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT pk_recruitment_request PRIMARY KEY (id),
     CONSTRAINT fk_recruitment_request_member_id FOREIGN KEY (member_id) REFERENCES member(id),
@@ -48,19 +50,20 @@ CREATE TABLE IF NOT EXISTS recruitment (
     recruit_type TINYINT NOT NULL,
     status TINYINT NOT NULL DEFAULT 0,
     image_url VARCHAR(255),
-    started_at DATETIME,
-    ended_at DATETIME,
+    started_at DATETIME NOT NULL,
+    ended_at DATETIME NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at DATETIME,
     member_id INT NOT NULL,
     recruitment_template_id INT,
-#     introduce_template_id INT NOT NULL,
+    introduce_template_id INT NOT NULL,
     recruitment_request_id INT UNIQUE,
 
     CONSTRAINT pk_recruitment PRIMARY KEY (id),
     CONSTRAINT fk_recruitment_member_id FOREIGN KEY (member_id) REFERENCES member(id),
     CONSTRAINT fk_recruitment_template_id FOREIGN KEY (recruitment_template_id) REFERENCES recruitment_template(id),
-#     CONSTRAINT fk_introduce_template_id FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
+    CONSTRAINT fk_introduce_template_id FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
     CONSTRAINT fk_recruitment_request_id FOREIGN KEY (recruitment_request_id) REFERENCES recruitment_request(id)
 );
 
