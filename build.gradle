@@ -47,6 +47,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.modelmapper:modelmapper:3.2.0'
 
+    // https://mvnrepository.com/artifact/org.mybatis/mybatis
+    implementation("org.mybatis:mybatis:3.5.16")
+
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl

@@ -1,0 +1,19 @@
+package com.piveguyz.empickbackend.employment.interviewScore.command.application.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class InterviewScoreCommandDTO {
+    private Integer id;
+    private Integer interviewId;
+    private Integer interviewerId;
+    private Integer itemId;
+    private Double score;
+    private String review;
+}
