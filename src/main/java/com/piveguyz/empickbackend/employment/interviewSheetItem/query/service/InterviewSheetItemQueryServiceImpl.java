@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interviewSheetItem.query.service;
+package com.piveguyz.empickbackend.employment.interviewSheetItem.query.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

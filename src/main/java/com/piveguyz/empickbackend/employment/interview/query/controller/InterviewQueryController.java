@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interview.query.controller;
+package com.piveguyz.empickbackend.employment.interview.query.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interviewCriteria.command.application.service;
+package com.piveguyz.empickbackend.employment.interviewCriteria.command.application.service;
 
 
 public interface InterviewCriteriaCommandService {

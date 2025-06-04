@@ -1,9 +1,9 @@
-package com.piveguyz.empickbackend.interviewSheet.command.domain.repository;
+package com.piveguyz.empickbackend.employment.interviewSheet.command.domain.repository;
 
-import com.piveguyz.empickbackend.interview.command.domain.aggregate.InterviewEntity;
+import com.piveguyz.empickbackend.employment.interviewSheet.command.domain.aggregate.InterviewSheetEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InterviewSheetRepository extends JpaRepository<InterviewEntity, Integer> {
+public interface InterviewSheetRepository extends JpaRepository<InterviewSheetEntity, Integer> {
 }

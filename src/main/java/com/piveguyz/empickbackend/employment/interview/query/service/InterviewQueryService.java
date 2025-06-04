@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interview.query.service;
+package com.piveguyz.empickbackend.employment.interview.query.service;
 
 public interface InterviewQueryService {
 }

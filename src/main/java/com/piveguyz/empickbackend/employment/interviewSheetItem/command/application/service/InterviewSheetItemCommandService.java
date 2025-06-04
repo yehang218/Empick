@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interviewSheetItem.command.application.service;
+package com.piveguyz.empickbackend.employment.interviewSheetItem.command.application.service;
 
 
 public interface InterviewSheetItemCommandService {

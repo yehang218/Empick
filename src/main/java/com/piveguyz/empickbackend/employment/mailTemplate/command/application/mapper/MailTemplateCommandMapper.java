@@ -3,10 +3,11 @@ package com.piveguyz.empickbackend.employment.mailTemplate.command.application.m
 import com.piveguyz.empickbackend.employment.mailTemplate.command.application.dto.MailTemplateCommandDTO;
 import com.piveguyz.empickbackend.employment.mailTemplate.command.domain.aggregate.MailTemplateEntity;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
 
-@Mapper
+@Component
 public class MailTemplateCommandMapper {
-    public static MailTemplateCommandDTO toDTO(MailTemplateEntity mailTemplateEntity) {
+    public MailTemplateCommandDTO toDTO(MailTemplateEntity mailTemplateEntity) {
         MailTemplateCommandDTO mailTemplateCommandDTO = new MailTemplateCommandDTO();
 
         mailTemplateCommandDTO.setId(mailTemplateEntity.getId());
@@ -18,7 +19,7 @@ public class MailTemplateCommandMapper {
         return mailTemplateCommandDTO;
     }
 
-    public static MailTemplateEntity toEntity(MailTemplateCommandDTO mailTemplateCommandDTO) {
+    public  MailTemplateEntity toEntity(MailTemplateCommandDTO mailTemplateCommandDTO) {
         MailTemplateEntity mailTemplateEntity = new MailTemplateEntity();
         mailTemplateEntity.setId(mailTemplateCommandDTO.getId());
         mailTemplateEntity.setTitle(mailTemplateCommandDTO.getTitle());

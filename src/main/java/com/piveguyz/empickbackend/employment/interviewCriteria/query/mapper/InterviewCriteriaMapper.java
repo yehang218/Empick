@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interviewCriteria.query.mapper;
+package com.piveguyz.empickbackend.employment.interviewCriteria.query.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 

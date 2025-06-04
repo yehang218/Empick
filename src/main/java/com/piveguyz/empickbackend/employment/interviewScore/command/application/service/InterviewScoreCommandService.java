@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interviewScore.command.application.service;
+package com.piveguyz.empickbackend.employment.interviewScore.command.application.service;
 
 
 public interface InterviewScoreCommandService {

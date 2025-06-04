@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interviewSheetItem.query.mapper;
+package com.piveguyz.empickbackend.employment.interviewSheetItem.query.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 

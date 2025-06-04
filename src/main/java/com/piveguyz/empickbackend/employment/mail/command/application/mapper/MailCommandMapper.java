@@ -2,9 +2,9 @@ package com.piveguyz.empickbackend.employment.mail.command.application.mapper;
 
 import com.piveguyz.empickbackend.employment.mail.command.application.dto.MailCommandDTO;
 import com.piveguyz.empickbackend.employment.mail.command.domain.aggregate.MailEntity;
-import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
 
-@Mapper
+@Component
 public class MailCommandMapper {
     public MailCommandDTO toDTO(MailEntity savedMailEntity) {
         MailCommandDTO mailCommandDTO = new MailCommandDTO();

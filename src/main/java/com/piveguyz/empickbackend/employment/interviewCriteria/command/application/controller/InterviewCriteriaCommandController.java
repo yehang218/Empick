@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.interviewCriteria.command.application.controller;
+package com.piveguyz.empickbackend.employment.interviewCriteria.command.application.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

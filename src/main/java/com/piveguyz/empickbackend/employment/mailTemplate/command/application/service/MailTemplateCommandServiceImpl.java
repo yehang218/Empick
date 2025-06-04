@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,8 +33,14 @@ public class MailTemplateCommandServiceImpl implements MailTemplateCommandServic
             throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE);
         }
 
-        MailTemplateEntity mailTemplateEntity = mailTemplateCommandMapper.toEntity(mailTemplateCommandDTO);
+        MailTemplateEntity mailTemplateEntity = new MailTemplateEntity();
+        mailTemplateEntity.setTitle(title);
+        mailTemplateEntity.setContent(content);
+        mailTemplateEntity.setIsDeleted("N");
+        mailTemplateEntity.setMemberId(1);
+        mailTemplateEntity.setUpdatedAt(LocalDateTime.now());
         MailTemplateEntity createdMailTemplateEntity = mailTemplateRepository.save(mailTemplateEntity);
+
         MailTemplateCommandDTO createdMailTemplateCommandDTO = mailTemplateCommandMapper.toDTO(createdMailTemplateEntity);
         return createdMailTemplateCommandDTO;
     }
