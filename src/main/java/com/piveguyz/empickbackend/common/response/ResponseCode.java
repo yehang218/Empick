@@ -34,7 +34,20 @@ public enum ResponseCode {
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
 
-
+    // 3) 채용공고
+    EMPLOYMENT_RECRUITMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2030, "요청한 채용 공고를 찾을 수 없습니다."),
+    EMPLOYMENT_RECRUITMENT_INVALID_PERIOD(false, HttpStatus.BAD_REQUEST, 2031, "채용 기간이 유효하지 않습니다."),
+    EMPLOYMENT_RECRUITMENT_ALREADY_DELETED(false, HttpStatus.GONE, 2032, "이미 삭제된 채용 공고입니다."),
+    EMPLOYMENT_RECRUITMENT_UNAUTHORIZED_ACCESS(false, HttpStatus.FORBIDDEN, 2033, "채용 공고에 접근할 권한이 없습니다."),
+    EMPLOYMENT_RECRUITMENT_CANNOT_MODIFY_PUBLISHED(false, HttpStatus.CONFLICT, 2034, "게시된 채용 공고는 수정할 수 없습니다."),
+    EMPLOYMENT_RECRUITMENT_NO_TITLE(false, HttpStatus.BAD_REQUEST, 2035, "채용 공고 제목을 입력하지 않았습니다."),
+    EMPLOYMENT_RECRUITMENT_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2036, "채용 공고 내용을 입력하지 않았습니다."),
+    EMPLOYMENT_RECRUITMENT_NO_START_DATE(false, HttpStatus.BAD_REQUEST, 2037, "채용 시작일을 입력하지 않았습니다."),
+    EMPLOYMENT_RECRUITMENT_NO_END_DATE(false, HttpStatus.BAD_REQUEST, 2038, "채용 마감일을 입력하지 않았습니다."),
+    EMPLOYMENT_RECRUITMENT_INVALID_DATE_ORDER(false, HttpStatus.BAD_REQUEST, 2039, "마감일은 시작일보다 이후여야 합니다."),
+    EMPLOYMENT_RECRUITMENT_NO_INTRODUCE_TEMPLATE(false, HttpStatus.BAD_REQUEST, 2040, "자기소개서 템플릿이 지정되지 않았습니다."),
+    EMPLOYMENT_RECRUITMENT_NO_MEMBER_ID(false, HttpStatus.BAD_REQUEST, 2041, "작성자 정보가 누락되었습니다."),
+    EMPLOYMENT_RECRUITMENT_DUPLICATE_TITLE(false, HttpStatus.CONFLICT, 2042, "같은 제목의 채용 공고가 이미 존재합니다."),
     //  지원자 - 2100 ~ 2199
 
 
