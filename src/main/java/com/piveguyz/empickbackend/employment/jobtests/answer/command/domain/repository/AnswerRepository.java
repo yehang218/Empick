@@ -1,4 +1,4 @@
 package com.piveguyz.empickbackend.employment.jobtests.answer.command.domain.repository;
 
-public class AnswerRepository {
+public interface AnswerRepository {
 }
