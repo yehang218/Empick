@@ -3,11 +3,16 @@ package com.piveguyz.empickbackend.auth.command.application.service;
 import com.piveguyz.empickbackend.auth.command.application.dto.LoginRequestDTO;
 import com.piveguyz.empickbackend.auth.command.application.dto.LoginResponseDTO;
 import com.piveguyz.empickbackend.auth.command.jwt.JwtProvider;
+import com.piveguyz.empickbackend.common.exception.BusinessException;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
+import com.piveguyz.empickbackend.member.query.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +21,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final MemberMapper memberMapper;
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO requestDTO) {
@@ -23,13 +29,23 @@ public class AuthCommandServiceImpl implements AuthCommandService {
                 Integer.parseInt(
                         requestDTO.getEmployeeNumber()
                 )
-        ).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+        ).orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
 
         if (!passwordEncoder.matches(requestDTO.getPassword(), member.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new BusinessException(ResponseCode.BAD_REQUEST); // 로그인 실패의 정확한 원인을 밝히지 않기 위함
         }
 
-        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber());
+        if (member.getResignAt() != null) {
+            throw new BusinessException(ResponseCode.MEMBER_RESIGNED);
+        }
+
+        if (member.getStatus() != 0) {
+            throw new BusinessException(ResponseCode.MEMBER_STATUS_SUSPENDED);
+        }
+
+        List<String> roles = memberMapper.findRolesByEmployeeNumber(member.getEmployeeNumber());
+
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber(), roles);
         String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmployeeNumber());
 
         return LoginResponseDTO.builder()

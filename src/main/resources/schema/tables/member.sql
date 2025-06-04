@@ -15,18 +15,18 @@ CREATE TABLE `member`
     `address`           VARCHAR(255) NOT NULL COMMENT '주소',
     `vacation_count`    INT          NOT NULL DEFAULT 0 COMMENT '휴가 일수',
     `hire_at`           DATETIME     NOT NULL COMMENT '입사일',
-    `resign_at`         DATETIME     NULL COMMENT '퇴사일',
+    `resign_at`         DATETIME NULL COMMENT '퇴사일',
     `created_at`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    `updated_at`        DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
-    `created_member_id` INT          NULL COMMENT '입사처리자',
-    `deleted_member_id` INT          NULL COMMENT '퇴사처리자',
-    `updated_member_id` INT          NULL COMMENT '수정자',
-    `last_login_at`     DATETIME     NULL COMMENT '로그인 시작',
+    `updated_at`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `created_member_id` INT NULL COMMENT '입사처리자',
+    `deleted_member_id` INT NULL COMMENT '퇴사처리자',
+    `updated_member_id` INT NULL COMMENT '수정자',
+    `last_login_at`     DATETIME NULL COMMENT '로그인 시작',
     `status`            TINYINT      NOT NULL COMMENT '계정 상태 (0 = 비활성, 1 = 활성)',
-    `department_id`     INT          NULL COMMENT '부서',
-    `position_id`       INT          NULL COMMENT '직책',
-    `job_id`            INT          NULL COMMENT '직무',
-    `rank_id`           INT          NULL COMMENT '직급',
+    `department_id`     INT NULL COMMENT '부서',
+    `position_id`       INT NULL COMMENT '직책',
+    `job_id`            INT NULL COMMENT '직무',
+    `rank_id`           INT NULL COMMENT '직급',
     CONSTRAINT `fk_member_department`
         FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_member_position_id`
@@ -35,15 +35,15 @@ CREATE TABLE `member`
         FOREIGN KEY (`job_id`) REFERENCES `job` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_member_rank_id`
         FOREIGN KEY (`rank_id`) REFERENCES `rank` (`id`) ON DELETE CASCADE
-)
-    COMMENT = '사원 테이블';
+) COMMENT = '사원 테이블';
 
-# status는 트리거 적용 가능
+#
+status는 트리거 적용 가능
 CREATE TABLE `member_edit`
 (
     `id`                 INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '사원 테이블 ID',
     `member_id`          INT          NOT NULL COMMENT '요청 사원 ID',
-    `approved_member_id` INT          NULL COMMENT '승인자 ID',
+    `approved_member_id` INT NULL COMMENT '승인자 ID',
     `target_field`       VARCHAR(255) NOT NULL COMMENT '변경을 원하는 속성',
     `original_value`     VARCHAR(255) NOT NULL COMMENT '이전 값',
     `requested_value`    VARCHAR(255) NOT NULL COMMENT '변경을 원하는 값',
@@ -51,13 +51,12 @@ CREATE TABLE `member_edit`
     `status`             TINYINT      NOT NULL DEFAULT 0 COMMENT '처리 상태 (0 = PENDING, 1 = APPROVED, 2 =REJECTED)',
     `requested_at`       DATETIME     NOT NULL COMMENT '요청시각',
     `reason`             TEXT         NOT NULL COMMENT '변경 사유',
-    `updated_at`         DATETIME     NULL     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    `updated_at`         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     CONSTRAINT `fk_member_edit_member`
         FOREIGN KEY (`member_id`) REFERENCES `member` (`id`),
     CONSTRAINT `fk_member_edit_approver`
         FOREIGN KEY (`approved_member_id`) REFERENCES `member` (`id`) ON DELETE SET NULL
-)
-    COMMENT = '사원 정보 수정 요청 테이블';
+) COMMENT = '사원 정보 수정 요청 테이블';
 
 
 CREATE TABLE `department_head`
@@ -69,5 +68,4 @@ CREATE TABLE `department_head`
         FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_department_head_member`
         FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE
-)
-    COMMENT = '부서장 테이블 = 사원(N) : 부서(M)';
+) COMMENT = '부서장 테이블 = 사원(N) : 부서(M)';
