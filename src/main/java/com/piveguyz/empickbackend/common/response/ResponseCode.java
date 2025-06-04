@@ -34,6 +34,13 @@ public enum ResponseCode {
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
 
+    // 2) 채용 템플릿
+    EMPLOYMENT_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2010, "요청한 템플릿을 찾을 수 없습니다."),
+    EMPLOYMENT_TEMPLATE_NO_NAME(false, HttpStatus.BAD_REQUEST, 2011, "템플릿 이름을 입력하지 않았습니다."),
+    EMPLOYMENT_TEMPLATE_ALREADY_DELETED(false, HttpStatus.GONE, 2012, "이미 삭제된 템플릿입니다."),
+    EMPLOYMENT_TEMPLATE_UNAUTHORIZED_ACCESS(false, HttpStatus.FORBIDDEN, 2013, "해당 템플릿에 대한 접근 권한이 없습니다."),
+    EMPLOYMENT_TEMPLATE_NO_ITEMS(false, HttpStatus.BAD_REQUEST, 2014, "템플릿 항목이 하나 이상 필요합니다."),
+    EMPLOYMENT_TEMPLATE_DUPLICATE_NAME(false, HttpStatus.CONFLICT, 2015, "같은 이름의 템플릿이 이미 존재합니다."),
 
     //  지원자 - 2100 ~ 2199
 
