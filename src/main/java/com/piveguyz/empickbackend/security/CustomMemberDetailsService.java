@@ -1,5 +1,7 @@
 package com.piveguyz.empickbackend.security;
 
+import com.piveguyz.empickbackend.common.exception.BusinessException;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,15 @@ public class CustomMemberDetailsService implements UserDetailsService {
         try {
             memberId = Integer.parseInt(username);
         } catch (NumberFormatException e) {
-            throw new UsernameNotFoundException("유효하지 않은 사원 ID입니다: " + username);
+            throw new BusinessException(ResponseCode.BAD_REQUEST);
         }
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new UsernameNotFoundException("사원이 존재하지 않습니다."));
+                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+
+        if (member.getResignAt() != null) {
+            throw new BusinessException(ResponseCode.MEMBER_RESIGNED);
+        }
 
         return new CustomMemberDetails(member);
     }
