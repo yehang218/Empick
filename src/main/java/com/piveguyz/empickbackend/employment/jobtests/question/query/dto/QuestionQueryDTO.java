@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class QuestionQueryDTO {
     private int id;
     private String content;
-    private String detail_content;
+    private String detailContent;
     private QuestionType type;
     private JobtestDifficulty difficulty;
     private String answer;
