@@ -28,8 +28,9 @@ public enum ResponseCode {
     // 인사 오류 - 1000 ~ 1999
 
 
-    // 채용 오류 -  2000 ~ 2999
-    //  채용 공고 - 2000 ~ 2099
+
+    // 채용 오류 - 2000 ~ 2999
+    // 채용 공고 - 2000 ~ 2099
 
 
     //  지원자 - 2100 ~ 2199
@@ -51,12 +52,21 @@ public enum ResponseCode {
     EMPLOYMENT_QUESTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2412, "요청한 문제를 찾을 수 없습니다."),
     EMPLOYMENT_QUESTION_INVALID_TYPE(false, HttpStatus.BAD_REQUEST, 2413, "유효하지 않은 실무 테스트 유형입니다."),
     EMPLOYMENT_QUESTION_INVALID_DIFFICULTY(false, HttpStatus.BAD_REQUEST, 2414, "유효하지 않은 난이도입니다."),
-    EMPLOYMENT_QUESTION_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2415, "작성자 정보가 유효하지 않습니다.");
+    EMPLOYMENT_QUESTION_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2415, "작성자 정보가 유효하지 않습니다."),
 
     //  면접 일정 - 2500 ~ 2599
 
 
     //  안내 메일 - 2600 ~ 2699
+    EMPLOYMENT_MAIL_TEMPLATE_DUPLICATE_TITLE(false, HttpStatus.CONFLICT, 2600, "이름이 중복된 템플릿이 존재합니다."),
+    EMPLOYMENT_MAIL_TEMPLATE_NO_TITLE(false, HttpStatus.BAD_REQUEST, 2601, "제목을 입력하지 않았습니다."),
+    EMPLOYMENT_MAIL_TEMPLATE_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2602, "내용을 입력하지 않았습니다."),
+    EMPLOYMENT_MAIL_TEMPLATE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2603, "존재하지 않는 템플릿입니다."),
+
+    EMPLOYMENT_MAIL_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2630, "요청한 메일을 찾을 수 없습니다."),
+    EMPLOYMENT_MAIL_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2631, "메일의 내용을 입력하지 않았습니다."),
+    EMPLOYMENT_MAIL_INADEQUATE_EMAIL(false, HttpStatus.CONFLICT, 2632, "유효하지 않은 형태의 이메일입니다.");
+
 
 
     private final boolean success;
