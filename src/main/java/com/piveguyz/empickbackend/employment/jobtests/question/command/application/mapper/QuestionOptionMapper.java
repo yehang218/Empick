@@ -34,6 +34,7 @@ public class QuestionOptionMapper {
     public static UpdateQuestionOptionCommandDTO toUpdateDto(QuestionOptionEntity entity) {
         return UpdateQuestionOptionCommandDTO.builder()
                 .content(entity.getContent())
+                .optionNumber(entity.getOptionNumber())
                 .build();
     }
 }
