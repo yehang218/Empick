@@ -29,7 +29,7 @@ public class InterviewCriteriaCommandServiceImpl implements InterviewCriteriaCom
         if(detailContent == null) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_NO_DETAIL_CONTENT);
         }
-        if(repository.existsByContent(content)){
+        if (repository.existsByContentAndIsDeleted(content, "N")) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_DUPLICATE_CONTENT);
         }
         InterviewCriteriaEntity entity = new InterviewCriteriaEntity();
@@ -54,7 +54,7 @@ public class InterviewCriteriaCommandServiceImpl implements InterviewCriteriaCom
         if(detailContent == null) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_NO_DETAIL_CONTENT);
         }
-        if(repository.existsByContentAndIdNot(content, id)){
+        if (repository.existsByContentAndIdNotAndIsDeleted(content, id, "N")) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_DUPLICATE_CONTENT);
         }
         InterviewCriteriaEntity entity = new InterviewCriteriaEntity();
@@ -70,8 +70,10 @@ public class InterviewCriteriaCommandServiceImpl implements InterviewCriteriaCom
 
     @Override
     public InterviewCriteriaCommandDTO deleteCriteria(Integer id) {
-        InterviewCriteriaEntity entity = repository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND));
+        if(!repository.existsByIdAndIsDeleted(id, "N")){
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND);
+        }
+        InterviewCriteriaEntity entity = repository.findByIdAndIsDeleted(id, "N");
 
         entity.setIsDeleted("Y");
         entity.setMemberId(1);
