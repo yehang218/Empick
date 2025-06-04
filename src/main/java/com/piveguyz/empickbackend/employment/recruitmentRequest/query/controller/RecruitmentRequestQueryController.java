@@ -14,6 +14,9 @@ import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.recruitmentRequest.query.dto.RecruitmentRequestQueryDTO;
 import com.piveguyz.empickbackend.employment.recruitmentRequest.query.service.RecruitmentRequestQueryService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +27,15 @@ import lombok.RequiredArgsConstructor;
 public class RecruitmentRequestQueryController {
 	private final RecruitmentRequestQueryService recruitmentRequestQueryService;
 
+	@Operation(
+		summary = "채용 요청서 전체 목록 조회",
+		description = "등록된 모든 채용 요청서를 조회합니다."
+	)
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+		@ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
+	})
+
 	// 채용 요청서 전체 목록 조회
 	@GetMapping
 	public ResponseEntity<CustomApiResponse<List<RecruitmentRequestQueryDTO>>> getAllRequests() {
@@ -32,6 +44,17 @@ public class RecruitmentRequestQueryController {
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
 	}
 
+	@Operation(
+		summary = "채용 요청서 상세 조회",
+		description = """
+			- 특정 채용 요청서를 ID로 조회합니다.
+		"""
+	)
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+		@ApiResponse(responseCode = "2000", description = "채용 요청서를 찾을 수 없습니다."),
+		@ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
+	})
 	// 채용 요청서 상세 조회
 	@GetMapping("/{id}")
 	public ResponseEntity<CustomApiResponse<RecruitmentRequestQueryDTO>> getRequestById(@PathVariable int id) {

@@ -11,6 +11,9 @@ import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.recruitmentRequest.command.application.dto.RecruitmentRequestCommandDTO;
 import com.piveguyz.empickbackend.employment.recruitmentRequest.command.application.service.RecruitmentRequestCommandService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +25,18 @@ public class RecruitmentRequestCommandController {
 
 	private final RecruitmentRequestCommandService recruitmentRequestCommandService;
 
-	// 채용 요청서 등록
+	@Operation(
+		summary = "채용 요청서 등록",
+		description = """
+                    - 채용 요청서를 등록합니다.
+                    - 부서 ID, 인원 수, 기간, 직무 요건 등을 포함해야 합니다.
+                    """
+	)
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+		@ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
+	})
 	@PostMapping
 	public ResponseEntity<CustomApiResponse<Void>> create(@RequestBody RecruitmentRequestCommandDTO dto) {
 		recruitmentRequestCommandService.create(dto);
