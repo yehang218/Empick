@@ -56,7 +56,8 @@ public enum ResponseCode {
     EMPLOYMENT_QUESTION_INVALID_DIFFICULTY(false, HttpStatus.BAD_REQUEST, 2414, "유효하지 않은 난이도입니다."),
     EMPLOYMENT_QUESTION_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2415, "작성자 정보가 유효하지 않습니다."),
 
-    //  면접 일정 - 2500 ~ 2599
+    //  면접 - 2500 ~ 2599
+    EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2500, "존재하지 않는 면접 기준입니다."),
 
 
     //  안내 메일 - 2600 ~ 2699
