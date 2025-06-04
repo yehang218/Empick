@@ -2,6 +2,7 @@ package com.piveguyz.empickbackend;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
                 description = "Empick의 API 명세서"
         )
 )
+@MapperScan("com.piveguyz.empickbackend.**.mapper")
 @SpringBootApplication
 public class Application {
 
