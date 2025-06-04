@@ -97,4 +97,16 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 
 		recruitment.setStatus(status);
 	}
+
+	@Override
+	public void deleteRecruitment(int id) {
+		Recruitment recruitment = recruitmentRepository.findById(id)
+			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NOT_FOUND));
+
+		if (recruitment.getDeletedAt() != null) {
+			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_ALREADY_DELETED);
+		}
+
+		recruitment.setDeletedAt(LocalDateTime.now());
+	}
 }

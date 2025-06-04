@@ -8,4 +8,6 @@ public interface RecruitmentCommandService {
 	void updateRecruitment(int id, RecruitmentCommandDTO dto);
 
 	void updateStatus(int id, int status);
+
+	void deleteRecruitment(int id);
 }

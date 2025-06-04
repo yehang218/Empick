@@ -42,6 +42,7 @@ public class Recruitment {
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
+	@Setter
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
