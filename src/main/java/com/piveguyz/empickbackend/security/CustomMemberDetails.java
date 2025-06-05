@@ -15,13 +15,13 @@ public class CustomMemberDetails implements UserDetails {
         this.member = member;
     }
 
+    // TODO: role 테이블을 설계 완료하면 위의 주석 내용으로 구체화
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {
 //        // 예: Member에 권한(Role)이 단일 문자열이라면 이렇게 처리
 //        return Collections.singleton(new SimpleGrantedAuthority(member.getRole()));
 //    }
 
-    // TODO: role 테이블을 설계 완료하면 위의 주석 내용으로 구체화
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
