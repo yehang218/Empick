@@ -15,9 +15,6 @@ public class MemberSignUpRequestDTO {
     @NotBlank
     private String password;
 
-    @NotNull
-    private Integer employeeNumber;
-
     @NotBlank
     private String name;
 
@@ -42,13 +39,12 @@ public class MemberSignUpRequestDTO {
 
     private LocalDateTime resignAt;
 
-    private Integer createdMemberId;
     private Integer deletedMemberId;
     private Integer updatedMemberId;
     private LocalDateTime lastLoginAt;
 
     @NotNull
-    private Integer status;
+    private Integer status = 1;
 
     private Integer departmentId;
     private Integer positionId;
