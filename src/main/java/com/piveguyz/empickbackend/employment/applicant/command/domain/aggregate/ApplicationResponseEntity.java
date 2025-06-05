@@ -1,4 +1,4 @@
 package com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate;
 
-public class ApplicationForm {
+public class ApplicationResponseEntity {
 }
