@@ -1,4 +1,4 @@
 package com.piveguyz.empickbackend.employment.introduce.query.mapper;
 
-public class IntroduceResultMapper {
+public interface IntroduceResultMapper {
 }

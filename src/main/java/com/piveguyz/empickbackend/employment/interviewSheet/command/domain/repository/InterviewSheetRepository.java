@@ -4,6 +4,10 @@ import com.piveguyz.empickbackend.employment.interviewSheet.command.domain.aggre
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface InterviewSheetRepository extends JpaRepository<InterviewSheetEntity, Integer> {
+    InterviewSheetEntity findByIdAndIsDeleted(Integer id, String n);
+
+    boolean existsByName(String name);
+
+    boolean existsByNameAndIdNotAndIsDeleted(String name, Integer id, String isDeleted);
 }
