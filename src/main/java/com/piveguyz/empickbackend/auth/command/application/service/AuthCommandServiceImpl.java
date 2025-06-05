@@ -55,9 +55,6 @@ public class AuthCommandServiceImpl implements AuthCommandService {
                 1000 * 60 * 60 * 24 * 7
         );
 
-        System.out.println("DEBUG: Login success - memberId=" + member.getId());
-        System.out.println("DEBUG: RefreshToken=" + refreshToken);
-
         return LoginResponseDTO.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
