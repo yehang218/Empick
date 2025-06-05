@@ -22,6 +22,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final MemberMapper memberMapper;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO requestDTO) {
@@ -47,6 +48,15 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
         String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber(), roles);
         String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmployeeNumber());
+
+        refreshTokenService.saveRefreshToken(
+                member.getId(),
+                refreshToken,
+                1000 * 60 * 60 * 24 * 7
+        );
+
+        System.out.println("DEBUG: Login success - memberId=" + member.getId());
+        System.out.println("DEBUG: RefreshToken=" + refreshToken);
 
         return LoginResponseDTO.builder()
                 .accessToken(accessToken)
