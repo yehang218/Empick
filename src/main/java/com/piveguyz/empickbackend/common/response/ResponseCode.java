@@ -33,7 +33,15 @@ public enum ResponseCode {
 
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
-
+    // 1) 채용 요청서
+    EMPLOYMENT_REQUEST_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2000, "채용 요청서를 찾을 수 없습니다."),
+    EMPLOYMENT_REQUEST_MISSING_DEPARTMENT(false, HttpStatus.BAD_REQUEST, 2001, "부서를 선택하지 않았습니다."),
+    EMPLOYMENT_REQUEST_INVALID_HEADCOUNT(false, HttpStatus.BAD_REQUEST, 2002, "모집 인원은 1명 이상이어야 합니다."),
+    EMPLOYMENT_REQUEST_INVALID_DATE_RANGE(false, HttpStatus.BAD_REQUEST, 2003, "시작일은 마감일보다 이전이어야 합니다."),
+    EMPLOYMENT_REQUEST_MISSING_EMPLOYMENT_TYPE(false, HttpStatus.BAD_REQUEST, 2004, "고용 형태를 입력해야 합니다."),
+    EMPLOYMENT_REQUEST_MISSING_QUALIFICATION(false, HttpStatus.BAD_REQUEST, 2005, "자격 요건을 입력해야 합니다."),
+    EMPLOYMENT_REQUEST_MISSING_RESPONSIBILITY(false, HttpStatus.BAD_REQUEST, 2006, "담당 업무를 입력해야 합니다."),
+    EMPLOYMENT_REQUEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2007, "해당 기간 내 중복된 채용 요청이 존재합니다."),
 
     //  지원자 - 2100 ~ 2199
 
