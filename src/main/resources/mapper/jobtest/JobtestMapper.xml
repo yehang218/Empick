@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.mapper.JobtestMapper">
+
+    <resultMap id="JobTestQuestionMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionQueryDTO">
+        <id property="id" column="job_test_question_id"/>
+        <result property="score" column="score"/>
+        <result property="optionNumber" column="option_number"/>
+        <result property="questionId" column="question_id"/>
+    </resultMap>
+
+    <resultMap id="JobTestEvalCriteriaMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestEvaluationCriteriaQueryDTO">
+        <id property="id" column="criteria_id"/>
+        <result property="content" column="criteria_content"/>
+        <result property="detailContent" column="criteria_detail_content"/>
+        <result property="scoreWeight" column="score_weight"/>
+    </resultMap>
+
+    <resultMap id="JobTestMap" type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQueryDTO">
+        <id property="id" column="job_test_id"/>
+        <result property="title" column="job_test_title"/>
+        <result property="difficulty" column="difficulty"/>
+        <result property="testTime" column="test_time"/>
+        <result property="creatorName" column="creator_name"/>
+        <result property="updatedName" column="updated_name"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+
+        <collection property="questions"
+                    ofType="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionQueryDTO"
+                    resultMap="JobTestQuestionMap"/>
+        <collection property="evaluationCriteria"
+                    ofType="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestEvaluationCriteriaQueryDTO"
+                    resultMap="JobTestEvalCriteriaMap"/>
+    </resultMap>
+
+    <resultMap id="ApplicationMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationWithJobtestQueryDTO">
+        <id property="applicationId" column="application_id"/>
+        <result property="applicantId" column="applicant_id"/>
+        <result property="applicantName" column="applicant_name"/>
+        <association property="jobTest"
+                     javaType="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQueryDTO"
+                     resultMap="JobTestMap"/>
+    </resultMap>
+
+    <select id="findApplicationsWithJobtestInfo" resultMap="ApplicationMap">
+        SELECT a.id                AS application_id,
+               a.applicant_id,
+               ap.name             AS applicant_name,
+
+               jt.id               AS job_test_id,
+               jt.title            AS job_test_title,
+               jt.difficulty,
+               jt.test_time,
+               cm.name             AS creator_name,
+               um.name             AS updated_name,
+               jt.created_at,
+               jt.updated_at,
+
+               jtq.id              AS job_test_question_id,
+               jtq.score,
+               jtq.option_number,
+               jtq.question_id,
+
+               jtec.id             AS criteria_id,
+               jtec.content        AS criteria_content,
+               jtec.detail_content AS criteria_detail_content,
+               jtec.score_weight
+
+        FROM application a
+                 JOIN applicant ap ON a.applicant_id = ap.id
+                 JOIN application_job_test ajt ON ajt.application_id = a.id
+                 JOIN job_test jt ON jt.id = ajt.job_test_id
+
+                 JOIN member cm ON jt.created_member_id = cm.id
+                 LEFT JOIN member um ON jt.updated_member_id = um.id
+
+                 LEFT JOIN job_test_question jtq ON jtq.job_test_id = jt.id
+                 LEFT JOIN job_test_evaluation_criteria jtec ON jtec.job_test_id = jt.id
+        ORDER BY a.id, jt.id
+    </select>
+</mapper>

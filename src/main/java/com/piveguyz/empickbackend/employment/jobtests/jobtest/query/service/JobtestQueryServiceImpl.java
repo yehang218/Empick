@@ -1,4 +1,21 @@
 package com.piveguyz.empickbackend.employment.jobtests.jobtest.query.service;
 
-public class JobtestQueryServiceImpl {
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationWithJobtestQueryDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.mapper.JobtestMapper;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class JobtestQueryServiceImpl implements JobtestQueryService {
+    private final JobtestMapper jobtestMapper;
+
+    JobtestQueryServiceImpl(JobtestMapper jobtestMapper) {
+        this.jobtestMapper = jobtestMapper;
+    }
+
+    @Override
+    public List<ApplicationWithJobtestQueryDTO> getAllApplicationJobTestInfo() {
+        return jobtestMapper.findApplicationsWithJobtestInfo();
+    }
 }

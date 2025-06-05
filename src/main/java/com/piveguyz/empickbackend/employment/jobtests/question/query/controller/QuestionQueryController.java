@@ -36,9 +36,10 @@ public class QuestionQueryController {
                     """
     )
     @GetMapping
-    public ResponseEntity<List<QuestionListQueryDTO>> getAllQuestions() {
+    public ResponseEntity<CustomApiResponse<List<QuestionListQueryDTO>>> getAllQuestions() {
         List<QuestionListQueryDTO> questionList = questionQueryService.getAllQuestions();
-        return ResponseEntity.ok(questionList);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, questionList));
     }
 
     @Operation(
@@ -53,6 +54,7 @@ public class QuestionQueryController {
     @GetMapping("/{id}")
     public ResponseEntity<CustomApiResponse<QuestionQueryDTO>> getQuestionById(@PathVariable int id) {
         QuestionQueryDTO questionDTO = questionQueryService.getQuestionById(id);
-        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, questionDTO));
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, questionDTO));
     }
 }
