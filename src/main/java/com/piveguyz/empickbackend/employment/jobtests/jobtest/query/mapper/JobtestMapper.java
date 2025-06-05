@@ -1,4 +1,7 @@
 package com.piveguyz.empickbackend.employment.jobtests.jobtest.query.mapper;
 
-public class JobtestMapper {
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface JobtestMapper {
 }

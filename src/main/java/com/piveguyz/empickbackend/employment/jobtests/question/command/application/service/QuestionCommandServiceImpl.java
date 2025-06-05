@@ -53,7 +53,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
 
         // 수정자가 없는 회원이라면
         if (!memberRepository.existsById(updateQuestionCommandDTO.getUpdatedMemberId())) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_INVALID_UPDATED_MEMBER);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_UPDATED_MEMBER);
         }
 
         question.updateQuestionEntity(updateQuestionCommandDTO);
