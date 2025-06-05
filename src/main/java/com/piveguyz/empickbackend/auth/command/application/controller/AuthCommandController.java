@@ -41,6 +41,7 @@ public class AuthCommandController {
                     - employeeNumber : 100001, pwd :  password1234@@
                     - employeeNumber : 100002, pwd :  password5678@@
                     - employeeNumber : 100003, pwd :  password9876@@ (퇴사)
+                    - employeeNumber : 100004, pwd :  123qwe@@ (인사팀 권한 가짐)
                     """
     )
     @ApiResponses(value = {
