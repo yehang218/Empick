@@ -1,11 +1,14 @@
 package com.piveguyz.empickbackend.employment.jobtests.jobtest.query.mapper;
 
-import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationWithJobtestQueryDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQueryDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionListQueryDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface JobtestMapper {
-    List<ApplicationWithJobtestQueryDTO> findApplicationsWithJobtestInfo();
+    List<JobtestQuestionListQueryDTO> findAllJobTestsSimple();
+    JobtestQueryDTO findJobTestById(@Param("jobtestId") int id);
 }

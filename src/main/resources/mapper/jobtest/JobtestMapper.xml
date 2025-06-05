@@ -48,7 +48,23 @@
                      resultMap="JobTestMap"/>
     </resultMap>
 
-    <select id="findApplicationsWithJobtestInfo" resultMap="ApplicationMap">
+    <!--    전체 실무테스트 목록 조회-->
+    <select id="findAllJobTestsSimple" resultMap="ApplicationMap">
+        SELECT jt.id,
+               jt.title,
+               jt.difficulty,
+               cm.name AS creator_name,
+               um.name AS updated_name
+        FROM job_test jt
+                 JOIN member cm ON jt.created_member_id = cm.id
+                 LEFT JOIN member um ON jt.updated_member_id = um.id
+        ORDER BY jt.created_at DESC
+    </select>
+
+    <!--    특정 실무테스트 조회-->
+    <select id="findJobTestById"
+            parameterType="int"
+            resultMap="JobTestMap">
         SELECT a.id                AS application_id,
                a.applicant_id,
                ap.name             AS applicant_name,
@@ -82,6 +98,6 @@
 
                  LEFT JOIN job_test_question jtq ON jtq.job_test_id = jt.id
                  LEFT JOIN job_test_evaluation_criteria jtec ON jtec.job_test_id = jt.id
-        ORDER BY a.id, jt.id
+        WHERE jt.id = #{id}
     </select>
 </mapper>
