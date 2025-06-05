@@ -10,25 +10,8 @@ DROP TABLE IF EXISTS `question_option`;
 DROP TABLE IF EXISTS `question`;
 DROP TABLE IF EXISTS `application_job_test`;
 DROP TABLE IF EXISTS `job_test`;
-DROP TABLE IF EXISTS `job_test_type`;
 
 SET foreign_key_checks = 1;
-
-# ========================== 실무 테스트 유형
-CREATE TABLE job_test_type
-(
-    id                INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    name              VARCHAR(255) NOT NULL,
-    description       LONGTEXT     NULL,
-    created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at        DATETIME     NULL,
-    created_member_id INT          NOT NULL,
-    updated_member_id INT          NULL,
-
-    FOREIGN KEY (`created_member_id`) REFERENCES `member` (`id`),
-    FOREIGN KEY (`updated_member_id`) REFERENCES `member` (`id`)
-);
-
 
 # ========================== 실무 테스트
 CREATE TABLE job_test
@@ -39,11 +22,9 @@ CREATE TABLE job_test
     test_time         INT          NOT NULL,
     created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME     NULL,
-    job_test_type_id  INT          NOT NULL,
     created_member_id INT          NOT NULL,
     updated_member_id INT          NULL,
 
-    FOREIGN KEY (`job_test_type_id`) REFERENCES `job_test_type` (`id`),
     FOREIGN KEY (`created_member_id`) REFERENCES `member` (`id`),
     FOREIGN KEY (`updated_member_id`) REFERENCES `member` (`id`)
 );
