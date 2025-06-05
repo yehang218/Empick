@@ -57,7 +57,8 @@ public class InterviewCriteriaCommandServiceImpl implements InterviewCriteriaCom
         if (repository.existsByContentAndIdNotAndIsDeleted(content, id, "N")) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_DUPLICATE_CONTENT);
         }
-        InterviewCriteriaEntity entity = new InterviewCriteriaEntity();
+        InterviewCriteriaEntity entity = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND));
         entity.setContent(content);
         entity.setDetailContent(detailContent);
         entity.setIsDeleted("N");
