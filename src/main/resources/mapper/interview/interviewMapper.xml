@@ -40,11 +40,12 @@
         SELECT
             id,
             sheet_id,
-            date,
+            `date`,
             address,
             score,
             interview_review
-        WHERE date BETWEEN #{start} AND #{end}
+        FROM interview
+        WHERE `date` BETWEEN #{start} AND #{end}
     </select>
 
     <select id="checkAvailable" resultMap="InterviewResultMap">
