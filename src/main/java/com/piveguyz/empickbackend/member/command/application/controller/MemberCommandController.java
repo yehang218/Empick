@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.member.command.application.controller;
 
+import com.piveguyz.empickbackend.common.constants.ApiExamples;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpRequestDTO;
@@ -7,10 +8,12 @@ import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpRes
 import com.piveguyz.empickbackend.member.command.application.service.MemberCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,12 +34,14 @@ public class MemberCommandController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공",
                     content = @Content(schema = @Schema(implementation = MemberSignUpResponseDTO.class))),
-            @ApiResponse(responseCode = "409", description = "이메일 중복 오류"),
-            @ApiResponse(responseCode = "400", description = "유효성 검사 실패")
+//            @ApiResponse(responseCode = "1001", description = "삭제된 사원",
+//                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_1001_EXAMPLE))),
+            @ApiResponse(responseCode = "409", description = "이메일 중복 오류", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_409_EXAMPLE))),
+            @ApiResponse(responseCode = "400", description = "유효성 검사 실패", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_400_EXAMPLE))),
     })
-    public ResponseEntity<CustomApiResponse<MemberSignUpResponseDTO>> signup(@RequestBody MemberSignUpRequestDTO request) {
+    public ResponseEntity<CustomApiResponse<MemberSignUpResponseDTO>> signup(@RequestBody @Valid MemberSignUpRequestDTO request) {
         MemberSignUpResponseDTO result = memberCommandService.signUp(request);
-        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
-                .body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
+        return ResponseEntity.status(ResponseCode.CREATED.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.CREATED, result));
     }
 }
