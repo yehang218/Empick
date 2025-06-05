@@ -69,7 +69,7 @@ public class RecruitmentCommandController {
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS));
 	}
 
-	@Operation(summary = "채용 공고 삭제", description = "채용 공고를 소프트 삭제합니다.")
+	@Operation(summary = "채용 공고 삭제", description = "채용 공고를 삭제합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "채용 공고가 성공적으로 삭제되었습니다."),
 		@ApiResponse(responseCode = "2030", description = "요청한 채용 공고를 찾을 수 없습니다."),
