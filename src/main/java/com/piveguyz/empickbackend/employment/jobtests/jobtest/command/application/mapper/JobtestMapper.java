@@ -15,7 +15,6 @@ public class JobtestMapper {
                 .difficulty(dto.getDifficulty())
                 .testTime(dto.getTestTime())
                 .createdAt(LocalDateTime.now())
-                .jobTestTypeId(dto.getJobtestTypeId())
                 .createdMemberId(dto.getCreatedMemberId())
                 .build();
     }
@@ -26,7 +25,6 @@ public class JobtestMapper {
                 .title(entity.getTitle())
                 .difficulty(entity.getDifficulty())
                 .testTime(entity.getTestTime())
-                .jobtestTypeId(entity.getJobTestTypeId())
                 .createdMemberId(entity.getCreatedMemberId())
                 .build();
     }
@@ -36,7 +34,6 @@ public class JobtestMapper {
                 .title(updatedEntity.getTitle())
                 .difficulty(updatedEntity.getDifficulty())
                 .testTime(updatedEntity.getTestTime())
-                .jobTestTypeId(updatedEntity.getJobTestTypeId())
                 .updatedMemberId(updatedEntity.getUpdatedMemberId())
                 .build();
     }

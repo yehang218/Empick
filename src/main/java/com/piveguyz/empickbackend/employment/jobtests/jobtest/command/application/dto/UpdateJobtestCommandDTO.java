@@ -12,6 +12,6 @@ public class UpdateJobtestCommandDTO {
     private String title;
     private JobtestDifficulty difficulty;
     private Integer testTime;
-    private Integer jobTestTypeId;
+
     private int updatedMemberId;
 }

@@ -5,7 +5,6 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicatio
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -37,9 +36,6 @@ public class JobtestEntity {
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
-    @Column(name = "job_test_type_id", nullable = false)
-    private int jobTestTypeId;
-
     @Column(name = "created_member_id", nullable = false)
     private int createdMemberId;
 
@@ -62,9 +58,7 @@ public class JobtestEntity {
         if(updateJobtestCommandDTO.getTestTime() != null) {
             this.testTime = updateJobtestCommandDTO.getTestTime();
         }
-        if(updateJobtestCommandDTO.getJobTestTypeId() != null) {
-            this.jobTestTypeId = updateJobtestCommandDTO.getJobTestTypeId();
-        }
+
         this.updatedMemberId = updateJobtestCommandDTO.getUpdatedMemberId();
         this.updatedAt = LocalDateTime.now();
     }

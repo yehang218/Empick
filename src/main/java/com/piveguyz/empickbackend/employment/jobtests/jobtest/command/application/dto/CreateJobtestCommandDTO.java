@@ -15,6 +15,5 @@ public class CreateJobtestCommandDTO {
     private JobtestDifficulty difficulty;
     private int testTime;
 
-    private int jobtestTypeId;
     private int createdMemberId;
 }

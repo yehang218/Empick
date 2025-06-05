@@ -34,7 +34,6 @@ public class JobtestCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2402", description = "작성자 정보가 유효하지 않습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2421", description = "동일한 이름의 실무테스트가 이미 등록되어 있습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2400", description = "유효하지 않은 난이도입니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2401", description = "유효하지 않은 실무 테스트 유형입니다."),
     })
     @PostMapping
     public ResponseEntity<CustomApiResponse<CreateJobtestCommandDTO>> createJobtest(@RequestBody @Valid CreateJobtestCommandDTO createJobtestCommandDTO) {
@@ -48,13 +47,12 @@ public class JobtestCommandController {
             summary = "실무테스트 수정",
             description = """
                     실무테스트를 수정합니다.
-                    - id에 해당하는 실무테스트의 시험 시간, 유형, 난이도 수정 가능
+                    - id에 해당하는 실무테스트의 시험 시간, 난이도 수정 가능
                     """
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2402", description = "작성자 정보가 유효하지 않습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2420", description = "이 실무테스트는 다른 곳에서 사용중이므로 수정하거나 삭제할 수 없습니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2401", description = "유효하지 않은 실무 테스트 유형입니다."),
     })
     @PatchMapping("/{id}")
     public ResponseEntity<CustomApiResponse<UpdateJobtestCommandDTO>> updateJobtest(
@@ -66,10 +64,9 @@ public class JobtestCommandController {
     }
 
     @Operation(
-            summary = "실무테스트 수정",
+            summary = "실무테스트 삭제",
             description = """
-                    실무테스트를 수정합니다.
-                    - id에 해당하는 실무테스트의 시험 시간, 유형, 난이도 수정 가능
+                    id에 해당하는 실무테스트를 삭제합니다.
                     """
     )
     @ApiResponses(value = {

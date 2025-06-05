@@ -62,7 +62,6 @@ public enum ResponseCode {
 
     //  실무테스트 - 2400 ~ 2499
     EMPLOYMENT_INVALID_DIFFICULTY(false, HttpStatus.INTERNAL_SERVER_ERROR, 2400, "유효하지 않은 난이도입니다."),
-    EMPLOYMENT_INVALID_TYPE(false, HttpStatus.INTERNAL_SERVER_ERROR, 2401, "유효하지 않은 실무 테스트 유형입니다."),
     EMPLOYMENT_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2402, "작성자 정보가 유효하지 않습니다."),
     EMPLOYMENT_INVALID_UPDATED_MEMBER(false, HttpStatus.BAD_REQUEST, 2403, "수정자 정보가 유효하지 않습니다."),
 

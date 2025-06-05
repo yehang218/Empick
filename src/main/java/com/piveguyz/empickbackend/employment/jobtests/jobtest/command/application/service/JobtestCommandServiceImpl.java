@@ -7,9 +7,7 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicatio
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.mapper.JobtestMapper;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.JobtestEntity;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.JobtestRepository;
-import com.piveguyz.empickbackend.employment.jobtests.type.command.domain.repository.JobtestTypeRepository;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
-import org.apache.coyote.Response;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +15,11 @@ import org.springframework.stereotype.Service;
 public class JobtestCommandServiceImpl implements JobtestCommandService {
     private final JobtestRepository jobtestRepository;
     private final MemberRepository memberRepository;
-    private final JobtestTypeRepository jobtestTypeRepository;
 
     public JobtestCommandServiceImpl(JobtestRepository jobtestRepository,
-                                     MemberRepository memberRepository,
-                                     JobtestTypeRepository jobtestTypeRepository) {
+                                     MemberRepository memberRepository) {
         this.jobtestRepository = jobtestRepository;
         this.memberRepository = memberRepository;
-        this.jobtestTypeRepository = jobtestTypeRepository;
     }
 
 
@@ -39,11 +34,6 @@ public class JobtestCommandServiceImpl implements JobtestCommandService {
         // 작성자가 없는 사원인 경우
         if (!memberRepository.existsById(createJobtestCommandDTO.getCreatedMemberId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_MEMBER);
-        }
-
-        // 만약 없는 실무테스트 유형이라면
-        if(!jobtestTypeRepository.existsById(createJobtestCommandDTO.getJobtestTypeId())) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_TYPE);
         }
 
         JobtestEntity jobtestEntity = JobtestMapper.toEntity(createJobtestCommandDTO);
@@ -62,11 +52,6 @@ public class JobtestCommandServiceImpl implements JobtestCommandService {
         // 수정자가 만약 없는 회원이라면
         if (!memberRepository.existsById(updateJobtestCommandDTO.getUpdatedMemberId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_UPDATED_MEMBER);
-        }
-
-        // 만약 없는 실무테스트 유형이라면
-        if(!jobtestTypeRepository.existsById(updateJobtestCommandDTO.getJobTestTypeId())) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_TYPE);
         }
 
         jobtest.updateJobtestEntity(updateJobtestCommandDTO);
