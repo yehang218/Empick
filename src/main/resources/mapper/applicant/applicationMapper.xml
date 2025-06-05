@@ -25,7 +25,6 @@
             a.status,
             a.applicant_id,
             a.introduce_rating_result_id,
-            a.job_test_evaluation_result_id,
             a.interview_id,
             a.updated_at,
             a.updated_by
