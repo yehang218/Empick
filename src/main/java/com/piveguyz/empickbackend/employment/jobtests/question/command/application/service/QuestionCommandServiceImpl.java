@@ -34,7 +34,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
 
         // 작성자가 없는 회원인 경우
         if (!memberRepository.existsById(createQuestionCommandDTO.getCreatedMemberId())) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_INVALID_MEMBER);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_MEMBER);
         }
 
         QuestionEntity questionEntity = QuestionMapper.toEntity(createQuestionCommandDTO);
