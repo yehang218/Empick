@@ -17,8 +17,8 @@ public class JobtestQueryServiceImpl implements JobtestQueryService {
     }
 
     @Override
-    public List<JobtestQuestionListQueryDTO> getAllJobTestsSimple() {
-        return jobtestMapper.findAllJobTestsSimple();
+    public List<JobtestQuestionListQueryDTO> getAllJobTests() {
+        return jobtestMapper.findAllJobTests();
     }
 
     @Override

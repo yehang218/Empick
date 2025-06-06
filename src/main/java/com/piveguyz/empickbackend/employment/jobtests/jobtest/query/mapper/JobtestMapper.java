@@ -9,6 +9,6 @@ import java.util.List;
 
 @Mapper
 public interface JobtestMapper {
-    List<JobtestQuestionListQueryDTO> findAllJobTestsSimple();
-    JobtestQueryDTO findJobTestById(@Param("jobtestId") int id);
+    List<JobtestQuestionListQueryDTO> findAllJobTests();
+    JobtestQueryDTO findJobTestById(@Param("id") int id);
 }

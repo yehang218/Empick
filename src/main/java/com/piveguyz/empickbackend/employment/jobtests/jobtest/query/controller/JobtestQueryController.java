@@ -2,7 +2,7 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationWithJobtestQueryDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionListQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.service.JobtestQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,8 +33,8 @@ public class JobtestQueryController {
                     """
     )
     @GetMapping
-    public ResponseEntity<CustomApiResponse<List<ApplicationWithJobtestQueryDTO>>> getAllApplicationJobTests() {
-        List<ApplicationWithJobtestQueryDTO> result = jobtestQueryService.getAllApplicationJobTestInfo();
+    public ResponseEntity<CustomApiResponse<List<JobtestQuestionListQueryDTO>>> getAllApplicationJobTests() {
+        List<JobtestQuestionListQueryDTO> result = jobtestQueryService.getAllJobTests();
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
     }
