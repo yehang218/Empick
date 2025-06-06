@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.piveguyz.empickbackend.common.exception.BusinessException;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.applicationItem.query.dto.ApplicationItemCategoryQueryDTO;
 import com.piveguyz.empickbackend.employment.applicationItem.query.mapper.ApplicationItemCategoryQueryMapper;
 
@@ -16,6 +18,10 @@ public class ApplicationItemCategoryQueryServiceImpl implements ApplicationItemC
 
 	@Override
 	public List<ApplicationItemCategoryQueryDTO> getAllCategories() {
-		return applicationItemCategoryQueryMapper.findAllCategories();
+		List<ApplicationItemCategoryQueryDTO> list = applicationItemCategoryQueryMapper.findAllCategories();
+		if (list == null || list.isEmpty()) {
+			throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_ITEM_CATEGORY_EMPTY);
+		}
+		return list;
 	}
 }
