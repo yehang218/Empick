@@ -52,7 +52,7 @@ public enum ResponseCode {
     EMPLOYMENT_TEMPLATE_DUPLICATE_NAME(false, HttpStatus.CONFLICT, 2015, "같은 이름의 템플릿이 이미 존재합니다."),
 
     //  지원자 - 2100 ~ 2199
-
+    EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
 
     //  지원서 - 2200 ~ 2299
 
