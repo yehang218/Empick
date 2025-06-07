@@ -80,9 +80,7 @@ class MemberCommandServiceImplTest {
         request.setPhone("010-1234-5678");
         request.setPictureUrl("https://image.url");
         request.setAddress("서울시");
-        request.setEmployeeNumber(123);
         request.setHireAt(LocalDateTime.now());
-        request.setCreatedMemberId(1);
         request.setStatus(1);
 
         when(memberRepository.findById(1)).thenReturn(Optional.of(new Member()));

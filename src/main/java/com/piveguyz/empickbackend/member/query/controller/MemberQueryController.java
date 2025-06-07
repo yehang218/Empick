@@ -1,12 +1,12 @@
 package com.piveguyz.empickbackend.member.query.controller;
 
+import com.piveguyz.empickbackend.auth.facade.AuthFacade;
 import com.piveguyz.empickbackend.common.constants.ApiExamples;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.query.dto.MemberResponseDTO;
 import com.piveguyz.empickbackend.member.query.facade.MemberProfileQueryFacade;
 import com.piveguyz.empickbackend.member.query.service.MemberQueryService;
-import com.piveguyz.empickbackend.security.CustomMemberDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "사원 API", description = "사원 등록 및 관리 API")
@@ -29,6 +28,7 @@ public class MemberQueryController {
 
     private final MemberQueryService memberQueryService;
     private final MemberProfileQueryFacade memberProfileQueryFacade;
+    private final AuthFacade authFacade;  // 🔥 AuthFacade 추가
 
     @Operation(summary = "내 정보 조회", description = """
             - 로그인한 사용자의 정보를 조회합니다. (JWT 토큰 필요)
@@ -41,8 +41,9 @@ public class MemberQueryController {
             @ApiResponse(responseCode = "404", description = "회원 정보를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE)))
     })
     @GetMapping("/me")
-    public ResponseEntity<CustomApiResponse<MemberResponseDTO>> getCurrentMember(@AuthenticationPrincipal CustomMemberDetails memberDetails) {
-        MemberResponseDTO responseDTO = memberQueryService.getMemberInfo(memberDetails.getMember().getId());
+    public ResponseEntity<CustomApiResponse<MemberResponseDTO>> getCurrentMember() {
+        Integer memberId = authFacade.getCurrentMemberId();
+        MemberResponseDTO responseDTO = memberQueryService.getMemberInfo(memberId);
         return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
     }
 
