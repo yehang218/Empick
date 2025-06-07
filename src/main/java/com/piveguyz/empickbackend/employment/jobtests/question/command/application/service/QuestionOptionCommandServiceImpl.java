@@ -58,6 +58,6 @@ public class QuestionOptionCommandServiceImpl implements QuestionOptionCommandSe
         QuestionOptionEntity option = questionOptionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_OPTION_NOT_FOUND));
         questionOptionRepository.delete(option);
-        return id;
+        return option.getId();
     }
 }
