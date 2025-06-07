@@ -76,7 +76,7 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICATION_ITEM_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2055, "해당 채용공고에 연결된 지원서 양식을 찾을 수 없습니다."),
 
     //  지원자 - 2100 ~ 2199
-
+    EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
 
     //  지원서 - 2200 ~ 2299
 
