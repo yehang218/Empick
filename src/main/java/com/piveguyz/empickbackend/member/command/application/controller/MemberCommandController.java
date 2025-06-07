@@ -51,12 +51,13 @@ public class MemberCommandController {
     @Operation(summary = "프로필 이미지 업로드", description = "프로필 이미지를 S3에 업로드하고 Member DB에 반영합니다.")
     public ResponseEntity<CustomApiResponse<S3UploadResponseDTO>> uploadProfileImage(
             @PathVariable int memberId,
-            @Parameter(description = "S3 저장 경로 예: profiles/{memberId}", example = "profiles/{memberId}")
-            @RequestParam("prefix") String prefix,
             @Parameter(description = "저장될 파일명 예: profile.png", example = "profile.png")
             @RequestParam("fileName") String fileName,
             @Parameter(description = "업로드할 파일", content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
             @RequestPart("file") MultipartFile file) {
+
+        // prefix를 강제로 설정
+        String prefix = "profiles/" + memberId;
 
         MemberProfileUploadRequestDTO request = MemberProfileUploadRequestDTO.builder()
                 .prefix(prefix)
@@ -70,3 +71,4 @@ public class MemberCommandController {
                 .body(CustomApiResponse.of(ResponseCode.CREATED, result));
     }
 }
+
