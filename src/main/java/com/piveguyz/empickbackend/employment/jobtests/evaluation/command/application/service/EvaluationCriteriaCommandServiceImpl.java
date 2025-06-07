@@ -29,7 +29,7 @@ public class EvaluationCriteriaCommandServiceImpl implements EvaluationCriteriaC
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_JOBTEST);
         }
 
-        // 가중치가 0 ~ 1이 아닌경우
+        // 가중치가 0 ~ 1이 아닌 경우
         if(createEvaluationCriteriaCommandDTO.getScoreWeight() > 1.0f ||
         createEvaluationCriteriaCommandDTO.getScoreWeight() < 0.0f) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT);
@@ -47,6 +47,12 @@ public class EvaluationCriteriaCommandServiceImpl implements EvaluationCriteriaC
         // 평가 기준이 있는지 확인
         EvaluationCriteriaEntity evaluationCriteria = evaluationCriteriaRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_EVALUATION_CRITERIA));
+
+        // 가중치가 0 ~ 1이 아닌 경우
+        if(updateEvaluationCriteriaCommandDTO.getScoreWeight() > 1.0f ||
+                updateEvaluationCriteriaCommandDTO.getScoreWeight() < 0.0f) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT);
+        }
 
         evaluationCriteria.updateEvaluationCriteria(updateEvaluationCriteriaCommandDTO);
         EvaluationCriteriaEntity updatedEntity = evaluationCriteriaRepository.save(evaluationCriteria);
