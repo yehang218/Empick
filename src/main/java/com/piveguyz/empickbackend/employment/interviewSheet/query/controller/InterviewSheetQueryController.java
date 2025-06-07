@@ -30,7 +30,7 @@ public class InterviewSheetQueryController {
     @Operation(
             summary = "면접 평가표 전체 조회",
             description = """
-                    - 면접 평가표를 모두 조회합니다.
+                    - 면접 평가표를 전부 조회합니다.
                     """
     )
     @ApiResponses(value = {
@@ -54,7 +54,8 @@ public class InterviewSheetQueryController {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2520", description = "존재하지 않습니다.")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2520", description = "존재하지 않는 항목입니다.")
+
     })
     @GetMapping("/findById")
     public ResponseEntity<CustomApiResponse<InterviewSheetQueryDTO>> findById(@RequestParam("id") Integer id) {
