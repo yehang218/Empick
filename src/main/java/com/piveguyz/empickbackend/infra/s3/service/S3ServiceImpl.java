@@ -1,5 +1,6 @@
-package com.piveguyz.empickbackend.infra.s3;
+package com.piveguyz.empickbackend.infra.s3.service;
 
+import com.piveguyz.empickbackend.infra.s3.dto.S3UploadResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,8 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Service
@@ -22,6 +25,9 @@ public class S3ServiceImpl implements S3Service {
 
     @Value("${aws.s3.bucket}")
     private String bucket;
+
+    @Value("${aws.s3.region}")
+    private String region;
 
     // 보안상 제한할 확장자 리스트 (블랙리스트)
     private static final List<String> BLACKLISTED_EXTENSIONS = List.of(
@@ -55,9 +61,8 @@ public class S3ServiceImpl implements S3Service {
         }
     }
 
-    // 사용자가 직접 파일명을 지정할 수 있는 업로드 메서드
     @Override
-    public String uploadFile(String prefix, String fileName, MultipartFile file) {
+    public S3UploadResponseDTO uploadFile(String prefix, String fileName, MultipartFile file) {
         try {
             if (fileName == null || !fileName.contains(".")) {
                 throw new IllegalArgumentException("파일 이름에 확장자가 없습니다.");
@@ -82,7 +87,15 @@ public class S3ServiceImpl implements S3Service {
             s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
             log.info("S3 업로드 성공 - key: {}", key);
 
-            return key;
+            // Presigned URL을 만들려면 별도 Presigner 설정 필요. 여기서는 Static URL 방식으로 예시
+            String encodedKey = URLEncoder.encode(key, StandardCharsets.UTF_8);
+            String url = String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, region, encodedKey);
+
+            return S3UploadResponseDTO.builder()
+                    .key(key)
+                    .contentType(file.getContentType())
+                    .size(file.getSize())
+                    .build();
 
         } catch (IOException e) {
             log.error("파일 업로드 실패 - prefix: {}", prefix, e);

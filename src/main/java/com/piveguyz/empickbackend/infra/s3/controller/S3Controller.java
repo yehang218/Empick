@@ -1,10 +1,15 @@
-package com.piveguyz.empickbackend.infra.s3;
+package com.piveguyz.empickbackend.infra.s3.controller;
 
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.infra.s3.dto.S3UploadResponseDTO;
+import com.piveguyz.empickbackend.infra.s3.service.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,15 +50,16 @@ public class S3Controller {
 
     @Operation(summary = "파일 업로드", description = "prefix와 fileName을 직접 지정하여 파일을 업로드합니다.")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> postUpload(
+    public ResponseEntity<CustomApiResponse<S3UploadResponseDTO>> postUpload(
             @Parameter(description = "S3에 저장될 prefix 경로", example = "docs/1")
             @RequestParam String prefix,
             @Parameter(description = "S3에 저장될 파일명", example = "report.pdf")
             @RequestParam String fileName,
             @Parameter(description = "업로드할 파일", schema = @Schema(type = "string", format = "binary"))
             @RequestPart("file") MultipartFile file) {
-        String key = s3Service.uploadFile(prefix, fileName, file);
-        return ResponseEntity.ok(key);
+        S3UploadResponseDTO response = s3Service.uploadFile(prefix, fileName, file);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(CustomApiResponse.of(ResponseCode.CREATED, response));
     }
 
     @Operation(summary = "파일 삭제", description = "S3에 저장된 파일을 삭제합니다.")

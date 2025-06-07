@@ -14,6 +14,7 @@ public enum ResponseCode {
 
     // 모든 성공 코드
     SUCCESS(true, HttpStatus.OK, 200, "요청이 성공적으로 처리되었습니다."),
+    CREATED(true, HttpStatus.CREATED, 201, "리소스가 성공적으로 생성되었습니다."),
 
     // 클라이언트 오류 (4xx)
     BAD_REQUEST(false, HttpStatus.BAD_REQUEST, 400, "잘못된 요청입니다."),
