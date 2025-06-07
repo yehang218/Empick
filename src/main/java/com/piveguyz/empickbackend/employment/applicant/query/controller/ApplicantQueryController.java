@@ -3,6 +3,7 @@ package com.piveguyz.empickbackend.employment.applicant.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO;
 import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQueryDTO;
 import com.piveguyz.empickbackend.employment.applicant.query.service.ApplicantQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +35,7 @@ public class ApplicantQueryController {
     })
 
     @GetMapping
-    public ResponseEntity<CustomApiResponse<List<ApplicationQueryDTO>>> getAllApplicant() {
+    public ResponseEntity<CustomApiResponse<List<ApplicantQueryDTO>>> getAllApplicant() {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, applicantQueryService.findAllApplicant()));
     }
