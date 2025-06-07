@@ -5,9 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ApplicationWithJobtestQueryDTO {
+public class ApplicationJobtestQueryDTO {
     private int applicationId;
     private int applicantId;
     private String applicantName;
-    private JobtestQueryDTO jobTest;
 }
