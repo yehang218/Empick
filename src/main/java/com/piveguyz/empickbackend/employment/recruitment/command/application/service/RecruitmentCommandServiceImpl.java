@@ -1,6 +1,10 @@
 package com.piveguyz.empickbackend.employment.recruitment.command.application.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,13 +73,43 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		Recruitment recruitment = recruitmentRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NOT_FOUND));
 
+		// 게시된 공고는 수정 불가
 		if (recruitment.getStatus() == RecruitmentStatus.PUBLISHED) {
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_CANNOT_MODIFY_PUBLISHED);
 		}
 
 		validate(dto);
-
 		recruitment.update(dto);
+
+		List<ApplicationItem> existingItems = applicationItemRepository.findByRecruitmentId(recruitment.getId());
+		Map<Integer, ApplicationItem> existingMap = existingItems.stream()
+			.collect(Collectors.toMap(item -> item.getCategory().getId(), item -> item));
+
+		Set<Integer> incomingCategoryIds = dto.getApplicationItems().stream()
+			.map(ApplicationItemCreateDTO::getApplicationItemCategoryId)
+			.collect(Collectors.toSet());
+
+		for (ApplicationItem existing : existingItems) {
+			if (!incomingCategoryIds.contains(existing.getCategory().getId())) {
+				applicationItemRepository.delete(existing);
+			}
+		}
+
+		for (ApplicationItemCreateDTO itemDTO : dto.getApplicationItems()) {
+			ApplicationItem existing = existingMap.get(itemDTO.getApplicationItemCategoryId());
+			if (existing != null) {
+				existing.setIsRequiredYn(itemDTO.isRequired() ? "Y" : "N");
+			} else {
+				ApplicationItemCategory category = applicationItemCategoryRepository.findById(itemDTO.getApplicationItemCategoryId())
+					.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_ITEM_CATEGORY_NOT_FOUND));
+				ApplicationItem newItem = ApplicationItem.builder()
+					.recruitment(recruitment)
+					.category(category)
+					.isRequiredYn(itemDTO.isRequired() ? "Y" : "N")
+					.build();
+				applicationItemRepository.save(newItem);
+			}
+		}
 	}
 
 	private void validate(RecruitmentCommandDTO dto) {
