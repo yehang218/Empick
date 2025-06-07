@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ApplicantQueryDTO {
-    private int id;
+    private long id;
     private String name;
     private String phone;
     private String email;

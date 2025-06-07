@@ -20,9 +20,6 @@ public class InterviewEntity {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "applicant_id")
-    private Integer applicantId;
-
     @Column(name = "sheet_id")
     private Integer sheetId;
 
