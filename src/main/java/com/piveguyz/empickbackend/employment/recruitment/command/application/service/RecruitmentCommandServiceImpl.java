@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.employment.recruitment.command.application.service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,8 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 
 	@Override
 	public void createRecruitment(RecruitmentCommandDTO dto) {
-		validate(dto);
+		validateRecruitmentInfo(dto);
+		validateApplicationItems(dto.getApplicationItems());
 
 		Recruitment recruitment = Recruitment.builder()
 			.title(dto.getTitle())
@@ -78,7 +80,9 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_CANNOT_MODIFY_PUBLISHED);
 		}
 
-		validate(dto);
+		validateRecruitmentInfo(dto);
+		validateApplicationItems(dto.getApplicationItems());
+
 		recruitment.update(dto);
 
 		List<ApplicationItem> existingItems = applicationItemRepository.findByRecruitmentId(recruitment.getId());
@@ -112,7 +116,20 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		}
 	}
 
-	private void validate(RecruitmentCommandDTO dto) {
+	private void validateApplicationItems(List<ApplicationItemCreateDTO> applicationItems) {
+		if (applicationItems == null || applicationItems.isEmpty()) {
+			throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_ITEM_TEMPLATE_NOT_FOUND);
+		}
+
+		Set<Integer> uniqueIds = new HashSet<>();
+		for (ApplicationItemCreateDTO item : applicationItems) {
+			if (!uniqueIds.add(item.getApplicationItemCategoryId())) {
+				throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_ITEM_DUPLICATED);
+			}
+		}
+	}
+
+	private void validateRecruitmentInfo(RecruitmentCommandDTO dto) {
 		if (dto.getTitle() == null || dto.getTitle().isBlank()) {
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NO_TITLE);
 		}
