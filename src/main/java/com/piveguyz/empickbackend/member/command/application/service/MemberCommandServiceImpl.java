@@ -79,6 +79,22 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .build();
     }
 
+    @Override
+    public void updateProfileImage(int memberId, String key) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+
+        member.updateProfileImageUrl(key);
+    }
+
+    @Override
+    public void clearProfileImage(int memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+
+        member.clearProfileImageUrl();
+    }
+
     /**
      * 랜덤한 6자리 EmployeeNumber를 생성하고 중복 방지.
      */
