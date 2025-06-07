@@ -5,25 +5,48 @@
 
 <mapper namespace="com.piveguyz.empickbackend.employment.recruitment.query.mapper.RecruitmentQueryMapper">
 
-    <select id="findRecruitments" resultType="com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryDTO">
+    <resultMap id="RecruitmentResultMap" type="com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryDTO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="recruit_type" property="recruitType"
+                typeHandler="com.piveguyz.empickbackend.common.handler.RecruitTypeHandler"/>
+        <result column="status" property="status"
+                typeHandler="com.piveguyz.empickbackend.common.handler.RecruitmentStatusHandler"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="ended_at" property="endedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted_at" property="deletedAt"/>
+        <result column="member_id" property="memberId"/>
+        <result column="member_name" property="memberName"/>
+        <result column="department_name" property="departmentName"/>
+        <result column="recruitment_template_id" property="recruitmentTemplateId"/>
+        <result column="introduce_template_id" property="introduceTemplateId"/>
+        <result column="recruitment_request_id" property="recruitmentRequestId"/>
+    </resultMap>
+
+    <!-- 채용 공고 목록 조회 -->
+    <select id="findRecruitments" resultMap="RecruitmentResultMap">
         SELECT
         r.id,
         r.title,
         r.content,
         r.recruit_type,
         r.status,
-        r.image_url AS imageUrl,
-        DATE_FORMAT(r.started_at, '%Y-%m-%d') AS startedAt,
-        DATE_FORMAT(r.ended_at, '%Y-%m-%d') AS endedAt,
-        DATE_FORMAT(r.created_at, '%Y-%m-%d') AS createdAt,
-        DATE_FORMAT(r.updated_at, '%Y-%m-%d') AS updatedAt,
-        DATE_FORMAT(r.deleted_at, '%Y-%m-%d') AS deletedAt,
-        r.member_id AS memberId,
-        m.name AS memberName,
-        d.name AS departmentName,
-        r.recruitment_template_id AS recruitmentTemplateId,
-        r.introduce_template_id AS introduceTemplateId,
-        r.recruitment_request_id AS recruitmentRequestId
+        r.image_url,
+        r.started_at,
+        r.ended_at,
+        r.created_at,
+        r.updated_at,
+        r.deleted_at,
+        r.member_id,
+        m.name AS member_name,
+        d.name AS department_name,
+        r.recruitment_template_id,
+        r.introduce_template_id,
+        r.recruitment_request_id
         FROM recruitment r
         JOIN member m ON r.member_id = m.id
         LEFT JOIN department d ON m.department_id = d.id
@@ -49,24 +72,26 @@
         ORDER BY r.created_at DESC
     </select>
 
-    <select id="findById" resultType="com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryDTO">
-        SELECT r.id,
-               r.title,
-               r.content,
-               r.recruit_type,
-               r.status,
-               r.image_url,
-               r.started_at,
-               r.ended_at,
-               r.created_at,
-               r.updated_at,
-               r.deleted_at,
-               r.member_id,
-               m.name AS member_name,
-               d.name AS department_name,
-               r.recruitment_template_id,
-               r.introduce_template_id,
-               r.recruitment_request_id
+    <!-- 채용 공고 상세 조회 -->
+    <select id="findById" resultMap="RecruitmentResultMap">
+        SELECT
+            r.id,
+            r.title,
+            r.content,
+            r.recruit_type,
+            r.status,
+            r.image_url,
+            r.started_at,
+            r.ended_at,
+            r.created_at,
+            r.updated_at,
+            r.deleted_at,
+            r.member_id,
+            m.name AS member_name,
+            d.name AS department_name,
+            r.recruitment_template_id,
+            r.introduce_template_id,
+            r.recruitment_request_id
         FROM recruitment r
                  LEFT JOIN member m ON r.member_id = m.id
                  LEFT JOIN department d ON m.department_id = d.id

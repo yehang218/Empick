@@ -6,10 +6,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 import com.piveguyz.empickbackend.employment.recruitment.command.application.dto.RecruitmentCommandDTO;
+import com.piveguyz.empickbackend.employment.recruitment.command.domain.converter.RecruitTypeConverter;
+import com.piveguyz.empickbackend.employment.recruitment.command.domain.converter.RecruitmentStatusConverter;
+import com.piveguyz.empickbackend.employment.recruitment.command.domain.enums.RecruitType;
+import com.piveguyz.empickbackend.employment.recruitment.command.domain.enums.RecruitmentStatus;
 
 @Entity
 @Table(name = "recruitment")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -24,11 +29,13 @@ public class Recruitment {
 	@Lob
 	private String content;
 
+	@Convert(converter = RecruitTypeConverter.class)
 	@Column(name = "recruit_type")
-	private int recruitType;
+	private RecruitType recruitType;
 
-	@Setter
-	private int status;
+	@Convert(converter = RecruitmentStatusConverter.class)
+	@Column(name = "status", nullable = false)
+	private RecruitmentStatus status;
 
 	@Column(name = "image_url")
 	private String imageUrl;

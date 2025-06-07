@@ -1,6 +1,10 @@
 package com.piveguyz.empickbackend.employment.recruitment.command.application.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import com.piveguyz.empickbackend.employment.applicationItem.query.dto.ApplicationItemCreateDTO;
+import com.piveguyz.empickbackend.employment.recruitment.command.domain.enums.RecruitType;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +18,7 @@ import lombok.Setter;
 public class RecruitmentCommandDTO {
 	private String title;
 	private String content;
-	private int recruitType;
+	private RecruitType recruitType;
 	private String imageUrl;
 	private LocalDateTime startedAt;
 	private LocalDateTime endedAt;
@@ -22,4 +26,6 @@ public class RecruitmentCommandDTO {
 	private Integer recruitmentTemplateId;
 	private int introduceTemplateId;
 	private Integer recruitmentRequestId;
+
+	private List<ApplicationItemCreateDTO> applicationItems; // 지원서 항목
 }
