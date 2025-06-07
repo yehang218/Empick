@@ -27,6 +27,8 @@ CREATE TABLE `member`
     `position_id`       INT NULL COMMENT '직책',
     `job_id`            INT NULL COMMENT '직무',
     `rank_id`           INT NULL COMMENT '직급',
+    CONSTRAINT `uk_member_employee_number` UNIQUE (`employee_number`),
+    CONSTRAINT `uk_member_email` UNIQUE (`email`),
     CONSTRAINT `fk_member_department`
         FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_member_position_id`
