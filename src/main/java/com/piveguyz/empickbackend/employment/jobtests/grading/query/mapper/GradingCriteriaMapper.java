@@ -1,4 +1,7 @@
 package com.piveguyz.empickbackend.employment.jobtests.grading.query.mapper;
 
-public class GradingCriteriaMapper {
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface GradingCriteriaMapper {
 }
