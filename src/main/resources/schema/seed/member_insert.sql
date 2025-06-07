@@ -1,3 +1,54 @@
+INSERT INTO member (
+    id,
+    password,
+    employee_number,
+    name,
+    birth,
+    phone,
+    picture_url,
+    email,
+    address,
+    vacation_count,
+    hire_at,
+    resign_at,
+    created_at,
+    updated_at,
+    created_member_id,
+    deleted_member_id,
+    updated_member_id,
+    last_login_at,
+    status,
+    department_id,
+    position_id,
+    job_id,
+    rank_id
+) VALUES (
+             1,
+             'password123!',         -- 비밀번호는 테스트용 평문
+             1001,                   -- 사번
+             '홍길동',
+             '1990-01-01',
+             '010-1234-5678',
+             'https://example.com/profile.jpg',
+             'hong@example.com',
+             '서울특별시 강남구 테헤란로 123',
+             15,
+             NOW(),
+             NULL,
+             NOW(),
+             NOW(),
+             NULL,
+             NULL,
+             NULL,
+             NOW(),
+             1,                      -- 계정 활성 상태
+             1,                      -- department_id
+             1,                      -- position_id
+             1,                      -- job_id
+             1                       -- rank_id
+         );
+
+
 INSERT INTO `member`
 (
   `password`,
