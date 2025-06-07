@@ -29,8 +29,9 @@ public class EvaluationCriteriaCommandServiceImpl implements EvaluationCriteriaC
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_JOBTEST);
         }
 
-        // 가중치가 1을 넘는 경우
-        if(createEvaluationCriteriaCommandDTO.getScoreWeight() > 1.0f) {
+        // 가중치가 0 ~ 1이 아닌경우
+        if(createEvaluationCriteriaCommandDTO.getScoreWeight() > 1.0f ||
+        createEvaluationCriteriaCommandDTO.getScoreWeight() < 0.0f) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT);
         }
 

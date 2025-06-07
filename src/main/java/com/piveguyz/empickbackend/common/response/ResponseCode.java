@@ -113,7 +113,7 @@ public enum ResponseCode {
 
     //   3) 평가 기준
     EMPLOYMENT_INVALID_EVALUATION_CRITERIA(false, HttpStatus.BAD_REQUEST, 2430, "평가 기준이 유효하지 않습니다."),
-    EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT(false, HttpStatus.BAD_REQUEST,2431, "평가 기준의 가중치는 1을 초과할 수 없습니다."),
+    EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT(false, HttpStatus.BAD_REQUEST,2431, "평가 기준의 가중치는 0 ~ 1을 벗어날 수 없습니다."),
 
 
     //  면접 일정 - 2500 ~ 2599
