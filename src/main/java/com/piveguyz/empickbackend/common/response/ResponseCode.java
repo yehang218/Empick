@@ -15,6 +15,7 @@ public enum ResponseCode {
 
     // 모든 성공 코드
     SUCCESS(true, HttpStatus.OK, 200, "요청이 성공적으로 처리되었습니다."),
+    CREATED(true, HttpStatus.CREATED, 201, "리소스가 성공적으로 생성되었습니다."),
 
     // 클라이언트 오류 (4xx)
     BAD_REQUEST(false, HttpStatus.BAD_REQUEST, 400, "잘못된 요청입니다."),
@@ -30,7 +31,10 @@ public enum ResponseCode {
     MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1000, "사원 정보를 찾을 수 없습니다."),
     MEMBER_RESIGNED(false, HttpStatus.NOT_ACCEPTABLE,1001, "삭제된 사원 정보입니다."),
     MEMBER_STATUS_SUSPENDED(false, HttpStatus.NOT_ACCEPTABLE, 1004, "사원 상태가 차단되었습니다."),
-
+    MEMBER_EMAIL_DUPLICATED(false, HttpStatus.NOT_ACCEPTABLE, 1005, "이미 존재하는 이메일입니다."),
+    MEMBER_CREATED_MEMBER_ID_REQUIRED(false, HttpStatus.BAD_REQUEST, 1006, "입사처리자가 지정되지 않았습니다."),
+    MEMBER_CREATED_MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1007, "입사처리자를 찾을 수 없습니다."),
+    MEMBER_CREATED_MEMBER_NO_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "입사처리자는 ROLE_HR_ACCESS 권한이 있어야 합니다."),
 
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
@@ -133,8 +137,9 @@ public enum ResponseCode {
     EMPLOYMENT_MAIL_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2631, "메일의 내용을 입력하지 않았습니다."),
     EMPLOYMENT_MAIL_INADEQUATE_EMAIL(false, HttpStatus.CONFLICT, 2632, "유효하지 않은 형태의 이메일입니다."),
 
-    // 2700 ~ 2799
-    INVALID_REFRESH_TOKEN(false, HttpStatus.UNAUTHORIZED, 2700, "유효하지 않은 Refresh Token입니다.");
+    // 인증 2700 ~ 2799
+    INVALID_REFRESH_TOKEN(false, HttpStatus.UNAUTHORIZED, 2700, "유효하지 않은 Refresh Token입니다."),
+    MEMBER_EMPLOYEE_NUMBER_DUPLICATE(false, HttpStatus.UNAUTHORIZED, 2701, "중복된 사번입니다.");
 
     private final boolean success;
     private final HttpStatus httpStatus;        // HTTP 상태 코드

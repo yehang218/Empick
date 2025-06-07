@@ -10,11 +10,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -40,9 +44,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 CustomMemberDetails memberDetails =
                         (CustomMemberDetails) customMemberDetailsService.loadUserByUsername(memberId);
 
-                // SecurityContextHolder에 인증 객체 주입
+                // 🔥 roles 클레임에서 권한 추출 (null-safe)
+                List<String> roles = claims.get("roles", List.class);
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                if (roles != null) {
+                    for (String role : roles) {
+                        if (role != null && !role.isBlank()) {
+                            authorities.add(new SimpleGrantedAuthority(role));
+                        }
+                    }
+                }
+
+                // 🔥 SecurityContextHolder에 권한 포함해서 인증 객체 주입
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(memberDetails, null, memberDetails.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(memberDetails, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (JwtException e) {
