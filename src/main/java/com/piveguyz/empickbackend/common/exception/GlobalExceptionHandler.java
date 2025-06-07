@@ -55,7 +55,9 @@ public class GlobalExceptionHandler {
             String field = invalidFormat.getPath().get(0).getFieldName();
 
             if ("type".equals(field)) {
-                return ResponseEntity.status(ResponseCode.EMPLOYMENT_INVALID_TYPE.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_TYPE));
+                return ResponseEntity
+                        .status(ResponseCode.EMPLOYMENT_INVALID_QUESTION_TYPE.getHttpStatus())
+                        .body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_QUESTION_TYPE));
             } else if ("difficulty".equals(field)) {
                 return ResponseEntity.status(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY));
             }
