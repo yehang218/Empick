@@ -24,10 +24,11 @@ public enum ResponseCode {
 
     // 서버 오류 (5xx)
     INTERNAL_SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 500, "서버 내부 오류입니다."),
+    DATABASE_CONNECTION_ERROR(false, HttpStatus.SERVICE_UNAVAILABLE, 503, "DB 연결에 실패했습니다."),
 
     // 인사 오류 - 1000 ~ 1999
     MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1000, "사원 정보를 찾을 수 없습니다."),
-    MEMBER_RESIGNED(false, HttpStatus.NOT_ACCEPTABLE,1001, "삭제된 사원 정보입니다."),
+    MEMBER_RESIGNED(false, HttpStatus.NOT_ACCEPTABLE, 1001, "삭제된 사원 정보입니다."),
     MEMBER_STATUS_SUSPENDED(false, HttpStatus.NOT_ACCEPTABLE, 1004, "사원 상태가 차단되었습니다."),
 
 
