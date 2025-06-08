@@ -20,5 +20,5 @@ public class JobtestApplicationsDTO {
 
     private List<JobtestQuestionQueryDTO> questions;
     private List<JobtestEvaluationCriteriaQueryDTO> evaluationCriteria;
-    private List<ApplicationJobtestQueryDTO> applications;  // 지원자 요약 목록
+    private List<ApplicationInfoDTO> applications;  // 지원자 요약 목록
 }

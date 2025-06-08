@@ -41,8 +41,8 @@
 
 
     <!--    상세조회-->
-    <resultMap id="ApplicationJobtestMap"
-               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationJobtestQueryDTO">
+    <resultMap id="ApplicationInfoMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationInfoDTO">
         <id property="applicationId" column="application_id"/>
         <result property="applicantId" column="applicant_id"/>
         <result property="applicantName" column="applicant_name"/>
@@ -61,7 +61,7 @@
 
         <collection property="questions" resultMap="JobTestQuestionMap"/>
         <collection property="evaluationCriteria" resultMap="JobTestEvalCriteriaMap"/>
-        <collection property="applications" resultMap="ApplicationJobtestMap"/>
+        <collection property="applications" resultMap="ApplicationInfoMap"/>
     </resultMap>
 
 
