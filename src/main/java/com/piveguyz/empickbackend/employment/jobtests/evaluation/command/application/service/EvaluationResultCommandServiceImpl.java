@@ -5,9 +5,8 @@ import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.jobtests.evaluation.command.application.dto.CreateEvaluationResultCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.evaluation.command.application.dto.UpdateEvaluationResultCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.evaluation.command.domain.aggregate.EvaluationResultEntity;
-import com.piveguyz.empickbackend.employment.jobtests.evaluation.command.domain.repository.EvaluationCriteriaRepository;
 import com.piveguyz.empickbackend.employment.jobtests.evaluation.command.domain.repository.EvaluationResultRepository;
-import com.piveguyz.empickbackend.employment.jobtests.evaluation.query.mapper.EvaluationResultMapper;
+import com.piveguyz.empickbackend.employment.jobtests.evaluation.command.application.mapper.EvaluationResultMapper;
 import org.springframework.stereotype.Service;
 
 @Service
