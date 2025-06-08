@@ -36,9 +36,23 @@ public enum ResponseCode {
     MEMBER_CREATED_MEMBER_ID_REQUIRED(false, HttpStatus.BAD_REQUEST, 1006, "입사처리자가 지정되지 않았습니다."),
     MEMBER_CREATED_MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1007, "입사처리자를 찾을 수 없습니다."),
     MEMBER_CREATED_MEMBER_NO_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "입사처리자는 ROLE_HR_ACCESS 권한이 있어야 합니다."),
+    NO_HR_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "ROLE_HR_ACCESS 권한이 있어야 합니다."),
+
     MEMBER_PROFILE_IMAGE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1009 , "사원의 프로필 사진을 찾을 수 없습니다." ),
     MEMBER_ID_INVALID(false, HttpStatus.BAD_REQUEST, 1010, "유효하지 않은 사원 ID 입니다."),
     DUPLICATE_EDIT_REQUEST(false, HttpStatus.CONFLICT, 1011, "같은 필드에 대해 이미 대기중인 수정 요청이 존재합니다."),
+    EDIT_PROPOSAL_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1100, "변경 요청을 찾을 수 없습니다."),
+    EDIT_PROPOSAL_ALREADY_REJECTED(false, HttpStatus.BAD_REQUEST, 1101, "이미 거절된 요청입니다. 변경할 수 없습니다."),
+    EDIT_PROPOSAL_SELF_APPROVE_NOT_ALLOWED(false, HttpStatus.FORBIDDEN, 1102, "본인이 요청한 변경은 본인이 처리할 수 없습니다."),
+    EDIT_PROPOSAL_INVALID_FIELD(false, HttpStatus.BAD_REQUEST, 1103, "유효하지 않은 필드입니다."),
+    EDIT_PROPOSAL_APPROVED(true, HttpStatus.OK, 1104, "변경 요청이 승인되었습니다."),
+    EDIT_PROPOSAL_REJECTED(true, HttpStatus.OK, 1105, "변경 요청이 거절되었습니다."),
+
+    // 부서, 직책, 직무, 직급 관련 NOT_FOUND
+    DEPARTMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1200, "요청한 부서를 찾을 수 없습니다."),
+    POSITION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1201, "요청한 직책을 찾을 수 없습니다."),
+    JOB_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1202, "요청한 직무를 찾을 수 없습니다."),
+    RANK_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1203, "요청한 직급을 찾을 수 없습니다."),
 
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
