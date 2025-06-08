@@ -1,12 +1,11 @@
 package com.piveguyz.empickbackend.member.command.application.service;
 
+import com.piveguyz.empickbackend.member.command.application.dto.MemberEditApproveCommandDTO;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberEditProposalCommandDTO;
+import com.piveguyz.empickbackend.member.command.application.dto.MemberEditRejectCommandDTO;
 
 public interface MemberEditProposalCommandService {
-    /**
-     * 사원 정보 수정 요청 생성
-     *
-     * @param dto 수정 요청 DTO
-     */
     void createMemberEditRequest(MemberEditProposalCommandDTO dto);
+    void approveEditProposal(int proposalId);
+    void reject(MemberEditRejectCommandDTO dto);
 }

@@ -1,7 +1,7 @@
 package com.piveguyz.empickbackend.member.command.domain.aggregate;
 
-import com.piveguyz.empickbackend.member.command.domain.enums.MemberEditStatus;
 import com.piveguyz.empickbackend.member.command.domain.enums.FieldType;
+import com.piveguyz.empickbackend.member.command.domain.enums.MemberEditStatus;
 import com.piveguyz.empickbackend.member.command.domain.enums.MemberTargetField;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,8 +25,8 @@ public class MemberEditProposalEntity {
     @Column(name = "member_id", nullable = false)
     private Integer memberId;
 
-    @Column(name = "approved_member_id")
-    private Integer approvedMemberId;
+    @Column(name = "reviewer_id")
+    private Integer reviewerId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "target_field", nullable = false)
@@ -57,4 +57,24 @@ public class MemberEditProposalEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "reject_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
+
+    /**
+     * 변경 요청 승인 처리
+     */
+    public void approve(Integer approverId) {
+        this.reviewerId = approverId;
+        this.status = MemberEditStatus.APPROVED;
+    }
+
+    /**
+     * 변경 요청 거절 처리
+     */
+    public void reject(Integer approverId, String rejectionReason) {
+        this.reviewerId = approverId;
+        this.status = MemberEditStatus.REJECTED;
+        this.rejectionReason = rejectionReason;
+    }
 }
