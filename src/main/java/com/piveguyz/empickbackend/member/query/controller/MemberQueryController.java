@@ -20,6 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "사원 API", description = "사원 등록 및 관리 API")
 @RestController
 @RequestMapping("/api/v1/member")
@@ -28,7 +30,7 @@ public class MemberQueryController {
 
     private final MemberQueryService memberQueryService;
     private final MemberProfileQueryFacade memberProfileQueryFacade;
-    private final AuthFacade authFacade;  // 🔥 AuthFacade 추가
+    private final AuthFacade authFacade;
 
     @Operation(summary = "내 정보 조회", description = """
             - 로그인한 사용자의 정보를 조회합니다. (JWT 토큰 필요)
@@ -47,14 +49,36 @@ public class MemberQueryController {
         return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
     }
 
+    @Operation(summary = "사원 이름으로 조회", description = "- 사원 이름으로 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사원 조회 성공", content = @Content(schema = @Schema(implementation = MemberResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "사원 정보를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE)))
+    })
+    @GetMapping("/search/name")
+    public ResponseEntity<CustomApiResponse<List<MemberResponseDTO>>> getMembersByName(
+            @RequestParam("name") String name) {
+        List<MemberResponseDTO> members = memberQueryService.getMembersByName(name);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, members));
+    }
+
+    @Operation(summary = "사번으로 조회", description = "- 사번으로 사원 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사원 조회 성공", content = @Content(schema = @Schema(implementation = MemberResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "사원 정보를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE)))
+    })
+    @GetMapping("/search/employeeNumber")
+    public ResponseEntity<CustomApiResponse<List<MemberResponseDTO>>> getMembersByEmployeeNumber(
+            @RequestParam("employeeNumber") int employeeNumber) {
+        List<MemberResponseDTO> members = memberQueryService.getMembersByEmployeeNumber(employeeNumber);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, members));
+    }
+
     @Operation(summary = "프로필 이미지 다운로드", description = """
             - memberId로 S3에서 프로필 이미지를 다운로드합니다.
             - **현재 DB에 55번 id의 사원의 프로필 사진 경로만 제대로 등록 되어 있음**
             """)
     @GetMapping("/{memberId}/profile-image")
-    public ResponseEntity<byte[]> downloadProfileImage(
-            @PathVariable int memberId) {
-
+    public ResponseEntity<byte[]> downloadProfileImage(@PathVariable int memberId) {
         byte[] imageData = memberProfileQueryFacade.downloadProfileImage(memberId);
         String profileImageKey = memberQueryService.getProfileImageKey(memberId);
         String contentType = guessContentType(profileImageKey);
@@ -66,13 +90,11 @@ public class MemberQueryController {
 
     private String guessContentType(String key) {
         String lowerKey = key.toLowerCase();
-
         if (lowerKey.endsWith(".png")) return "image/png";
         if (lowerKey.endsWith(".jpg") || lowerKey.endsWith(".jpeg")) return "image/jpeg";
         if (lowerKey.endsWith(".webp")) return "image/webp";
         if (lowerKey.endsWith(".gif")) return "image/gif";
         if (lowerKey.endsWith(".svg")) return "image/svg+xml";
-
         return "application/octet-stream";
     }
 }
