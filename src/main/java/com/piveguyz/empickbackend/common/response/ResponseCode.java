@@ -111,6 +111,9 @@ public enum ResponseCode {
     EMPLOYMENT_JOBTEST_DUPLICATE(false, HttpStatus.CONFLICT, 2421, "동일한 이름의 실무테스트가 이미 등록되어 있습니다."),
     EMPLOYMENT_INVALID_JOBTEST(false, HttpStatus.NOT_FOUND, 2422, "요청한 실무테스트를 찾을 수 없습니다."),
 
+    // 평가 결과
+    EMPLOYMENT_INVALID_EVALUATION_RESULT(false, HttpStatus.NOT_FOUND, 2440, "요청한 평가 결과를 찾을 수 없습니다."),
+
 
     //  면접 일정 - 2500 ~ 2599
 
