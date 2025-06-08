@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate;
 
 import com.piveguyz.empickbackend.employment.jobtests.common.enums.JobtestDifficulty;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateJobtestCommandDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +28,7 @@ public class JobtestEntity {
     private JobtestDifficulty difficulty;
 
     @Column(name = "test_time", nullable = false)
-    private String testTime;
+    private int testTime;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -35,12 +36,30 @@ public class JobtestEntity {
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
 
-    @Column(name = "job_test_type_id", nullable = false)
-    private int jobTestTypeId;
-
     @Column(name = "created_member_id", nullable = false)
     private int createdMemberId;
 
     @Column(name = "updated_member_id", nullable = true)
     private Integer updatedMemberId;
+
+    @PrePersist
+    public void PrePersist() {this.createdAt = LocalDateTime.now(); }
+
+    @PreUpdate
+    public void PreUpdate() {this.updatedAt = LocalDateTime.now(); }
+
+    public void updateJobtestEntity(UpdateJobtestCommandDTO updateJobtestCommandDTO) {
+        if(updateJobtestCommandDTO.getTitle() != null) {
+            this.title = updateJobtestCommandDTO.getTitle();
+        }
+        if(updateJobtestCommandDTO.getTitle() != null) {
+            this.difficulty = updateJobtestCommandDTO.getDifficulty();
+        }
+        if(updateJobtestCommandDTO.getTestTime() != null) {
+            this.testTime = updateJobtestCommandDTO.getTestTime();
+        }
+
+        this.updatedMemberId = updateJobtestCommandDTO.getUpdatedMemberId();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

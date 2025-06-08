@@ -15,13 +15,6 @@ public class CustomMemberDetails implements UserDetails {
         this.member = member;
     }
 
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        // 예: Member에 권한(Role)이 단일 문자열이라면 이렇게 처리
-//        return Collections.singleton(new SimpleGrantedAuthority(member.getRole()));
-//    }
-
-    // TODO: role 테이블을 설계 완료하면 위의 주석 내용으로 구체화
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -39,26 +32,31 @@ public class CustomMemberDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // 계정 만료 여부. 여기선 항상 true로 설정
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // 계정 잠김 여부. 여기선 항상 true로 설정
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // 비밀번호 만료 여부. 여기선 항상 true로 설정
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // 계정 활성화 여부. 여기선 항상 true로 설정
+        return true;
     }
 
     // 추가로 Member 엔터티 반환을 위한 Getter
     public Member getMember() {
         return member;
+    }
+
+    // 🔥 Member ID 반환 메서드 추가
+    public Integer getId() {
+        return member.getId();
     }
 }

@@ -5,9 +5,10 @@ import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,9 +24,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<CustomApiResponse<Void>> handleBusinessException(BusinessException ex) {
-        return ResponseEntity
-                .status(ex.getCode().getHttpStatus())
-                .body(CustomApiResponse.of(ex.getCode()));
+        return ResponseEntity.status(ex.getCode().getHttpStatus()).body(CustomApiResponse.of(ex.getCode()));
     }
 
     /**
@@ -34,8 +33,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<CustomApiResponse<String>> handleValidationException(MethodArgumentNotValidException ex) {
         String errorMessage = Objects.requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage();
-        return ResponseEntity.badRequest()
-                .body(CustomApiResponse.of(ResponseCode.VALIDATION_FAIL, errorMessage));
+        return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.VALIDATION_FAIL, errorMessage));
     }
 
     /**
@@ -43,8 +41,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<CustomApiResponse<String>> handleConstraintViolation(ConstraintViolationException ex) {
-        return ResponseEntity.badRequest()
-                .body(CustomApiResponse.of(ResponseCode.VALIDATION_FAIL, ex.getMessage()));
+        return ResponseEntity.badRequest().body(CustomApiResponse.of(ResponseCode.VALIDATION_FAIL, ex.getMessage()));
     }
 
     /**
@@ -59,19 +56,26 @@ public class GlobalExceptionHandler {
 
             if ("type".equals(field)) {
                 return ResponseEntity
-                        .status(ResponseCode.EMPLOYMENT_INVALID_TYPE.getHttpStatus())
-                        .body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_TYPE));
+                        .status(ResponseCode.EMPLOYMENT_INVALID_QUESTION_TYPE.getHttpStatus())
+                        .body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_QUESTION_TYPE));
             } else if ("difficulty".equals(field)) {
-                return ResponseEntity
-                        .status(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY.getHttpStatus())
-                        .body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY));
+                return ResponseEntity.status(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY));
             }
         }
 
         // 기타 잘못된 JSON 구조 (예: 닫히지 않은 괄호 등)
-        return ResponseEntity
-                .status(ResponseCode.BAD_REQUEST.getHttpStatus())
-                .body(CustomApiResponse.of(ResponseCode.BAD_REQUEST));
+        return ResponseEntity.status(ResponseCode.BAD_REQUEST.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.BAD_REQUEST));
+    }
+
+
+    /**
+     * DB 연결 실패인 경우
+     */
+    @ExceptionHandler({DataAccessException.class, CannotGetJdbcConnectionException.class})
+    public ResponseEntity<CustomApiResponse<Void>> handleDatabaseConnectionException(Exception ex) {
+        ex.printStackTrace(); // 로그 남기기
+
+        return ResponseEntity.status(ResponseCode.DATABASE_CONNECTION_ERROR.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.DATABASE_CONNECTION_ERROR));
     }
 
     /**
@@ -80,8 +84,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomApiResponse<Void>> handleException(Exception ex) {
         ex.printStackTrace(); // 로그로 남기기
-        return ResponseEntity
-                .status(ResponseCode.INTERNAL_SERVER_ERROR.getHttpStatus())
-                .body(CustomApiResponse.of(ResponseCode.INTERNAL_SERVER_ERROR));
+        return ResponseEntity.status(ResponseCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.INTERNAL_SERVER_ERROR));
     }
 }
