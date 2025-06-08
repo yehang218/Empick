@@ -1,4 +1,7 @@
 package com.piveguyz.empickbackend.job.command.domain.repository;
 
-public class JobRepository {
+import com.piveguyz.empickbackend.job.command.domain.aggregate.JobEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface JobRepository extends JpaRepository<JobEntity, Integer> {
 }
