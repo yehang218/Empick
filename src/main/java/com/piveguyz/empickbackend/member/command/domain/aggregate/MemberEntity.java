@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
                 @UniqueConstraint(name = "uk_member_email", columnNames = "email")
         }
 )
-public class Member {
+public class MemberEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
