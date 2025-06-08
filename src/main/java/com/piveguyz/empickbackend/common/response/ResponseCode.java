@@ -112,6 +112,23 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_JOBTEST(false, HttpStatus.NOT_FOUND, 2422, "요청한 실무테스트를 찾을 수 없습니다."),
 
 
+
+
+
+
+
+
+
+
+    //   5) 실무테스트 답안
+    EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2450, "요청한 답안을 찾을 수 없습니다."),
+
+
+
+    EMPLOYMENT_INVALID_CORRECTED_VALUE(false, HttpStatus.BAD_REQUEST, 2451, "isCorrect 값은 'Y' 또는 'N'이어야 합니다."),
+
+
+
     //  면접 일정 - 2500 ~ 2599
 
 
