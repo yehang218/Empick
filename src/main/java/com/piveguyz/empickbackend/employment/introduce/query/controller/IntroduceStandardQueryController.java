@@ -4,6 +4,7 @@ import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceStandard;
+import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardItemQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.service.IntroduceStandardQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,4 +40,18 @@ public class IntroduceStandardQueryController {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, introduceStandardQueryService.findAllIntroduceStandard()));
     }
+
+    @Operation(summary = "자기소개서 기준 항목 전체 조회", description = "기준 항목 데이터를 전체 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
+    })
+    @GetMapping("/item")
+    public ResponseEntity<CustomApiResponse<List<IntroduceStandardItemQueryDTO>>> getAllIntroduceStandardItem() {
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS,
+                        introduceStandardQueryService.findAllIntroduceStandardItem()));
+    }
 }
+

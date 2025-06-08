@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.introduce.query.service;
 
+import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardItemQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.mapper.IntroduceStandardMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,10 @@ public class IntroduceStandardQueryServiceImp implements IntroduceStandardQueryS
     @Override
     public List<IntroduceStandardQueryDTO> findAllIntroduceStandard() {
         return IntroduceStandardMapper.findAllIntroduceStandard();
+    }
+
+    @Override
+    public List<IntroduceStandardItemQueryDTO> findAllIntroduceStandardItem() {
+        return IntroduceStandardMapper.findAllIntroduceStandardItem();
     }
 }
