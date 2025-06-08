@@ -1,8 +1,14 @@
 package com.piveguyz.empickbackend.employment.introduce.query.controller;
 
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationResponseQueryDTO;
+import com.piveguyz.empickbackend.employment.applicant.query.service.ApplicationResponseQueryService;
 import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.service.IntroduceQueryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,3 +33,6 @@ public class IntroduceQueryController {
         return ResponseEntity.ok(introduce);
     }
 }
+
+
+
