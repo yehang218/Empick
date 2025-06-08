@@ -113,6 +113,12 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_JOBTEST_QUESTION(false, HttpStatus.NOT_FOUND, 2423, "이 실무테스트에는 해당 문제가 등록되어 있지 않습니다."),
     EMPLOYMENT_JOBTEST_QUESTION_DUPLICATE(false, HttpStatus.CONFLICT, 2424, "이 실무테스트에는 해당 문제가 이미 등록되어 있습니다."),
 
+    //   3) 평가 기준
+    EMPLOYMENT_INVALID_EVALUATION_CRITERIA(false, HttpStatus.BAD_REQUEST, 2430, "평가 기준이 유효하지 않습니다."),
+    EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT(false, HttpStatus.BAD_REQUEST,2431, "평가 기준의 가중치는 0 ~ 1을 벗어날 수 없습니다."),
+
+    
+
     //  면접 일정 - 2500 ~ 2599
 
 
