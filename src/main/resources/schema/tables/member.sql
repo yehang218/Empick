@@ -43,7 +43,7 @@ CREATE TABLE `member_edit`
 (
     `id`                 INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '사원 정보 수정 요청 ID',
     `member_id`          INT          NOT NULL COMMENT '대상 사원 ID',
-    `approved_member_id` INT          NULL COMMENT '승인자 ID',
+    `reviewer_id` INT          NULL COMMENT '승인자 ID',
     `target_field`       VARCHAR(255) NOT NULL COMMENT '수정 요청 대상 필드',
     `original_value`     VARCHAR(255) NOT NULL COMMENT '기존 값',
     `requested_value`    VARCHAR(255) NOT NULL COMMENT '수정 요청 값',
@@ -55,7 +55,7 @@ CREATE TABLE `member_edit`
     CONSTRAINT `fk_member_edit_member`
         FOREIGN KEY (`member_id`) REFERENCES `member` (`id`) ON DELETE CASCADE,
     CONSTRAINT `fk_member_edit_approver`
-        FOREIGN KEY (`approved_member_id`) REFERENCES `member` (`id`) ON DELETE SET NULL
+        FOREIGN KEY (`reviewer_id`) REFERENCES `member` (`id`) ON DELETE SET NULL
 ) COMMENT = '사원 정보 수정 요청 테이블';
 
 #status는
@@ -64,7 +64,7 @@ CREATE TABLE `member_edit`
 (
     `id`                 INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '사원 테이블 ID',
     `member_id`          INT          NOT NULL COMMENT '요청 사원 ID',
-    `approved_member_id` INT          NULL COMMENT '승인자 ID',
+    `reviewer_id` INT          NULL COMMENT '승인자 ID',
     `target_field`       VARCHAR(255) NOT NULL COMMENT '변경을 원하는 속성',
     `original_value`     VARCHAR(255) NOT NULL COMMENT '이전 값',
     `requested_value`    VARCHAR(255) NOT NULL COMMENT '변경을 원하는 값',
@@ -76,7 +76,7 @@ CREATE TABLE `member_edit`
     CONSTRAINT `fk_member_edit_member`
         FOREIGN KEY (`member_id`) REFERENCES `member` (`id`),
     CONSTRAINT `fk_member_edit_approver`
-        FOREIGN KEY (`approved_member_id`) REFERENCES `member` (`id`) ON DELETE SET NULL
+        FOREIGN KEY (`reviewer_id`) REFERENCES `member` (`id`) ON DELETE SET NULL
 ) COMMENT = '사원 정보 수정 요청 테이블';
 
 
