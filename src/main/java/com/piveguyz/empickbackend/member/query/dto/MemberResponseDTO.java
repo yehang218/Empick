@@ -1,13 +1,25 @@
 package com.piveguyz.empickbackend.member.query.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
-@AllArgsConstructor
+@Builder
 public class MemberResponseDTO {
-    private int id;
+    private Integer id;
+    private Integer employeeNumber;
     private String name;
-    private int employeeNumber;
     private String email;
+    private String phone;
+    private String departmentName;
+    private String positionName;
+    private String jobName;
+    private String rankName;
+    private String pictureUrl;
+    private Integer status;
+    private LocalDateTime hireAt;
+    private LocalDateTime resignAt;
 }
