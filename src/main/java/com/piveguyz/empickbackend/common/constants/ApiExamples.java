@@ -1,6 +1,16 @@
 package com.piveguyz.empickbackend.common.constants;
 
 public class ApiExamples {
+
+    public static final String ERROR_409_EXAMPLE =             """
+            {
+              "success": false,
+              "code": 409,
+              "message": "중복된 이메일입니다.",
+              "data": null
+            }
+            """;
+
     private ApiExamples() {}
 
     public static final String ERROR_400_EXAMPLE =

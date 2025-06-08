@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.piveguyz.empickbackend.employment.applicationItem.query.mapper.ApplicationItemCategoryQueryMapper">
+
+    <resultMap id="ApplicationItemCategoryResultMap" type="com.piveguyz.empickbackend.employment.applicationItem.query.dto.ApplicationItemCategoryQueryDTO">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="input_type" property="inputType"
+                typeHandler="com.piveguyz.empickbackend.common.handler.InputTypeHandler" />
+        <result column="display_order" property="displayOrder" />
+        <result column="application_item_category_id" property="applicationItemCategoryId" />
+    </resultMap>
+
+    <select id="findAllCategories" resultMap="ApplicationItemCategoryResultMap">
+        SELECT
+            id,
+            name,
+            input_type,
+            display_order,
+            application_item_category_id
+        FROM application_item_category
+        ORDER BY id ASC
+    </select>
+</mapper>
