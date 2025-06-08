@@ -32,11 +32,14 @@ public class MailCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2631", description = "메일의 내용을 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2632", description = "유효하지 않은 형태의 이메일입니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2633", description = "메일의 제목을 입력하지 않았습니다."),
     })
 
     @PostMapping("/create")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> createMail(@RequestBody MailCommandDTO mailCommandDTO) {
-        MailCommandDTO createdMailCommandDTO = mailCommandService.createMail(mailCommandDTO);
+        MailCommandDTO createdMailCommandDTO = mailCommandService.createMail(mailCommandDTO);       // DB에 메일 저장
+//        mailCommandService.sendSimpleMail(createdMailCommandDTO);     // 실제 메일 발송
+        mailCommandService.sendHTMLMail(createdMailCommandDTO);         // 더 복잡한 html 메일 발송
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, createdMailCommandDTO));
