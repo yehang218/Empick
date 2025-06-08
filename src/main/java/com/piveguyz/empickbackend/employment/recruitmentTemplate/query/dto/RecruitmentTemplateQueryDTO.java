@@ -11,5 +11,6 @@ public class RecruitmentTemplateQueryDTO {
 	private String departmentName; // 부서명
 	private String memberName;     // 작성자 이름
 	private String createdAt;
+	private String updatedAt;
 	private List<RecruitmentTemplateItemQueryDTO> items;  // 항목
 }
