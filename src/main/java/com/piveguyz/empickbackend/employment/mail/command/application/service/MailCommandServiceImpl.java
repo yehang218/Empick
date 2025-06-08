@@ -22,7 +22,9 @@ import org.thymeleaf.context.Context;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class MailCommandServiceImpl implements MailCommandService {
     private final TemplateEngine templateEngine;
 
     @Override
-    public MailCommandDTO createMail(MailCommandDTO dto) {
+    public List<String> createMail(MailCommandDTO dto) {
         String title = dto.getTitle();
         if(title == null || title.isEmpty()) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_NO_TITLE);
@@ -43,68 +45,75 @@ public class MailCommandServiceImpl implements MailCommandService {
         if(content == null || content.isEmpty()){
             throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_NO_CONTENT);
         }
-        String email = dto.getEmail();
-        if(!email.contains("@")){
-            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_INADEQUATE_EMAIL);
+        List<String> email = dto.getEmail();
+        List<String> sendedEmail = new ArrayList<>();
+        for(String eachEmail : email) {
+            if (!eachEmail.contains("@")) {
+                throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_INADEQUATE_EMAIL);
+            }
+            MailEntity entity = new MailEntity();
+            entity.setApplicantId(dto.getApplicantId());
+            entity.setEmail(eachEmail);
+            entity.setTitle(dto.getTitle());
+            entity.setContent(dto.getContent());
+            entity.setSenderId(1);
+            entity.setSendedAt(LocalDateTime.now());
+            MailEntity savedEntity = mailRepository.save(entity);
         }
-        MailEntity entity = new MailEntity();
-        entity.setApplicantId(dto.getApplicantId());
-        entity.setEmail(dto.getEmail());
-        entity.setTitle(dto.getTitle());
-        entity.setContent(dto.getContent());
-        entity.setSenderId(1);
-        entity.setSendedAt(LocalDateTime.now());
-        MailEntity savedEntity = mailRepository.save(entity);
-        MailCommandDTO savedDTO = mailCommandMapper.toDTO(savedEntity);
-        return savedDTO;
+        return sendedEmail;
     }
 
     @Async
     public void sendSimpleMail(MailCommandDTO dto){
-        SimpleMailMessage message = new SimpleMailMessage();
+        List<String> emails = dto.getEmail();
+        for(String eachEmail : emails) {
+            SimpleMailMessage message = new SimpleMailMessage();
 //        message.setTo(dto.getEmail());
-        message.setFrom("noreply@example.com");
-        message.setTo("tjalswhd1@gmail.com");
-        message.setSubject(dto.getTitle());
-        message.setText(dto.getContent());
+            message.setFrom("noreply@example.com");
+            message.setTo("tjalswhd1@gmail.com");
+            message.setSubject(dto.getTitle());
+            message.setText(dto.getContent());
 
-        javaMailSender.send(message);
-
+            javaMailSender.send(message);
+        }
     }
 
     @Override
     public void sendHTMLMail(MailCommandDTO createdMailCommandDTO) {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        try {
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        List<String> emails = createdMailCommandDTO.getEmail();
+        for(String eachEmail : emails) {
+            try {
+                MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+                MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 //            mimeMessageHelper.setFrom("noreply@example.com");
 //            mimeMessageHelper.setTo(createdMailCommandDTO.getEmail());
 //            mimeMessageHelper.setSubject(createdMailCommandDTO.getTitle());
 //            mimeMessageHelper.setText(createdMailCommandDTO.getContent(), true);
 
-            Context context = new Context();
-            context.setVariable("subject", createdMailCommandDTO.getTitle());
-            context.setVariable("message", createdMailCommandDTO.getContent());
+                Context context = new Context();
+                context.setVariable("subject", createdMailCommandDTO.getTitle());
+                context.setVariable("message", createdMailCommandDTO.getContent());
 //            if (createdMailCommandDTO.getTarget().equals("user")) {
 //                context.setVariable("userType", "일반 사용자");
 //            } else if (createdMailCommandDTO.getTarget().equals("admin")) {
 //                context.setVariable("userType", "관리자");
 //            }
 
-            // MailSendServiceImpl.java 내부
-            String base64Image = getBase64EncodedImage("static/images/empick-logo.png");
-            context.setVariable("logoImage", base64Image);
+                // MailSendServiceImpl.java 내부
+                String base64Image = getBase64EncodedImage("static/images/empick-logo.png");
+                context.setVariable("logoImage", base64Image);
 
-            String htmlContent = templateEngine.process("email-template", context);
-            mimeMessageHelper.setTo(createdMailCommandDTO.getEmail());
-            mimeMessageHelper.setSubject(createdMailCommandDTO.getTitle());
-            mimeMessageHelper.setText(htmlContent, true);
-            javaMailSender.send(mimeMessage);
-            System.out.println("Thymeleaf 템플릿 이메일 전송 성공!");
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                String htmlContent = templateEngine.process("email-template", context);
+                mimeMessageHelper.setTo(eachEmail);
+                mimeMessageHelper.setSubject(createdMailCommandDTO.getTitle());
+                mimeMessageHelper.setText(htmlContent, true);
+                javaMailSender.send(mimeMessage);
+                System.out.println("Thymeleaf 템플릿 이메일 전송 성공!");
+            } catch (MessagingException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

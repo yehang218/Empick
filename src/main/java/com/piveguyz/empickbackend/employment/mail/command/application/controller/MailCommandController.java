@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/employment/mail")
 public class MailCommandController {
@@ -37,11 +39,11 @@ public class MailCommandController {
 
     @PostMapping("/create")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> createMail(@RequestBody MailCommandDTO mailCommandDTO) {
-        MailCommandDTO createdMailCommandDTO = mailCommandService.createMail(mailCommandDTO);       // DB에 메일 저장
-//        mailCommandService.sendSimpleMail(createdMailCommandDTO);     // 실제 메일 발송
-        mailCommandService.sendHTMLMail(createdMailCommandDTO);         // 더 복잡한 html 메일 발송
+        List<String> emailList = mailCommandService.createMail(mailCommandDTO);       // DB에 메일 저장
+//        mailCommandService.sendSimpleMail(createdMailCommandDTO);     // 단순 메일 발송
+        mailCommandService.sendHTMLMail(mailCommandDTO);         // 더 복잡한 html 메일 발송
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, createdMailCommandDTO));
+                .body(CustomApiResponse.of(result, mailCommandDTO));
     }
 }

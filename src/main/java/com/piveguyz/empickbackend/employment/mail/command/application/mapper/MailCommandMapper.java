@@ -10,7 +10,6 @@ public class MailCommandMapper {
         MailCommandDTO mailCommandDTO = new MailCommandDTO();
         mailCommandDTO.setId(savedMailEntity.getId());
         mailCommandDTO.setApplicantId(savedMailEntity.getApplicantId());
-        mailCommandDTO.setEmail(savedMailEntity.getEmail());
         mailCommandDTO.setTitle(savedMailEntity.getTitle());
         mailCommandDTO.setContent(savedMailEntity.getContent());
         mailCommandDTO.setSenderId(savedMailEntity.getSenderId());
@@ -22,7 +21,6 @@ public class MailCommandMapper {
         MailEntity mailEntity = new MailEntity();
         mailEntity.setId(mailCommandDTO.getId());
         mailEntity.setApplicantId(mailCommandDTO.getApplicantId());
-        mailEntity.setEmail(mailCommandDTO.getEmail());
         mailEntity.setTitle(mailCommandDTO.getTitle());
         mailEntity.setContent(mailCommandDTO.getContent());
         mailEntity.setSenderId(mailCommandDTO.getSenderId());
