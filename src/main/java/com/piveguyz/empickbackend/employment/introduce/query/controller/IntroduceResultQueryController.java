@@ -2,6 +2,8 @@ package com.piveguyz.empickbackend.employment.applicant.query.controller;
 
 
 
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceResultQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.service.IntroduceQueryService;
 import com.piveguyz.empickbackend.employment.introduce.query.service.IntroduceResultQueryService;
@@ -15,16 +17,18 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/introduce-result")
+@RequestMapping("/api/v1/employment/introduce-result")
 @Tag(name = "자기소개서 평가 결과", description = "자소서 평가 결과 API")
 public class IntroduceResultQueryController {
 
     private final IntroduceResultQueryService introduceResultQueryService;
 
     @Operation(summary = "자기소개서 평가 결과 전체 조회", description = "introduce_rating_result 전체 조회 API")
+
     @GetMapping
-    public ResponseEntity<List<IntroduceResultQueryDTO>> getAllIntroduceResults() {
-        List<IntroduceResultQueryDTO> result = introduceResultQueryService.findAllIntroduceResult();
-        return ResponseEntity.ok(result);
+    public ResponseEntity<CustomApiResponse<List<IntroduceResultQueryDTO>>> getAllIntroduceResults() {
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, introduceResultQueryService.findAllIntroduceResult()));
+
     }
 }
