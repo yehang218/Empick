@@ -1,5 +1,7 @@
 package com.piveguyz.empickbackend.department.query.service;
 
+import com.piveguyz.empickbackend.common.exception.BusinessException;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.department.query.dto.DeptMemberQueryResponseDTO;
 import com.piveguyz.empickbackend.department.query.mapper.DeptMemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,10 @@ public class DeptMemberQueryServiceImpl implements DeptMemberQueryService {
 
     @Override
     public List<DeptMemberQueryResponseDTO> getMembersByDepartmentId(int departmentId) {
-        return deptMemberMapper.findMembersByDepartmentId(departmentId);
+        List<DeptMemberQueryResponseDTO> members = deptMemberMapper.findMembersByDepartmentId(departmentId);
+        if (members.isEmpty()) {
+            throw new BusinessException(ResponseCode.MEMBER_NOT_FOUND); // 사원이 없을 때 예외 처리
+        }
+        return members;
     }
 }
