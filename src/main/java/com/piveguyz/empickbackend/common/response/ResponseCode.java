@@ -121,6 +121,8 @@ public enum ResponseCode {
     EMPLOYMENT_INTERVIEW_SCORE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2550, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE(false, HttpStatus.BAD_REQUEST, 2551, "점수를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_REVIEW(false, HttpStatus.BAD_REQUEST, 2552, "평가를 입력하지 않았습니다."),
+    EMPLOYMENT_INTERVIEW_SCORE_NO_ITEM(false, HttpStatus.BAD_REQUEST, 2553, "해당하는 평가 항목이 존재하지 않습니다."),
+    EMPLOYMENT_INTERVIEW_SCORE_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2554, "이미 평가 점수가 등록되어 있습니다."),
 
 
     //  안내 메일 - 2600 ~ 2699
