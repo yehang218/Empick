@@ -86,6 +86,18 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         member.clearProfileImageUrl();
     }
 
+    @Override
+    public void resignMember(int memberId) {
+        Integer currentMemberId = authFacade.getCurrentMemberId();
+
+        authFacade.checkHasRole(RoleCode.ROLE_HR_ACCESS);
+
+        MemberEntity member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+
+        member.resign(LocalDateTime.now(), currentMemberId);
+    }
+
     /**
      * 랜덤한 6자리 EmployeeNumber를 생성하고 중복 방지.
      */

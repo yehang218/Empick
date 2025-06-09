@@ -141,4 +141,10 @@ public class MemberEntity {
     public void updatePictureUrl(String requestedValue) {
         this.pictureUrl = requestedValue;
     }
+
+    public void resign(LocalDateTime resignAt, int deletedMemberId) {
+        this.resignAt = resignAt;
+        this.status = 0; // 비활성
+        this.deletedMemberId = deletedMemberId;
+    }
 }
