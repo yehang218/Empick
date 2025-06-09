@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.security;
 
-import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
+import com.piveguyz.empickbackend.member.command.domain.aggregate.MemberEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,9 +9,9 @@ import java.util.List;
 
 public class CustomMemberDetails implements UserDetails {
 
-    private final Member member;
+    private final MemberEntity member;
 
-    public CustomMemberDetails(Member member) {
+    public CustomMemberDetails(MemberEntity member) {
         this.member = member;
     }
 
@@ -51,7 +51,7 @@ public class CustomMemberDetails implements UserDetails {
     }
 
     // 추가로 Member 엔터티 반환을 위한 Getter
-    public Member getMember() {
+    public MemberEntity getMember() {
         return member;
     }
 
