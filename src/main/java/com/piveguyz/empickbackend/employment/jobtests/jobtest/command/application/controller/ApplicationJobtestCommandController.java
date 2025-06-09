@@ -48,7 +48,7 @@ public class ApplicationJobtestCommandController {
     )
     @ApiResponses(value = {
     })
-    @PatchMapping
+    @PatchMapping("/{id}")
     public ResponseEntity<CustomApiResponse<UpdateApplicationJobtestCommandDTO>> updateApplicationJobtest(
             @PathVariable int id,
             @RequestBody @Valid UpdateApplicationJobtestCommandDTO updateApplicationJobtestCommandDTO) {
