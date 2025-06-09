@@ -45,8 +45,9 @@ public enum ResponseCode {
     EDIT_PROPOSAL_ALREADY_REJECTED(false, HttpStatus.BAD_REQUEST, 1101, "이미 거절된 요청입니다. 변경할 수 없습니다."),
     EDIT_PROPOSAL_SELF_APPROVE_NOT_ALLOWED(false, HttpStatus.FORBIDDEN, 1102, "본인이 요청한 변경은 본인이 처리할 수 없습니다."),
     EDIT_PROPOSAL_INVALID_FIELD(false, HttpStatus.BAD_REQUEST, 1103, "유효하지 않은 필드입니다."),
-    EDIT_PROPOSAL_APPROVED(true, HttpStatus.OK, 1104, "변경 요청이 승인되었습니다."),
-    EDIT_PROPOSAL_REJECTED(true, HttpStatus.OK, 1105, "변경 요청이 거절되었습니다."),
+    EDIT_PROPOSAL_APPROVED(true, HttpStatus.ACCEPTED, 1104, "변경 요청이 승인되었습니다."),
+    EDIT_PROPOSAL_REJECTED(true, HttpStatus.NOT_ACCEPTABLE, 1105, "변경 요청이 거절되었습니다."),
+    REQUIRED_LOGIN(true, HttpStatus.NOT_ACCEPTABLE, 1106, "로그인이 필요합니다."),
 
     // 부서, 직책, 직무, 직급 관련 NOT_FOUND
     DEPARTMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1200, "요청한 부서를 찾을 수 없습니다."),
