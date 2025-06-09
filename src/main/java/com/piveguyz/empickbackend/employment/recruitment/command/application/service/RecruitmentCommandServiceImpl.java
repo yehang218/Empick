@@ -75,7 +75,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 			ApplicationItem item = ApplicationItem.builder()
 				.recruitment(saved)
 				.category(category)
-				.isRequiredYn(itemDTO.isRequired() ? "Y" : "N")
+				.isRequiredYn(itemDTO.isRequired())
 				.build();
 
 			applicationItemRepository.save(item);
@@ -131,14 +131,14 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		for (ApplicationItemCreateDTO itemDTO : dto.getApplicationItems()) {
 			ApplicationItem existing = existingMap.get(itemDTO.getApplicationItemCategoryId());
 			if (existing != null) {
-				existing.setIsRequiredYn(itemDTO.isRequired() ? "Y" : "N");
+				existing.setRequiredYn(itemDTO.isRequired());
 			} else {
 				ApplicationItemCategory category = applicationItemCategoryRepository.findById(itemDTO.getApplicationItemCategoryId())
 					.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_ITEM_CATEGORY_NOT_FOUND));
 				ApplicationItem newItem = ApplicationItem.builder()
 					.recruitment(recruitment)
 					.category(category)
-					.isRequiredYn(itemDTO.isRequired() ? "Y" : "N")
+					.isRequiredYn(itemDTO.isRequired())
 					.build();
 				applicationItemRepository.save(newItem);
 			}
