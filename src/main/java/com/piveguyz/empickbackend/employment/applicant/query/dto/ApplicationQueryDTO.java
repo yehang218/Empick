@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApplicationQueryDTO {
+
     private int id;
     private int recruitmentId;
     private LocalDateTime createdAt;
