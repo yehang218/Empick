@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.introduce.query.mapper.IntroduceStandardMapper">
+
+    <select id="findAllIntroduceStandardItem"
+            resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardItemQueryDTO">
+        SELECT
+            id,
+            content,
+            member_id AS memberId,
+            updated_by AS updatedBy,
+            updated_at AS updatedAt
+        FROM
+            introduce_standard_item
+    </select>
+
+</mapper>

@@ -18,10 +18,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "지원서 항목 조회 API", description = "지원서 항목 조회 및 카테고리 조회")
+@Tag(name = "지원서 항목 카테고리 조회 API", description = "지원서 항목 카테고리 조회")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/application/item")
+@RequestMapping("/api/v1/employment/application/item/category")
 public class ApplicationItemCategoryQueryController {
 	private final ApplicationItemCategoryQueryService applicationItemCategoryQueryService;
 
@@ -35,7 +35,7 @@ public class ApplicationItemCategoryQueryController {
 		@ApiResponse(responseCode = "2050", description = "지원서 항목 카테고리를 찾을 수 없습니다."),
 		@ApiResponse(responseCode = "2051", description = "지원서 항목 카테고리가 존재하지 않습니다.")
 	})
-	@GetMapping("/category")
+	@GetMapping
 	public ResponseEntity<CustomApiResponse<List<ApplicationItemCategoryQueryDTO>>> getAllCategories() {
 		List<ApplicationItemCategoryQueryDTO> result = applicationItemCategoryQueryService.getAllCategories();
 		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
