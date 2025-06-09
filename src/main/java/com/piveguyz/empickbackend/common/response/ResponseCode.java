@@ -123,13 +123,15 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2402, "작성자 정보가 유효하지 않습니다."),
     EMPLOYMENT_INVALID_UPDATED_MEMBER(false, HttpStatus.BAD_REQUEST, 2403, "수정자 정보가 유효하지 않습니다."),
     EMPLOYMENT_INVALID_SATISFIED_VALUE(false, HttpStatus.BAD_REQUEST, 2404, "isSatisfied 값은 'Y' 또는 'N'이어야 합니다."),
+    EMPLOYMENT_INVALID_JOBTEST_STATUS(false, HttpStatus.BAD_REQUEST, 2405, "유효하지 않은 실무테스트 처리 상태입니다."),
+    EMPLOYMENT_INVALID_CORRECTED_VALUE(false, HttpStatus.BAD_REQUEST, 2406, "isCorrect 값은 'Y' 또는 'N'이어야 합니다."),
 
     //   1) 실무테스트 문제
     EMPLOYMENT_QUESTION_FAIL(false, HttpStatus.INTERNAL_SERVER_ERROR, 2410, "실무테스트 문제 등록에 실패했습니다."),
     EMPLOYMENT_QUESTION_DUPLICATE(false, HttpStatus.CONFLICT, 2411, "동일한 문제가 이미 등록되어 있습니다."),
     EMPLOYMENT_INVALID_QUESTION_TYPE(false, HttpStatus.BAD_REQUEST, 2412, "유효하지 않은 실무테스트 문제 유형입니다."),
-    EMPLOYMENT_QUESTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2414, "요청한 문제를 찾을 수 없습니다."),
-    EMPLOYMENT_QUESTION_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2415, "이 문제는 다른 곳에서 사용 중이므로 삭제할 수 없습니다."),
+    EMPLOYMENT_QUESTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2413, "요청한 문제를 찾을 수 없습니다."),
+    EMPLOYMENT_QUESTION_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2414, "이 문제는 다른 곳에서 사용 중이므로 삭제할 수 없습니다."),
 
     EMPLOYMENT_OPTION_COUNT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2416, "선택지는 최대 5개까지만 등록할 수 있습니다."),
     EMPLOYMENT_QUESTION_OPTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2417, "선택지를 찾을 수 없습니다."),
@@ -142,21 +144,31 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_JOBTEST_QUESTION(false, HttpStatus.NOT_FOUND, 2423, "이 실무테스트에는 해당 문제가 등록되어 있지 않습니다."),
     EMPLOYMENT_JOBTEST_QUESTION_DUPLICATE(false, HttpStatus.CONFLICT, 2424, "이 실무테스트에는 해당 문제가 이미 등록되어 있습니다."),
 
-    //   3) 평가 기준
-    EMPLOYMENT_INVALID_EVALUATION_CRITERIA(false, HttpStatus.BAD_REQUEST, 2430, "평가 기준이 유효하지 않습니다."),
-    EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT(false, HttpStatus.BAD_REQUEST, 2431, "평가 기준의 가중치는 0 ~ 1을 벗어날 수 없습니다."),
+    //   3) 지원서별 실무테스트
+    EMPLOYMENT_INVALID_ENTRY_CODE(false, HttpStatus.BAD_REQUEST, 2300, "입장 코드는 5자리 숫자여야 합니다."),
+    EMPLOYMENT_ENTRY_CODE_DUPLICATE(false, HttpStatus.CONFLICT, 2301, "중복된 입장 코드입니다."),
+    EMPLOYMENT_INVALID_APPLICATION_JOBTEST(false, HttpStatus.NOT_FOUND, 2302, "존재하지 않는 지원서별 실무테스트입니다."),
 
 
-    //   4) 채점 기준
-    EMPLOYMENT_INVALID_QUESTION_GRADING_CRITERIA(false, HttpStatus.NOT_FOUND, 2440, "요청한 실무테스트 문제 평가 기준을 찾을 수 없습니다."),
+    //   4) 실무테스트 답안
+    EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2440, "요청한 답안을 찾을 수 없습니다."),
 
-    //   5) 실무테스트 답안
-    EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2450, "요청한 답안을 찾을 수 없습니다."),
+    //   5) 채점 기준
+    EMPLOYMENT_INVALID_QUESTION_GRADING_CRITERIA(false, HttpStatus.NOT_FOUND, 2450, "요청한 실무테스트 문제 채점 기준을 찾을 수 없습니다."),
 
-    // 4) 평가 결과
-    EMPLOYMENT_INVALID_EVALUATION_RESULT(false, HttpStatus.NOT_FOUND, 2440, "요청한 평가 결과를 찾을 수 없습니다."),
+    //   6) 채점 결과
 
-    EMPLOYMENT_INVALID_CORRECTED_VALUE(false, HttpStatus.BAD_REQUEST, 2451, "isCorrect 값은 'Y' 또는 'N'이어야 합니다."),
+    //   7) 평가 기준
+    EMPLOYMENT_INVALID_EVALUATION_CRITERIA(false, HttpStatus.BAD_REQUEST, 2470, "평가 기준이 유효하지 않습니다."),
+    EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT(false, HttpStatus.BAD_REQUEST, 2471, "평가 기준의 가중치는 0 ~ 1을 벗어날 수 없습니다."),
+
+    //   8) 평가 결과
+    EMPLOYMENT_INVALID_EVALUATION_RESULT(false, HttpStatus.NOT_FOUND, 2480, "요청한 평가 결과를 찾을 수 없습니다."),
+
+
+    //   9)
+
+
 
 
     
