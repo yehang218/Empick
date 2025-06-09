@@ -158,20 +158,6 @@ public enum ResponseCode {
     // 4) 평가 결과
     EMPLOYMENT_INVALID_EVALUATION_RESULT(false, HttpStatus.NOT_FOUND, 2440, "요청한 평가 결과를 찾을 수 없습니다."),
 
-
-
-
-
-
-
-
-
-
-    //   5) 실무테스트 답안
-    EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2450, "요청한 답안을 찾을 수 없습니다."),
-
-
-
     EMPLOYMENT_INVALID_CORRECTED_VALUE(false, HttpStatus.BAD_REQUEST, 2451, "isCorrect 값은 'Y' 또는 'N'이어야 합니다."),
 
 
