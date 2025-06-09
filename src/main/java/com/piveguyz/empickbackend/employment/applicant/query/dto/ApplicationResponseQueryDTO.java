@@ -9,13 +9,13 @@ import lombok.Setter;
 public class ApplicationResponseQueryDTO {
 
     @Schema(description = "응답 ID")
-    private Long id;
+    private int id;
 
     @Schema(description = "지원서 ID")
-    private Long applicationId;
+    private int applicationId;
 
     @Schema(description = "지원서 항목 ID")
-    private Long applicationItemId;
+    private int applicationItemId;
 
     @Schema(description = "응답 내용")
     private String content;
