@@ -1,15 +1,14 @@
 package com.piveguyz.empickbackend.member.command.application.service;
 
+import com.piveguyz.empickbackend.auth.facade.AuthFacade;
+import com.piveguyz.empickbackend.common.constants.RoleCode;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpRequestDTO;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpResponseDTO;
 import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
-import com.piveguyz.empickbackend.security.CustomMemberDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,23 +21,15 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthFacade authFacade;
 
     @Override
     public MemberSignUpResponseDTO signUp(MemberSignUpRequestDTO request) {
-        // 🔥 Step 1️⃣: 현재 로그인 사용자 정보 추출
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof CustomMemberDetails)) {
-            throw new BusinessException(ResponseCode.UNAUTHORIZED);
-        }
+        // 🔥 Step 1️⃣: 현재 로그인 사용자 ID 조회
+        Integer createdMemberId = authFacade.getCurrentMemberId();
 
-        CustomMemberDetails currentUser = (CustomMemberDetails) authentication.getPrincipal();
-        Integer createdMemberId = currentUser.getId();
-
-        // 🔥 Step 2️⃣: 현재 로그인 사용자의 권한 확인
-        if (authentication.getAuthorities().stream()
-                .noneMatch(auth -> auth.getAuthority().equals("ROLE_HR_ACCESS"))) {
-            throw new BusinessException(ResponseCode.MEMBER_CREATED_MEMBER_NO_PERMISSION);
-        }
+        // 🔥 Step 2️⃣: 권한 체크 (퍼사드 사용 + enum)
+        authFacade.checkHasRole(RoleCode.ROLE_HR_ACCESS);
 
         // 🔥 Step 3️⃣: 입사처리자(현재 로그인 사용자) 조회
         Member createdMember = memberRepository.findById(createdMemberId)
