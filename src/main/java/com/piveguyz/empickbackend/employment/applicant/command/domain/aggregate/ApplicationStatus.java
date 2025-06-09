@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.applicant.command.application.dto;
+package com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate;
 
 public enum ApplicationStatus {
     WAITING(0, "서류검토대기중"),
