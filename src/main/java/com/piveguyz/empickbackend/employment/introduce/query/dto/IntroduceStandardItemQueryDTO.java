@@ -1,7 +1,9 @@
 package com.piveguyz.empickbackend.employment.introduce.query.dto;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -9,12 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IntroduceStandardQueryDTO {
+public class IntroduceStandardItemQueryDTO {
     private Long id;
     private String content;
     private Long memberId;
-    private Long introduceId;
-    private Long introduceStandardItemId;
     private Long updatedBy;
     private LocalDateTime updatedAt;
 }
