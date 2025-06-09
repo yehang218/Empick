@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.piveguyz.empickbackend.member.query.mapper.MemberEditProposalQueryMapper">
+<mapper namespace="com.piveguyz.empickbackend.orgstructure.member.query.mapper.MemberEditProposalQueryMapper">
 
-    <select id="findProposals" resultType="com.piveguyz.empickbackend.member.query.dto.MemberEditProposalQueryDTO">
+    <select id="findProposals" resultType="com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberEditProposalQueryDTO">
         SELECT
         id,
         member_id AS memberId,

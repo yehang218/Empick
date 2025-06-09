@@ -2,11 +2,11 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.piveguyz.empickbackend.department.query.mapper.DeptMemberMapper">
+<mapper namespace="com.piveguyz.empickbackend.orgstructure.department.query.mapper.DeptMemberMapper">
 
     <!-- 부서 ID로 해당 부서에 속한 사원 리스트 조회 -->
     <select id="findMembersByDepartmentId" parameterType="int"
-            resultType="com.piveguyz.empickbackend.department.query.dto.DeptMemberQueryResponseDTO">
+            resultType="com.piveguyz.empickbackend.orgstructure.department.query.dto.DeptMemberQueryResponseDTO">
         SELECT m.id
              , m.name
              , m.employee_number AS employeeNumber

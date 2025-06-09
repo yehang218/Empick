@@ -8,7 +8,7 @@ import com.piveguyz.empickbackend.employment.jobtests.question.command.applicati
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.mapper.QuestionMapper;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionEntity;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.repository.QuestionRepository;
-import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
+import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
