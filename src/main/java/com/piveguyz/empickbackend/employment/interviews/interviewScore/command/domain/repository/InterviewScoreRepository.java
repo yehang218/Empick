@@ -4,4 +4,5 @@ import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.d
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InterviewScoreRepository extends JpaRepository<InterviewScoreEntity, Integer> {
+    boolean existsByInterviewIdAndInterviewerIdAndItemId(Integer interviewId, Integer interviewerId, Integer itemId);
 }

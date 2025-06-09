@@ -2,11 +2,12 @@ package com.piveguyz.empickbackend.employment.interviews.interviewScore.command.
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewScore.command.application.dto.InterviewScoreCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewScore.command.application.service.InterviewScoreCommandService;
+import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.dto.InterviewScoreCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.service.InterviewScoreCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 public class InterviewScoreCommandController {
     private final InterviewScoreCommandService service;
 
-    public InterviewScoreCommandController(InterviewScoreCommandService service) {
+    @Autowired
+    public InterviewScoreCommandController(InterviewScoreCommandService service)
+    {
         this.service = service;
     }
 
@@ -33,7 +36,7 @@ public class InterviewScoreCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2552", description = "평가를 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2554", description = "이미 평가 점수가 등록되어 있습니다."),
     })
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> createInterviewScore(@RequestBody InterviewScoreCommandDTO dto) {
         InterviewScoreCommandDTO createdDTO = service.create(dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -54,8 +57,8 @@ public class InterviewScoreCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2551", description = "점수를 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2552", description = "평가를 입력하지 않았습니다.")
     })
-    @PostMapping("/update")
-    public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> updateInterviewScore(@RequestParam("id") Integer id,
+    @PatchMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> updateInterviewScore(@PathVariable("id") Integer id,
                                                                                             @RequestBody InterviewScoreCommandDTO dto) {
         InterviewScoreCommandDTO updatedDTO = service.update(id, dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -74,8 +77,8 @@ public class InterviewScoreCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2550", description = "존재하지 않습니다."),
     })
-    @DeleteMapping("/delete")
-    public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> deleteInterviewScore(@RequestParam("id") Integer id){
+    @DeleteMapping("/{id}}")
+    public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> deleteInterviewScore(@PathVariable("id") Integer id){
         InterviewScoreCommandDTO deletedDTO = service.delete(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())

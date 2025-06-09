@@ -4,12 +4,10 @@ import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.interviews.interview.command.application.dto.InterviewCommandDTO;
 import com.piveguyz.empickbackend.employment.interviews.interview.command.application.service.InterviewCommandService;
-import com.piveguyz.empickbackend.employment.interviews.interview.query.dto.InterviewQueryDTO;
 import com.piveguyz.empickbackend.employment.interviews.interview.query.service.InterviewQueryService;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.service.InterviewScoreCommandService;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.query.dto.InterviewScoreQueryDTO;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.query.service.InterviewScoreQueryService;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;

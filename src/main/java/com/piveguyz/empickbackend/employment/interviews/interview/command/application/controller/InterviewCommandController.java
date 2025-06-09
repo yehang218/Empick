@@ -2,6 +2,7 @@ package com.piveguyz.empickbackend.employment.interviews.interview.command.appli
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.interviews.facade.InterviewFacade;
 import com.piveguyz.empickbackend.employment.interviews.interview.command.application.dto.InterviewCommandDTO;
 import com.piveguyz.empickbackend.employment.interviews.interview.command.application.service.InterviewCommandService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/employment/interview")
 public class InterviewCommandController {
     private final InterviewCommandService service;
+    private final InterviewFacade facade;
 
     @Autowired
-    public InterviewCommandController(InterviewCommandService service) {
+    public InterviewCommandController(InterviewCommandService service, InterviewFacade facade) {
         this.service = service;
+        this.facade = facade;
     }
 
     @Operation(
@@ -34,7 +37,7 @@ public class InterviewCommandController {
     })
     @PostMapping
     public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> create(@RequestBody InterviewCommandDTO dto) {
-        InterviewCommandDTO createdDTO = service.create(dto);
+        InterviewCommandDTO createdDTO = facade.createInterview(dto);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, createdDTO));

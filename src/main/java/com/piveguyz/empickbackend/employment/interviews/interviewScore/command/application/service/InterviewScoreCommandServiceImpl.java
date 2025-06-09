@@ -2,10 +2,10 @@ package com.piveguyz.empickbackend.employment.interviews.interviewScore.command.
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewScore.command.application.dto.InterviewScoreCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewScore.command.application.mapper.InterviewScoreCommandMapper;
-import com.piveguyz.empickbackend.employment.interviewScore.command.domain.aggregate.InterviewScoreEntity;
-import com.piveguyz.empickbackend.employment.interviewScore.command.domain.repository.InterviewScoreRepository;
+import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.dto.InterviewScoreCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.mapper.InterviewScoreCommandMapper;
+import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.domain.aggregate.InterviewScoreEntity;
+import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.domain.repository.InterviewScoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
