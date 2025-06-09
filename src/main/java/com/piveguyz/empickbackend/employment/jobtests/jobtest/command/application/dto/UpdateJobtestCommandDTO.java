@@ -3,6 +3,8 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicati
 import com.piveguyz.empickbackend.employment.jobtests.common.enums.JobtestDifficulty;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @ToString
 @NoArgsConstructor
@@ -12,6 +14,8 @@ public class UpdateJobtestCommandDTO {
     private String title;
     private JobtestDifficulty difficulty;
     private Integer testTime;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
 
     private int updatedMemberId;
 }

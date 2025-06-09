@@ -14,6 +14,8 @@ public class CreateJobtestCommandDTO {
     private String title;
     private JobtestDifficulty difficulty;
     private int testTime;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
 
     private int createdMemberId;
 }

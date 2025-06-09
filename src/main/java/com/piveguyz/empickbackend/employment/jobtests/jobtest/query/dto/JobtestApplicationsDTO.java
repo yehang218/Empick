@@ -13,6 +13,8 @@ public class JobtestApplicationsDTO {
     private String title;
     private int difficulty;
     private int testTime;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
     private String creatorName;
     private String updatedName;
     private LocalDateTime createdAt;

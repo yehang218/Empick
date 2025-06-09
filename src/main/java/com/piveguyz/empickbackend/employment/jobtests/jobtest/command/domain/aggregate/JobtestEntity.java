@@ -30,6 +30,12 @@ public class JobtestEntity {
     @Column(name = "test_time", nullable = false)
     private int testTime;
 
+    @Column(name = "started_at", nullable = true)
+    private LocalDateTime startedAt;
+
+    @Column(name = "ended_at", nullable = true)
+    private LocalDateTime endedAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -57,6 +63,12 @@ public class JobtestEntity {
         }
         if(updateJobtestCommandDTO.getTestTime() != null) {
             this.testTime = updateJobtestCommandDTO.getTestTime();
+        }
+        if(updateJobtestCommandDTO.getStartedAt() != null) {
+            this.startedAt = updateJobtestCommandDTO.getStartedAt();
+        }
+        if(updateJobtestCommandDTO.getEndedAt() != null) {
+            this.endedAt = updateJobtestCommandDTO.getEndedAt();
         }
 
         this.updatedMemberId = updateJobtestCommandDTO.getUpdatedMemberId();
