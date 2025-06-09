@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.recruitmentProcess.query.mapper.RecruitmentProcessQueryMapper">
+
+    <resultMap id="RecruitmentProcessResultMap" type="com.piveguyz.empickbackend.employment.recruitmentProcess.query.dto.RecruitmentProcessQueryDTO">
+        <result column="step_type" property="stepType"
+                typeHandler="com.piveguyz.empickbackend.common.handler.StepTypeHandler"/>
+        <result column="display_order" property="displayOrder"/>
+    </resultMap>
+
+    <select id="findByRecruitmentId" resultMap="RecruitmentProcessResultMap">
+        SELECT
+            step_type,
+            display_order
+        FROM recruitment_process
+        WHERE recruitment_id = #{recruitmentId}
+    </select>
+
+</mapper>

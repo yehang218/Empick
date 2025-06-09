@@ -96,6 +96,13 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICATION_ITEM_DUPLICATED(false, HttpStatus.CONFLICT, 2052, "동일한 항목이 양식에 중복 포함되어 있습니다."),
     EMPLOYMENT_APPLICATION_ITEM_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2053, "해당 채용공고에 연결된 지원서 양식을 찾을 수 없습니다."),
 
+    // 5) 채용 프로세스
+    EMPLOYMENT_RECRUITMENT_PROCESS_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2060, "채용 프로세스를 찾을 수 없습니다."),
+    EMPLOYMENT_RECRUITMENT_PROCESS_EMPTY(false, HttpStatus.NO_CONTENT, 2061, "채용 프로세스가 존재하지 않습니다."),
+    EMPLOYMENT_RECRUITMENT_PROCESS_INVALID_STEP(false, HttpStatus.BAD_REQUEST, 2062, "유효하지 않은 전형 단계 코드입니다."),
+    EMPLOYMENT_RECRUITMENT_PROCESS_DUPLICATED_ORDER(false, HttpStatus.CONFLICT, 2063, "채용 프로세스 순서(displayOrder)가 중복되었습니다."),
+    EMPLOYMENT_RECRUITMENT_PROCESS_RECRUITMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2064, "채용 공고를 찾을 수 없습니다."),
+
     //  지원자 - 2100 ~ 2199
     EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
 
@@ -162,6 +169,8 @@ public enum ResponseCode {
     EMPLOYMENT_INTERVIEW_SCORE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2550, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE(false, HttpStatus.BAD_REQUEST, 2551, "점수를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_REVIEW(false, HttpStatus.BAD_REQUEST, 2552, "평가를 입력하지 않았습니다."),
+    EMPLOYMENT_INTERVIEW_SCORE_NO_ITEM(false, HttpStatus.BAD_REQUEST, 2553, "해당하는 평가 항목이 존재하지 않습니다."),
+    EMPLOYMENT_INTERVIEW_SCORE_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2554, "이미 평가 점수가 등록되어 있습니다."),
 
 
     //  안내 메일 - 2600 ~ 2699

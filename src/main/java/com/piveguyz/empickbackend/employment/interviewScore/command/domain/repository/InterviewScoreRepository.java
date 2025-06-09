@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 public interface InterviewScoreRepository extends JpaRepository<InterviewScoreEntity, Integer> {
+
+    boolean existsByInterviewIdAndInterviewerIdAndItemId(Integer interviewId, Integer interviewerId, Integer itemId);
 }
