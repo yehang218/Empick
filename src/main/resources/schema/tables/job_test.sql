@@ -33,17 +33,20 @@ CREATE TABLE job_test
 # ========================== 지원서별 실무 테스트
 CREATE TABLE application_job_test
 (
-    id                  INT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    assigned_at         DATETIME NOT NULL,
-    evaluator_comment   LONGTEXT NULL,
-    submitted_at        DATETIME NOT NULL,
-    grading_total_score INT      NULL,
-    evaluation_score    INT      NULL,
-    grading_status      TINYINT  NOT NULL DEFAULT 0,
-    evaluation_status   TINYINT  NOT NULL DEFAULT 0,
-    application_id      INT      NOT NULL,
-    job_test_id         INT      NOT NULL,
-    member_id           INT      NOT NULL,
+    id                  INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    started_at          DATETIME     NULL,
+    ended_at            DATETIME     NULL,
+    evaluator_comment   LONGTEXT     NULL,
+    submitted_at        DATETIME     NOT NULL,
+    grading_total_score INT          NULL,
+    evaluation_score    INT          NULL,
+    grading_status      TINYINT      NOT NULL DEFAULT 0,
+    evaluation_status   TINYINT      NOT NULL DEFAULT 0,
+    entry_code          VARCHAR(255) NULL,
+
+    application_id      INT          NOT NULL,
+    job_test_id         INT          NOT NULL,
+    member_id           INT          NOT NULL,
 
     FOREIGN KEY (`application_id`) REFERENCES `application` (`id`),
     FOREIGN KEY (`job_test_id`) REFERENCES `job_test` (`id`),
