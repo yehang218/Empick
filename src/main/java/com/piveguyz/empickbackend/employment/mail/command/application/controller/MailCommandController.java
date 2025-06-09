@@ -65,6 +65,6 @@ public class MailCommandController {
         MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(dto);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, dto));
+                .body(CustomApiResponse.of(result, sendedDTO));
     }
 }

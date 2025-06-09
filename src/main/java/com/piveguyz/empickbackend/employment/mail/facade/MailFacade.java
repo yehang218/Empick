@@ -14,6 +14,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
@@ -54,6 +55,7 @@ public class MailFacade {
                 throw new RuntimeException(e);
             }
         }
+        return dto;
     }
 
     public MailCommandDTO sendInterviewMail(MailCommandDTO dto) {
@@ -65,7 +67,8 @@ public class MailFacade {
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 (E) a h시 mm분")
                         .withLocale(Locale.KOREAN);
-                String formattedDateTime = interviewDateTime.format(formatter); // interviewDateTime은 LocalDateTime
+                String interviewDateTime = "";
+                String formattedDateTime = interviewDateTime.format(String.valueOf(formatter)); // interviewDateTime은 LocalDateTime
 
                 Context context = new Context();
                 context.setVariable("applicantName", "홍길동");
@@ -88,6 +91,7 @@ public class MailFacade {
                 throw new RuntimeException(e);
             }
         }
+        return dto;
     }
 
     public String getBase64EncodedImage(String imagePath) throws IOException {
