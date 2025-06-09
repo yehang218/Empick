@@ -36,6 +36,8 @@ public enum ResponseCode {
     MEMBER_CREATED_MEMBER_ID_REQUIRED(false, HttpStatus.BAD_REQUEST, 1006, "입사처리자가 지정되지 않았습니다."),
     MEMBER_CREATED_MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1007, "입사처리자를 찾을 수 없습니다."),
     MEMBER_CREATED_MEMBER_NO_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "입사처리자는 ROLE_HR_ACCESS 권한이 있어야 합니다."),
+    MEMBER_PROFILE_IMAGE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1009 , "사원의 프로필 사진을 찾을 수 없습니다." ),
+    MEMBER_ID_INVALID(false, HttpStatus.BAD_REQUEST, 1010, "유효하지 않은 사원 ID 입니다."),
 
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
@@ -76,10 +78,8 @@ public enum ResponseCode {
     // 4) 지원서 항목
     EMPLOYMENT_APPLICATION_ITEM_CATEGORY_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2050, "지원서 항목 카테고리를 찾을 수 없습니다."),
     EMPLOYMENT_APPLICATION_ITEM_CATEGORY_EMPTY(false, HttpStatus.NO_CONTENT, 2051, "지원서 항목 카테고리가 존재하지 않습니다."),
-    EMPLOYMENT_APPLICATION_ITEM_INVALID_INPUT_TYPE(false, HttpStatus.BAD_REQUEST, 2052, "지원서 항목의 입력 형태가 유효하지 않습니다."),
-    EMPLOYMENT_APPLICATION_ITEM_DUPLICATED(false, HttpStatus.CONFLICT, 2053, "동일한 항목이 양식에 중복 포함되어 있습니다."),
-    EMPLOYMENT_APPLICATION_ITEM_REQUIRED_FIELD_MISSING(false, HttpStatus.BAD_REQUEST, 2054, "필수 항목의 값이 누락되었습니다."),
-    EMPLOYMENT_APPLICATION_ITEM_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2055, "해당 채용공고에 연결된 지원서 양식을 찾을 수 없습니다."),
+    EMPLOYMENT_APPLICATION_ITEM_DUPLICATED(false, HttpStatus.CONFLICT, 2052, "동일한 항목이 양식에 중복 포함되어 있습니다."),
+    EMPLOYMENT_APPLICATION_ITEM_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2053, "해당 채용공고에 연결된 지원서 양식을 찾을 수 없습니다."),
 
     //  지원자 - 2100 ~ 2199
     EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
@@ -122,7 +122,7 @@ public enum ResponseCode {
 
     //   5) 실무테스트 답안
     EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2450, "요청한 답안을 찾을 수 없습니다."),
-    
+
 
     //  면접 일정 - 2500 ~ 2599
 
@@ -158,7 +158,7 @@ public enum ResponseCode {
 
     // 인증 2700 ~ 2799
     INVALID_REFRESH_TOKEN(false, HttpStatus.UNAUTHORIZED, 2700, "유효하지 않은 Refresh Token입니다."),
-    MEMBER_EMPLOYEE_NUMBER_DUPLICATE(false, HttpStatus.UNAUTHORIZED, 2701, "중복된 사번입니다.");
+    MEMBER_EMPLOYEE_NUMBER_DUPLICATE(false, HttpStatus.UNAUTHORIZED, 2701, "중복된 사번입니다."),;
 
     private final boolean success;
     private final HttpStatus httpStatus;        // HTTP 상태 코드

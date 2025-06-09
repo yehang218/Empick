@@ -90,4 +90,17 @@ public class Member {
 
     @Column(name = "rank_id")
     private Integer rankId;
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateProfileImageUrl(String key) {
+        this.pictureUrl = key;
+    }
+
+    public void clearProfileImageUrl() {
+        this.pictureUrl = null;
+    }
 }
