@@ -22,6 +22,9 @@ import com.piveguyz.empickbackend.employment.recruitment.command.application.dto
 import com.piveguyz.empickbackend.employment.recruitment.command.domain.aggregate.Recruitment;
 import com.piveguyz.empickbackend.employment.recruitment.command.domain.enums.RecruitmentStatus;
 import com.piveguyz.empickbackend.employment.recruitment.command.domain.repository.RecruitmentRepository;
+import com.piveguyz.empickbackend.employment.recruitmentProcess.command.application.dto.RecruitmentProcessCreateDTO;
+import com.piveguyz.empickbackend.employment.recruitmentProcess.command.domain.aggregate.RecruitmentProcess;
+import com.piveguyz.empickbackend.employment.recruitmentProcess.command.domain.repository.RecruitmentProcessRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +35,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 	private final RecruitmentRepository recruitmentRepository;
 	private final ApplicationItemRepository applicationItemRepository;
 	private final ApplicationItemCategoryRepository applicationItemCategoryRepository;
+	private final RecruitmentProcessRepository recruitmentProcessRepository;
 
 	@Override
 	public void createRecruitment(RecruitmentCommandDTO dto) {
@@ -67,6 +71,23 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 				.build();
 
 			applicationItemRepository.save(item);
+		}
+
+		if (dto.getRecruitmentProcesses() != null && !dto.getRecruitmentProcesses().isEmpty()) {
+			Set<Integer> displayOrders = new HashSet<>();
+			for (RecruitmentProcessCreateDTO processDTO : dto.getRecruitmentProcesses()) {
+				if (!displayOrders.add(processDTO.getDisplayOrder())) {
+					throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_PROCESS_DUPLICATED_ORDER);
+				}
+
+				RecruitmentProcess process = RecruitmentProcess.builder()
+					.recruitment(saved)
+					.stepType(processDTO.getStepType())
+					.displayOrder(processDTO.getDisplayOrder())
+					.build();
+
+				recruitmentProcessRepository.save(process);
+			}
 		}
 	}
 
@@ -112,6 +133,34 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 					.isRequiredYn(itemDTO.isRequired() ? "Y" : "N")
 					.build();
 				applicationItemRepository.save(newItem);
+			}
+		}
+
+		List<RecruitmentProcess> existingProcesses = recruitmentProcessRepository.findAllByRecruitmentId(recruitment.getId());
+		Map<Integer, RecruitmentProcess> existingProcessMap = existingProcesses.stream()
+			.collect(Collectors.toMap(RecruitmentProcess::getDisplayOrder, p -> p));
+
+		Set<Integer> incomingOrders = dto.getRecruitmentProcesses().stream()
+			.map(RecruitmentProcessCreateDTO::getDisplayOrder)
+			.collect(Collectors.toSet());
+
+		for (RecruitmentProcess existing : existingProcesses) {
+			if (!incomingOrders.contains(existing.getDisplayOrder())) {
+				recruitmentProcessRepository.delete(existing);
+			}
+		}
+
+		for (RecruitmentProcessCreateDTO processDTO : dto.getRecruitmentProcesses()) {
+			RecruitmentProcess existing = existingProcessMap.get(processDTO.getDisplayOrder());
+			if (existing != null) {
+				existing.setStepType(processDTO.getStepType());
+			} else {
+				RecruitmentProcess newProcess = RecruitmentProcess.builder()
+					.recruitment(recruitment)
+					.stepType(processDTO.getStepType())
+					.displayOrder(processDTO.getDisplayOrder())
+					.build();
+				recruitmentProcessRepository.save(newProcess);
 			}
 		}
 	}
