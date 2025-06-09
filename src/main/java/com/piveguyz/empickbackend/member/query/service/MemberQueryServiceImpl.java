@@ -2,40 +2,52 @@ package com.piveguyz.empickbackend.member.query.service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
-import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
 import com.piveguyz.empickbackend.member.query.dto.MemberResponseDTO;
+import com.piveguyz.empickbackend.member.query.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-public class MemberQueryServiceImpl implements MemberQueryService{
+public class MemberQueryServiceImpl implements MemberQueryService {
 
-    private final MemberRepository memberRepository;
+    private final MemberMapper memberMapper;
 
     @Override
     public MemberResponseDTO getMemberInfo(int memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+        MemberResponseDTO member = memberMapper.findMemberById(memberId);
+        if (member == null) {
+            throw new BusinessException(ResponseCode.MEMBER_NOT_FOUND);
+        }
+        return member;
+    }
 
-        return new MemberResponseDTO(
-                member.getId(),
-                member.getName(),
-                member.getEmployeeNumber(),
-                member.getEmail()
-        );
+    @Override
+    public List<MemberResponseDTO> getMembersByName(String name) {
+        List<MemberResponseDTO> members = memberMapper.findMembersByName(name);
+        if (members.isEmpty()) {
+            throw new BusinessException(ResponseCode.MEMBER_NOT_FOUND);
+        }
+        return members;
+    }
+
+    @Override
+    public List<MemberResponseDTO> getMembersByEmployeeNumber(int employeeNumber) {
+        List<MemberResponseDTO> members = memberMapper.findMembersByEmployeeNumber(employeeNumber);
+        if (members.isEmpty()) {
+            throw new BusinessException(ResponseCode.MEMBER_NOT_FOUND);
+        }
+        return members;
     }
 
     @Override
     public String getProfileImageKey(int memberId) {
-        try {
-        } catch (NumberFormatException e) {
-            throw new BusinessException(ResponseCode.MEMBER_ID_INVALID);
+        MemberResponseDTO member = memberMapper.findMemberById(memberId);
+        if (member == null) {
+            throw new BusinessException(ResponseCode.MEMBER_NOT_FOUND);
         }
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
 
         String pictureUrl = member.getPictureUrl();
         if (pictureUrl == null || pictureUrl.isBlank()) {

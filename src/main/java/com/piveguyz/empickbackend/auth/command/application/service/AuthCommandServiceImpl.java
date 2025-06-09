@@ -5,7 +5,7 @@ import com.piveguyz.empickbackend.auth.command.application.dto.LoginResponseDTO;
 import com.piveguyz.empickbackend.auth.command.jwt.JwtProvider;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
+import com.piveguyz.empickbackend.member.command.domain.aggregate.MemberEntity;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
 import com.piveguyz.empickbackend.member.query.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO requestDTO) {
-        Member member = memberRepository.findByEmployeeNumber(
+        MemberEntity member = memberRepository.findByEmployeeNumber(
                 Integer.parseInt(
                         requestDTO.getEmployeeNumber()
                 )

@@ -2,7 +2,7 @@ package com.piveguyz.empickbackend.member.command.application.service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpRequestDTO;
-import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
+import com.piveguyz.empickbackend.member.command.domain.aggregate.MemberEntity;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -83,7 +83,7 @@ class MemberCommandServiceImplTest {
         request.setHireAt(LocalDateTime.now());
         request.setStatus(1);
 
-        when(memberRepository.findById(1)).thenReturn(Optional.of(new Member()));
+        when(memberRepository.findById(1)).thenReturn(Optional.of(new MemberEntity()));
         when(memberRepository.existsByEmail("duplicate@domain.com")).thenReturn(true);
 
         // when & then
