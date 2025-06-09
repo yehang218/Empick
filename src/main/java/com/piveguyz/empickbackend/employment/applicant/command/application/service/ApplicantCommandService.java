@@ -5,6 +5,4 @@ import jakarta.validation.Valid;
 
 public interface ApplicantCommandService {
     ApplicantCommandDTO createApplicant(ApplicantCommandDTO dto);
-//    ApplicantCommandDTO updateApplicant(int id, ApplicantCommandDTO dto);
-//    int deleteApplicant(int id);
 }

@@ -74,7 +74,6 @@ public enum ResponseCode {
     EMPLOYMENT_TEMPLATE_NO_ITEMS(false, HttpStatus.BAD_REQUEST, 2014, "템플릿 항목이 하나 이상 필요합니다."),
     EMPLOYMENT_TEMPLATE_DUPLICATE_NAME(false, HttpStatus.CONFLICT, 2015, "같은 이름의 템플릿이 이미 존재합니다."),
 
-    // 지원자 - 2100 ~ 2199
     // 3) 채용공고
     EMPLOYMENT_RECRUITMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2030, "요청한 채용 공고를 찾을 수 없습니다."),
     EMPLOYMENT_RECRUITMENT_INVALID_PERIOD(false, HttpStatus.BAD_REQUEST, 2031, "채용 기간이 유효하지 않습니다."),

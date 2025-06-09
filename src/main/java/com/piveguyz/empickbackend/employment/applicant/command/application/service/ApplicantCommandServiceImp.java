@@ -30,21 +30,4 @@ public class ApplicantCommandServiceImp implements ApplicantCommandService {
         ApplicantEntity saved = applicantRepository.save(entity);
         return ApplicantCommandMapper.toDto(saved);
     }
-
-//    @Override
-//    public ApplicantCommandDTO updateApplicant(int id, ApplicantCommandDTO dto) {
-//        ApplicantEntity entity = axpplicantRepository.findById(id)
-//                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_APPLICANT));
-//        entity.updateFromDTO(dto);
-//        ApplicantEntity saved = applicantRepository.save(entity);
-//        return ApplicantCommandMapper.toDto(saved);
-//    }
-//
-//    @Override
-//    public int deleteApplicant(int id) {
-//        ApplicantEntity entity = applicantRepository.findById(id)
-//                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_APPLICANT));
-//        applicantRepository.delete(entity);
-//        return id;
-//    }
 }

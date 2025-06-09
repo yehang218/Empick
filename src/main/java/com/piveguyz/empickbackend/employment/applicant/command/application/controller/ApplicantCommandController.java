@@ -23,33 +23,11 @@ public class ApplicantCommandController {
     // 지원자 등록
     @Operation(summary = "지원자 등록", description = "지원자를 새로 등록합니다.")
     @ApiResponses(value = {})
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<CustomApiResponse<ApplicantCommandDTO>> createApplicant(
             @RequestBody @Valid ApplicantCommandDTO applicantCommandDTO) {
         ApplicantCommandDTO created = applicantCommandService.createApplicant(applicantCommandDTO);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, created));
     }
-
-//    // 지원자 수정
-//    @Operation(summary = "지원자 수정", description = "지원자 정보를 수정합니다.")
-//    @ApiResponses(value = {})
-//    @PatchMapping("/{id}")
-//    public ResponseEntity<CustomApiResponse<ApplicantCommandDTO>> updateApplicant(
-//            @PathVariable int id,
-//            @RequestBody @Valid ApplicantCommandDTO applicantCommandDTO) {
-//        ApplicantCommandDTO updated = applicantCommandService.updateApplicant(id, applicantCommandDTO);
-//        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
-//                .body(CustomApiResponse.of(ResponseCode.SUCCESS, updated));
-//    }
-//
-//    // 지원자 삭제
-//    @Operation(summary = "지원자 삭제", description = "지원자를 삭제합니다.")
-//    @ApiResponses(value = {})
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<CustomApiResponse<Integer>> deleteApplicant(@PathVariable int id) {
-//        int deletedId = applicantCommandService.deleteApplicant(id);
-//        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
-//                .body(CustomApiResponse.of(ResponseCode.SUCCESS, deletedId));
-//    }
 }

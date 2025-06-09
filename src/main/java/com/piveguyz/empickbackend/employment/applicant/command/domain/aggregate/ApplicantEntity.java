@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate;
 
+import com.piveguyz.empickbackend.employment.applicant.command.application.dto.ApplicantCommandDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,7 +35,7 @@ public class ApplicantEntity {
     @Column(nullable = false)
     private String address;
 
-    public void update(ApplicantEntity updated) {
+    public void updateFromEntity(ApplicantEntity updated) {
         this.name = updated.getName();
         this.phone = updated.getPhone();
         this.email = updated.getEmail();
