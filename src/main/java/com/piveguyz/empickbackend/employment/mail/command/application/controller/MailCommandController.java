@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -61,12 +58,11 @@ public class MailCommandController {
                 .body(CustomApiResponse.of(result, sendedDTO));
     }
 
-    @PostMapping("/send/interview")
-    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendInterviewMail(@RequestBody MailCommandDTO dto) {
-        MailCommandDTO createdDTO = mailCommandService.createMail(dto);
-        MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(createdDTO);
+    @PostMapping("/send/interview/{id}")
+    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendInterviewMail(@PathVariable("id") Integer id) {
+        MailCommandDTO createdDTO = mailFacade.sendInterviewMail(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, sendedDTO));
+                .body(CustomApiResponse.of(result, createdDTO));
     }
 }

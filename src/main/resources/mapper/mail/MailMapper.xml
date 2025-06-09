@@ -77,8 +77,11 @@
             application.applicant_id as applicant_id,
             applicant.name as applicant_name,
             applicant.email as email,
-            application_job_test.id as applicationJobTestId,
-            application_job_test.started_at
+            application_job_test.id as application_job_test_id,
+            application_job_test.started_at as started_at,
+            application_job_test.ended_at as ended_at,
+
+
         FROM application
                  JOIN recruitment ON application.recruitment_id = recruitment.id
                  JOIN applicant ON application.applicant_id = applicant.id
@@ -107,6 +110,7 @@
             recruitment.title as recruitment_title,
             application.applicant_id as applicant_id,
             applicant.name as applicant_name,
+            applicant.email as email,
             application.interview_id as interview_id,
             interview.datetime as interview_datetime,
             interview.address as interview_address

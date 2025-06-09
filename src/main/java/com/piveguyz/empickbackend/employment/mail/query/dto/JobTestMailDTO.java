@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class JobtestMailDTO {
+public class JobTestMailDTO {
     private Integer id;     // 지원서 id
     private Integer recruitmentId;
     private String recruitmentTitle;
