@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.piveguyz.empickbackend.employment.recruitment.command.application.dto.RecruitmentCommandDTO;
 import com.piveguyz.empickbackend.employment.recruitment.command.domain.converter.RecruitTypeConverter;
 import com.piveguyz.empickbackend.employment.recruitment.command.domain.converter.RecruitmentStatusConverter;
@@ -49,7 +51,10 @@ public class Recruitment {
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
-	@Setter
+	@Column(name = "updated_at")
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
+
 	@Column(name = "deleted_at")
 	private LocalDateTime deletedAt;
 
