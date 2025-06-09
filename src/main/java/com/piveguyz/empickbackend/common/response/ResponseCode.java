@@ -94,6 +94,7 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_DIFFICULTY(false, HttpStatus.INTERNAL_SERVER_ERROR, 2400, "유효하지 않은 난이도입니다."),
     EMPLOYMENT_INVALID_MEMBER(false, HttpStatus.BAD_REQUEST, 2402, "작성자 정보가 유효하지 않습니다."),
     EMPLOYMENT_INVALID_UPDATED_MEMBER(false, HttpStatus.BAD_REQUEST, 2403, "수정자 정보가 유효하지 않습니다."),
+    EMPLOYMENT_INVALID_SATISFIED_VALUE(false, HttpStatus.BAD_REQUEST, 2404, "isSatisfied 값은 'Y' 또는 'N'이어야 합니다."),
 
     //   1) 실무테스트 문제
     EMPLOYMENT_QUESTION_FAIL(false, HttpStatus.INTERNAL_SERVER_ERROR, 2410, "실무테스트 문제 등록에 실패했습니다."),
@@ -113,7 +114,14 @@ public enum ResponseCode {
 
     //   3) 평가 기준
     EMPLOYMENT_INVALID_EVALUATION_CRITERIA(false, HttpStatus.BAD_REQUEST, 2430, "평가 기준이 유효하지 않습니다."),
-    EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT(false, HttpStatus.BAD_REQUEST,2431, "평가 기준의 가중치는 0 ~ 1을 벗어날 수 없습니다."),
+    EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT(false, HttpStatus.BAD_REQUEST, 2431, "평가 기준의 가중치는 0 ~ 1을 벗어날 수 없습니다."),
+
+
+    //   4) 채점 기준
+    EMPLOYMENT_INVALID_QUESTION_GRADING_CRITERIA(false, HttpStatus.NOT_FOUND, 2440, "요청한 실무테스트 문제 평가 기준을 찾을 수 없습니다."),
+
+    //   5) 실무테스트 답안
+    EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2450, "요청한 답안을 찾을 수 없습니다."),
 
 
     //  면접 일정 - 2500 ~ 2599
