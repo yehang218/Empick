@@ -1,10 +1,9 @@
-package com.piveguyz.empickbackend.employment.interview.query.mapper;
+package com.piveguyz.empickbackend.employment.interviews.interview.query.mapper;
 
-import com.piveguyz.empickbackend.employment.interview.query.dto.InterviewQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interview.query.dto.InterviewQueryDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 

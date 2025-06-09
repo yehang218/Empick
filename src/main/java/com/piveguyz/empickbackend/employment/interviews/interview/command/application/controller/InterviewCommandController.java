@@ -1,9 +1,9 @@
-package com.piveguyz.empickbackend.employment.interview.command.application.controller;
+package com.piveguyz.empickbackend.employment.interviews.interview.command.application.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interview.command.application.dto.InterviewCommandDTO;
-import com.piveguyz.empickbackend.employment.interview.command.application.service.InterviewCommandService;
+import com.piveguyz.empickbackend.employment.interviews.interview.command.application.dto.InterviewCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interview.command.application.service.InterviewCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +32,7 @@ public class InterviewCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> create(@RequestBody InterviewCommandDTO dto) {
         InterviewCommandDTO createdDTO = service.create(dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -50,8 +50,8 @@ public class InterviewCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @PostMapping("/update")
-    public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> update(@RequestParam("id") Integer id,
+    @PatchMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> update(@PathVariable("id") Integer id,
                                                                          @RequestBody InterviewCommandDTO dto) {
         InterviewCommandDTO updatedDTO = service.update(id, dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -69,8 +69,8 @@ public class InterviewCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @DeleteMapping("/delete")
-    public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> delete(Integer id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> delete(@PathVariable("id") Integer id) {
         InterviewCommandDTO deletedDTO = service.delete(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())

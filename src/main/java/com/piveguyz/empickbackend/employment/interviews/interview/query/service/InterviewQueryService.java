@@ -1,6 +1,6 @@
-package com.piveguyz.empickbackend.employment.interview.query.service;
+package com.piveguyz.empickbackend.employment.interviews.interview.query.service;
 
-import com.piveguyz.empickbackend.employment.interview.query.dto.InterviewQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interview.query.dto.InterviewQueryDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,6 +1,6 @@
-package com.piveguyz.empickbackend.employment.interviewSheetItem.query.service;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.query.service;
 
-import com.piveguyz.empickbackend.employment.interviewSheetItem.query.dto.InterviewSheetItemQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.query.dto.InterviewSheetItemQueryDTO;
 
 import java.util.List;
 

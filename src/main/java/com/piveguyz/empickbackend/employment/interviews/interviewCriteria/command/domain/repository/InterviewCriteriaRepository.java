@@ -1,7 +1,7 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.command.domain.repository;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.domain.repository;
 
 
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.domain.aggregate.InterviewCriteriaEntity;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.domain.aggregate.InterviewCriteriaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InterviewCriteriaRepository extends JpaRepository<InterviewCriteriaEntity, Integer> {

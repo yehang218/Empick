@@ -1,6 +1,6 @@
-package com.piveguyz.empickbackend.employment.interviewSheet.query.mapper;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheet.query.mapper;
 
-import com.piveguyz.empickbackend.employment.interviewSheet.query.dto.InterviewSheetQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.query.dto.InterviewSheetQueryDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

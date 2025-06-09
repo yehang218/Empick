@@ -1,7 +1,7 @@
-package com.piveguyz.empickbackend.employment.interview.command.application.service;
+package com.piveguyz.empickbackend.employment.interviews.interview.command.application.service;
 
 
-import com.piveguyz.empickbackend.employment.interview.command.application.dto.InterviewCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interview.command.application.dto.InterviewCommandDTO;
 
 public interface InterviewCommandService {
     InterviewCommandDTO create(InterviewCommandDTO dto);

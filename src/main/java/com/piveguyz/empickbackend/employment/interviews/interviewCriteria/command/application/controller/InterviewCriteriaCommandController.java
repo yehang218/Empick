@@ -1,9 +1,9 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.command.application.controller;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.application.service.InterviewCriteriaCommandService;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.service.InterviewCriteriaCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +35,7 @@ public class InterviewCriteriaCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2511", description = "상세 내용을 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2512", description = "이미 존재하는 내용입니다.")
     })
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CustomApiResponse<InterviewCriteriaCommandDTO>> createCriteria(@RequestBody InterviewCriteriaCommandDTO dto) {
         InterviewCriteriaCommandDTO createdDTO = interviewCriteriaCommandService.createCriteria(dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -56,8 +56,8 @@ public class InterviewCriteriaCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2511", description = "상세 내용을 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2512", description = "이미 존재하는 내용입니다.")
     })
-    @PostMapping("/update")
-    public ResponseEntity<CustomApiResponse<InterviewCriteriaCommandDTO>> updateCriteria(@RequestParam("id") Integer id,
+    @PatchMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewCriteriaCommandDTO>> updateCriteria(@PathVariable("id") Integer id,
                                                                                          @RequestBody InterviewCriteriaCommandDTO dto) {
         InterviewCriteriaCommandDTO updatedDTO = interviewCriteriaCommandService.updateCriteria(id, dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -78,8 +78,8 @@ public class InterviewCriteriaCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2511", description = "상세 내용을 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2512", description = "이미 존재하는 내용입니다.")
     })
-    @DeleteMapping("/delete")
-    public ResponseEntity<CustomApiResponse<InterviewCriteriaCommandDTO>> deleteCriteria(@RequestParam("id") Integer id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewCriteriaCommandDTO>> deleteCriteria(@PathVariable("id") Integer id) {
         InterviewCriteriaCommandDTO deletedDTO = interviewCriteriaCommandService.deleteCriteria(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())

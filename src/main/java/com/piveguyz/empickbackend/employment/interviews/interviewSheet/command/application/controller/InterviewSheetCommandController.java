@@ -1,9 +1,9 @@
-package com.piveguyz.empickbackend.employment.interviewSheet.command.application.controller;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewSheet.command.application.dto.InterviewSheetCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewSheet.command.application.service.InterviewSheetCommandService;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.dto.InterviewSheetCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.service.InterviewSheetCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +34,7 @@ public class InterviewSheetCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2521", description = "이름을 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2522", description = "중복된 이름이 존재합니다.")
     })
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CustomApiResponse<InterviewSheetCommandDTO>> createSheet(@RequestBody InterviewSheetCommandDTO dto) {
         InterviewSheetCommandDTO createdDTO = service.createSheet(dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -55,8 +55,8 @@ public class InterviewSheetCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2521", description = "이름을 입력하지 않았습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2522", description = "중복된 이름이 존재합니다.")
     })
-    @PostMapping("/update")
-    public ResponseEntity<CustomApiResponse<InterviewSheetCommandDTO>> updateSheet(@RequestParam("id") Integer id,
+    @PatchMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewSheetCommandDTO>> updateSheet(@PathVariable("id") Integer id,
                                                                                    @RequestBody InterviewSheetCommandDTO dto) {
         InterviewSheetCommandDTO updatedDTO = service.updateSheet(id, dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -75,8 +75,8 @@ public class InterviewSheetCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2520", description = "존재하지 않습니다.")
     })
-    @DeleteMapping("/delete")
-    public ResponseEntity<CustomApiResponse<InterviewSheetCommandDTO>> deleteSheet(@RequestParam("id") Integer id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewSheetCommandDTO>> deleteSheet(@PathVariable("id") Integer id) {
         InterviewSheetCommandDTO deletedDTO = service.deleteSheet(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())

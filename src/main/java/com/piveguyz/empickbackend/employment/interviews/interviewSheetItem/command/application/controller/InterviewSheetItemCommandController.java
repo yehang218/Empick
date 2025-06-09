@@ -1,9 +1,9 @@
-package com.piveguyz.empickbackend.employment.interviewSheetItem.command.application.controller;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.command.application.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewSheetItem.command.application.dto.InterviewSheetItemCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewSheetItem.command.application.service.InterviewSheetItemCommandService;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.command.application.dto.InterviewSheetItemCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.command.application.service.InterviewSheetItemCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ public class InterviewSheetItemCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2531", description = "이미 존재하는 항목입니다.")
     })
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CustomApiResponse<InterviewSheetItemCommandDTO>> create(@RequestBody InterviewSheetItemCommandDTO dto) {
         InterviewSheetItemCommandDTO createdDTO = service.create(dto);
         ResponseCode result = ResponseCode.SUCCESS;
@@ -52,8 +52,8 @@ public class InterviewSheetItemCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2530", description = "존재하지 않는 항목입니다.")
     })
-    @DeleteMapping("/delete")
-    public ResponseEntity<CustomApiResponse<InterviewSheetItemCommandDTO>> delete(@RequestParam("id") Integer id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewSheetItemCommandDTO>> delete(@PathVariable("id") Integer id){
         InterviewSheetItemCommandDTO dto = service.delete(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())

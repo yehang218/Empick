@@ -1,7 +1,7 @@
-package com.piveguyz.empickbackend.employment.interviewSheet.command.application.mapper;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.mapper;
 
-import com.piveguyz.empickbackend.employment.interviewSheet.command.application.dto.InterviewSheetCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewSheet.command.domain.aggregate.InterviewSheetEntity;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.dto.InterviewSheetCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.domain.aggregate.InterviewSheetEntity;
 import org.springframework.stereotype.Component;
 
 @Component

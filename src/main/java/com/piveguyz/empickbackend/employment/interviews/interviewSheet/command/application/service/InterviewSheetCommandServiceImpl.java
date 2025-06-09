@@ -1,11 +1,11 @@
-package com.piveguyz.empickbackend.employment.interviewSheet.command.application.service;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewSheet.command.application.dto.InterviewSheetCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewSheet.command.application.mapper.InterviewSheetCommandMapper;
-import com.piveguyz.empickbackend.employment.interviewSheet.command.domain.aggregate.InterviewSheetEntity;
-import com.piveguyz.empickbackend.employment.interviewSheet.command.domain.repository.InterviewSheetRepository;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.dto.InterviewSheetCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.application.mapper.InterviewSheetCommandMapper;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.domain.aggregate.InterviewSheetEntity;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.command.domain.repository.InterviewSheetRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

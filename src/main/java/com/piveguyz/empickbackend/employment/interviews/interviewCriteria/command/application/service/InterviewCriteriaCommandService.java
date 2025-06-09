@@ -1,7 +1,7 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.command.application.service;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.service;
 
 
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
 
 public interface InterviewCriteriaCommandService {
     InterviewCriteriaCommandDTO createCriteria(InterviewCriteriaCommandDTO dto);

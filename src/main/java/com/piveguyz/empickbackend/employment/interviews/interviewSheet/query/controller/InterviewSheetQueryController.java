@@ -1,18 +1,15 @@
-package com.piveguyz.empickbackend.employment.interviewSheet.query.controller;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheet.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewSheet.query.dto.InterviewSheetQueryDTO;
-import com.piveguyz.empickbackend.employment.interviewSheet.query.service.InterviewSheetQueryService;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.query.dto.InterviewSheetQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheet.query.service.InterviewSheetQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,7 +34,7 @@ public class InterviewSheetQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @GetMapping("/findAll")
+    @GetMapping
     public ResponseEntity<CustomApiResponse<List<InterviewSheetQueryDTO>>> findAll() {
         List<InterviewSheetQueryDTO> dtoList = service.findAll();
         ResponseCode result = ResponseCode.SUCCESS;
@@ -57,8 +54,8 @@ public class InterviewSheetQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2520", description = "존재하지 않는 항목입니다.")
 
     })
-    @GetMapping("/findById")
-    public ResponseEntity<CustomApiResponse<InterviewSheetQueryDTO>> findById(@RequestParam("id") Integer id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<InterviewSheetQueryDTO>> findById(@PathVariable("id") Integer id) {
         InterviewSheetQueryDTO dto = service.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
@@ -75,7 +72,7 @@ public class InterviewSheetQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @GetMapping("/searchByName")
+    @GetMapping("/name")
     public ResponseEntity<CustomApiResponse<List<InterviewSheetQueryDTO>>> searchByName(@RequestParam("name") String name) {
         List<InterviewSheetQueryDTO> dtoList = service.searchByName(name);
         ResponseCode result = ResponseCode.SUCCESS;

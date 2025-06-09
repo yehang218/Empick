@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.interviewScore.command.application.dto;
+package com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,11 +1,11 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.command.application.service;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.application.mapper.InterviewCriteriaCommandMapper;
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.domain.aggregate.InterviewCriteriaEntity;
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.domain.repository.InterviewCriteriaRepository;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.mapper.InterviewCriteriaCommandMapper;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.domain.aggregate.InterviewCriteriaEntity;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.domain.repository.InterviewCriteriaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

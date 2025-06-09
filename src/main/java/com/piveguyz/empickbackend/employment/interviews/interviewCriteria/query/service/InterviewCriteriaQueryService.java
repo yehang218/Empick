@@ -1,6 +1,6 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.query.service;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.service;
 
-import com.piveguyz.empickbackend.employment.interviewCriteria.query.dto.InterviewCriteriaQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.dto.InterviewCriteriaQueryDTO;
 
 import java.util.List;
 

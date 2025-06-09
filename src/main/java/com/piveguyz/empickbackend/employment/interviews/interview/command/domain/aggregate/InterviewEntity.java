@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.interview.command.domain.aggregate;
+package com.piveguyz.empickbackend.employment.interviews.interview.command.domain.aggregate;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

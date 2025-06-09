@@ -1,7 +1,7 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.command.application.mapper;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.mapper;
 
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
-import com.piveguyz.empickbackend.employment.interviewCriteria.command.domain.aggregate.InterviewCriteriaEntity;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.application.dto.InterviewCriteriaCommandDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.command.domain.aggregate.InterviewCriteriaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,14 +1,13 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.query.service;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewCriteria.query.dto.InterviewCriteriaQueryDTO;
-import com.piveguyz.empickbackend.employment.interviewCriteria.query.mapper.InterviewCriteriaMapper;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.dto.InterviewCriteriaQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.mapper.InterviewCriteriaMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

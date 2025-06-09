@@ -1,6 +1,6 @@
-package com.piveguyz.empickbackend.employment.interviewScore.query.service;
+package com.piveguyz.empickbackend.employment.interviews.interviewScore.query.service;
 
-import com.piveguyz.empickbackend.employment.interviewScore.query.dto.InterviewScoreQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewScore.query.dto.InterviewScoreQueryDTO;
 
 import java.util.List;
 

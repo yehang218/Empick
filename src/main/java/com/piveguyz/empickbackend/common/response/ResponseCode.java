@@ -113,9 +113,6 @@ public enum ResponseCode {
 
 
     //  면접 일정 - 2500 ~ 2599
-
-
-    //  면접 일정 - 2500 ~ 2599
     EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2500, "존재하지 않는 면접 기준입니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2510, "내용을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_DETAIL_CONTENT(false, HttpStatus.BAD_REQUEST, 2511, "상세 내용을 입력하지 않았습니다."),
@@ -129,6 +126,7 @@ public enum ResponseCode {
     EMPLOYMENT_INTERVIEW_NO_SHEET(false, HttpStatus.BAD_REQUEST, 2541, "평가표가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_DATE(false, HttpStatus.BAD_REQUEST, 2542, "날짜가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_ADDRESS(false, HttpStatus.BAD_REQUEST, 2543, "주소가 등록되지 않았습니다."),
+    EMPLOYMENT_INTERVIEW_IMPOSSIBLE_TIME(false, HttpStatus.BAD_REQUEST, 2544, "불가능한 시간입니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2550, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE(false, HttpStatus.BAD_REQUEST, 2551, "점수를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_REVIEW(false, HttpStatus.BAD_REQUEST, 2552, "평가를 입력하지 않았습니다."),

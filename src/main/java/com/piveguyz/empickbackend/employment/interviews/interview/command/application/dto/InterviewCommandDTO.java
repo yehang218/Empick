@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.interview.command.application.dto;
+package com.piveguyz.empickbackend.employment.interviews.interview.command.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

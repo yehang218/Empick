@@ -1,6 +1,6 @@
-package com.piveguyz.empickbackend.employment.interviewCriteria.query.mapper;
+package com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.mapper;
 
-import com.piveguyz.empickbackend.employment.interviewCriteria.query.dto.InterviewCriteriaQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.dto.InterviewCriteriaQueryDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

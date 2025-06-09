@@ -1,18 +1,15 @@
-package com.piveguyz.empickbackend.employment.interviewSheetItem.query.controller;
+package com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.interviewSheetItem.query.dto.InterviewSheetItemQueryDTO;
-import com.piveguyz.empickbackend.employment.interviewSheetItem.query.service.InterviewSheetItemQueryService;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.query.dto.InterviewSheetItemQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.query.service.InterviewSheetItemQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,7 +34,7 @@ public class InterviewSheetItemQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @GetMapping("/findAll")
+    @GetMapping
     public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findAll() {
         List<InterviewSheetItemQueryDTO> dtoList = service.findAll();
         ResponseCode result = ResponseCode.SUCCESS;
@@ -56,8 +53,8 @@ public class InterviewSheetItemQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2530", description = "존재하지 않는 항목입니다.")
     })
-    @GetMapping("/findById")
-    public ResponseEntity<CustomApiResponse<InterviewSheetItemQueryDTO>> findById(@RequestParam("id") Integer id) {
+    @GetMapping("/{id}}")
+    public ResponseEntity<CustomApiResponse<InterviewSheetItemQueryDTO>> findById(@PathVariable("id") Integer id) {
         InterviewSheetItemQueryDTO dto = service.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
@@ -74,8 +71,8 @@ public class InterviewSheetItemQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @GetMapping("/findBySheetId")
-    public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findBySheetId(@RequestParam("sheetId") Integer sheetId) {
+    @GetMapping("/sheet/{sheetId}")
+    public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findBySheetId(@PathVariable("sheetId") Integer sheetId) {
         List<InterviewSheetItemQueryDTO> dtoList = service.findBySheetId(sheetId);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
@@ -92,8 +89,8 @@ public class InterviewSheetItemQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @GetMapping("/findByCriteriaId")
-    public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findByCriteriaId(@RequestParam("criteriaId") Integer criteriaId) {
+    @GetMapping("/criteria/{criteriaId}")
+    public ResponseEntity<CustomApiResponse<List<InterviewSheetItemQueryDTO>>> findByCriteriaId(@PathVariable("criteriaId") Integer criteriaId) {
         List<InterviewSheetItemQueryDTO> dtoList = service.findByCriteriaId(criteriaId);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
