@@ -8,6 +8,7 @@ import lombok.*;
 @Entity
 @Table(name = "application_item")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -18,10 +19,6 @@ public class ApplicationItem {
 
 	@Column(name = "is_required", nullable = false)
 	private String isRequiredYn;
-
-	public boolean isRequired() {
-		return "Y".equalsIgnoreCase(isRequiredYn);
-	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "application_item_category_id")

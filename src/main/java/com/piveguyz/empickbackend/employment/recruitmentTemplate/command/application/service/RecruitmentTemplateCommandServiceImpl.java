@@ -27,7 +27,7 @@ public class RecruitmentTemplateCommandServiceImpl implements RecruitmentTemplat
 			.name(dto.getName())
 			.memberId(dto.getMemberId())
 			.createdAt(LocalDateTime.now())
-			.isDeleted("N")
+			.isDeleted(false)
 			.build();
 
 		for (RecruitmentTemplateItemCommandDTO itemDto : dto.getItems()) {

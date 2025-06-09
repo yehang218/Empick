@@ -5,4 +5,8 @@ import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpRes
 
 public interface MemberCommandService {
     MemberSignUpResponseDTO signUp(MemberSignUpRequestDTO request);
+
+    void updateProfileImage(int memberId, String key);
+
+    void clearProfileImage(int memberId);
 }
