@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.employment.jobtests.question.query.dto;
 
 import com.piveguyz.empickbackend.employment.jobtests.common.enums.JobtestDifficulty;
+import com.piveguyz.empickbackend.employment.jobtests.grading.query.dto.GradingCriteriaQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.enums.QuestionType;
 import lombok.*;
 
@@ -31,4 +32,7 @@ public class QuestionQueryDTO {
 
     // 해당 문제를 사용하고 있는 실무 테스트 id
     private List<UsedJobtestDTO> usedJobTests;
+
+    // 해당 문제에 대한 채점 기준
+    private List<GradingCriteriaQueryDTO> gradingCriterias;
 }

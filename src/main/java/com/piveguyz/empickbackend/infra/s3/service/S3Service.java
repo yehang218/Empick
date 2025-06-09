@@ -14,4 +14,6 @@ public interface S3Service {
     void delete(String key);
 
     List<String> listFiles(String prefix);
+
+    String generatePublicUrl(String key);
 }
