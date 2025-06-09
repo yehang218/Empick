@@ -23,6 +23,7 @@ public class ApplicationJobtestMapper {
 
     public static CreateApplicationJobtestCommandDTO toCreateDto(ApplicationJobtestEntity entity) {
         return CreateApplicationJobtestCommandDTO.builder()
+                .evaluatorComment(entity.getEvaluatorComment())
                 .evaluationScore(entity.getEvaluationScore())
                 .submittedAt(entity.getSubmittedAt())
                 .gradingTotalScore(entity.getGradingTotalScore())
