@@ -4,6 +4,7 @@ import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.mail.command.application.dto.MailCommandDTO;
 import com.piveguyz.empickbackend.employment.mail.command.application.service.MailCommandService;
+import com.piveguyz.empickbackend.employment.mail.facade.MailFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,11 @@ import java.util.List;
 @RequestMapping("api/v1/employment/mail")
 public class MailCommandController {
     private final MailCommandService mailCommandService;
+    private final MailFacade mailFacade;
 
-    public MailCommandController(MailCommandService mailCommandService) {
+    public MailCommandController(MailCommandService mailCommandService, MailFacade mailFacade) {
         this.mailCommandService = mailCommandService;
+        this.mailFacade = mailFacade;
     }
 
     @Operation(
@@ -45,5 +48,23 @@ public class MailCommandController {
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, mailCommandDTO));
+    }
+
+    @PostMapping("/send/jobtest")
+    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendJobtestMail(@RequestBody MailCommandDTO dto) {
+        List<String> emailList = mailCommandService.createMail(dto);
+        MailCommandDTO sendedDTO = mailFacade.sendJobtestMail(dto);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dto));
+    }
+
+    @PostMapping("/send/interview")
+    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendInterviewMail(@RequestBody MailCommandDTO dto) {
+        List<String> emailList = mailCommandService.createMail(dto);
+        MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(dto);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dto));
     }
 }
