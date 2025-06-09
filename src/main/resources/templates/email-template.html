@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${subject}">Notification Email</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            max-width: 600px;
+            margin: auto;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        .header {
+            border-bottom: 1px solid #dddddd;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333333;
+        }
+        .content {
+            font-size: 16px;
+            color: #444444;
+            line-height: 1.6;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #999999;
+            text-align: center;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            max-height: 60px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img th:if="${logoImage != null}" th:src="'data:image/png;base64,' + ${logoImage}" alt="Empick Logo" style="max-width: 150px;"/>
+
+    <div class="header">
+        <h1 th:text="${subject}">이메일 제목</h1>
+    </div>
+
+    <div class="content">
+        <p th:utext="${message}">본문 내용이 여기에 들어갑니다.</p>
+
+        <p th:if="${userType != null}">
+            <strong>사용자 유형:</strong> <span th:text="${userType}"></span>
+        </p>
+    </div>
+
+    <div class="footer">
+        본 메일은 발신 전용입니다. 문의사항은 홈페이지를 이용해주세요.
+    </div>
+</div>
+</body>
+</html>

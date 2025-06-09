@@ -56,8 +56,9 @@ public class QuestionOptionCommandController {
     public ResponseEntity<CustomApiResponse<UpdateQuestionOptionCommandDTO>> updateOption(
             @PathVariable int id,
             @RequestBody UpdateQuestionOptionCommandDTO updateQuestionOptionCommandDTO) {
-        var updated = questionOptionCommandService.updateQuestionOption(id, updateQuestionOptionCommandDTO);
-        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, updated));
+        UpdateQuestionOptionCommandDTO updated = questionOptionCommandService.updateQuestionOption(id, updateQuestionOptionCommandDTO);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, updated));
     }
 
     @Operation(
@@ -73,6 +74,7 @@ public class QuestionOptionCommandController {
     public ResponseEntity<CustomApiResponse<Integer>> deleteOption(
             @PathVariable int id) {
         int deleteId = questionOptionCommandService.deleteQuestionOption(id);
-        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, deleteId));
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, deleteId));
     }
 }
