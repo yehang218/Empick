@@ -139,6 +139,8 @@ public enum ResponseCode {
     EMPLOYMENT_JOBTEST_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2420, "이 실무테스트는 다른 곳에서 사용중이므로 수정하거나 삭제할 수 없습니다."),
     EMPLOYMENT_JOBTEST_DUPLICATE(false, HttpStatus.CONFLICT, 2421, "동일한 이름의 실무테스트가 이미 등록되어 있습니다."),
     EMPLOYMENT_INVALID_JOBTEST(false, HttpStatus.NOT_FOUND, 2422, "요청한 실무테스트를 찾을 수 없습니다."),
+    EMPLOYMENT_INVALID_JOBTEST_QUESTION(false, HttpStatus.NOT_FOUND, 2423, "이 실무테스트에는 해당 문제가 등록되어 있지 않습니다."),
+    EMPLOYMENT_JOBTEST_QUESTION_DUPLICATE(false, HttpStatus.CONFLICT, 2424, "이 실무테스트에는 해당 문제가 이미 등록되어 있습니다."),
 
     //   3) 평가 기준
     EMPLOYMENT_INVALID_EVALUATION_CRITERIA(false, HttpStatus.BAD_REQUEST, 2430, "평가 기준이 유효하지 않습니다."),
@@ -171,6 +173,7 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_CORRECTED_VALUE(false, HttpStatus.BAD_REQUEST, 2451, "isCorrect 값은 'Y' 또는 'N'이어야 합니다."),
 
 
+    
 
     //  면접 일정 - 2500 ~ 2599
 
