@@ -16,7 +16,7 @@ public class InterviewCommandDTO {
     private Integer id;
     private Integer sheetId;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime date;
+    private LocalDateTime datetime;
     private String address;
     private Double score;
     private String interviewReview;

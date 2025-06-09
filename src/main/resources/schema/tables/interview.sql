@@ -45,7 +45,7 @@ COMMENT = '평가 기준표별 평가 기준';
 CREATE TABLE `interview` (
      `id`	INT	NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
      `sheet_id`	INT	NOT NULL COMMENT '평가표 id',
-     `date`	DATETIME	NOT NULL COMMENT '날짜',
+     `datetime`	DATETIME	NOT NULL COMMENT '면접 일시',
      `address`	LONGTEXT	NOT NULL COMMENT '주소',
      `score`	DOUBLE	NULL COMMENT '점수',
      `interview_review`	LONGTEXT	NULL COMMENT '면접 평가',

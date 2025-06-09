@@ -23,8 +23,8 @@ public class InterviewEntity {
     @Column(name = "sheet_id")
     private Integer sheetId;
 
-    @Column(name = "date")
-    private LocalDateTime date;
+    @Column(name = "datetime")
+    private LocalDateTime datetime;
 
     @Column(name = "address")
     private String address;

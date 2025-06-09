@@ -8,10 +8,12 @@ import com.piveguyz.empickbackend.employment.interviews.interview.query.service.
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.service.InterviewScoreCommandService;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.query.dto.InterviewScoreQueryDTO;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.query.service.InterviewScoreQueryService;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class InterviewFacade {
     private final InterviewScoreCommandService interviewScoreCommandService;
     private final InterviewScoreQueryService interviewScoreQueryService;
@@ -28,7 +30,7 @@ public class InterviewFacade {
     }
 
     public InterviewCommandDTO createInterview(InterviewCommandDTO interviewCommandDTO){
-        LocalDateTime interviewTime = interviewCommandDTO.getDate();
+        LocalDateTime interviewTime = interviewCommandDTO.getDatetime();
         boolean possible = interviewQueryService.checkAvailable(interviewTime);
         if(possible){
             InterviewCommandDTO createdDTO = interviewCommandService.create(interviewCommandDTO);

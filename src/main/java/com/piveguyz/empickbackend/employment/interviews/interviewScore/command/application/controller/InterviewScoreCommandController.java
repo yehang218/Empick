@@ -77,7 +77,7 @@ public class InterviewScoreCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2550", description = "존재하지 않습니다."),
     })
-    @DeleteMapping("/{id}}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> deleteInterviewScore(@PathVariable("id") Integer id){
         InterviewScoreCommandDTO deletedDTO = service.delete(id);
         ResponseCode result = ResponseCode.SUCCESS;

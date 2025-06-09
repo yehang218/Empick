@@ -53,7 +53,7 @@ public class InterviewScoreQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2550", description = "존재하지 않습니다.")
     })
-    @GetMapping("/{id}}")
+    @GetMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewScoreQueryDTO>> findById(@PathVariable("id") Integer id) {
         InterviewScoreQueryDTO dto = interviewScoreQueryService.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;

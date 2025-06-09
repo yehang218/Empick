@@ -7,7 +7,7 @@
     <resultMap id="InterviewResultMap" type="com.piveguyz.empickbackend.employment.interviews.interview.query.dto.InterviewQueryDTO">
         <id column="id" property="id"/>
         <result column="sheet_id" property="sheetId"/>
-        <result column="date" property="date"/>
+        <result column="datetime" property="datetime"/>
         <result column="address" property="address"/>
         <result column="score" property="score"/>
         <result column="interview_review" property="interviewReview"/>
@@ -17,7 +17,7 @@
         SELECT
             id,
             sheet_id,
-            date,
+            datetime,
             address,
             score,
             interview_review
@@ -28,7 +28,7 @@
         SELECT
             id,
             sheet_id,
-            date,
+            datetime,
             address,
             score,
             interview_review
@@ -40,7 +40,7 @@
         SELECT
             id,
             sheet_id,
-            `date`,
+            datetime,
             address,
             score,
             interview_review
@@ -49,7 +49,12 @@
     </select>
 
     <select id="checkAvailable" resultMap="InterviewResultMap">
-        SELECT id, sheet_id, date, address, score, interview_review
+        SELECT id,
+               sheet_id,
+               datetime,
+               address,
+               score,
+               interview_review
         FROM interview
         WHERE date BETWEEN #{start} AND #{end}
     </select>

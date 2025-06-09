@@ -21,7 +21,7 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
     public InterviewCommandDTO create(InterviewCommandDTO dto) {
         InterviewEntity entity = new InterviewEntity();
         entity.setSheetId(dto.getSheetId());
-        entity.setDate(dto.getDate());
+        entity.setDatetime(dto.getDatetime());
         entity.setAddress(dto.getAddress());
         entity.setScore(dto.getScore());
         entity.setInterviewReview(dto.getInterviewReview());
@@ -34,7 +34,7 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
         InterviewEntity entity = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_NOT_FOUND));
         entity.setSheetId(dto.getSheetId());
-        entity.setDate(dto.getDate());
+        entity.setDatetime(dto.getDatetime());
         entity.setAddress(dto.getAddress());
         entity.setScore(dto.getScore());
         entity.setInterviewReview(dto.getInterviewReview());

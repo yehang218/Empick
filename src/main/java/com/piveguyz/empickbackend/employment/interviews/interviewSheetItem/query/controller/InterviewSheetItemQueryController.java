@@ -53,7 +53,7 @@ public class InterviewSheetItemQueryController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2530", description = "존재하지 않는 항목입니다.")
     })
-    @GetMapping("/{id}}")
+    @GetMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewSheetItemQueryDTO>> findById(@PathVariable("id") Integer id) {
         InterviewSheetItemQueryDTO dto = service.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;

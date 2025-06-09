@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class InterviewQueryDTO {
     private Integer id;
     private Integer sheetId;
-    private LocalDateTime date;
+    private LocalDateTime datetime;
     private String address;
     private Double score;
     private String interviewReview;
