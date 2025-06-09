@@ -8,7 +8,6 @@ import com.piveguyz.empickbackend.member.query.dto.MemberResponseDTO;
 import com.piveguyz.empickbackend.member.query.facade.MemberProfileQueryFacade;
 import com.piveguyz.empickbackend.member.query.service.MemberQueryService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class MemberQueryController {
 
-    private final MemberQueryService memberQueryService;
     private final MemberProfileQueryFacade memberProfileQueryFacade;
     private final AuthFacade authFacade;  // 🔥 AuthFacade 추가
 
@@ -43,7 +41,7 @@ public class MemberQueryController {
     @GetMapping("/me")
     public ResponseEntity<CustomApiResponse<MemberResponseDTO>> getCurrentMember() {
         Integer memberId = authFacade.getCurrentMemberId();
-        MemberResponseDTO responseDTO = memberQueryService.getMemberInfo(memberId);
+        MemberResponseDTO responseDTO = memberProfileQueryFacade.getMemberInfo(memberId);
         return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
     }
 
@@ -52,11 +50,11 @@ public class MemberQueryController {
             - **현재 DB에 55번 id의 사원의 프로필 사진 경로만 제대로 등록 되어 있음**
             """)
     @GetMapping("/{memberId}/profile-image")
-    public ResponseEntity<byte[]> downloadProfileImage(
+    public ResponseEntity<byte[]> getProfileImage(
             @PathVariable int memberId) {
 
         byte[] imageData = memberProfileQueryFacade.downloadProfileImage(memberId);
-        String profileImageKey = memberQueryService.getProfileImageKey(memberId);
+        String profileImageKey = memberProfileQueryFacade.getProfileImageKey(memberId);
         String contentType = guessContentType(profileImageKey);
 
         return ResponseEntity.ok()
