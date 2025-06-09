@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.introduce.query.dto;
 
+import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceResultStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,12 +13,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IntroduceResultQueryDTO {
-    private long id;
-    private long memberId;
+    private int id;
+    private int memberId;
     private String content;
-    private long ratingScore;
-    private long introduceStandardId;
-    private long status;
-    private long updatedBy;
+    private int ratingScore;
+    private int introduceStandardId;
+    private IntroduceResultStatus status;
+    private int updatedBy;
     private LocalDateTime updatedAt;
 }
