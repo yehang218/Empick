@@ -103,6 +103,12 @@ public enum ResponseCode {
     EMPLOYMENT_RECRUITMENT_PROCESS_DUPLICATED_ORDER(false, HttpStatus.CONFLICT, 2063, "채용 프로세스 순서(displayOrder)가 중복되었습니다."),
     EMPLOYMENT_RECRUITMENT_PROCESS_RECRUITMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2064, "채용 공고를 찾을 수 없습니다."),
 
+    // 6) 채용 공고 템플릿 복사본
+    EMPLOYMENT_TEMPLATE_COPY_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2070, "채용 템플릿 복사본을 찾을 수 없습니다."),
+    EMPLOYMENT_TEMPLATE_COPY_EMPTY(false, HttpStatus.BAD_REQUEST, 2071, "복사본이 비어 있습니다."),
+    EMPLOYMENT_TEMPLATE_COPY_DUPLICATED_ORDER(false, HttpStatus.CONFLICT, 2072, "채용 템플릿 복사본 displayOrder가 중복되었습니다."),
+    EMPLOYMENT_TEMPLATE_COPY_RECRUITMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2073, "해당 채용공고에 대한 복사본이 없습니다."),
+
     //  지원자 - 2100 ~ 2199
     EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
 
@@ -133,6 +139,8 @@ public enum ResponseCode {
     EMPLOYMENT_JOBTEST_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2420, "이 실무테스트는 다른 곳에서 사용중이므로 수정하거나 삭제할 수 없습니다."),
     EMPLOYMENT_JOBTEST_DUPLICATE(false, HttpStatus.CONFLICT, 2421, "동일한 이름의 실무테스트가 이미 등록되어 있습니다."),
     EMPLOYMENT_INVALID_JOBTEST(false, HttpStatus.NOT_FOUND, 2422, "요청한 실무테스트를 찾을 수 없습니다."),
+    EMPLOYMENT_INVALID_JOBTEST_QUESTION(false, HttpStatus.NOT_FOUND, 2423, "이 실무테스트에는 해당 문제가 등록되어 있지 않습니다."),
+    EMPLOYMENT_JOBTEST_QUESTION_DUPLICATE(false, HttpStatus.CONFLICT, 2424, "이 실무테스트에는 해당 문제가 이미 등록되어 있습니다."),
 
     //   3) 평가 기준
     EMPLOYMENT_INVALID_EVALUATION_CRITERIA(false, HttpStatus.BAD_REQUEST, 2430, "평가 기준이 유효하지 않습니다."),
@@ -148,6 +156,10 @@ public enum ResponseCode {
     // 4) 평가 결과
     EMPLOYMENT_INVALID_EVALUATION_RESULT(false, HttpStatus.NOT_FOUND, 2440, "요청한 평가 결과를 찾을 수 없습니다."),
 
+    EMPLOYMENT_INVALID_CORRECTED_VALUE(false, HttpStatus.BAD_REQUEST, 2451, "isCorrect 값은 'Y' 또는 'N'이어야 합니다."),
+
+
+    
 
     //  면접 일정 - 2500 ~ 2599
     EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2500, "존재하지 않는 면접 기준입니다."),
@@ -180,6 +192,7 @@ public enum ResponseCode {
     EMPLOYMENT_MAIL_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2630, "요청한 메일을 찾을 수 없습니다."),
     EMPLOYMENT_MAIL_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2631, "메일의 내용을 입력하지 않았습니다."),
     EMPLOYMENT_MAIL_INADEQUATE_EMAIL(false, HttpStatus.CONFLICT, 2632, "유효하지 않은 형태의 이메일입니다."),
+    EMPLOYMENT_MAIL_NO_TITLE(false, HttpStatus.BAD_REQUEST, 2633, "메일의 제목을 입력하지 않았습니다."),
 
     // 인증 2700 ~ 2799
     INVALID_REFRESH_TOKEN(false, HttpStatus.UNAUTHORIZED, 2700, "유효하지 않은 Refresh Token입니다."),
