@@ -103,6 +103,12 @@ public enum ResponseCode {
     EMPLOYMENT_RECRUITMENT_PROCESS_DUPLICATED_ORDER(false, HttpStatus.CONFLICT, 2063, "채용 프로세스 순서(displayOrder)가 중복되었습니다."),
     EMPLOYMENT_RECRUITMENT_PROCESS_RECRUITMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2064, "채용 공고를 찾을 수 없습니다."),
 
+    // 6) 채용 공고 템플릿 복사본
+    EMPLOYMENT_TEMPLATE_COPY_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2070, "채용 템플릿 복사본을 찾을 수 없습니다."),
+    EMPLOYMENT_TEMPLATE_COPY_EMPTY(false, HttpStatus.BAD_REQUEST, 2071, "복사본이 비어 있습니다."),
+    EMPLOYMENT_TEMPLATE_COPY_DUPLICATED_ORDER(false, HttpStatus.CONFLICT, 2072, "채용 템플릿 복사본 displayOrder가 중복되었습니다."),
+    EMPLOYMENT_TEMPLATE_COPY_RECRUITMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2073, "해당 채용공고에 대한 복사본이 없습니다."),
+
     //  지원자 - 2100 ~ 2199
     EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
 
