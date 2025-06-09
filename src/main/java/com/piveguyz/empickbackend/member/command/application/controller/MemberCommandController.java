@@ -78,7 +78,6 @@ public class MemberCommandController {
             description = """
             - 해당 사원을 퇴사 처리합니다.
             - `resign_at`(퇴사일)을 현재 시간으로 업데이트하고, `status`를 비활성(0)으로 설정합니다.
-            - 또한 `deleted_member_id`를 입력한 값으로 기록합니다.
             """,
             security = @SecurityRequirement(name = "bearerAuth")
     )
