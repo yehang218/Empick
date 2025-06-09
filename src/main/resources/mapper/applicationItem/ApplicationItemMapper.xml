@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.applicationItem.query.mapper.ApplicationItemQueryMapper">
+
+    <resultMap id="ApplicationItemResultMap" type="com.piveguyz.empickbackend.employment.applicationItem.query.dto.ApplicationItemQueryDTO">
+        <id column="id" property="id" />
+        <result column="application_item_category_id" property="categoryId" />
+        <result column="category_name" property="categoryName" />
+        <result column="input_type" property="inputType"
+                typeHandler="com.piveguyz.empickbackend.common.handler.InputTypeHandler" />
+        <result column="is_required" property="isRequired"
+                typeHandler="com.piveguyz.empickbackend.common.handler.YnBooleanTypeHandler" />
+    </resultMap>
+
+    <select id="findByRecruitmentId" resultMap="ApplicationItemResultMap">
+        SELECT
+               ai.id,
+               ai.application_item_category_id,
+               c.name AS category_name,
+               c.input_type,
+               ai.is_required
+          FROM application_item ai
+          JOIN application_item_category c ON ai.application_item_category_id = c.id
+         WHERE ai.recruitment_id = #{recruitmentId}
+    </select>
+
+</mapper>

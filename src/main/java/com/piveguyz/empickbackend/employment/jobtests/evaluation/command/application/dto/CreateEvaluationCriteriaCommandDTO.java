@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.jobtests.evaluation.query.dto;
+package com.piveguyz.empickbackend.employment.jobtests.evaluation.command.application.dto;
 
 import lombok.*;
 
@@ -7,12 +7,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
-public class EvaluationCriteriaQueryDTO {
-    // 내용, 상세 내용, 가중치
-    private int id;
+public class CreateEvaluationCriteriaCommandDTO {
     private String content;
     private String detailContent;
     private double scoreWeight;
+
     private int jobtestId;
 }
