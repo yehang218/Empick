@@ -24,7 +24,6 @@ CREATE TABLE application
     applicant_id INT NOT NULL COMMENT '지원자 id',
     introduce_rating_result_id INT NULL COMMENT '자기소개서 평가 결과 id',
     interview_id INT NULL COMMENT '면접 id',
-    job_test_evaluation_result_id INT NULL COMMENT '실무 테스트 평가 결과 id',
     updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '수정시각',
     updated_by INT NULL COMMENT '수정자 (member_id)',
 
@@ -32,7 +31,6 @@ CREATE TABLE application
     FOREIGN KEY (applicant_id) REFERENCES applicant(id),
     FOREIGN KEY (introduce_rating_result_id) REFERENCES introduce_rating_result(id),
     FOREIGN KEY (interview_id) REFERENCES interview(id),
-    FOREIGN KEY (job_test_evaluation_result_id) REFERENCES job_test_evaluation_result(id),
     FOREIGN KEY (updated_by) REFERENCES member(id)
 );
 
