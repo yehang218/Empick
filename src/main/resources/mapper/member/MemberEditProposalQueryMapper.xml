@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.member.query.mapper.MemberEditProposalQueryMapper">
+
+    <select id="findProposals" resultType="com.piveguyz.empickbackend.member.query.dto.MemberEditProposalQueryDTO">
+        SELECT
+        id,
+        member_id AS memberId,
+        target_field AS targetField,
+        original_value AS originalValue,
+        requested_value AS requestedValue,
+        status
+        FROM member_edit
+        <where>
+            <if test="memberId != null">
+                member_id = #{memberId}
+            </if>
+        </where>
+        ORDER BY requested_at DESC
+    </select>
+
+</mapper>

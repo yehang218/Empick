@@ -5,13 +5,26 @@
 
 <mapper namespace="com.piveguyz.empickbackend.employment.recruitmentTemplate.query.mapper.RecruitmentTemplateQueryMapper">
 
+    <resultMap id="RecruitmentTemplateResultMap"
+               type="com.piveguyz.empickbackend.employment.recruitmentTemplate.query.dto.RecruitmentTemplateQueryDTO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="department_name" property="departmentName"/>
+        <result column="member_name" property="memberName"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="is_deleted" property="isDeleted"
+                typeHandler="com.piveguyz.empickbackend.common.handler.YnBooleanTypeHandler"/>
+    </resultMap>
+
     <!-- 템플릿 목록 조회 -->
     <select id="findAll" resultType="com.piveguyz.empickbackend.employment.recruitmentTemplate.query.dto.RecruitmentTemplateQueryDTO">
         SELECT rt.id,
                rt.name,
                d.name AS departmentName,
                m.name AS memberName,
-               DATE_FORMAT(rt.created_at, '%Y-%m-%d') AS createdAt
+               DATE_FORMAT(rt.created_at, '%Y-%m-%d') AS createdAt,
+               DATE_FORMAT(rt.updated_at, '%Y-%m-%d') AS updatedAt
         FROM recruitment_template rt
                  JOIN member m ON rt.member_id = m.id
                  JOIN department d ON m.department_id = d.id
@@ -25,7 +38,8 @@
                rt.name,
                d.name AS departmentName,
                m.name AS memberName,
-               DATE_FORMAT(rt.created_at, '%Y-%m-%d') AS createdAt
+               DATE_FORMAT(rt.created_at, '%Y-%m-%d') AS createdAt,
+               DATE_FORMAT(rt.updated_at, '%Y-%m-%d') AS updated_at
         FROM recruitment_template rt
                  JOIN member m ON rt.member_id = m.id
                  JOIN department d ON m.department_id = d.id

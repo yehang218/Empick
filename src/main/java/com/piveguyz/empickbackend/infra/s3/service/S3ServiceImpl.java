@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -141,5 +142,10 @@ public class S3ServiceImpl implements S3Service {
             log.error("S3 파일 리스트 조회 실패 - prefix: {}", prefix, e);
             throw new RuntimeException("파일 리스트 조회 실패", e);
         }
+    }
+
+    @Override
+    public String generatePublicUrl(String key) {
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, region, key);
     }
 }
