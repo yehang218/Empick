@@ -25,6 +25,8 @@ import com.piveguyz.empickbackend.employment.recruitment.command.domain.reposito
 import com.piveguyz.empickbackend.employment.recruitmentProcess.command.application.dto.RecruitmentProcessCreateDTO;
 import com.piveguyz.empickbackend.employment.recruitmentProcess.command.domain.aggregate.RecruitmentProcess;
 import com.piveguyz.empickbackend.employment.recruitmentProcess.command.domain.repository.RecruitmentProcessRepository;
+import com.piveguyz.empickbackend.employment.recruitmentTemplate.command.domain.aggregate.RecruitmentTemplate;
+import com.piveguyz.empickbackend.employment.recruitmentTemplate.command.domain.repository.RecruitmentTemplateRepository;
 import com.piveguyz.empickbackend.employment.recruitmentTemplateCopy.command.application.service.RecruitmentTemplateCopyCommandService;
 
 import lombok.RequiredArgsConstructor;
@@ -38,11 +40,16 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 	private final ApplicationItemCategoryRepository applicationItemCategoryRepository;
 	private final RecruitmentProcessRepository recruitmentProcessRepository;
 	private final RecruitmentTemplateCopyCommandService recruitmentTemplateCopyCommandService;
+	private final RecruitmentTemplateRepository recruitmentTemplateRepository;
 
 	@Override
 	public void createRecruitment(RecruitmentCommandDTO dto) {
 		validateRecruitmentInfo(dto);
 		validateApplicationItems(dto.getApplicationItems());
+
+		RecruitmentTemplate template = recruitmentTemplateRepository
+			.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
+			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
 
 		Recruitment recruitment = Recruitment.builder()
 			.title(dto.getTitle())
@@ -75,7 +82,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 			ApplicationItem item = ApplicationItem.builder()
 				.recruitment(saved)
 				.category(category)
-				.isRequiredYn(itemDTO.isRequired())
+				.isRequiredYn(itemDTO.getIsRequired())
 				.build();
 
 			applicationItemRepository.save(item);
@@ -104,6 +111,9 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		Recruitment recruitment = recruitmentRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NOT_FOUND));
 
+		RecruitmentTemplate template = recruitmentTemplateRepository.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
+			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
+
 		// 게시된 공고는 수정 불가
 		if (recruitment.getStatus() == RecruitmentStatus.PUBLISHED) {
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_CANNOT_MODIFY_PUBLISHED);
@@ -131,14 +141,14 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		for (ApplicationItemCreateDTO itemDTO : dto.getApplicationItems()) {
 			ApplicationItem existing = existingMap.get(itemDTO.getApplicationItemCategoryId());
 			if (existing != null) {
-				existing.setRequiredYn(itemDTO.isRequired());
+				existing.setIsRequiredYn(itemDTO.getIsRequired());
 			} else {
 				ApplicationItemCategory category = applicationItemCategoryRepository.findById(itemDTO.getApplicationItemCategoryId())
 					.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_ITEM_CATEGORY_NOT_FOUND));
 				ApplicationItem newItem = ApplicationItem.builder()
 					.recruitment(recruitment)
 					.category(category)
-					.isRequiredYn(itemDTO.isRequired())
+					.isRequiredYn(itemDTO.getIsRequired())
 					.build();
 				applicationItemRepository.save(newItem);
 			}

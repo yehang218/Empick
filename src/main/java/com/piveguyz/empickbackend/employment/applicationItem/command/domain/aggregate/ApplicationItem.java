@@ -20,7 +20,7 @@ public class ApplicationItem {
 
 	@Column(name = "is_required", nullable = false)
 	@Convert(converter = YnBooleanConverter.class)
-	private boolean isRequiredYn;
+	private Boolean isRequiredYn;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "application_item_category_id")

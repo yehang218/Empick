@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 public class ApplicationItemCommandDTO {
 	private int categoryId;
-	private boolean isRequired;
+	private Boolean isRequired;
 }
