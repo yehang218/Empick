@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IntroduceTemplateItemQueryDTO {
-    private Long Id;
+    private int Id;
     private String Title;
-    private Long MemberId;
+    private int MemberId;
 }
