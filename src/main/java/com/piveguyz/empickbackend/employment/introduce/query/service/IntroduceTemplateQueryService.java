@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface IntroduceTemplateQueryService {
     List<IntroduceTemplateQueryDTO> findAllIntroduceTemplate();
+
+    List<IntroduceTemplateQueryDTO> findAllIntroduceTemplateItem();
 }

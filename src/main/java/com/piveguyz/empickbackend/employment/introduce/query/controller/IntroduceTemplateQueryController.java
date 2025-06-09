@@ -2,7 +2,6 @@ package com.piveguyz.empickbackend.employment.introduce.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.service.IntroduceTemplateQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,5 +37,19 @@ public class IntroduceTemplateQueryController {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, introduceTemplateQueryService.
                         findAllIntroduceTemplate()));
+    }
+
+    @Operation(summary = "자기소개서 템플릿 항목 전체 조회", description = "자기소개서 템플릿 항목을 조회합니다")
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회됨"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류")
+    })
+    @GetMapping("/item")
+    public ResponseEntity<CustomApiResponse<List<IntroduceTemplateQueryDTO>>> getAllIntroduceTemplateItem() {
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS,
+                        introduceTemplateQueryService.findAllIntroduceTemplateItem()));
     }
 }

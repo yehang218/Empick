@@ -13,9 +13,13 @@ public class IntroduceTemplateQueryServiceImp implements IntroduceTemplateQueryS
 
     private final IntroduceTemplateMapper introduceTemplateMapper;
 
-
 @Override
 public List<IntroduceTemplateQueryDTO> findAllIntroduceTemplate() {
     return introduceTemplateMapper.findAllIntroduceTemplate();
+    }
+
+    @Override
+    public List<IntroduceTemplateQueryDTO> findAllIntroduceTemplateItem() {
+        return introduceTemplateMapper.findAllIntroduceTemplateItem();
     }
 }
