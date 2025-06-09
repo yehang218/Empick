@@ -15,6 +15,7 @@ public class ApplicationQueryServiceImp implements ApplicationQueryService {
 
     @Override
     public List<ApplicationQueryDTO> findAllApplication() {
+
         return applicationMapper.findAllApplication();
     }
 }
