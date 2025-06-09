@@ -11,6 +11,7 @@ import com.piveguyz.empickbackend.member.command.domain.repository.MemberReposit
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -87,6 +88,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
+    @Transactional
     public void resignMember(int memberId) {
         Integer currentMemberId = authFacade.getCurrentMemberId();
 
@@ -94,6 +96,10 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+
+        if (member.getResignAt() != null) {
+            throw new BusinessException(ResponseCode.ALREDY_RESIGNED);
+        }
 
         member.resign(LocalDateTime.now(), currentMemberId);
     }

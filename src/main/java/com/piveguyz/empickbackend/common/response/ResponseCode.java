@@ -48,6 +48,7 @@ public enum ResponseCode {
     EDIT_PROPOSAL_APPROVED(true, HttpStatus.ACCEPTED, 1104, "변경 요청이 승인되었습니다."),
     EDIT_PROPOSAL_REJECTED(true, HttpStatus.NOT_ACCEPTABLE, 1105, "변경 요청이 거절되었습니다."),
     REQUIRED_LOGIN(true, HttpStatus.NOT_ACCEPTABLE, 1106, "로그인이 필요합니다."),
+    ALREDY_RESIGNED(true, HttpStatus.NOT_ACCEPTABLE, 1107, "퇴사 처리된 사원입니다."),
 
     // 부서, 직책, 직무, 직급 관련 NOT_FOUND
     DEPARTMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1200, "요청한 부서를 찾을 수 없습니다."),
