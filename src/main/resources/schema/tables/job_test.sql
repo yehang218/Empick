@@ -20,6 +20,8 @@ CREATE TABLE job_test
     title             VARCHAR(255) NOT NULL,
     difficulty        TINYINT      NOT NULL,
     test_time         INT          NOT NULL,
+    started_at        DATETIME     NULL COMMENT '시험 시작 일시',
+    ended_at          DATETIME     NULL COMMENT '시험 종료 일시',
     created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME     NULL,
     created_member_id INT          NOT NULL,
@@ -34,8 +36,6 @@ CREATE TABLE job_test
 CREATE TABLE application_job_test
 (
     id                  INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    started_at          DATETIME     NULL COMMENT '시험 시작 일시',
-    ended_at            DATETIME     NULL COMMENT '시험 종료 일시',
     evaluator_comment   LONGTEXT     NULL COMMENT '평가자 코멘트',
     submitted_at        DATETIME     NOT NULL COMMENT '제출 일시',
     grading_total_score INT          NULL COMMENT '채점 총 점수',
@@ -46,7 +46,7 @@ CREATE TABLE application_job_test
 
     application_id      INT          NOT NULL COMMENT '지원서 id',
     job_test_id         INT          NOT NULL COMMENT '실무테스트 id',
-    member_id           INT          NOT NULL COMMENT '평가자 id',
+    member_id           INT          NULL COMMENT '평가자 id',
 
     FOREIGN KEY (`application_id`) REFERENCES `application` (`id`),
     FOREIGN KEY (`job_test_id`) REFERENCES `job_test` (`id`),
