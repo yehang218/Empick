@@ -7,8 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApplicantBookmarkQueryDTO {
-    private Long memberId;
-    private Long applicantId;
+    private int memberId;
+    private int applicantId;
     private String name;
     private String phone;
     private String email;

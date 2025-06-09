@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ApplicantBookmarkQueryService {
     List<ApplicantBookmarkQueryDTO> findAllApplicantBookmark();
+
+    List<ApplicantBookmarkQueryDTO> findApplicantBookmarkByMemberId(int memberId);
 }
