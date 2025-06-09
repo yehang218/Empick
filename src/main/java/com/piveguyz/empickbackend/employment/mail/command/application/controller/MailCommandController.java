@@ -7,6 +7,7 @@ import com.piveguyz.empickbackend.employment.mail.command.application.service.Ma
 import com.piveguyz.empickbackend.employment.mail.facade.MailFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +22,7 @@ public class MailCommandController {
     private final MailCommandService mailCommandService;
     private final MailFacade mailFacade;
 
+    @Autowired
     public MailCommandController(MailCommandService mailCommandService, MailFacade mailFacade) {
         this.mailCommandService = mailCommandService;
         this.mailFacade = mailFacade;
@@ -42,7 +44,7 @@ public class MailCommandController {
 
     @PostMapping("/create")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> createMail(@RequestBody MailCommandDTO mailCommandDTO) {
-        List<String> emailList = mailCommandService.createMail(mailCommandDTO);       // DB에 메일 저장
+        MailCommandDTO createdDTO = mailCommandService.createMail(mailCommandDTO);       // DB에 메일 저장
 //        mailCommandService.sendSimpleMail(createdMailCommandDTO);     // 단순 메일 발송
         mailCommandService.sendHTMLMail(mailCommandDTO);         // 더 복잡한 html 메일 발송
         ResponseCode result = ResponseCode.SUCCESS;
@@ -52,17 +54,17 @@ public class MailCommandController {
 
     @PostMapping("/send/jobtest")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendJobtestMail(@RequestBody MailCommandDTO dto) {
-        List<String> emailList = mailCommandService.createMail(dto);
-        MailCommandDTO sendedDTO = mailFacade.sendJobtestMail(dto);
+        MailCommandDTO createdDTO = mailCommandService.createMail(dto);
+        MailCommandDTO sendedDTO = mailFacade.sendJobtestMail(createdDTO);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, dto));
+                .body(CustomApiResponse.of(result, sendedDTO));
     }
 
     @PostMapping("/send/interview")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendInterviewMail(@RequestBody MailCommandDTO dto) {
-        List<String> emailList = mailCommandService.createMail(dto);
-        MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(dto);
+        MailCommandDTO createdDTO = mailCommandService.createMail(dto);
+        MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(createdDTO);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, sendedDTO));

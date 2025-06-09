@@ -6,7 +6,7 @@ import com.piveguyz.empickbackend.employment.mail.command.application.dto.MailCo
 import java.util.List;
 
 public interface MailCommandService {
-    List<String> createMail(MailCommandDTO mailCommandDTO);
+    MailCommandDTO createMail(MailCommandDTO mailCommandDTO);
 
     void sendSimpleMail(MailCommandDTO createdMailCommandDTO);
 

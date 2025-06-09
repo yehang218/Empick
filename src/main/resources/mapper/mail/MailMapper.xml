@@ -52,4 +52,69 @@
         WHERE email = #{email}
     </select>
 
+    <resultMap id="JobTestMailResultMap" type="com.piveguyz.empickbackend.employment.mail.query.dto.JobTestMailDTO">
+        <id column="id" property="id"/>
+        <result column="recruitment_id" property="recruitmentId"/>
+        <result column="recruitment_title" property="recruitmentTitle"/>
+        <result column="applicant_id" property="applicantId"/>
+        <result column="applicant_name" property="applicantName"/>
+        <result column="email" property="email"/>
+        <result column="application_job_test_id" property="applicationJobTestId"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="ended_at" property="endedAt"/>
+        <result column="entry_code" property="entryCode"/>
+        <result column="job_test_id" property="jobTestId"/>
+        <result column="job_test_title" property="jobTestTitle"/>
+        <result column="problem_count" property="problemCount"/>
+<!-- 시험이름, 시험일정, 시험 시간, 지원자 이름, 문항수, 입장코드 -->
+    </resultMap>
+
+    <select id="findForJobTestMail" resultMap="JobTestMailResultMap">
+        SELECT
+            application.id as id,
+            application.recruitment_id as recruitment_id,
+            recruitment.title as recruitment_title,
+            application.applicant_id as applicant_id,
+            applicant.name as applicant_name,
+            applicant.email as email,
+            application_job_test.id as applicationJobTestId,
+            application_job_test.started_at
+        FROM application
+                 JOIN recruitment ON application.recruitment_id = recruitment.id
+                 JOIN applicant ON application.applicant_id = applicant.id
+                 JOIN application_job_test ON application.id = application.id = application_job_test.application_id
+                 JOIN job_test ON application_job_test.job_test_id = job_test.id
+                 JOIN job_test_question ON job_test.id = job_test_question.job_test_id
+        WHERE application.id = #{id};
+    </select>
+
+    <resultMap id="InterviewMailResultMap" type="com.piveguyz.empickbackend.employment.mail.query.dto.InterviewMailDTO">
+        <id column="id" property="id"/>
+        <result column="recruitment_id" property="recruitmentId"/>
+        <result column="recruitment_title" property="recruitmentTitle"/>
+        <result column="applicant_id" property="applicantId"/>
+        <result column="applicant_name" property="applicantName"/>
+        <result column="email" property="email"/>
+        <result column="interview_id" property="interviewId"/>
+        <result column="interview_datetime" property="interviewDatetime"/>
+        <result column="interview_address" property="interviewAddress"/>
+    </resultMap>
+
+    <select id="findForInterviewMail" resultMap="InterviewMailResultMap">
+        SELECT
+            application.id as id,
+            application.recruitment_id as recruitment_id,
+            recruitment.title as recruitment_title,
+            application.applicant_id as applicant_id,
+            applicant.name as applicant_name,
+            application.interview_id as interview_id,
+            interview.datetime as interview_datetime,
+            interview.address as interview_address
+        FROM application
+        JOIN recruitment ON application.recruitment_id = recruitment.id
+        JOIN applicant ON application.applicant_id = applicant.id
+        JOIN interview ON application.interview_id = interview.id
+        WHERE application.id = #{id};
+    </select>
+
 </mapper>
