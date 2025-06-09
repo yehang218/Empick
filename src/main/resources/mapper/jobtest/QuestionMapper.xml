@@ -36,6 +36,7 @@
         <!-- 1:N 관계 -->
         <collection property="options" resultMap="QuestionOptionMap"/>
         <collection property="usedJobTests" resultMap="UsedJobTestMap"/>
+        <collection property="gradingCriterias" resultMap="GradingCriteriaMap"/>
     </resultMap>
 
 
@@ -54,6 +55,14 @@
         <result property="title" column="jt_title"/>
     </resultMap>
 
+    <!--    해당 문제에 대한 채점 기준-->
+    <resultMap id="GradingCriteriaMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.grading.query.dto.GradingCriteriaQueryDTO">
+        <id property="id" column="qgc_id"/>
+        <result property="content" column="qgc_content"/>
+        <result property="detailContent" column="qgc_detail_content"/>
+        <result property="scoreWeight" column="qgc_score_weight"/>
+    </resultMap>
 
     <select id="selectAllQuestion" resultMap="QuestionListMap">
         SELECT q.id,
@@ -83,11 +92,16 @@
                qo.content          AS qo_content,
 
                jt.id               AS jt_id,
-               jt.title            AS jt_title
+               jt.title            AS jt_title,
+
+               qgc.content         AS qgc_content,
+               qgc.detail_content  AS qgc_detail_content,
+               qgc.score_weight    AS qgc_score_weight
         FROM question q
                  LEFT JOIN question_option qo ON qo.question_id = q.id
                  LEFT JOIN job_test_question jtq ON jtq.question_id = q.id
                  LEFT JOIN job_test jt ON jt.id = jtq.job_test_id
+                 LEFT JOIN question_grading_criteria qgc ON qgc.question_id = q.id
         WHERE q.id = #{id}
     </select>
 </mapper>

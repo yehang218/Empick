@@ -45,7 +45,7 @@ CREATE TABLE application_job_test
     job_test_id         INT      NOT NULL,
     member_id           INT      NOT NULL,
 
-    FOREIGN KEY (`application_id`) REFERENCES `application`(`id`),
+    FOREIGN KEY (`application_id`) REFERENCES `application` (`id`),
     FOREIGN KEY (`job_test_id`) REFERENCES `job_test` (`id`),
     FOREIGN KEY (`member_id`) REFERENCES `member` (`id`)
 );
@@ -103,10 +103,10 @@ CREATE TABLE answer
     attempt                 INT      NOT NULL DEFAULT 1,
     is_correct              TINYINT  NULL,
     application_job_test_id INT      NOT NULL,
-    job_test_question_id    INT      NOT NULL,
+    question_id             INT      NOT NULL,
 
     FOREIGN KEY (`application_job_test_id`) REFERENCES `application_job_test` (`id`),
-    FOREIGN KEY (`job_test_question_id`) REFERENCES `job_test_question` (`id`)
+    FOREIGN KEY (`question_id`) REFERENCES `question` (`id`)
 );
 
 
@@ -132,8 +132,8 @@ CREATE TABLE grading_result
     answer_id                    INT        NOT NULL,
     question_grading_criteria_id INT        NOT NULL,
 
-    FOREIGN KEY (`answer_id`) REFERENCES `answer` (`id`)
-
+    FOREIGN KEY (`answer_id`) REFERENCES `answer` (`id`),
+    FOREIGN KEY (`question_grading_criteria_id`) REFERENCES `question_grading_criteria` (`id`)
 );
 
 

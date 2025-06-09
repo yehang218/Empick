@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.piveguyz.empickbackend.department.query.mapper.DeptMemberMapper">
+
+    <!-- 부서 ID로 해당 부서에 속한 사원 리스트 조회 -->
+    <select id="findMembersByDepartmentId" parameterType="int"
+            resultType="com.piveguyz.empickbackend.department.query.dto.DeptMemberQueryResponseDTO">
+        SELECT m.id
+             , m.name
+             , m.employee_number AS employeeNumber
+             , m.email
+             , m.phone
+             , p.name            AS positionName
+             , j.name            AS jobName
+             , rnk.name          AS rankName
+             , m.picture_url     AS pictureUrl
+             , m.hire_at         AS hireAt
+        FROM member m
+                 LEFT JOIN position p ON m.position_id = p.id
+                 LEFT JOIN job j ON m.job_id = j.id
+                 LEFT JOIN rank rnk ON m.rank_id = rnk.id
+        WHERE m.department_id = #{departmentId}
+    </select>
+
+</mapper>
