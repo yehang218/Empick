@@ -3,20 +3,90 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.piveguyz.empickbackend.member.query.mapper.MemberMapper">
-
+    
+    <!-- 사원의 권한 코드 리스트 조회 -->
     <select id="findRolesByEmployeeNumber" parameterType="int" resultType="string">
-        SELECT r.code
+        SELECT DISTINCT r.code
         FROM member m
-        LEFT JOIN department d ON m.department_id = d.id
-        LEFT JOIN position p ON m.position_id = p.id
-        LEFT JOIN job j ON m.job_id = j.id
-        LEFT JOIN rank rnk ON m.rank_id = rnk.id
-        LEFT JOIN role r ON (
-        r.id = d.role_id OR
-        r.id = p.role_id OR
-        r.id = j.role_id OR
-        r.id = rnk.role_id
-        )
+                 LEFT JOIN department d ON m.department_id = d.id
+                 LEFT JOIN position p ON m.position_id = p.id
+                 LEFT JOIN job j ON m.job_id = j.id
+                 LEFT JOIN rank rnk ON m.rank_id = rnk.id
+                 LEFT JOIN role r ON r.id IN (
+                                              d.role_id, p.role_id, j.role_id, rnk.role_id
+            )
+        WHERE m.employee_number = #{employeeNumber}
+    </select>
+
+    <!-- 단일 사원 조회 -->
+    <select id="findMemberById" parameterType="int"
+            resultType="com.piveguyz.empickbackend.member.query.dto.MemberResponseDTO">
+        SELECT m.id
+             , m.employee_number AS employeeNumber
+             , m.name
+             , m.email
+             , m.phone
+             , d.name            AS departmentName
+             , p.name            AS positionName
+             , j.name            AS jobName
+             , rnk.name          AS rankName
+             , m.picture_url     AS pictureUrl
+             , m.status
+             , m.hire_at         AS hireAt
+             , m.resign_at       AS resignAt
+        FROM member m
+                 LEFT JOIN department d ON m.department_id = d.id
+                 LEFT JOIN position p ON m.position_id = p.id
+                 LEFT JOIN job j ON m.job_id = j.id
+                 LEFT JOIN rank rnk ON m.rank_id = rnk.id
+        WHERE m.id = #{memberId}
+    </select>
+
+    <!-- 이름으로 사원 조회 -->
+    <select id="findMembersByName" parameterType="string"
+            resultType="com.piveguyz.empickbackend.member.query.dto.MemberResponseDTO">
+        SELECT m.id
+             , m.employee_number AS employeeNumber
+             , m.name
+             , m.email
+             , m.phone
+             , d.name            AS departmentName
+             , p.name            AS positionName
+             , j.name            AS jobName
+             , rnk.name          AS rankName
+             , m.picture_url     AS pictureUrl
+             , m.status
+             , m.hire_at         AS hireAt
+             , m.resign_at       AS resignAt
+        FROM member m
+                 LEFT JOIN department d ON m.department_id = d.id
+                 LEFT JOIN position p ON m.position_id = p.id
+                 LEFT JOIN job j ON m.job_id = j.id
+                 LEFT JOIN rank rnk ON m.rank_id = rnk.id
+        WHERE m.name LIKE CONCAT('%',#{name},'%')
+    </select>
+
+    <!-- 사번으로 사원 조회 -->
+    <select id="findMembersByEmployeeNumber" parameterType="int"
+            resultType="com.piveguyz.empickbackend.member.query.dto.MemberResponseDTO">
+        SELECT m.id
+             , m.employee_number AS employeeNumber
+             , m.name
+             , m.email
+             , m.phone
+             , d.name            AS departmentName
+             , p.name            AS positionName
+             , j.name            AS jobName
+             , rnk.name          AS rankName
+             , m.picture_url     AS pictureUrl
+             , m.status
+             , m.hire_at         AS hireAt
+             , m.resign_at       AS resignAt
+        FROM member m
+                 LEFT JOIN department d ON m.department_id = d.id
+                 LEFT JOIN position p ON m.position_id = p.id
+                 LEFT JOIN job j ON m.job_id = j.id
+                 LEFT JOIN rank rnk ON m.rank_id = rnk.id
         WHERE m.employee_number = #{employeeNumber}
     </select>
 

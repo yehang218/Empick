@@ -6,7 +6,7 @@ import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpRequestDTO;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberSignUpResponseDTO;
-import com.piveguyz.empickbackend.member.command.domain.aggregate.Member;
+import com.piveguyz.empickbackend.member.command.domain.aggregate.MemberEntity;
 import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +32,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         authFacade.checkHasRole(RoleCode.ROLE_HR_ACCESS);
 
         // 🔥 Step 3️⃣: 입사처리자(현재 로그인 사용자) 조회
-        Member createdMember = memberRepository.findById(createdMemberId)
+        MemberEntity createdMember = memberRepository.findById(createdMemberId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_CREATED_MEMBER_NOT_FOUND));
 
         // 🔥 Step 4️⃣: 이메일 중복 체크
@@ -44,7 +44,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         int employeeNumber = generateUniqueEmployeeNumber();
 
         // 🔥 Step 6️⃣: 신규 사원 생성
-        Member member = Member.builder()
+        MemberEntity member = MemberEntity.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName())
@@ -59,7 +59,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .createdMemberId(createdMemberId)
                 .build();
 
-        Member savedMember = memberRepository.save(member);
+        MemberEntity savedMember = memberRepository.save(member);
 
         return MemberSignUpResponseDTO.builder()
                 .id(savedMember.getId())
@@ -72,7 +72,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Override
     public void updateProfileImage(int memberId, String key) {
-        Member member = memberRepository.findById(memberId)
+        MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
 
         member.updateProfileImageUrl(key);
@@ -80,7 +80,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
 
     @Override
     public void clearProfileImage(int memberId) {
-        Member member = memberRepository.findById(memberId)
+        MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
 
         member.clearProfileImageUrl();

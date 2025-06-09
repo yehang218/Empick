@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class MemberCommandController {
     private final MemberProfileCommandFacade memberProfileFacade;
 
     @PostMapping
-    @Operation(summary = "사원 등록", description = "새로운 사원을 등록합니다.")
+    @Operation(summary = "사원 등록", description = "새로운 사원을 등록합니다.", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공",
                     content = @Content(schema = @Schema(implementation = MemberSignUpResponseDTO.class))),

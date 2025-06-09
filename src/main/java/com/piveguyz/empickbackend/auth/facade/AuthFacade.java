@@ -39,7 +39,7 @@ public class AuthFacade {
     public void checkHasRole(RoleCode requiredRole) {
         List<String> roles = getCurrentUserRoles();
         if (roles.stream().noneMatch(role -> role.equals(requiredRole.name()))) {
-            throw new BusinessException(ResponseCode.MEMBER_CREATED_MEMBER_NO_PERMISSION);
+            throw new BusinessException(ResponseCode.NO_HR_PERMISSION);
         }
     }
 
@@ -52,7 +52,7 @@ public class AuthFacade {
                 .anyMatch(role -> List.of(requiredRoles).stream()
                         .anyMatch(requiredRole -> role.equals(requiredRole.name())));
         if (!hasRole) {
-            throw new BusinessException(ResponseCode.MEMBER_CREATED_MEMBER_NO_PERMISSION);
+            throw new BusinessException(ResponseCode.NO_HR_PERMISSION);
         }
     }
 

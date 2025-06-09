@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Builder
-
 @Table(name = "member",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_member_employee_number", columnNames = "employee_number"),
                 @UniqueConstraint(name = "uk_member_email", columnNames = "email")
         }
 )
-public class Member {
+public class MemberEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -102,5 +102,43 @@ public class Member {
 
     public void clearProfileImageUrl() {
         this.pictureUrl = null;
+    }
+
+    // FK 필드 업데이트 메서드
+    public void updateDepartmentId(Integer departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public void updatePositionId(Integer positionId) {
+        this.positionId = positionId;
+    }
+
+    public void updateJobId(Integer jobId) {
+        this.jobId = jobId;
+    }
+
+    public void updateRankId(Integer rankId) {
+        this.rankId = rankId;
+    }
+
+    // String 필드 업데이트 메서드
+    public void updateName(String requestedValue) {
+        this.name = requestedValue;
+    }
+
+    public void updatePhone(String requestedValue) {
+        this.phone = requestedValue;
+    }
+
+    public void updateEmail(String requestedValue) {
+        this.email = requestedValue;
+    }
+
+    public void updateAddress(String requestedValue) {
+        this.address = requestedValue;
+    }
+
+    public void updatePictureUrl(String requestedValue) {
+        this.pictureUrl = requestedValue;
     }
 }
