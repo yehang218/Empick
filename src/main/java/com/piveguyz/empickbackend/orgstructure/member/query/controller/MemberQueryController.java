@@ -4,9 +4,9 @@ import com.piveguyz.empickbackend.auth.facade.AuthFacade;
 import com.piveguyz.empickbackend.common.constants.ApiExamples;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.orgstructure.facade.MemberProfileFacade;
 import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberEditProposalQueryDTO;
 import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberResponseDTO;
-import com.piveguyz.empickbackend.orgstructure.member.query.facade.MemberProfileQueryFacade;
 import com.piveguyz.empickbackend.orgstructure.member.query.service.MemberEditProposalQueryService;
 import com.piveguyz.empickbackend.orgstructure.member.query.service.MemberQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberQueryController {
 
-    private final MemberProfileQueryFacade memberProfileQueryFacade;
+    private final MemberProfileFacade memberProfileFacade;
     private final MemberQueryService memberQueryService;
     private final AuthFacade authFacade;  // 🔥 AuthFacade 추가
     private final MemberEditProposalQueryService queryService;
@@ -49,7 +49,7 @@ public class MemberQueryController {
     @GetMapping("/me")
     public ResponseEntity<CustomApiResponse<MemberResponseDTO>> getCurrentMember() {
         Integer memberId = authFacade.getCurrentMemberId();
-        MemberResponseDTO responseDTO = memberProfileQueryFacade.getMemberInfo(memberId);
+        MemberResponseDTO responseDTO = memberProfileFacade.getMemberInfo(memberId);
         return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
     }
 
@@ -85,8 +85,8 @@ public class MemberQueryController {
     public ResponseEntity<byte[]> getProfileImage(
             @PathVariable int memberId) {
 
-        byte[] imageData = memberProfileQueryFacade.downloadProfileImage(memberId);
-        String profileImageKey = memberProfileQueryFacade.getProfileImageKey(memberId);
+        byte[] imageData = memberProfileFacade.downloadProfileImage(memberId);
+        String profileImageKey = memberProfileFacade.getProfileImageKey(memberId);
         String contentType = guessContentType(profileImageKey);
 
         return ResponseEntity.ok()

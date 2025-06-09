@@ -4,10 +4,10 @@ import com.piveguyz.empickbackend.common.constants.ApiExamples;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.infra.s3.dto.S3UploadResponseDTO;
+import com.piveguyz.empickbackend.orgstructure.facade.MemberProfileFacade;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberProfileUploadRequestDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberSignUpRequestDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberSignUpResponseDTO;
-import com.piveguyz.empickbackend.orgstructure.member.command.application.facade.MemberProfileCommandFacade;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.service.MemberCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MemberCommandController {
 
     private final MemberCommandService memberCommandService;
-    private final MemberProfileCommandFacade memberProfileFacade;
+    private final MemberProfileFacade memberProfileFacade;
 
     @PostMapping
     @Operation(summary = "사원 등록", description = "새로운 사원을 등록합니다.", security = @SecurityRequirement(name = "bearerAuth"))
