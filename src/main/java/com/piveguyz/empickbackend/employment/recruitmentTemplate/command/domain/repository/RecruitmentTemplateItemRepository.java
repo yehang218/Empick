@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.piveguyz.empickbackend.employment.recruitmentTemplate.command.domain.aggregate.RecruitmentTemplateItem;
 
 public interface RecruitmentTemplateItemRepository extends JpaRepository<RecruitmentTemplateItem, Integer> {
+	List<RecruitmentTemplateItem> findByRecruitmentTemplateId(int templateId);
 }

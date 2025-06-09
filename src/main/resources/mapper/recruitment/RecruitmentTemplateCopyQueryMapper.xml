@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.recruitmentTemplateCopy.query.mapper.RecruitmentTemplateCopyQueryMapper">
+
+    <resultMap id="RecruitmentTemplateCopyResultMap"
+               type="com.piveguyz.empickbackend.employment.recruitmentTemplateCopy.query.dto.RecruitmentTemplateCopyQueryDTO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="display_order" property="displayOrder"/>
+        <result column="recruitment_id" property="recruitmentId"/>
+        <result column="recruitment_template_item_id" property="recruitmentTemplateItemId"/>
+    </resultMap>
+
+    <select id="findByRecruitmentId" resultMap="RecruitmentTemplateCopyResultMap">
+        SELECT
+            rtc.id,
+            rtc.title,
+            rtc.content,
+            rtc.display_order,
+            rtc.recruitment_id,
+            rtc.recruitment_template_item_id
+        FROM recruitment_template_copy rtc
+        WHERE rtc.recruitment_id = #{recruitmentId}
+        ORDER BY rtc.display_order ASC
+    </select>
+
+</mapper>

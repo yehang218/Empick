@@ -25,6 +25,7 @@ import com.piveguyz.empickbackend.employment.recruitment.command.domain.reposito
 import com.piveguyz.empickbackend.employment.recruitmentProcess.command.application.dto.RecruitmentProcessCreateDTO;
 import com.piveguyz.empickbackend.employment.recruitmentProcess.command.domain.aggregate.RecruitmentProcess;
 import com.piveguyz.empickbackend.employment.recruitmentProcess.command.domain.repository.RecruitmentProcessRepository;
+import com.piveguyz.empickbackend.employment.recruitmentTemplateCopy.command.application.service.RecruitmentTemplateCopyCommandService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 	private final ApplicationItemRepository applicationItemRepository;
 	private final ApplicationItemCategoryRepository applicationItemCategoryRepository;
 	private final RecruitmentProcessRepository recruitmentProcessRepository;
+	private final RecruitmentTemplateCopyCommandService recruitmentTemplateCopyCommandService;
 
 	@Override
 	public void createRecruitment(RecruitmentCommandDTO dto) {
@@ -58,6 +60,12 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 			.build();
 
 		Recruitment saved = recruitmentRepository.save(recruitment);
+
+		// 템플릿 복사본 생성
+		recruitmentTemplateCopyCommandService.copyTemplateItemsToRecruitment(
+			saved.getId(),
+			dto.getRecruitmentTemplateId()
+		);
 
 		// 지원서 항목 저장
 		for (ApplicationItemCreateDTO itemDTO : dto.getApplicationItems()) {
