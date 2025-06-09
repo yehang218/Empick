@@ -31,10 +31,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberQueryController {
 
-    private final MemberQueryService memberQueryService;
     private final MemberProfileQueryFacade memberProfileQueryFacade;
+    private final MemberQueryService memberQueryService;
+    private final AuthFacade authFacade;  // 🔥 AuthFacade 추가
     private final MemberEditProposalQueryService queryService;
-    private final AuthFacade authFacade;
 
     @Operation(summary = "내 정보 조회", description = """
             - 로그인한 사용자의 정보를 조회합니다. (JWT 토큰 필요)
@@ -49,7 +49,7 @@ public class MemberQueryController {
     @GetMapping("/me")
     public ResponseEntity<CustomApiResponse<MemberResponseDTO>> getCurrentMember() {
         Integer memberId = authFacade.getCurrentMemberId();
-        MemberResponseDTO responseDTO = memberQueryService.getMemberInfo(memberId);
+        MemberResponseDTO responseDTO = memberProfileQueryFacade.getMemberInfo(memberId);
         return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, responseDTO));
     }
 
@@ -82,9 +82,11 @@ public class MemberQueryController {
             - **현재 DB에 55번 id의 사원의 프로필 사진 경로만 제대로 등록 되어 있음**
             """)
     @GetMapping("/{memberId}/profile-image")
-    public ResponseEntity<byte[]> downloadProfileImage(@PathVariable int memberId) {
+    public ResponseEntity<byte[]> getProfileImage(
+            @PathVariable int memberId) {
+
         byte[] imageData = memberProfileQueryFacade.downloadProfileImage(memberId);
-        String profileImageKey = memberQueryService.getProfileImageKey(memberId);
+        String profileImageKey = memberProfileQueryFacade.getProfileImageKey(memberId);
         String contentType = guessContentType(profileImageKey);
 
         return ResponseEntity.ok()
@@ -118,11 +120,13 @@ public class MemberQueryController {
 
     private String guessContentType(String key) {
         String lowerKey = key.toLowerCase();
+
         if (lowerKey.endsWith(".png")) return "image/png";
         if (lowerKey.endsWith(".jpg") || lowerKey.endsWith(".jpeg")) return "image/jpeg";
         if (lowerKey.endsWith(".webp")) return "image/webp";
         if (lowerKey.endsWith(".gif")) return "image/gif";
         if (lowerKey.endsWith(".svg")) return "image/svg+xml";
+
         return "application/octet-stream";
     }
 }
