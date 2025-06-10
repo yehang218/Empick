@@ -7,11 +7,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AnswerRepository extends JpaRepository<AnswerEntity, Integer> {
     @Query("SELECT MAX(a.attempt) FROM AnswerEntity a WHERE a.applicationJobTestId = :jobTestId AND a.questionId = :questionId")
     Integer findMaxAttempt(@Param("jobTestId") int jobTestId, @Param("questionId") int questionId);
 
-    List<AnswerEntity> findLatestAnswersByApplicationJobTestId(int applicationJobTestId);
+    Optional<AnswerEntity> findByApplicationJobTestIdAndQuestionId(int applicationJobTestId, int questionId);
 }

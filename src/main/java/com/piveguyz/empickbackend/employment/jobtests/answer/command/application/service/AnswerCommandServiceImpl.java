@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,13 +40,20 @@ public class AnswerCommandServiceImpl implements AnswerCommandService {
         int jobTestId = createAnswerCommandDTO.getApplicationJobTestId();
         int questionId = createAnswerCommandDTO.getQuestionId();
 
-        // 이미 같은 문제에 대한 답이 존재하는 경우 대비
-        Integer maxAttempt = answerRepository.findMaxAttempt(jobTestId, questionId);
-        int nextAttempt = (maxAttempt == null) ? 1 : maxAttempt + 1;
+        Optional<AnswerEntity> existing = answerRepository.findByApplicationJobTestIdAndQuestionId(jobTestId, questionId);
 
-        AnswerEntity entity = AnswerMapper.toEntity(createAnswerCommandDTO, nextAttempt);
+        AnswerEntity entity;
+
+        if (existing.isPresent()) {
+            // 기존 답안 덮어쓰기 (update)
+            entity = existing.get();
+            entity.updateAnswerEntity(createAnswerCommandDTO, entity.getAttempt() + 1);
+        } else {
+            // 처음 시도라면
+            entity = AnswerMapper.toEntity(createAnswerCommandDTO, 1);
+        }
+
         AnswerEntity saved = answerRepository.save(entity);
-
         return AnswerMapper.toCreateDTO(saved);
     }
 

@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.jobtests.answer.command.domain.aggregate;
 
+import com.piveguyz.empickbackend.employment.jobtests.answer.command.application.dto.CreateAnswerCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.answer.command.application.dto.UpdateAnswerCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.answer.command.domain.aggregate.enums.CorrectType;
 import jakarta.persistence.*;
@@ -46,5 +47,10 @@ public class AnswerEntity {
     public void updateAnswerEntity(UpdateAnswerCommandDTO dto) {
         this.isCorrect = dto.getIsCorrect();
         this.score = dto.getScore();
+    }
+
+    public void updateAnswerEntity(CreateAnswerCommandDTO dto, int attempt) {
+        this.content = dto.getContent();
+        this.attempt = attempt;
     }
 }
