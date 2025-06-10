@@ -1,11 +1,9 @@
 SET foreign_key_checks = 0;
-
 DROP TABLE IF EXISTS `interview_sheet`;
 DROP TABLE IF EXISTS `interview_criteria`;
 DROP TABLE IF EXISTS `interview_sheet_item`;
 DROP TABLE IF EXISTS `interview`;
 DROP TABLE IF EXISTS `interview_score`;
-
 SET foreign_key_checks = 1;
 
 CREATE TABLE `interview_sheet` (
@@ -44,11 +42,13 @@ COMMENT = '평가 기준표별 평가 기준';
 
 CREATE TABLE `interview` (
      `id`	INT	NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
+     `application_id` INT NOT NULL COMMENT '지원서 id',
      `sheet_id`	INT	NOT NULL COMMENT '평가표 id',
-     `date`	DATETIME	NOT NULL COMMENT '날짜',
+     `datetime`	DATETIME	NOT NULL COMMENT '면접 일시',
      `address`	LONGTEXT	NOT NULL COMMENT '주소',
      `score`	DOUBLE	NULL COMMENT '점수',
      `interview_review`	LONGTEXT	NULL COMMENT '면접 평가',
+     FOREIGN KEY (`application_id`) REFERENCES `application`(`id`),
      FOREIGN KEY (`sheet_id`) REFERENCES `interview_sheet`(`id`)
 )
 COMMENT = '면접';
