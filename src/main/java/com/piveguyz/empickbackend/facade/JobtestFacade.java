@@ -21,7 +21,7 @@ public class JobtestFacade {
 
     // 실무테스트 채점
     public List<UpdateAnswerCommandDTO> gradeApplicationJobTest(int applicationJobTestId) {
-        List<AnswerEntity> answers = answerCommandService.findLatestAnswersByApplicationJobTestId(applicationJobTestId);
+        List<AnswerEntity> answers = answerCommandService.findByApplicationJobtestId(applicationJobTestId);
         List<UpdateAnswerCommandDTO> updateAnswers = new ArrayList<>();
 
         for (AnswerEntity answer : answers) {

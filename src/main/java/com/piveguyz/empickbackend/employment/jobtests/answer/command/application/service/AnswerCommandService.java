@@ -14,11 +14,11 @@ public interface AnswerCommandService {
 
     UpdateAnswerCommandDTO updateAnswerCommandDTO(int id, UpdateAnswerCommandDTO updateAnswerCommandDTO);
     UpdateAnswerCommandDTO updateAnswerEntity(AnswerEntity answer);
-    
+
     Integer deleteAnswer(int id);
 
     void autoGrade(AnswerEntity answer, QuestionEntity question);
     void descriptiveGrade(AnswerEntity answer, QuestionEntity question);
 
-    List<AnswerEntity> findLatestAnswersByApplicationJobTestId(int applicationJobTestId);
+    List<AnswerEntity> findByApplicationJobtestId(int applicationJobTestId);
 }

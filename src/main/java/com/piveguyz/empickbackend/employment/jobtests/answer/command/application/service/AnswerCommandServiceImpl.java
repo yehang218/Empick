@@ -120,7 +120,7 @@ public class AnswerCommandServiceImpl implements AnswerCommandService {
     }
 
     @Override
-    public List<AnswerEntity> findLatestAnswersByApplicationJobTestId(int applicationJobTestId) {
+    public List<AnswerEntity> findByApplicationJobtestId(int applicationJobTestId) {
         return List.of();
     }
 
