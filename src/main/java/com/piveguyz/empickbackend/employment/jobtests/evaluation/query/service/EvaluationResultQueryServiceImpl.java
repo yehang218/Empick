@@ -6,6 +6,8 @@ import com.piveguyz.empickbackend.employment.jobtests.evaluation.query.dto.JobTe
 import com.piveguyz.empickbackend.employment.jobtests.evaluation.query.mapper.EvaluationResultMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EvaluationResultQueryServiceImpl implements EvaluationResultQueryService {
 
@@ -16,8 +18,8 @@ public class EvaluationResultQueryServiceImpl implements EvaluationResultQuerySe
     }
 
     @Override
-    public JobTestEvaluationDetailDTO getEvaluationResultByApplicationId(int applicationId) {
-        JobTestEvaluationDetailDTO dto = evaluationResultMapper.findEvaluationByApplicationId(applicationId);
+    public List<JobTestEvaluationDetailDTO> getEvaluationResultByApplicationId(int applicationId) {
+        List<JobTestEvaluationDetailDTO> dto = evaluationResultMapper.findEvaluationByApplicationId(applicationId);
         if (dto == null) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_EVALUATION_RESULT);
         }

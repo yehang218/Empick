@@ -4,7 +4,9 @@ import com.piveguyz.empickbackend.employment.jobtests.evaluation.query.dto.JobTe
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface EvaluationResultMapper {
-    JobTestEvaluationDetailDTO findEvaluationByApplicationId(@Param("applicationId") int applicationId);
+    List<JobTestEvaluationDetailDTO> findEvaluationByApplicationId(@Param("applicationId") int applicationId);
 }
