@@ -8,7 +8,11 @@ import java.util.List;
 public interface MailCommandService {
     MailCommandDTO createMail(MailCommandDTO mailCommandDTO);
 
-    void sendSimpleMail(MailCommandDTO createdMailCommandDTO);
+    MailCommandDTO sendSimpleMail(MailCommandDTO createdMailCommandDTO);
 
-    void sendHTMLMail(MailCommandDTO createdMailCommandDTO);
+    MailCommandDTO sendHTMLMail(MailCommandDTO createdMailCommandDTO);
+
+    MailCommandDTO sendJobtestMail(Integer id);
+
+    MailCommandDTO sendInterviewMail(Integer id);
 }

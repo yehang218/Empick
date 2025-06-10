@@ -42,17 +42,24 @@ public class MailCommandController {
     @PostMapping("/create")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> createMail(@RequestBody MailCommandDTO mailCommandDTO) {
         MailCommandDTO createdDTO = mailCommandService.createMail(mailCommandDTO);       // DB에 메일 저장
-//        mailCommandService.sendSimpleMail(createdMailCommandDTO);     // 단순 메일 발송
-        mailCommandService.sendHTMLMail(mailCommandDTO);         // 더 복잡한 html 메일 발송
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, mailCommandDTO));
+                .body(CustomApiResponse.of(result, createdDTO));
     }
 
-    @PostMapping("/send/jobtest")
-    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendJobtestMail(@RequestBody MailCommandDTO dto) {
-        MailCommandDTO createdDTO = mailCommandService.createMail(dto);
-        MailCommandDTO sendedDTO = mailFacade.sendJobtestMail(createdDTO);
+    @PostMapping("/send")
+    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendMail(@RequestBody MailCommandDTO mailCommandDTO) {
+        MailCommandDTO sendedDTO = mailFacade.sendMail(mailCommandDTO);
+        MailCommandDTO createdDTO = mailCommandService.createMail(sendedDTO);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, createdDTO));
+
+    }
+
+    @PostMapping("/send/jobtest/{id}")
+    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendJobtestMail(@PathVariable("id") Integer id) {
+        MailCommandDTO sendedDTO = mailFacade.sendJobtestMail(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, sendedDTO));
@@ -60,9 +67,9 @@ public class MailCommandController {
 
     @PostMapping("/send/interview/{id}")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendInterviewMail(@PathVariable("id") Integer id) {
-        MailCommandDTO createdDTO = mailFacade.sendInterviewMail(id);
+        MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, createdDTO));
+                .body(CustomApiResponse.of(result, sendedDTO));
     }
 }

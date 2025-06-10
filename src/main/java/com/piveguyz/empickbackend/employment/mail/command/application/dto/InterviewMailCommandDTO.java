@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.mail.query.dto;
+package com.piveguyz.empickbackend.employment.mail.command.application.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class InterviewMailDTO {
+public class InterviewMailCommandDTO {
     private Integer id;     // 지원서 id
     private Integer recruitmentId;
     private String recruitmentTitle;

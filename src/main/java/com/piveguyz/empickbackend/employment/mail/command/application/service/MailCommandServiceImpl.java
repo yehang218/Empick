@@ -6,6 +6,9 @@ import com.piveguyz.empickbackend.employment.mail.command.application.dto.MailCo
 import com.piveguyz.empickbackend.employment.mail.command.application.mapper.MailCommandMapper;
 import com.piveguyz.empickbackend.employment.mail.command.domain.aggregate.MailEntity;
 import com.piveguyz.empickbackend.employment.mail.command.domain.repository.MailRepository;
+import com.piveguyz.empickbackend.employment.mail.query.dto.InterviewMailQueryDTO;
+import com.piveguyz.empickbackend.employment.mail.query.dto.JobTestMailQueryDTO;
+import com.piveguyz.empickbackend.employment.mail.query.mapper.MailMapper;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +25,9 @@ import org.thymeleaf.context.Context;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class MailCommandServiceImpl implements MailCommandService {
     private final MailCommandMapper mailCommandMapper;
     private final JavaMailSender javaMailSender;
     private final TemplateEngine templateEngine;
+    private final MailMapper mailMapper;
 
     @Override
     public MailCommandDTO createMail(MailCommandDTO dto) {
@@ -61,50 +65,164 @@ public class MailCommandServiceImpl implements MailCommandService {
     }
 
     @Async
-    public void sendSimpleMail(MailCommandDTO dto) {
+    public MailCommandDTO sendSimpleMail(MailCommandDTO dto) {
         String email = dto.getEmail();
+        if(!email.contains("@")) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_INADEQUATE_EMAIL);
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(dto.getEmail());
         message.setFrom("noreply@example.com");
         message.setSubject(dto.getTitle());
         message.setText(dto.getContent());
-
         javaMailSender.send(message);
+        return dto;
     }
 
     @Override
-    public void sendHTMLMail(MailCommandDTO createdMailCommandDTO) {
-        String email = createdMailCommandDTO.getEmail();
+    public MailCommandDTO sendHTMLMail(MailCommandDTO dto) {
+        String email = dto.getEmail();
+        if(!email.contains("@")) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_INADEQUATE_EMAIL);
+        }
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 //            mimeMessageHelper.setFrom("noreply@example.com");
-//            mimeMessageHelper.setTo(createdMailCommandDTO.getEmail());
-//            mimeMessageHelper.setSubject(createdMailCommandDTO.getTitle());
-//            mimeMessageHelper.setText(createdMailCommandDTO.getContent(), true);
+//            mimeMessageHelper.setTo(dto.getEmail());
+//            mimeMessageHelper.setSubject(dto.getTitle());
+//            mimeMessageHelper.setText(dto.getContent(), true);
 
             Context context = new Context();
-            context.setVariable("subject", createdMailCommandDTO.getTitle());
-            context.setVariable("message", createdMailCommandDTO.getContent());
-//            if (createdMailCommandDTO.getTarget().equals("user")) {
-//                context.setVariable("userType", "일반 사용자");
-//            } else if (createdMailCommandDTO.getTarget().equals("admin")) {
-//                context.setVariable("userType", "관리자");
-//            }
+            context.setVariable("subject", dto.getTitle());
+            context.setVariable("message", dto.getContent());
+            String base64Image = getBase64EncodedImage("static/images/empick-logo.png");
+            context.setVariable("logoImage", base64Image);
+            String htmlContent = templateEngine.process("email-template", context);
 
-            // MailSendServiceImpl.java 내부
+            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setSubject(dto.getTitle());
+            mimeMessageHelper.setText(htmlContent, true);
+            javaMailSender.send(mimeMessage);
+
+            MailCommandDTO sendedDTO = new MailCommandDTO();
+            sendedDTO.setEmail(email);
+            sendedDTO.setTitle(dto.getTitle());
+            sendedDTO.setContent(htmlContent);
+            sendedDTO.setSenderId(1);
+            sendedDTO.setSendedAt(LocalDateTime.now());
+            return sendedDTO;
+        } catch (MessagingException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public MailCommandDTO sendJobtestMail(Integer id) {
+        JobTestMailQueryDTO dto = mailMapper.findForJobTestMail(id);
+        Integer recruitmentId = dto.getRecruitmentId();
+        String recruitmentTitle = dto.getRecruitmentTitle();
+        Integer applicantId = dto.getApplicantId();
+        String applicantName = dto.getApplicantName();
+        String email = dto.getEmail();
+        Integer applicationJobTestId = dto.getApplicationJobTestId();
+        String entryCode = dto.getEntryCode();
+        Integer jobTestId = dto.getJobTestId();
+        String jobTestTitle = dto.getJobTestTitle();
+        Integer testTime = dto.getTestTime();
+        LocalDateTime startedAt = dto.getStartedAt();
+        LocalDateTime endedAt = dto.getEndedAt();
+        Integer problemCount = dto.getProblemCount();
+        if(applicantId == null) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICANT_NOT_FOUND);
+        }
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+
+            Context context = new Context();
+            context.setVariable("recruitmentTitle", recruitmentTitle);
+            context.setVariable("applicantName", applicantName);
+            context.setVariable("entryCode", entryCode);
+            context.setVariable("jobTestTitle", jobTestTitle);
+            context.setVariable("testTime", testTime);
+            context.setVariable("startedAt", startedAt);
+            context.setVariable("endedAt", endedAt);
+            context.setVariable("problemCount", problemCount);
+
             String base64Image = getBase64EncodedImage("static/images/empick-logo.png");
             context.setVariable("logoImage", base64Image);
 
-            String htmlContent = templateEngine.process("email-template", context);
-            mimeMessageHelper.setTo(email);
-            mimeMessageHelper.setSubject(createdMailCommandDTO.getTitle());
+            String htmlContent = templateEngine.process("jobtest-mail-template", context);
+            String title = "실무 테스트 일정 안내 메일";
+
+//            mimeMessageHelper.setTo(email);
+            mimeMessageHelper.setTo("tjalswhd1@naver.com");
+            mimeMessageHelper.setSubject(title);
+            mimeMessageHelper.setText(htmlContent, true);
+            javaMailSender.send(mimeMessage);
+
+            MailCommandDTO sendedDTO = new MailCommandDTO();
+            sendedDTO.setApplicantId(applicantId);
+            sendedDTO.setEmail(email);
+            sendedDTO.setTitle(title);
+            sendedDTO.setContent(htmlContent);
+            sendedDTO.setSenderId(1);
+            sendedDTO.setSendedAt(LocalDateTime.now());
+            return sendedDTO;
+        } catch (MessagingException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public MailCommandDTO sendInterviewMail(Integer applicationId) {
+        InterviewMailQueryDTO dto = mailMapper.findForInterviewMail(applicationId);
+        Integer recruitmentId = dto.getRecruitmentId();
+        String recruitmentTitle = dto.getRecruitmentTitle();
+        Integer applicantId = dto.getApplicantId();
+        String applicantName = dto.getApplicantName();
+//        String email = dto.getEmail();
+        String email = "tjalswhd1@naver.com";
+        Integer interviewId = dto.getInterviewId();
+        LocalDateTime interviewDateTime = dto.getInterviewDatetime();
+        String interviewAddress = dto.getInterviewAddress();
+        if(applicantId == null) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICANT_NOT_FOUND);
+        }
+        try {
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 (E) a h시 mm분")
+                    .withLocale(Locale.KOREAN);
+            String formattedDateTime = interviewDateTime.format(formatter);
+
+            Context context = new Context();
+            context.setVariable("recruitmentTitle", recruitmentTitle);
+            context.setVariable("applicantName", applicantName);
+            context.setVariable("interviewDateTimeFormatted", formattedDateTime);
+            context.setVariable("zoomUrl", interviewAddress);
+
+            String base64Image = getBase64EncodedImage("static/images/empick-logo.png");
+            context.setVariable("logoImage", base64Image);
+
+            String htmlContent = templateEngine.process("interview-mail-template", context);
+            String title = "면접 일정 안내 메일";
+
+//            mimeMessageHelper.setTo(email);   // 현재 DB상 이메일이라 확인 불가
+            mimeMessageHelper.setTo("tjalswhd1@naver.com"); // 확인을 위해 본인 이메일 사용
+            mimeMessageHelper.setSubject(title);
             mimeMessageHelper.setText(htmlContent, true);
             javaMailSender.send(mimeMessage);
             System.out.println("Thymeleaf 템플릿 이메일 전송 성공!");
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+
+            MailCommandDTO sendedDTO = new MailCommandDTO();
+            sendedDTO.setApplicantId(applicantId);
+            sendedDTO.setEmail(email);
+            sendedDTO.setTitle(title);
+            sendedDTO.setContent(htmlContent);
+            sendedDTO.setSenderId(1);
+            sendedDTO.setSendedAt(LocalDateTime.now());
+            return sendedDTO;
+        } catch (MessagingException | IOException e) {
             throw new RuntimeException(e);
         }
     }

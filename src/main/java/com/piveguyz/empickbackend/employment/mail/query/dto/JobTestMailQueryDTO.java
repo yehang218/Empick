@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class JobTestMailDTO {
+public class JobTestMailQueryDTO {
     private Integer id;     // 지원서 id
     private Integer recruitmentId;
     private String recruitmentTitle;
@@ -15,10 +15,11 @@ public class JobTestMailDTO {
     private String applicantName;
     private String email;
     private Integer applicationJobTestId;
-    private LocalDateTime startedAt;
-    private LocalDateTime endedAt;
     private String entryCode;
     private Integer jobTestId;
     private String jobTestTitle;
+    private Integer testTime;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
     private Integer problemCount;
 }
