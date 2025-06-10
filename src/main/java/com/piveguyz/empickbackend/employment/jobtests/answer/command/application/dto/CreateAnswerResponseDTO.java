@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 public class CreateAnswerResponseDTO {
     private String content;
-    private CorrectType isCorrect;
     private int attempt;
     private int applicationJobTestId;
     private int questionId;

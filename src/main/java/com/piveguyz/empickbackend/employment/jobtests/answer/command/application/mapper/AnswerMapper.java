@@ -13,7 +13,6 @@ public class AnswerMapper {
         return AnswerEntity.builder()
                 .content(dto.getContent())
                 .attempt(attempt)
-                .isCorrect(dto.getIsCorrect())
                 .applicationJobTestId(dto.getApplicationJobTestId())
                 .questionId(dto.getQuestionId())
                 .build();
@@ -22,7 +21,6 @@ public class AnswerMapper {
     public static CreateAnswerResponseDTO toCreateDTO(AnswerEntity entity) {
         return CreateAnswerResponseDTO.builder()
                 .content(entity.getContent())
-                .isCorrect(entity.getIsCorrect())
                 .attempt(entity.getAttempt())
                 .applicationJobTestId(entity.getApplicationJobTestId())
                 .questionId(entity.getQuestionId())
@@ -32,6 +30,7 @@ public class AnswerMapper {
     public static UpdateAnswerCommandDTO toUpdateDto(AnswerEntity entity) {
         return UpdateAnswerCommandDTO.builder()
                 .isCorrect(entity.getIsCorrect())
+                .score(entity.getScore())
                 .build();
     }
 }

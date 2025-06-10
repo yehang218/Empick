@@ -29,13 +29,22 @@ public class AnswerEntity {
     @Column(name = "is_correct", nullable = true)
     private CorrectType isCorrect;
 
+    @Column(name = "score", nullable = false)
+    private Double score;
+
     @Column(name = "application_job_test_id", nullable = false)
     private int applicationJobTestId;
 
     @Column(name = "question_id", nullable = false)
     private int questionId;
 
+    public void applyGradingResult(CorrectType correctType, double score) {
+        this.isCorrect = correctType;
+        this.score = score;
+    }
+
     public void updateAnswerEntity(UpdateAnswerCommandDTO dto) {
         this.isCorrect = dto.getIsCorrect();
+        this.score = dto.getScore();
     }
 }
