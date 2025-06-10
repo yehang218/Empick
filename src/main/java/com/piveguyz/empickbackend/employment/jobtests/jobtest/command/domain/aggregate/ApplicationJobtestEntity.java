@@ -27,10 +27,10 @@ public class ApplicationJobtestEntity {
     private LocalDateTime submittedAt;
 
     @Column(name = "grading_total_score", nullable = true)
-    private Integer gradingTotalScore;
+    private Double gradingTotalScore;
 
     @Column(name = "evaluation_score", nullable = true)
-    private Integer evaluationScore;
+    private Double evaluationScore;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "grading_status", nullable = false)

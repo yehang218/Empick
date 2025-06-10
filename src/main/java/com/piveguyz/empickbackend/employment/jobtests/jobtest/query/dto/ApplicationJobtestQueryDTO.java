@@ -11,8 +11,8 @@ public class ApplicationJobtestQueryDTO {
     private String recruitmentTitle;
     private String jobTestTitle;
     private JobtestStatus gradingStatus;
-    private Integer gradingTotalScore;
+    private Double gradingTotalScore;
     private JobtestStatus evaluationStatus;
-    private Integer evaluationScore;
+    private Double evaluationScore;
     private Integer applicationJobTestId;
 }
