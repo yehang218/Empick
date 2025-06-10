@@ -13,9 +13,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "실무 테스트 평가 결과 API", description = "실무테스트 평가 결과 등록, 수정, 삭제 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/evaluation-result")
+@RequestMapping("/api/v1/employment/evaluation-results")
 public class EvaluationResultCommandController {
     private final EvaluationResultCommandService evaluationResultCommandService;
 

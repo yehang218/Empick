@@ -14,9 +14,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "실무 테스트 문제 선택지 API", description = "실무테스트 문제 선택지 등록, 수정, 삭제 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/question-option")
+@RequestMapping("/api/v1/employment/question-options")
 public class QuestionOptionCommandController {
     private final QuestionOptionCommandService questionOptionCommandService;
 
@@ -28,8 +28,8 @@ public class QuestionOptionCommandController {
     @Operation(
             summary = "실무테스트 문제 선택지 등록",
             description = """
-                     실무 테스트 선택지를 등록합니다.
-                     실무 테스트 당 최대 5개까지 가능합니다.
+                     실무테스트 선택지를 등록합니다.
+                     실무테스트 당 최대 5개까지 가능합니다.
                     """
     )
     @ApiResponses(value = {
@@ -45,7 +45,7 @@ public class QuestionOptionCommandController {
     @Operation(
             summary = "실무테스트 문제 선택지 수정",
             description = """
-                     실무 테스트 선택지를 수정합니다.
+                     실무테스트 선택지를 수정합니다.
                     """
     )
     @ApiResponses(value = {
@@ -64,7 +64,7 @@ public class QuestionOptionCommandController {
     @Operation(
             summary = "실무테스트 문제 선택지 삭제",
             description = """
-                     실무 테스트 선택지를 삭제합니다.
+                     실무테스트 선택지를 삭제합니다.
                     """
     )
     @ApiResponses(value = {
