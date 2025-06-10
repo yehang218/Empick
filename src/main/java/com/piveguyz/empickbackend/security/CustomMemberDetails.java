@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.security;
 
-import com.piveguyz.empickbackend.member.command.domain.aggregate.MemberEntity;
+import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

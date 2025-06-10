@@ -2,8 +2,8 @@ package com.piveguyz.empickbackend.security;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.member.command.domain.aggregate.MemberEntity;
-import com.piveguyz.empickbackend.member.command.domain.repository.MemberRepository;
+import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEntity;
+import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
