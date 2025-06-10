@@ -38,8 +38,8 @@ CREATE TABLE application_job_test
     id                  INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
     evaluator_comment   LONGTEXT     NULL COMMENT '평가자 코멘트',
     submitted_at        DATETIME     NOT NULL COMMENT '제출 일시',
-    grading_total_score INT          NULL COMMENT '채점 총 점수',
-    evaluation_score    INT          NULL COMMENT '평가 점수',
+    grading_total_score DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '채점 총 점수',
+    evaluation_score    DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '평가 점수',
     grading_status      TINYINT      NOT NULL DEFAULT 0 COMMENT '채점 상태',
     evaluation_status   TINYINT      NOT NULL DEFAULT 0 COMMENT '평가 상태',
     entry_code          VARCHAR(255) NULL COMMENT '입장 코드',
@@ -105,6 +105,7 @@ CREATE TABLE answer
     content                 LONGTEXT NOT NULL,
     attempt                 INT      NOT NULL DEFAULT 1,
     is_correct              TINYINT  NULL,
+    score                   DOUBLE   NOT NULL DEFAULT 0.0,
     application_job_test_id INT      NOT NULL,
     question_id             INT      NOT NULL,
 
@@ -158,7 +159,7 @@ CREATE TABLE job_test_evaluation_result
 (
     id                              INT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
     evaluator_comment               LONGTEXT NULL,
-    score                           INT      NOT NULL,
+    score                           DOUBLE   NOT NULL DEFAULT 0.0,
     application_job_test_id         INT      NOT NULL,
     job_test_evaluation_criteria_id INT      NOT NULL,
 
