@@ -17,10 +17,13 @@ public class AuthFacade {
 
     public Integer getCurrentMemberId() {
         Authentication auth = getAuthentication();
-        CustomMemberDetails principal = (CustomMemberDetails) auth.getPrincipal();
-        return principal.getId();
+        Object principal = auth.getPrincipal();
+        if (principal instanceof CustomMemberDetails details) {
+            return details.getId();
+        } else {
+            throw new BusinessException(ResponseCode.REQUIRED_LOGIN);
+        }
     }
-
     public String getCurrentEmployeeNumber() {
         Authentication auth = getAuthentication();
         return auth.getName();

@@ -4,7 +4,7 @@ import com.piveguyz.empickbackend.auth.facade.AuthFacade;
 import com.piveguyz.empickbackend.common.constants.RoleCode;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.department.command.domain.repository.DepartmentRepository;
+import com.piveguyz.empickbackend.department.command.domain.repository.DeptRepository;
 import com.piveguyz.empickbackend.job.command.domain.repository.JobRepository;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberEditProposalCommandDTO;
 import com.piveguyz.empickbackend.member.command.application.dto.MemberEditRejectCommandDTO;
@@ -32,7 +32,7 @@ public class MemberEditProposalCommandServiceImpl implements MemberEditProposalC
     private final MemberEditProposalQueryMapper proposalQueryMapper;
     private final MemberRepository memberRepository;
 
-    private final DepartmentRepository departmentRepository;
+    private final DeptRepository departmentRepository;
     private final PositionRepository positionRepository;
     private final JobRepository jobRepository;
     private final RankRepository rankRepository;

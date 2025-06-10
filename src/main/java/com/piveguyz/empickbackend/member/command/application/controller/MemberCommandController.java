@@ -71,5 +71,26 @@ public class MemberCommandController {
         return ResponseEntity.status(ResponseCode.CREATED.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.CREATED, result));
     }
+
+    @PostMapping("/{memberId}/resign")
+    @Operation(
+            summary = "사원 퇴사 처리",
+            description = """
+            - 해당 사원을 퇴사 처리합니다.
+            - `resign_at`(퇴사일)을 현재 시간으로 업데이트하고, `status`를 비활성(0)으로 설정합니다.
+            """,
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "퇴사 처리 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_400_EXAMPLE))),
+            @ApiResponse(responseCode = "404", description = "회원 정보가 없음", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE)))
+    })
+    public ResponseEntity<CustomApiResponse<Void>> resignMember(
+            @PathVariable int memberId
+    ) {
+        memberCommandService.resignMember(memberId);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS));
+    }
 }
 

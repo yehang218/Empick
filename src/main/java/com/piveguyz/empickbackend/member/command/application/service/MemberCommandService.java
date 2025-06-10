@@ -9,4 +9,6 @@ public interface MemberCommandService {
     void updateProfileImage(int memberId, String key);
 
     void clearProfileImage(int memberId);
+
+    void resignMember(int memberId);
 }
