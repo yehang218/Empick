@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.employment.recruitmentTemplate.command.application.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -62,7 +63,7 @@ public class RecruitmentTemplateCommandController {
 		@ApiResponse(responseCode = "2010", description = "요청한 템플릿을 찾을 수 없습니다."),
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
 	})
-	@PutMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<CustomApiResponse<Void>> delete(@PathVariable int id) {
 		recruitmentTemplateCommandService.deleteTemplate(id);
 		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
