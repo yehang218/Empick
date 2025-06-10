@@ -29,7 +29,7 @@ public class InterviewerQueryServiceImpl implements InterviewerQueryService {
     public InterviewerQueryDTO findById(Integer id) {
         InterviewerQueryDTO dto = mapper.findById(id);
         if(dto == null) {
-            throw new BusinessException(ResponseCode.NOT_FOUND);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_NOT_FOUND);
         }
         return dto;
     }

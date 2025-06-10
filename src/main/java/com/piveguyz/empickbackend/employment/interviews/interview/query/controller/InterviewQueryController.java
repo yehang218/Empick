@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Tag(name="면접 Query API", description="면접 조회")
+@Tag(name="면접 API", description="면접 관리")
 @RestController
 @RequestMapping("api/v1/employment/interview")
 public class InterviewQueryController {

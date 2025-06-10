@@ -21,6 +21,11 @@ public class InterviewerCommandServiceImpl implements InterviewerCommandService 
 
     @Override
     public InterviewerCommandDTO createInterviewer(InterviewerCommandDTO dto) {
+        Integer interviewId = dto.getInterviewId();
+        Integer interviewerId = dto.getInterviewerId();
+        if(repository.existsByInterviewIdAndInterviewerId(interviewId, interviewerId)){
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_ALREADY_EXIST);
+        }
         InterviewerEntity entity = new InterviewerEntity();
         entity.setId(dto.getId());
         entity.setInterviewId(dto.getInterviewId());
@@ -34,7 +39,7 @@ public class InterviewerCommandServiceImpl implements InterviewerCommandService 
     @Override
     public InterviewerCommandDTO updateInterviewerReview(Integer id, String review) {
         InterviewerEntity entity = repository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResponseCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_NOT_FOUND));
         entity.setReview(review);
         InterviewerEntity savedEntity = repository.save(entity);
         return mapper.toDTO(savedEntity);
@@ -43,7 +48,7 @@ public class InterviewerCommandServiceImpl implements InterviewerCommandService 
     @Override
     public InterviewerCommandDTO deleteInterviewer(Integer id) {
         InterviewerEntity entity = repository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResponseCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_NOT_FOUND));
         repository.delete(entity);
         return mapper.toDTO(entity);
     }

@@ -63,7 +63,7 @@ public class InterviewFacade {
 
     public InterviewerCommandDTO updateInterviewerScore(Integer id) {
         InterviewerEntity entity = interviewerRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResponseCode.NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_NOT_FOUND));
         Double totalScore = (double) 0;
         List<InterviewScoreQueryDTO> dtoList = interviewScoreQueryService.findByInterviewerId(id);
         for(InterviewScoreQueryDTO scoreDTO : dtoList){
@@ -81,7 +81,7 @@ public class InterviewFacade {
     public InterviewerCommandDTO deleteInterviewer(Integer id) {
         List<InterviewScoreQueryDTO> dtoList = interviewScoreQueryService.findByInterviewerId(id);
         if(!dtoList.isEmpty()){
-            throw new BusinessException(ResponseCode.BAD_REQUEST);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_ALREADY_SCORE_INPUT);
         }
 //        for(InterviewScoreQueryDTO scoreDTO : dtoList){
 //            Integer scoreId = scoreDTO.getId();

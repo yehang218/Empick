@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "면접 담당자 Query API", description = "면접 담당자 조회")
+@Tag(name = "면접 담당자 API", description = "면접 담당자 관리")
 @RestController
 @RequestMapping("api/v1/employment/interviewer")
 @AllArgsConstructor
@@ -50,7 +50,7 @@ public class InterviewerQueryController {
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2500", description = "존재하지 않는 면접 기준입니다.")
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2561", description = "해당 면접 담당자가 존재하지 않습니다.")
     })
     @GetMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewerQueryDTO>> findById(@PathVariable("id") Integer id) {

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name="면접 평가표 Query API", description="면접 평가표 조회")
+@Tag(name="면접 평가표 API", description="면접 평가표 관리")
 @RestController
 @RequestMapping("api/v1/employment/interviewSheet")
 public class InterviewSheetQueryController {

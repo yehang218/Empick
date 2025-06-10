@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "면접 평가 기준 Command API", description = "면접 평가 기준 등록/수정/삭제")
+@Tag(name = "면접 평가 기준 API", description = "면접 평가 기준 관리")
 @RestController
 @RequestMapping("/api/v1/employment/interviewCriteria")
 public class InterviewCriteriaCommandController {

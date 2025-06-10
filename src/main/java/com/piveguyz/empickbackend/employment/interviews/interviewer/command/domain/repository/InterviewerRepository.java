@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InterviewerRepository extends JpaRepository<InterviewerEntity, Integer> {
 
+    boolean existsByInterviewIdAndInterviewerId(Integer interviewId, Integer interviewerId);
 }
