@@ -45,7 +45,7 @@
             score,
             interview_review
         FROM interview
-        WHERE `date` BETWEEN #{start} AND #{end}
+        WHERE `datetime` BETWEEN #{start} AND #{end}
     </select>
 
     <select id="checkAvailable" resultMap="InterviewResultMap">
@@ -56,7 +56,7 @@
                score,
                interview_review
         FROM interview
-        WHERE date BETWEEN #{start} AND #{end}
+        WHERE datetime BETWEEN #{start} AND #{end}
     </select>
 
 </mapper>

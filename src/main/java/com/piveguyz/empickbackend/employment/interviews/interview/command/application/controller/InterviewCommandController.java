@@ -74,7 +74,7 @@ public class InterviewCommandController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> delete(@PathVariable("id") Integer id) {
-        InterviewCommandDTO deletedDTO = service.delete(id);
+        InterviewCommandDTO deletedDTO = facade.deleteInterview(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, deletedDTO));
