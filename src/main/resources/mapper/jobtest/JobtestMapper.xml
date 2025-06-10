@@ -26,6 +26,8 @@
         <result property="title" column="job_test_title"/>
         <result property="difficulty" column="difficulty"/>
         <result property="testTime" column="test_time"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="endedAt" column="ended_at"/>
         <result property="creatorName" column="creator_name"/>
         <result property="updatedName" column="updated_name"/>
         <result property="createdAt" column="created_at"/>
@@ -54,6 +56,8 @@
         <result property="title" column="job_test_title"/>
         <result property="difficulty" column="difficulty"/>
         <result property="testTime" column="test_time"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="endedAt" column="ended_at"/>
         <result property="creatorName" column="creator_name"/>
         <result property="updatedName" column="updated_name"/>
         <result property="createdAt" column="created_at"/>
@@ -73,6 +77,8 @@
                jt.title AS job_test_title,
                jt.difficulty,
                jt.test_time,
+               jt.started_at,
+               jt.ended_at,
                cm.name  AS creator_name,
                um.name  AS updated_name,
                jt.created_at,
@@ -89,6 +95,8 @@
                jt.title            AS job_test_title,
                jt.difficulty,
                jt.test_time,
+               jt.started_at,
+               jt.ended_at,
                cm.name             AS creator_name,
                um.name             AS updated_name,
                jt.created_at,
