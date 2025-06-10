@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class RecruitmentTemplateCopyTemplateCopyCommandServiceImpl implements RecruitmentTemplateCopyCommandService {
+public class RecruitmentTemplateCopyCommandServiceImpl implements RecruitmentTemplateCopyCommandService {
 	private final RecruitmentTemplateItemRepository recruitmentTemplateItemRepository;
 	private final RecruitmentRepository recruitmentRepository;
 	private final RecruitmentTemplateCopyRepository recruitmentTemplateCopyRepository;
