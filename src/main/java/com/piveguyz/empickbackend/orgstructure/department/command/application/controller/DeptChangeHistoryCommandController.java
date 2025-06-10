@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("api/v1/dept-change-history")
-@Tag(name = "부서 이동 내역 API", description = "부서 이동 내역 생성, 조회 API")
+@Tag(name = "부서 API", description = "부서 이동 내역 생성, 조회 API")
 @RequiredArgsConstructor
 public class DeptChangeHistoryCommandController {
 

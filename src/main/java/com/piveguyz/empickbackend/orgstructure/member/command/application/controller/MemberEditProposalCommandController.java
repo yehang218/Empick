@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "사원 정보 수정 요청 API", description = "사원 정보 변경 요청 생성, 승인, 거절 API")
+@Tag(name = "사원 API", description = "사원 정보 변경 요청 생성, 승인, 거절 API")
 @RestController
 @RequestMapping("/api/v1/member/edit")
 @RequiredArgsConstructor
