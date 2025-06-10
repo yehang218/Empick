@@ -9,6 +9,7 @@ public class InterviewCommandMapper {
     public InterviewCommandDTO toDto(InterviewEntity entity){
         InterviewCommandDTO dto = new InterviewCommandDTO();
         dto.setId(entity.getId());
+        dto.setApplicationId(entity.getApplicationId());
         dto.setSheetId(entity.getSheetId());
         dto.setDatetime(entity.getDatetime());
         dto.setAddress(entity.getAddress());
@@ -20,6 +21,7 @@ public class InterviewCommandMapper {
     public InterviewEntity toEntity(InterviewCommandDTO dto){
         InterviewEntity entity = new InterviewEntity();
         entity.setId(dto.getId());
+        entity.setApplicationId(dto.getApplicationId());
         entity.setSheetId(dto.getSheetId());
         entity.setDatetime(dto.getDatetime());
         entity.setAddress(dto.getAddress());

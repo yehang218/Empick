@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class InterviewQueryDTO {
     private Integer id;
+    private Integer applicationId;
     private Integer sheetId;
     private LocalDateTime datetime;
     private String address;

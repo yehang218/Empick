@@ -11,9 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class InterviewScoreCommandDTO {
     private Integer id;
-    private Integer interviewId;
     private Integer interviewerId;
     private Integer itemId;
-    private Double score;
+    private Integer score;
     private String review;
 }

@@ -9,5 +9,5 @@ public interface InterviewScoreQueryService {
 
     InterviewScoreQueryDTO findById(Integer id);
 
-    List<InterviewScoreQueryDTO> findByInterviewId(Integer interviewId);
+    List<InterviewScoreQueryDTO> findByInterviewerId(Integer interviewerId);
 }

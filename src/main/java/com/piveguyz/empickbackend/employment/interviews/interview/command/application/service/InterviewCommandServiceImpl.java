@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,6 +22,7 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
     @Override
     public InterviewCommandDTO create(InterviewCommandDTO dto) {
         InterviewEntity entity = new InterviewEntity();
+        entity.setApplicationId(dto.getApplicationId());
         entity.setSheetId(dto.getSheetId());
         entity.setDatetime(dto.getDatetime());
         entity.setAddress(dto.getAddress());
@@ -38,6 +41,24 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
         entity.setAddress(dto.getAddress());
         entity.setScore(dto.getScore());
         entity.setInterviewReview(dto.getInterviewReview());
+        InterviewEntity updatedEntity = repository.save(entity);
+        return mapper.toDto(updatedEntity);
+    }
+
+    @Override
+    public InterviewCommandDTO updateDateTime(Integer id, LocalDateTime datetime) {
+        InterviewEntity entity = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_NOT_FOUND));
+        entity.setDatetime(datetime);
+        InterviewEntity updatedEntity = repository.save(entity);
+        return mapper.toDto(updatedEntity);
+    }
+
+    @Override
+    public InterviewCommandDTO updateAddress(Integer id, String address) {
+        InterviewEntity entity = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_NOT_FOUND));
+        entity.setAddress(address);
         InterviewEntity updatedEntity = repository.save(entity);
         return mapper.toDto(updatedEntity);
     }

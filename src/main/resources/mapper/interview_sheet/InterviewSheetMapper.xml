@@ -47,6 +47,4 @@
         AND name LIKE CONCAT('%', #{name}, '%');
     </select>
 
-
-
 </mapper>

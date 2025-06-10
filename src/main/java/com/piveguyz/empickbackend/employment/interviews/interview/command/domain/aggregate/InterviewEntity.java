@@ -20,6 +20,9 @@ public class InterviewEntity {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "application_id")
+    private Integer applicationId;
+
     @Column(name = "sheet_id")
     private Integer sheetId;
 

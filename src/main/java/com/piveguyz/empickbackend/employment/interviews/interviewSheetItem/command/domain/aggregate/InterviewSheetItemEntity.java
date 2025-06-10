@@ -27,7 +27,7 @@ public class InterviewSheetItemEntity {
     private Integer criteriaId;
 
     @Column(name = "weight")
-    private Integer weight;
+    private Double weight;
 
     @Column(name = "member_id")
     private Integer memberId;

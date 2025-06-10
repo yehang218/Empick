@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class InterviewCommandDTO {
     private Integer id;
+    private Integer applicationId;
     private Integer sheetId;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime datetime;

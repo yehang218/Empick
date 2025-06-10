@@ -3,10 +3,16 @@ package com.piveguyz.empickbackend.employment.interviews.interview.command.appli
 
 import com.piveguyz.empickbackend.employment.interviews.interview.command.application.dto.InterviewCommandDTO;
 
+import java.time.LocalDateTime;
+
 public interface InterviewCommandService {
     InterviewCommandDTO create(InterviewCommandDTO dto);
 
     InterviewCommandDTO update(Integer id, InterviewCommandDTO dto);
 
     InterviewCommandDTO delete(Integer id);
+
+    InterviewCommandDTO updateDateTime(Integer id, LocalDateTime datetime);
+
+    InterviewCommandDTO updateAddress(Integer id, String address);
 }

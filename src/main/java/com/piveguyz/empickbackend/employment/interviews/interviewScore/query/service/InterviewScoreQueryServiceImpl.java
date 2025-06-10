@@ -32,8 +32,8 @@ public class InterviewScoreQueryServiceImpl implements InterviewScoreQueryServic
     }
 
     @Override
-    public List<InterviewScoreQueryDTO> findByInterviewId(Integer interviewId) {
-        List<InterviewScoreQueryDTO> dtoList = interviewScoreMapper.findByInterviewId(interviewId);
+    public List<InterviewScoreQueryDTO> findByInterviewerId(Integer interviewerId) {
+        List<InterviewScoreQueryDTO> dtoList = interviewScoreMapper.findByInterviewerId(interviewerId);
         return dtoList;
     }
 }

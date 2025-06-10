@@ -19,13 +19,12 @@ public class InterviewScoreCommandServiceImpl implements InterviewScoreCommandSe
 
     @Override
     public InterviewScoreCommandDTO create(InterviewScoreCommandDTO dto) {
-        Integer interviewId = dto.getInterviewId();
         Integer interviewerId = dto.getInterviewerId();
         Integer itemId = dto.getItemId();
-        if(repository.existsByInterviewIdAndInterviewerIdAndItemId(interviewId, interviewerId, itemId)) {
+        if(repository.existsByInterviewerIdAndItemId(interviewerId, itemId)) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_SCORE_ALREADY_EXIST);
         }
-        Double score = dto.getScore();
+        Integer score = dto.getScore();
         if(score == null){
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE);
         }
@@ -34,7 +33,6 @@ public class InterviewScoreCommandServiceImpl implements InterviewScoreCommandSe
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_SCORE_NO_REVIEW);
         }
         InterviewScoreEntity entity = new InterviewScoreEntity();
-        entity.setInterviewId(dto.getInterviewId());
         entity.setInterviewerId(dto.getInterviewerId());
         entity.setItemId(dto.getItemId());
         entity.setScore(dto.getScore());
@@ -45,7 +43,7 @@ public class InterviewScoreCommandServiceImpl implements InterviewScoreCommandSe
 
     @Override
     public InterviewScoreCommandDTO update(Integer id, InterviewScoreCommandDTO dto) {
-        Double score = dto.getScore();
+        Integer score = dto.getScore();
         if(score == null){
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE);
         }

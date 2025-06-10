@@ -62,18 +62,18 @@ public class InterviewScoreQueryController {
     }
 
     @Operation(
-            summary = "면접 평가 점수 면접id로 조회",
+            summary = "면접 평가 점수 면접 담당자 id로 조회",
             description = """
-    - 면접id로 그 면접에서의 평가 점수를 조회합니다.
+    - 면접 담당자 id로 그 면접 담당자가 입력한 평가 점수를 조회합니다.
     """
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
     })
-    @GetMapping("/interview/{interviewId}")
-    public ResponseEntity<CustomApiResponse<List<InterviewScoreQueryDTO>>> findByInterviewId(@RequestParam("interviewId") Integer interviewId) {
-        List<InterviewScoreQueryDTO> dtoList = interviewScoreQueryService.findByInterviewId(interviewId);
+    @GetMapping("/interview/{interviewerId}")
+    public ResponseEntity<CustomApiResponse<List<InterviewScoreQueryDTO>>> findByInterviewerId(@PathVariable("interviewerId") Integer interviewerId) {
+        List<InterviewScoreQueryDTO> dtoList = interviewScoreQueryService.findByInterviewerId(interviewerId);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, dtoList));

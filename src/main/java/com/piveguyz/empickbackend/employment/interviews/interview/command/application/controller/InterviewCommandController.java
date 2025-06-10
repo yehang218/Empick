@@ -9,8 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @Tag(name="면접 Command API", description="면접 관리")
 @RestController
@@ -57,6 +60,26 @@ public class InterviewCommandController {
     public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> update(@PathVariable("id") Integer id,
                                                                          @RequestBody InterviewCommandDTO dto) {
         InterviewCommandDTO updatedDTO = service.update(id, dto);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, updatedDTO));
+    }
+
+    @PatchMapping("/{id}/datetime")
+    public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> updateDateTime(@PathVariable("id") Integer id,
+                                                                                 @RequestParam("datetime")
+                                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                                                                 LocalDateTime datetime){
+        InterviewCommandDTO updatedDTO = service.updateDateTime(id, datetime);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, updatedDTO));
+    }
+
+    @PatchMapping("/{id}/address")
+    public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> updateAddress(@PathVariable("id") Integer id,
+                                                                                @RequestParam("address") String address) {
+        InterviewCommandDTO updatedDTO = service.updateAddress(id, address);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, updatedDTO));

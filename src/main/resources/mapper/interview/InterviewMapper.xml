@@ -6,6 +6,7 @@
 <mapper namespace="com.piveguyz.empickbackend.employment.interviews.interview.query.mapper.InterviewMapper">
     <resultMap id="InterviewResultMap" type="com.piveguyz.empickbackend.employment.interviews.interview.query.dto.InterviewQueryDTO">
         <id column="id" property="id"/>
+        <result column="application_id" property="applicationId"/>
         <result column="sheet_id" property="sheetId"/>
         <result column="datetime" property="datetime"/>
         <result column="address" property="address"/>
@@ -16,29 +17,32 @@
     <select id="findAll" resultMap="InterviewResultMap">
         SELECT
             id,
-            sheet_id,
-            datetime,
-            address,
-            score,
-            interview_review
-        FROM interview;
-    </select>
-
-    <select id="findById" resultMap="InterviewResultMap">
-        SELECT
-            id,
+            application_id,
             sheet_id,
             datetime,
             address,
             score,
             interview_review
         FROM interview
-        WHERE id = #{id};
+    </select>
+
+    <select id="findById" resultMap="InterviewResultMap">
+        SELECT
+            id,
+            application_id,
+            sheet_id,
+            datetime,
+            address,
+            score,
+            interview_review
+        FROM interview
+        WHERE id = #{id}
     </select>
 
     <select id="findByDate" resultMap="InterviewResultMap">
         SELECT
             id,
+            application_id,
             sheet_id,
             datetime,
             address,
@@ -50,6 +54,7 @@
 
     <select id="checkAvailable" resultMap="InterviewResultMap">
         SELECT id,
+               application_id,
                sheet_id,
                datetime,
                address,
