@@ -63,7 +63,7 @@ public class S3Controller {
     }
 
     @Operation(summary = "파일 삭제", description = "S3에 저장된 파일을 삭제합니다.")
-    @DeleteMapping("/delete")
+    @DeleteMapping("")
     public ResponseEntity<Void> deleteFile(
             @Parameter(description = "삭제할 S3 key", example = "docs/1/report.pdf")
             @RequestParam String key) {

@@ -8,6 +8,7 @@ import com.piveguyz.empickbackend.orgstructure.department.command.domain.reposit
 import com.piveguyz.empickbackend.orgstructure.job.command.domain.repository.JobRepository;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberEditProposalCommandDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberEditRejectCommandDTO;
+import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.ProposalStatusUpdateDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEditProposalEntity;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEntity;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.enums.MemberEditStatus;
@@ -165,6 +166,49 @@ public class MemberEditProposalCommandServiceImpl implements MemberEditProposalC
 
         // 5️⃣ 거절 처리
         proposal.reject(reviewerId, dto.getRejectReason());
+    }
+
+    @Override
+    @Transactional
+    public void updateEditProposalStatus(Integer memberId, Integer proposalId, ProposalStatusUpdateDTO statusUpdateDTO) {
+        // 1️⃣ 권한 확인
+        authFacade.checkHasRole(RoleCode.ROLE_HR_ACCESS);
+
+        // 2️⃣ 요청 조회
+        MemberEditProposalEntity proposal = memberEditProposalRepository.findById(proposalId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EDIT_PROPOSAL_NOT_FOUND));
+
+        // 🔍 memberId와 proposal의 memberId가 일치하는지 검증(추가 보안)
+        if (!proposal.getMemberId().equals(memberId)) {
+            throw new BusinessException(ResponseCode.EDIT_PROPOSAL_MEMBER_MISMATCH);
+        }
+
+        // 3️⃣ 처리자(로그인 사용자) 가져오기
+        Integer reviewerId = authFacade.getCurrentMemberId();
+
+        // 4️⃣ 공통 검증
+        validateProposalCanBeProcessed(proposal, reviewerId);
+
+        // 5️⃣ 상태 값 확인 및 처리
+        MemberEditStatus newStatus;
+        try {
+            newStatus = MemberEditStatus.valueOf(statusUpdateDTO.getStatus().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ResponseCode.INVALID_STATUS_VALUE);
+        }
+
+        switch (newStatus) {
+            case APPROVED -> {
+                applyFieldChange(proposal);
+                proposal.approve(reviewerId);
+            }
+            case REJECTED -> {
+                // 거절 사유를 따로 받지 않으므로, 기본 사유 적용 (또는 DTO 확장 가능)
+                String rejectReason = "담당자에 의해 거절됨";
+                proposal.reject(reviewerId, rejectReason);
+            }
+            default -> throw new BusinessException(ResponseCode.INVALID_STATUS_VALUE);
+        }
     }
 
 }
