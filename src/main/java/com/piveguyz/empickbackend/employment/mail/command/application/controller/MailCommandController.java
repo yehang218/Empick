@@ -6,6 +6,7 @@ import com.piveguyz.empickbackend.employment.mail.command.application.dto.MailCo
 import com.piveguyz.empickbackend.employment.mail.command.application.service.MailCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "안내 메일 API", description = "안내 메일 관리")
 @RestController
-@RequestMapping("api/v1/employment/mail")
+@RequestMapping("/api/v1/employment/mail")
 public class MailCommandController {
     private final MailCommandService mailCommandService;
 

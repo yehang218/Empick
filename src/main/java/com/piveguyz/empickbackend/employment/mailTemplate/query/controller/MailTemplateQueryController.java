@@ -6,6 +6,7 @@ import com.piveguyz.empickbackend.employment.mailTemplate.query.dto.MailTemplate
 import com.piveguyz.empickbackend.employment.mailTemplate.query.service.MailTemplateQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "안내 메일 템플릿 API", description = "안내 메일 템플릿 관리")
 @RestController
 @RequestMapping("/api/v1/employment/mailTemplate")
 public class MailTemplateQueryController {
