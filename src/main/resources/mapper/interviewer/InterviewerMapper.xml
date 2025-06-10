@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.interviews.interviewer.query.mapper.InterviewerMapper">
+    <resultMap id="InterviewerResultMap" type="com.piveguyz.empickbackend.employment.interviews.interviewer.query.dto.InterviewerQueryDTO">
+        <id column="id" property="id"/>
+        <result column="interview_id" property="interviewId"/>
+        <result column="interviewer_id" property="interviewerId"/>
+        <result column="score" property="score"/>
+        <result column="review" property="review"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="InterviewerResultMap">
+        SELECT
+            id,
+            interview_id,
+            interviewer_id,
+            score,
+            review
+        FROM interviewer
+    </select>
+
+    <select id="findByInterviewId" resultMap="InterviewerResultMap">
+        SELECT
+            id,
+            interview_id,
+            interviewer_id,
+            score,
+            review
+        FROM interviewer
+        WHERE interview_id = #{interviewId}
+    </select>
+
+
+
+</mapper>

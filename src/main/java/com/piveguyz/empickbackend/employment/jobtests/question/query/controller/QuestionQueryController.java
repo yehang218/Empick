@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "실무 테스트 문제 API", description = "실무테스트 문제 조회 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/question")
+@RequestMapping("/api/v1/employment/questions")
 public class QuestionQueryController {
 
     private final QuestionQueryService questionQueryService;
@@ -30,9 +30,9 @@ public class QuestionQueryController {
 
     // 전체 실무 테스트 문제 조회
     @Operation(
-            summary = "전체 실무 테스트 문제 조회",
+            summary = "전체 실무테스트 문제 조회",
             description = """
-                     전체 실무 테스트 문제를 조회합니다.
+                     전체 실무테스트 문제를 조회합니다.
                     """
     )
     @GetMapping
@@ -43,9 +43,9 @@ public class QuestionQueryController {
     }
 
     @Operation(
-            summary = "실무 테스트 문제 상세 조회",
+            summary = "실무테스트 문제 상세 조회",
             description = """
-                     id에 해당하는 실무 테스트 문제의 정보를 조회합니다.
+                     id에 해당하는 실무테스트 문제의 정보를 조회합니다.
                     """
     )
     @ApiResponses(value = {

@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "지원서별 실무테스트 조회 API", description = "지원서별 실무테스트 조회 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/jobtest/application-jobtest")
+@RequestMapping("/api/v1/employment/application-jobtests")
 public class ApplicationJobtestQueryController {
 
     private final ApplicationJobtestQueryService applicationJobtestQueryService;
@@ -29,7 +29,7 @@ public class ApplicationJobtestQueryController {
                     지원서별 실무테스트 전체 목록을 조회합니다.
                     """
     )
-    @GetMapping("/list")
+    @GetMapping
     public ResponseEntity<CustomApiResponse<List<ApplicationJobtestQueryDTO>>> getApplicationJobtestList() {
         List<ApplicationJobtestQueryDTO> applicationJobtestList = applicationJobtestQueryService.getAllApplicationJobTests();
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
