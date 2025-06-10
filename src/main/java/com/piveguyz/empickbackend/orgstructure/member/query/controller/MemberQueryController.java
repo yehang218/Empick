@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "사원 API", description = "사원 등록 및 관리 API")
+@Tag(name = "사원 API", description = "사원 조회 API")
 @RestController
 @RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
@@ -58,7 +58,7 @@ public class MemberQueryController {
             @ApiResponse(responseCode = "200", description = "사원 조회 성공", content = @Content(schema = @Schema(implementation = MemberResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "사원 정보를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE)))
     })
-    @GetMapping("/search/name")
+    @GetMapping("/name")
     public ResponseEntity<CustomApiResponse<List<MemberResponseDTO>>> getMembersByName(
             @RequestParam("name") String name) {
         List<MemberResponseDTO> members = memberQueryService.getMembersByName(name);
@@ -70,7 +70,7 @@ public class MemberQueryController {
             @ApiResponse(responseCode = "200", description = "사원 조회 성공", content = @Content(schema = @Schema(implementation = MemberResponseDTO.class))),
             @ApiResponse(responseCode = "404", description = "사원 정보를 찾을 수 없음", content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE)))
     })
-    @GetMapping("/search/employeeNumber")
+    @GetMapping("/employeeNumber")
     public ResponseEntity<CustomApiResponse<List<MemberResponseDTO>>> getMembersByEmployeeNumber(
             @RequestParam("employeeNumber") int employeeNumber) {
         List<MemberResponseDTO> members = memberQueryService.getMembersByEmployeeNumber(employeeNumber);
