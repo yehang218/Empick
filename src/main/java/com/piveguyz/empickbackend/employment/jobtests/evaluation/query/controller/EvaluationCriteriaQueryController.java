@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "실무 테스트 평가 기준 API", description = "실무테스트 문제 평가 기준 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/evaluation-criteria")
+@RequestMapping("/api/v1/employment")
 public class EvaluationCriteriaQueryController {
     private final EvaluationCriteriaQueryService evaluationCriteriaQueryService;
 
@@ -34,7 +34,7 @@ public class EvaluationCriteriaQueryController {
     )
     @ApiResponses(value = {
     })
-    @GetMapping("/{jobtestId}")
+    @GetMapping("/jobtests/{jobtestId}/evaluation-criteria")
     public ResponseEntity<CustomApiResponse<List<EvaluationCriteriaQueryDTO>>> getEvaluationCriteriaByJobtestId(@PathVariable int jobtestId) {
         List<EvaluationCriteriaQueryDTO> evaluationCriteriaList = evaluationCriteriaQueryService.getEvaluationCriteriaByJobtestId(jobtestId);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
@@ -49,7 +49,7 @@ public class EvaluationCriteriaQueryController {
     )
     @ApiResponses(value = {
     })
-    @GetMapping("/criteria/{id}")
+    @GetMapping("/evaluation-criteria/{id}")
     public ResponseEntity<CustomApiResponse<EvaluationCriteriaQueryDTO>> getEvaluationCriteriaById(@PathVariable int id) {
         EvaluationCriteriaQueryDTO evaluationCriteriaQueryDTO = evaluationCriteriaQueryService.getEvaluationCriteriaById(id);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
