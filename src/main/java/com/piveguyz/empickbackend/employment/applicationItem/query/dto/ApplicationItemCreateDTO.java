@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ApplicationItemCreateDTO {
 	private int applicationItemCategoryId;
-	private boolean isRequired;
+	private Boolean isRequired;
 }

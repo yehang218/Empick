@@ -13,6 +13,8 @@ public class JobtestApplicationsDTO {
     private String title;
     private int difficulty;
     private int testTime;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
     private String creatorName;
     private String updatedName;
     private LocalDateTime createdAt;
@@ -20,5 +22,5 @@ public class JobtestApplicationsDTO {
 
     private List<JobtestQuestionQueryDTO> questions;
     private List<JobtestEvaluationCriteriaQueryDTO> evaluationCriteria;
-    private List<ApplicationJobtestQueryDTO> applications;  // 지원자 요약 목록
+    private List<ApplicationInfoDTO> applications;  // 지원자 요약 목록
 }

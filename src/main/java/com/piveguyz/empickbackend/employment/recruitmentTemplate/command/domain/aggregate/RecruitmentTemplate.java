@@ -36,7 +36,7 @@ public class RecruitmentTemplate {
 
 	@Column(name = "is_deleted", nullable = false)
 	@Convert(converter = YnBooleanConverter.class)
-	private boolean isDeleted;
+	private Boolean isDeleted;
 
 	@Column(name = "member_id")
 	private int memberId;

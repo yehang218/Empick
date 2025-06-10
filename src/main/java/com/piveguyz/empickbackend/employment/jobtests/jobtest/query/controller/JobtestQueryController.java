@@ -2,7 +2,6 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationJobtestQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestApplicationsDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionListQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.service.JobtestQueryService;
