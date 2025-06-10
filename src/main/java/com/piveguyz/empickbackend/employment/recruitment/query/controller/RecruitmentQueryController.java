@@ -19,7 +19,7 @@ import java.util.List;
 @Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment")
+@RequestMapping("/api/v1/employment/recruitments")
 public class RecruitmentQueryController {
 
 	private final RecruitmentQueryService recruitmentQueryService;

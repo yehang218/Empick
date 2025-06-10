@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "지원서 API", description = "지원서 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/application/item")
+@RequestMapping("/api/v1/employment/applications/items")
 public class ApplicationItemQueryController {
 	private final ApplicationItemQueryService applicationItemQueryService;
 

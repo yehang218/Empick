@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController("QueryRecruitmentController")
-@RequestMapping("api/v1/employment/recruitment/request")
+@RequestMapping("api/v1/employment/recruitments/requests")
 @RequiredArgsConstructor
 public class RecruitmentRequestQueryController {
 	private final RecruitmentRequestQueryService recruitmentRequestQueryService;

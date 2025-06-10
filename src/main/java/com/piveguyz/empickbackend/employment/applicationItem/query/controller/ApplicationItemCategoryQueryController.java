@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "지원서 API", description = "지원서 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/application/item/category")
+@RequestMapping("/api/v1/employment/applications/item-categories")
 public class ApplicationItemCategoryQueryController {
 	private final ApplicationItemCategoryQueryService applicationItemCategoryQueryService;
 

@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment/template")
+@RequestMapping("/api/v1/employment/recruitments/templates")
 public class RecruitmentTemplateCommandController {
 	private final RecruitmentTemplateCommandService recruitmentTemplateCommandService;
 
