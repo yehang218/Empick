@@ -17,4 +17,9 @@ public class ApplicantBookmarkQueryServiceImp implements ApplicantBookmarkQueryS
     public List<ApplicantBookmarkQueryDTO> findAllApplicantBookmark() {
         return applicantBookmarkMapper.findAllApplicantBookmark();
     }
+
+    @Override
+    public List<ApplicantBookmarkQueryDTO> findApplicantBookmarkByMemberId(int memberId) {
+        return applicantBookmarkMapper.findApplicantBookmarkByMemberId(memberId);
+    }
 }
