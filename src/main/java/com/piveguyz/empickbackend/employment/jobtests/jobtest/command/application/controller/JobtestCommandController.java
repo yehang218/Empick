@@ -12,9 +12,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "실무 테스트 Command API", description = "실무테스트 등록, 수정, 삭제 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest")
+@RequestMapping("/api/v1/employment/jobtests")
 public class JobtestCommandController {
     private final JobtestCommandService jobtestCommandService;
 
@@ -26,7 +26,7 @@ public class JobtestCommandController {
     @Operation(
             summary = "실무테스트 등록",
             description = """
-                     실무 테스트를 등록합니다.
+                     실무테스트를 등록합니다.
                     - difficulty : EASY / MEDIUM / HARD
                     """
     )

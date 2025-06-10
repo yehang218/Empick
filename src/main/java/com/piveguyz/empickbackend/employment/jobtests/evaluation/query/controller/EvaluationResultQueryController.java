@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "실무 테스트 평가 결과 Query API", description = "실무테스트 평가 결과 조회 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/evaluation-result")
+@RequestMapping("/api/v1/employment/applications")
 public class EvaluationResultQueryController {
 
     private final EvaluationResultQueryService evaluationResultQueryService;
@@ -34,7 +34,7 @@ public class EvaluationResultQueryController {
     )
     @ApiResponses(value = {
     })
-    @GetMapping("/{applicationId}")
+    @GetMapping("/{applicationId}/evaluation-results")
     public ResponseEntity<CustomApiResponse<JobTestEvaluationDetailDTO>> getEvaluationResultByApplicationId(
             @PathVariable int applicationId) {
         JobTestEvaluationDetailDTO evaluationResultDTO = evaluationResultQueryService.getEvaluationResultByApplicationId(applicationId);
