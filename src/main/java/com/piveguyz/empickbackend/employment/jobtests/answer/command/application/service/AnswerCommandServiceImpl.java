@@ -18,6 +18,7 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.agg
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.ApplicationJobtestRepository;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.JobtestQuestionRepository;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionEntity;
+import com.piveguyz.empickbackend.facade.JobtestFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -121,9 +122,8 @@ public class AnswerCommandServiceImpl implements AnswerCommandService {
 
     @Override
     public List<AnswerEntity> findByApplicationJobtestId(int applicationJobTestId) {
-        return List.of();
+        return answerRepository.findByApplicationJobTestId(applicationJobTestId);
     }
-
 
     // 실무테스트에 등록된 문제 점수 가져오기
     public int resolveScore(int applicationJobtestId, int questionId) {

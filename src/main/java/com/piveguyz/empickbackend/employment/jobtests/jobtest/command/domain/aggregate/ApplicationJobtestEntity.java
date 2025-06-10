@@ -80,4 +80,9 @@ public class ApplicationJobtestEntity {
         }
 
     }
+
+    public void completeGrading(Double totalScore) {
+        this.gradingTotalScore = totalScore;
+        this.gradingStatus = JobtestStatus.COMPLETED;
+    }
 }

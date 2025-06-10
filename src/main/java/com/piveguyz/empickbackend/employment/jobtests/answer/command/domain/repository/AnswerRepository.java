@@ -11,8 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface AnswerRepository extends JpaRepository<AnswerEntity, Integer> {
-    @Query("SELECT MAX(a.attempt) FROM AnswerEntity a WHERE a.applicationJobTestId = :jobTestId AND a.questionId = :questionId")
-    Integer findMaxAttempt(@Param("jobTestId") int jobTestId, @Param("questionId") int questionId);
-
     Optional<AnswerEntity> findByApplicationJobTestIdAndQuestionId(int applicationJobTestId, int questionId);
+
+    List<AnswerEntity> findByApplicationJobTestId(int applicationJobTestId);
 }

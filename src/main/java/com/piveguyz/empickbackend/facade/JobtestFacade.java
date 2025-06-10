@@ -5,6 +5,9 @@ import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.jobtests.answer.command.application.dto.UpdateAnswerCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.answer.command.application.service.AnswerCommandService;
 import com.piveguyz.empickbackend.employment.jobtests.answer.command.domain.aggregate.AnswerEntity;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.ApplicationJobtestCommandService;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.ApplicationJobtestRepository;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.ApplicationJobtestRepository;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.service.QuestionCommandService;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionEntity;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +21,13 @@ import java.util.List;
 public class JobtestFacade {
     private final AnswerCommandService answerCommandService;
     private final QuestionCommandService questionCommandService;
+    private final ApplicationJobtestCommandService applicationJobtestCommandService;
 
     // 실무테스트 채점
     public List<UpdateAnswerCommandDTO> gradeApplicationJobTest(int applicationJobTestId) {
         List<AnswerEntity> answers = answerCommandService.findByApplicationJobtestId(applicationJobTestId);
         List<UpdateAnswerCommandDTO> updateAnswers = new ArrayList<>();
+        double totalScore = 0.0;
 
         for (AnswerEntity answer : answers) {
             QuestionEntity question = questionCommandService.findById(answer.getQuestionId())
@@ -40,7 +45,12 @@ public class JobtestFacade {
                     throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION_TYPE);
             }
             updateAnswers.add(answerCommandService.updateAnswerEntity(answer));
+            totalScore += answer.getScore();
         }
+
+        // 지원서별 실무테스트 상태, 채점 총 점수 자동 변경
+        applicationJobtestCommandService.updateGradingStatusAndScore(applicationJobTestId, totalScore);
+
         return updateAnswers;
     }
 }
