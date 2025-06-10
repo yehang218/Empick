@@ -60,6 +60,8 @@ public class GlobalExceptionHandler {
                         .body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_QUESTION_TYPE));
             } else if ("difficulty".equals(field)) {
                 return ResponseEntity.status(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_DIFFICULTY));
+            } else if("gradingStatus".equals(field) || "evaluationStatus".equals(field)) {
+                return ResponseEntity.status(ResponseCode.EMPLOYMENT_INVALID_JOBTEST_STATUS.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.EMPLOYMENT_INVALID_JOBTEST_STATUS));
             }
         }
 
