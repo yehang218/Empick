@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Counter", description = "증가, 감소, 카운트값")
+@Tag(name = "카운터 예제 API ", description = "증가, 감소, 카운트값")
 @RestController
 @RequestMapping("/api/counter")
 @RequiredArgsConstructor
