@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 @Tag(name="면접 API", description="면접 관리")
 @RestController
-@RequestMapping("api/v1/employment/interview")
+@RequestMapping("/api/v1/employment/interview")
 public class InterviewCommandController {
     private final InterviewCommandService service;
     private final InterviewFacade facade;
