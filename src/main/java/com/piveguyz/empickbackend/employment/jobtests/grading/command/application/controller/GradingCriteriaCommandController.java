@@ -12,9 +12,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "실무 테스트 문제 채점 기준 API", description = "실무테스트 문제 채점 기준 등록, 수정, 삭제 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/grading-criteria")
+@RequestMapping("/api/v1/employment/grading-criteria")
 public class GradingCriteriaCommandController {
     private final GradingCriteriaCommandService gradingCriteriaCommandService;
 
@@ -27,7 +27,7 @@ public class GradingCriteriaCommandController {
     @Operation(
             summary = "실무테스트 문제 채점 기준 등록",
             description = """
-                     실무 테스트 채점 기준을 등록합니다.
+                     실무테스트 채점 기준을 등록합니다.
                     """
     )
     @ApiResponses(value = {
@@ -47,7 +47,7 @@ public class GradingCriteriaCommandController {
     @Operation(
             summary = "실무테스트 문제 채점 기준 수정",
             description = """
-                     실무 테스트 채점 기준을 수정합니다.
+                     실무테스트 채점 기준을 수정합니다.
                     """
     )
     @ApiResponses(value = {
@@ -67,7 +67,7 @@ public class GradingCriteriaCommandController {
     @Operation(
             summary = "실무테스트 문제 채점 기준 삭제",
             description = """
-                     실무 테스트 채점 기준을 삭제합니다.
+                     실무테스트 채점 기준을 삭제합니다.
                     """
     )
     @ApiResponses(value = {

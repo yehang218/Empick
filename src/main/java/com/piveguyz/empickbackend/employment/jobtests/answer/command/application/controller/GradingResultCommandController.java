@@ -12,9 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "실무테스트 답안 채점 결과 API", description = "실무테스트 답안 채점 결과 등록, 수정, 삭제 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/grading-results")
+@RequestMapping("/api/v1/employment/grading-results")
 public class GradingResultCommandController {
     private final GradingResultCommandService gradingResultCommandService;
 

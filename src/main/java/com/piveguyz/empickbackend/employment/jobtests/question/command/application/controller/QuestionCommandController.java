@@ -13,9 +13,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "실무 테스트 문제 API", description = "실무테스트 문제 등록, 수정, 삭제 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/question")
+@RequestMapping("/api/v1/employment/questions")
 public class QuestionCommandController {
     private final QuestionCommandService questionCommandService;
 
@@ -49,7 +49,7 @@ public class QuestionCommandController {
     @Operation(
             summary = "실무테스트 문제 수정",
             description = """
-                     실무 테스트 문제를 수정합니다.
+                     실무테스트 문제를 수정합니다.
                      - updatedMemberId는 필수로 있어야 함
                     """
     )
@@ -70,7 +70,7 @@ public class QuestionCommandController {
     @Operation(
             summary = "실무테스트 문제 삭제",
             description = """
-                     실무 테스트 문제를 삭제합니다.
+                     실무테스트 문제를 삭제합니다.
                     """
     )
     @ApiResponses(value = {

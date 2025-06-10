@@ -13,9 +13,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "실무테스트 지원서별 답변 API", description = "실무테스트 지원서별 답변 등록, 수정, 삭제 API")
+@Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtest/answer")
+@RequestMapping("/api/v1/employment/answers")
 public class AnswerCommandController {
     private final AnswerCommandService answerCommandService;
 
