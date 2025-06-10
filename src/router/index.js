@@ -2,11 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
     {
-        path: '/test/list',
-        name: 'ListView',
-        component: () => import('@/components/common/ListView.vue')
-    },
-    {
         path: '/',
         name: 'MainPage',
         component: () => import('@/views/MainPage.vue')
@@ -14,17 +9,14 @@ const routes = [
     {
         path: '/counter',
         name: 'CounterPage',
-        component: () => import('@/views/CounterPage.vue')
+        component: () => import('@/views/test/CounterPage.vue')
     },
     {
-
-        path: '/employment/jobtests',
-        name: 'EmploymentJobtests',
-        component: () => import('../views/employment/JobtestPage.vue'),
-        props: true
+        path: '/test/list-view-test-page',
+        name: 'ListViewTestPage',
+        component: () => import('@/views/test/ListViewTestPage.vue')
     },
-  
-      // 서민종 - 컴포넌트 테스트 페이지용 주소
+    // 서민종 - 컴포넌트 테스트 페이지용 주소
     {
         path: '/test/mj',
         name: 'MJTestMainPage',
@@ -49,9 +41,19 @@ const routes = [
         component: () => import('../views/test/MJEvaluationScoreTestPage.vue'),
     },
     {
+        path: '/test/list',
+        name: 'ListView',
+        component: () => import('@/components/common/ListView.vue')
+    },
+    {
         path: '/test/mj/mailReceiverList',
         name: 'MJMailReceiverListTestPage',
         component: () => import('../views/test/MJMailReceiverListTestPage.vue'),
+    },
+    {
+        path: '/test/mj/messageInputBox',
+        name: 'MJMessageInputBoxTestPage',
+        component: () => import('../views/test/MJMessageInputBoxTestPage.vue'),
     },
     {
         path: '/test/mj/oneColumnList',
@@ -60,6 +62,12 @@ const routes = [
     },
     {
 
+        path: '/counter',
+        name: 'CounterPage',
+        component: () => import('@/views/test/CounterPage.vue')
+    },
+
+    {
         path: '/employment/recruitment',
         name: 'RecruitmentPage',
         component: () => import('@/views/employment/RecruitmentPage.vue')
@@ -67,7 +75,13 @@ const routes = [
     {
         path: '/WSPage',
         name: 'WSPage',
-        component: () => import('@/views/WSPage.vue')
+        component: () => import('@/views/test/WSPage.vue')
+    },
+    {
+        path: '/employment/jobtests',
+        name: 'EmploymentJobtests',
+        component: () => import('@/views/test/EvaluationTestPage.vue'),
+        props: true
     },
 ];
 

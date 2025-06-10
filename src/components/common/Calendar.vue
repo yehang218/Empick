@@ -41,19 +41,17 @@
             <v-col
               v-for="(day, dIdx) in week"
               :key="dIdx"
-              class="text-center"
+              class="text-center pa-0"
               style="flex-basis: 14.28%; max-width: 14.28%;"
             >
               <v-btn
                 v-if="day"
-                :color="selectedDay === day ? 'primary' : 'default'"
+                :color="selectedDay === day ? 'primary' : undefined"
                 @click="selectDay(day)"
-                class="ma-1"
-                variant="outlined"
-                size="small"
+                class="calendar-day-btn"
                 :style="{ color: dIdx === 0 ? 'red' : dIdx === 6 ? 'blue' : '' }"
               >
-                {{ day }}
+              {{ day }}
               </v-btn>
             </v-col>
           </v-row>
@@ -158,6 +156,23 @@ const nextMonth = () => {
   display: flex;
   flex-grow: 1;
   height: auto;
+}
+
+.calendar-day-btn {
+  min-width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  box-shadow: none;
+  border: none;
+  background-color: #f5f5f5;
+  color: black;
+  font-weight: 500;
+  padding: 0;
+  margin: 2px; /* 버튼 사이 간격 축소 */
+}
+
+.calendar-day-btn:hover {
+  background-color: #e0e0e0;
 }
 
 .weekday-row,

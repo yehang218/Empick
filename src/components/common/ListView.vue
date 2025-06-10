@@ -1,40 +1,42 @@
+<!-- src/components/DynamicTable.vue -->
 <template>
     <v-container>
         <v-table class="mt-5">
             <thead>
                 <tr>
-                    <th>이름</th>
-                    <th>사번</th>
-                    <th>이메일</th>
-                    <th>연락처</th>
-                    <th>부서</th>
-                    <th>처리상태</th>
-                    <th></th>
+                    <th v-for="header in headers" :key="header.key">
+                        {{ header.label }}
+                    </th>
+                    <th></th> <!-- optional: actions column -->
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(user, index) in users" :key="index">
-                    <td class="d-flex align-center">
-                        <v-avatar class="me-2" size="32">
-                            <v-img :src="user.avatar" />
-                        </v-avatar>
-                        <div>
-                            <div>{{ user.name }}</div>
-                            <div class="text-caption grey--text">{{ user.position }}</div>
-                        </div>
-                    </td>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.phone }}</td>
-                    <td>
-                        <div>{{ user.department }}</div>
-                        <div class="text-caption grey--text">{{ user.departmentPosition }}</div>
-                    </td>
-                    <td>
-                        <v-chip :color="user.status === '처리완료' ? 'green lighten-4' : 'red lighten-4'"
-                            :text-color="user.status === '처리완료' ? 'green darken-2' : 'red darken-2'" small>
-                            {{ user.status }}
-                        </v-chip>
+                <tr v-for="(item, index) in data" :key="index">
+                    <td v-for="header in headers" :key="header.key">
+                        <template v-if="header.key === 'avatarName' && item.avatar && item.name">
+                            <div class="d-flex align-center">
+                                <v-avatar class="me-2" size="32">
+                                    <v-img :src="item.avatar" />
+                                </v-avatar>
+                                <div>
+                                    <div>{{ item.name }}</div>
+                                    <div class="text-caption grey--text">{{ item.position }}</div>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else-if="header.key === 'department' && item.department">
+                            <div>{{ item.department }}</div>
+                            <div class="text-caption grey--text">{{ item.departmentPosition }}</div>
+                        </template>
+                        <template v-else-if="header.key === 'status' && item.status">
+                            <v-chip :color="item.status === '처리완료' ? 'green lighten-4' : 'red lighten-4'"
+                                :text-color="item.status === '처리완료' ? 'green darken-2' : 'red darken-2'" small>
+                                {{ item.status }}
+                            </v-chip>
+                        </template>
+                        <template v-else>
+                            {{ item[header.key] }}
+                        </template>
                     </td>
                     <td>
                         <v-icon>mdi-arrow-right</v-icon>
@@ -47,55 +49,17 @@
 
 <script>
 export default {
-    data() {
-        return {
-            users: [
-                {
-                    name: 'Brooklyn Simmons',
-                    position: '대리',
-                    id: '87364523',
-                    email: 'brooklyns@mail.com',
-                    phone: '(603) 555-0123',
-                    department: '인사',
-                    departmentPosition: '팀장',
-                    status: '처리완료',
-                    avatar: 'https://cdn.vuetifyjs.com/images/john.jpg'
-                },
-                {
-                    name: 'Kristin Watson',
-                    position: '사원',
-                    id: '93874563',
-                    email: 'kristinw@mail.com',
-                    phone: '(219) 555-0114',
-                    department: '백엔드/개발',
-                    departmentPosition: 'PM',
-                    status: '미처리',
-                    avatar: 'https://cdn.vuetifyjs.com/images/john.jpg'
-                },
-                {
-                    name: 'Jacob Jones',
-                    position: '사원',
-                    id: '23847569',
-                    email: 'jacobj@mail.com',
-                    phone: '(319) 555-0115',
-                    department: '회계',
-                    departmentPosition: '미지정',
-                    status: '처리완료',
-                    avatar: 'https://cdn.vuetifyjs.com/images/john.jpg'
-                },
-                {
-                    name: 'Cody Fisher',
-                    position: '주임',
-                    id: '39485632',
-                    email: 'codyf@mail.com',
-                    phone: '(229) 555-0109',
-                    department: '인사',
-                    departmentPosition: '미지정',
-                    status: '처리완료',
-                    avatar: 'https://cdn.vuetifyjs.com/images/john.jpg'
-                },
-                // 다른 항목들도 동일하게 추가 가능
-            ]
+    name: 'DynamicTable',
+    props: {
+        headers: {
+            type: Array,
+            required: true,
+            default: () => []
+        },
+        data: {
+            type: Array,
+            required: true,
+            default: () => []
         }
     }
 }
@@ -104,9 +68,67 @@ export default {
 <style scoped>
 th {
     font-weight: bold;
+    color: #9A9A9A;
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 14px;
 }
 
 td {
     vertical-align: middle;
+    padding: 16px;
+    font-size: 14px;
+    color: #333333;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+.v-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tr:hover {
+    background-color: #F9F9F9;
+}
+
+.v-avatar {
+    margin-right: 12px;
+}
+
+.text-caption {
+    font-size: 12px;
+    color: #9A9A9A;
+    margin-top: 4px;
+}
+
+.v-chip {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+thead th {
+    background-color: #F8F8F8;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.v-icon {
+    cursor: pointer;
+    color: #9A9A9A;
+}
+
+tbody tr td:last-child {
+    text-align: right;
+    padding-right: 24px;
+}
+
+tbody tr td:first-child {
+    display: flex;
+    align-items: center;
+}
+
+tbody tr td {
+    height: 56px;
 }
 </style>
