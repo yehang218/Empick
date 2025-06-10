@@ -13,9 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IntroduceTemplateQueryDTO {
-    private Long id;
+    private int id;
     private String title;
-    private Long memberId;
-    private Long introduceTemplateItemId;
-
+    private int memberId;
+    private int introduceTemplateItemId;
 }

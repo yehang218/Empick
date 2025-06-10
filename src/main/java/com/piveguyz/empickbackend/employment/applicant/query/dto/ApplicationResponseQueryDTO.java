@@ -7,7 +7,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ApplicationResponseQueryDTO {
-
     @Schema(description = "응답 ID")
     private int id;
 
@@ -20,3 +19,4 @@ public class ApplicationResponseQueryDTO {
     @Schema(description = "응답 내용")
     private String content;
 }
+

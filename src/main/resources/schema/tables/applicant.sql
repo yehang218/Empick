@@ -50,6 +50,7 @@ CREATE TABLE applicant_bookmark
 (
     member_id INT NOT NULL COMMENT '사용자 ID',
     applicant_id INT NOT NULL COMMENT '지원자 ID',
+    PRIMARY KEY (member_id, applicant_id),
     FOREIGN KEY (member_id) REFERENCES member(id),
     FOREIGN KEY (applicant_id) REFERENCES applicant(id)
 )
