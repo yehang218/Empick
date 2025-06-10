@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/files")
-@Tag(name = "S3 파일 관리", description = "S3 파일 업로드, 다운로드, 삭제 API")
+@Tag(name = "S3 API", description = "S3 파일 업로드, 다운로드, 삭제 API")
 public class S3Controller {
 
     private final S3Service s3Service;
