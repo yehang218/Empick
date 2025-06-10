@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,5 +37,21 @@ public class ApplicantBookmarkQueryController {
     public ResponseEntity<CustomApiResponse<List<ApplicantBookmarkQueryDTO>>> getAllApplicantBookmark() {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, applicantBookmarkQueryService.findAllApplicantBookmark()));
+    }
+
+    @Operation(summary = "북마크 지원자 상세 조회", description = "북마크 지원자 중 한명을 상세조회합니다.")
+
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
+    })
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<CustomApiResponse<List<ApplicantBookmarkQueryDTO>>> getApplicantBookmarkByMemberId(
+            @PathVariable("memberId") int memberId) {
+                List<ApplicantBookmarkQueryDTO> result = applicantBookmarkQueryService.findApplicantBookmarkByMemberId(memberId);
+                return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                    .body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
     }
 }

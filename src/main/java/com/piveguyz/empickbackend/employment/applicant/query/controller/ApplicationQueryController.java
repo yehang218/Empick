@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.applicant.query.controller;
 
+
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQueryDTO;
