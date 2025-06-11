@@ -19,17 +19,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "지원서 항목 조회 API", description = "지원서 항목 조회")
+@Tag(name = "지원서 API", description = "지원서 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/application/item")
+@RequestMapping("/api/v1/employment/applications/items")
 public class ApplicationItemQueryController {
 	private final ApplicationItemQueryService applicationItemQueryService;
 
 	@Operation(
 		summary = "채용공고별 지원서 항목 조회",
 		description = """
-        해당 채용공고에 연결된 지원서 양식 항목 목록을 조회합니다.
+        해당 채용공고에 연결된 지원서 항목 목록을 조회합니다.
         """
 	)
 	@ApiResponses(value = {

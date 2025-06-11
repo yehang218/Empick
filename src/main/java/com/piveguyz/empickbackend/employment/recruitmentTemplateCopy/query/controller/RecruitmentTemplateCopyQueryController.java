@@ -19,15 +19,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "채용 템플릿 복사본 조회 API", description = "채용공고에 복사된 템플릿 항목 조회")
+@Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment/template/copy")
+@RequestMapping("/api/v1/employment/recruitments/template-copy")
 public class RecruitmentTemplateCopyQueryController {
 
 	private final RecruitmentTemplateCopyQueryService recruitmentTemplateCopyQueryService;
 
-	@Operation(summary = "채용 템플릿 복사본 조회", description = "채용공고 ID로 복사된 템플릿 항목들을 조회합니다.")
+	@Operation(summary = "채용 공고 템플릿 복사본 조회", description = "채용공고 ID로 복사된 템플릿 항목들을 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
 		@ApiResponse(responseCode = "2071", description = "채용 템플릿 복사본이 존재하지 않습니다."),
