@@ -33,5 +33,23 @@ public class ApplicationCommandServiceImp implements ApplicationCommandService {
         dto.setId(saved.getId()); // 응답용 id 설정
         return dto;
     }
+
+    @Override
+    public ApplicationCommandDTO updated(ApplicationCommandDTO dto) {
+        // 1. 해당 ID의 지원서가 존재하는지 확인
+        ApplicationEntity entity = applicationRepository.findById(dto.getId())
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_NOT_FOUND));
+
+        // 2. status만 업데이트
+        entity.setStatus(dto.getStatus());
+
+        // 3. 저장
+        ApplicationEntity updated = applicationRepository.save(entity);
+
+        // 4. entity → dto 변환 후 반환
+        return ApplicationCommandMapper.toDTO(updated);
+    }
+
+
 }
 

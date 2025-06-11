@@ -12,12 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "지원서 API", description = "지원서 등록 API")
+@Tag(name = "지원서 API", description = "지원서관련 API")
 @RestController
 @RequestMapping("/api/v1/employment/application")
 @RequiredArgsConstructor
@@ -35,7 +32,7 @@ public class ApplicationCommandController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "지원서 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "요청 값 오류"),
+            @ApiResponse(responseCode = "400", description = "바보"),//""요청 값 오류"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PostMapping
@@ -46,5 +43,23 @@ public class ApplicationCommandController {
         return ResponseEntity
                 .status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, response));
+    }
+
+    @PatchMapping("/{id}")
+    @Operation(summary = "지원서 상태 변경", description = "지원서Id에 해당하는 상태를 변경한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "상태 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "지원서 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    public ResponseEntity<CustomApiResponse<ApplicationCommandDTO>> updateApplicationStatus(
+            @PathVariable Integer id,
+            @RequestBody ApplicationCommandDTO dto){
+
+        dto.setId(id);
+        ApplicationCommandDTO updated = applicationCommandService.updated(dto);
+        return ResponseEntity
+                .status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, updated));
     }
 }

@@ -25,4 +25,6 @@ public class ApplicationCommandMapper {
         dto.setApplicantId(entity.getApplicantId());
         return dto;
     }
+
+
 }

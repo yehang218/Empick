@@ -18,7 +18,7 @@ public class ApplicationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(name = "recruitment_id", nullable = false)
     private int recruitmentId;
@@ -33,6 +33,6 @@ public class ApplicationEntity {
     private LocalDateTime createdAt;
 
     @Column(name = "introduce_rating_result_id")
-    private int introduceRatingResultId;
+    private Integer introduceRatingResultId;
 
 }

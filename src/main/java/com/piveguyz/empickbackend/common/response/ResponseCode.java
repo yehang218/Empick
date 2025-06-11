@@ -119,6 +119,7 @@ public enum ResponseCode {
     APPLICATION_RESPONSE_DUPLICATE(false, HttpStatus.CONFLICT, 2103, "이미 등록된 응답입니다."),
     APPLICATION_RESPONSE_EMPTY_CONTENT(false, HttpStatus.BAD_REQUEST, 2104, "응답 내용은 비워둘 수 없습니다."),
     EMPLOYMENT_APPLICATION_DUPLICATE_APPLICATION(false, HttpStatus.CONFLICT, 2105, "이미 해당 공고에 지원한 이력이 있습니다."),
+    EMPLOYMENT_APPLICATION_NOT_FOUND(false,HttpStatus.NOT_FOUND, 2106, "지원서를 찾을 수 없습니다."),
 
 
     //  지원서 - 2200 ~ 2299

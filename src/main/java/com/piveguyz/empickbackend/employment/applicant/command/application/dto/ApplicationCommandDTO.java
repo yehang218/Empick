@@ -10,9 +10,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApplicationCommandDTO {
-    private int id;
+    private Integer id;
     private int recruitmentId;
     private int applicantId;
     private int status;
-    private int introduceRatingResultId;
+    private Integer introduceRatingResultId;
 }
