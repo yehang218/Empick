@@ -4,79 +4,78 @@ import { useToast } from 'vue-toastification';
 
 const toast = useToast();
 
+const ERROR_MESSAGES = {
+    UNKNOWN: '알 수 없는 오류가 발생했습니다.',
+    NETWORK: '서버와의 통신에 실패했습니다.',
+    EMPTY_DATA: '데이터가 존재하지 않습니다.',
+};
+
 /**
  * API 에러를 처리하는 공통 핸들러
- * @param {Error} error - 발생한 에러 객체
- * @param {Object} options - 추가 옵션
- * @param {boolean} options.showToast - 토스트 메시지 표시 여부 (기본값: true)
- * @param {boolean} options.redirect - 리다이렉트 처리 여부 (기본값: true)
- * @returns {void}
  */
 export const handleApiError = (error, options = { showToast: true, redirect: true }) => {
     const { showToast = true, redirect = true } = options;
 
-    if (error.response) {
-        // 백엔드에서 반환한 에러 응답 처리
-        const apiResponse = ApiResponseDTO.fromJSON(error.response.data);
+    let apiResponse;
+    try {
+        apiResponse = ApiResponseDTO.fromJSON(error.response?.data || {});
+    } catch (_) {
+        apiResponse = new ApiResponseDTO(false, 'UNKNOWN', ERROR_MESSAGES.UNKNOWN, null);
+    }
 
-        // 에러 로깅
-                console.error('API Error:', {
-            code: apiResponse.code,
-            message: apiResponse.message,
-            status: error.response.status,
-            path: error.config?.url
-        });
+    console.error('API Error:', {
+        status: error.response?.status,
+        path: error.config?.url,
+        code: apiResponse.code,
+        message: apiResponse.message,
+    });
 
-        // HTTP 상태 코드에 따른 특별 처리
-        if (redirect) {
-            switch (error.response.status) {
-                case 401:
-                    // 인증 에러 - 로그인 페이지로 리다이렉트
-                    router.push('/login');
-                    break;
-                case 403:
-                    // 권한 없음 - 접근 거부 페이지로 리다이렉트
-                    router.push('/access-denied');
-                    break;
-                case 404:
-                    // 리소스 없음 - 404 페이지로 리다이렉트
-                    router.push('/not-found');
-                    break;
-                // 필요한 경우 다른 상태 코드에 대한 처리 추가
-            }
+    if (redirect && error.response) {
+        switch (error.response.status) {
+            case 401:
+                import('@/stores/authStore').then(({ useAuthStore }) => useAuthStore().logout());
+                router.push('/login');
+                break;
+            case 403:
+                router.push('/access-denied');      // 🚩 TODO : 권한이 필요하다고 뜨는 페이지
+                break;
+            case 404:
+                router.push('/not-found');          // 🚩 TODO : 404 페이지
+                break;
         }
+    }
 
-        // 토스트 메시지 표시
-        if (showToast) {
-            toast.error(apiResponse.message);
-        }
-
-    } else if (error.request) {
-        // 네트워크 오류 처리
-        console.error('Network Error:', error.request);
-        if (showToast) {
-            toast.error('서버와의 통신에 실패했습니다.');
-        }
-    } else {
-        // 기타 에러 처리
-        console.error('Error:', error.message);
-        if (showToast) {
-            toast.error('알 수 없는 오류가 발생했습니다.');
-        }
+    if (showToast) {
+        toast.error(apiResponse.message);
     }
 };
 
 /**
- * API 에러를 처리하고 결과를 반환하는 래퍼 함수
- * @param {Function} apiCall - API 호출 함수
- * @param {Object} options - 에러 처리 옵션
- * @returns {Promise<any>} API 호출 결과
+ * try-catch 없이 API 호출을 감싸는 공통 유틸
+ * 각 서비스에서 호출해서 사용
  */
 export const withErrorHandling = async (apiCall, options = {}) => {
     try {
         return await apiCall();
     } catch (error) {
         handleApiError(error, options);
-        throw error; // 에러를 다시 throw하여 호출자가 처리할 수 있도록 함
+        throw error;
     }
-}; 
+};
+
+/**
+ * 사용자 정의 에러를 API 응답 형식으로 강제 throw
+ */
+export const throwCustomApiError = (code, message, status = 400) => {
+    const error = new Error(message);
+    error.response = {
+        status,
+        data: {
+            success: false,
+            code,
+            message,
+            data: null,
+        }
+    };
+    throw error;
+};
