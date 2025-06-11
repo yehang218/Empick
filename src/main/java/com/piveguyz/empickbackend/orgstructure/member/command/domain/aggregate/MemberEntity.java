@@ -52,7 +52,7 @@ public class MemberEntity {
     @Column(name = "vacation_count", nullable = false)
     private int vacationCount;
 
-    @Column(name = "hire_at", nullable = false)
+    @Column(name = "hire_at", insertable = false)
     private LocalDateTime hireAt;
 
     @Column(name = "resign_at")
