@@ -115,6 +115,7 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
     EMPLOYMENT_APPLICANT_DUPLICATE_EMAIL(false, HttpStatus.CONFLICT, 2101, "이미 등록된 이메일입니다."),
     EMPLOYMENT_APPLICANT_DUPLICATE_PHONE(false, HttpStatus.CONFLICT, 2102, "이미 등록된 연락처입니다."),
+    EMPLOYMENT_APPLICATION_DUPLICATE_APPLICATION(false, HttpStatus.CONFLICT, 2105, "이미 해당 공고에 지원한 이력이 있습니다."),
 
 
     //  지원서 - 2200 ~ 2299
