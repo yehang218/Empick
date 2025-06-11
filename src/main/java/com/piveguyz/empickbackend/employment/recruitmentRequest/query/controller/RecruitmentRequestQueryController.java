@@ -20,9 +20,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "채용 요청서 조회 API", description = "채용 요청서 목록 및 상세 조회")
+@Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController("QueryRecruitmentController")
-@RequestMapping("api/v1/employment/recruitment/request")
+@RequestMapping("api/v1/employment/recruitments/requests")
 @RequiredArgsConstructor
 public class RecruitmentRequestQueryController {
 	private final RecruitmentRequestQueryService recruitmentRequestQueryService;
@@ -44,12 +44,7 @@ public class RecruitmentRequestQueryController {
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
 	}
 
-	@Operation(
-		summary = "채용 요청서 상세 조회",
-		description = """
-			- 특정 채용 요청서를 ID로 조회합니다.
-		"""
-	)
+	@Operation(summary = "채용 요청서 상세 조회", description = "특정 채용 요청서를 ID로 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
 		@ApiResponse(responseCode = "2000", description = "채용 요청서를 찾을 수 없습니다."),

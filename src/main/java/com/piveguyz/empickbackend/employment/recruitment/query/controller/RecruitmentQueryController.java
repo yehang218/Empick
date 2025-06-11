@@ -16,15 +16,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "채용 공고 조회 API", description = "채용 공고 목록 조회 및 상세 조회")
+@Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment")
+@RequestMapping("/api/v1/employment/recruitments")
 public class RecruitmentQueryController {
 
 	private final RecruitmentQueryService recruitmentQueryService;
 
-	@Operation(summary = "채용 공고 목록 조회", description = "- 등록된 채용 공고 목록을 조회합니다.")
+	@Operation(summary = "채용 공고 목록 조회", description = "등록된 채용 공고 목록을 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
 		@ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
@@ -38,7 +38,7 @@ public class RecruitmentQueryController {
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
 	}
 
-	@Operation(summary = "채용 공고 상세 조회", description = "- 특정 채용 공고의 상세 정보를 조회합니다.")
+	@Operation(summary = "채용 공고 상세 조회", description = "특정 채용 공고의 상세 정보를 조회합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
 		@ApiResponse(responseCode = "2030", description = "요청한 채용 공고를 찾을 수 없습니다."),

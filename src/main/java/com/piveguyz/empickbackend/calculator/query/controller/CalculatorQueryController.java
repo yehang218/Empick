@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Calculator", description = "덧샘, 뺄샘")
+@Tag(name = "계산기 예제 API ", description = "덧샘, 뺄샘")
 @RestController
 @RequestMapping("/api/calculator")
 @RequiredArgsConstructor

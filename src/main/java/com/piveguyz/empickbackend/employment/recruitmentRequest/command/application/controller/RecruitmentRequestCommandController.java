@@ -17,10 +17,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "채용 요청서 등록 API", description = "채용 요청서 등록")
+@Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController("RecruitmentRequestCommandController")
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment/request")
+@RequestMapping("/api/v1/employment/recruitments/requests")
 public class RecruitmentRequestCommandController {
 
 	private final RecruitmentRequestCommandService recruitmentRequestCommandService;
@@ -28,8 +28,9 @@ public class RecruitmentRequestCommandController {
 	@Operation(
 		summary = "채용 요청서 등록",
 		description = """
-                    - 채용 요청서를 등록합니다.
-                    - 부서 ID, 인원 수, 기간, 직무 요건 등을 포함해야 합니다.
+                    채용 요청서를 등록합니다.
+                    
+                    부서 ID, 인원 수, 기간, 직무 요건 등을 포함해야 합니다.
                     """
 	)
 	@ApiResponses(value = {

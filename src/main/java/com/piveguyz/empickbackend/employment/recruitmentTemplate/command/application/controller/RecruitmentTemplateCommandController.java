@@ -20,10 +20,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "채용 공고 템플릿 커맨드 API", description = "채용 공고 템플릿 등록/수정/삭제")
+@Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment/template")
+@RequestMapping("/api/v1/employment/recruitments/templates")
 public class RecruitmentTemplateCommandController {
 	private final RecruitmentTemplateCommandService recruitmentTemplateCommandService;
 

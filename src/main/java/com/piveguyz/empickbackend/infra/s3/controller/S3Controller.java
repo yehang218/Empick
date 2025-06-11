@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/files")
-@Tag(name = "S3 파일 관리", description = "S3 파일 업로드, 다운로드, 삭제 API")
+@Tag(name = "S3 API", description = "S3 파일 업로드, 다운로드, 삭제 API")
 public class S3Controller {
 
     private final S3Service s3Service;
@@ -63,7 +63,7 @@ public class S3Controller {
     }
 
     @Operation(summary = "파일 삭제", description = "S3에 저장된 파일을 삭제합니다.")
-    @DeleteMapping("/delete")
+    @DeleteMapping("")
     public ResponseEntity<Void> deleteFile(
             @Parameter(description = "삭제할 S3 key", example = "docs/1/report.pdf")
             @RequestParam String key) {
