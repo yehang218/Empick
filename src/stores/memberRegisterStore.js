@@ -65,6 +65,31 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             this.profileImageUrl = ''
             this.form.pictureUrl = ''
         },
+        resetForm() {
+            this.form = {
+                password: '',
+                name: '',
+                birth: '',
+                phone: '',
+                pictureUrl: '',
+                email: '',
+                address: '',
+                vacationCount: 0,
+                hireAt: '',
+                resignAt: '',
+                deletedMemberId: 0,
+                updatedMemberId: 0,
+                lastLoginAt: '',
+                status: 0,
+                departmentId: null,
+                positionId: null,
+                jobId: null,
+                rankId: null,
+            }
+            this.employeeNumber = ''
+            this.profileImageFile = null
+            this.profileImageUrl = ''
+        },
         showAlert(msg) {
             this.alertMessage = msg
             this.alertVisible = true
@@ -111,6 +136,7 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                         this.showAlert('프로필 이미지 업로드에 실패했습니다.')
                     }
                 }
+                this.resetForm()
                 // TODO: 등록 후 이동/초기화 등 처리
                 return true
             } catch (err) {
