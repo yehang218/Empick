@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 public class MemberSignUpRequestDTO {
 
-    @NotBlank
     private String password;
 
     @NotBlank
