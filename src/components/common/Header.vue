@@ -55,9 +55,6 @@
                 </div>
             </v-container>
         </div>
-
-        <!-- 본문 -->
-        <v-main class="main-content"></v-main>
     </v-app>
 </template>
 
@@ -192,6 +189,5 @@ function goTo(path) {
 .main-content {
     background-color: white;
     min-height: 100vh;
-    padding-top: 140px;
 }
 </style>

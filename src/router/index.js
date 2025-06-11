@@ -86,11 +86,25 @@ const routes = [
         name: 'CounterPage',
         component: () => import('@/views/test/CounterPage.vue')
     },
-
+    // 채용공고 관련 페이지
     {
-        path: '/employment/recruitment',
+        path: '/employment/recruitments',
         name: 'RecruitmentPage',
         component: () => import('@/views/employment/RecruitmentPage.vue')
+    },
+    {
+        path: '/employment/recruitments/requests',
+        name: 'RecruitmentRequestList',
+        component: () => import('@/views/employment/RecruitmentRequestListPage.vue')
+    },
+    {
+        path: '/employment/recruitments/requests/:id',
+        name: 'RecruitmentRequestDetail',
+        component: () => import('@/views/employment/RecruitmentRequestDetailPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: '/WSPage',
