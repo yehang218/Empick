@@ -27,11 +27,6 @@ const routes = [
         }
     },
     {
-        path: '/counter',
-        name: 'CounterPage',
-        component: () => import('@/views/test/CounterPage.vue')
-    },
-    {
         path: '/test/list-view-test-page',
         name: 'ListViewTestPage',
         component: () => import('@/views/test/ListViewTestPage.vue')
@@ -80,13 +75,6 @@ const routes = [
         name: 'MJOneColumnListTestPage',
         component: () => import('../views/test/MJOneColumnListTestPage.vue'),
     },
-    {
-
-        path: '/counter',
-        name: 'CounterPage',
-        component: () => import('@/views/test/CounterPage.vue')
-    },
-
     {
         path: '/employment/recruitment',
         name: 'RecruitmentPage',
