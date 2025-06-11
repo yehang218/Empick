@@ -145,8 +145,12 @@ public class MailCommandServiceImpl implements MailCommandService {
             context.setVariable("entryCode", entryCode);
             context.setVariable("jobTestTitle", jobTestTitle);
             context.setVariable("testTime", testTime);
-            context.setVariable("startedAt", startedAt);
-            context.setVariable("endedAt", endedAt);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 (E) a h시 mm분")
+                    .withLocale(Locale.KOREAN);
+            String startTime = startedAt.format(formatter);
+            String endTime = endedAt.format(formatter);
+            context.setVariable("startedAt", startTime);
+            context.setVariable("endedAt", endTime);
             context.setVariable("problemCount", problemCount);
 
             String base64Image = getBase64EncodedImage("static/images/empick-logo.png");
@@ -155,8 +159,7 @@ public class MailCommandServiceImpl implements MailCommandService {
             String htmlContent = templateEngine.process("jobtest-mail-template", context);
             String title = "실무 테스트 일정 안내 메일";
 
-//            mimeMessageHelper.setTo(email);
-            mimeMessageHelper.setTo("tjalswhd1@naver.com");
+            mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject(title);
             mimeMessageHelper.setText(htmlContent, true);
             javaMailSender.send(mimeMessage);
@@ -206,8 +209,7 @@ public class MailCommandServiceImpl implements MailCommandService {
             String htmlContent = templateEngine.process("interview-mail-template", context);
             String title = "면접 일정 안내 메일";
 
-//            mimeMessageHelper.setTo(email);   // 현재 DB상 이메일이라 확인 불가
-            mimeMessageHelper.setTo("tjalswhd1@naver.com"); // 확인을 위해 본인 이메일 사용
+            mimeMessageHelper.setTo(email);
             mimeMessageHelper.setSubject(title);
             mimeMessageHelper.setText(htmlContent, true);
             javaMailSender.send(mimeMessage);
