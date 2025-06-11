@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app v-if="isReady">
     <Sidebar v-if="showSidebar" />
     <v-main>
       <router-view />
@@ -8,14 +8,16 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import Sidebar from '@/components/common/MainSidebar.vue'
 import { RouterView } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 
 const route = useRoute();
+const router = useRouter();
 const authStore = useAuthStore();
+const isReady = ref(false);
 
 // 사이드바 표시 여부 결정
 const showSidebar = computed(() => {
@@ -23,9 +25,11 @@ const showSidebar = computed(() => {
   return !route.meta.hideSidebar;
 });
 
-onMounted(() => {
+onMounted(async () => {
   // 앱 시작 시 저장된 인증 상태 복원
   authStore.restoreAuth();
+  await router.isReady(); // 라우터가 준비될 때까지 대기
+  isReady.value = true;
 });
 </script>
 
