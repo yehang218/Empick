@@ -145,7 +145,7 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 if (employeeNumber && email) {
                     const mailStore = useMailStore()
                     const mailDto = new MailRequestDTO({
-                        email,
+                        email: [email],
                         title: '사번 및 임시 비밀번호 안내',
                         content: `사번: ${employeeNumber}\n임시 비밀번호: ${employeeNumber}\n로그인 후 비밀번호를 꼭 변경하세요.`
                     })

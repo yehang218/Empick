@@ -1,3 +1,3 @@
 export const MailAPI = {
-    CREATE: '/api/v1/mail/create',
+    CREATE: '/api/v1/employment/mail/create',
 };
