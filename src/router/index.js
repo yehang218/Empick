@@ -102,11 +102,21 @@ const routes = [
         name: 'WSPage',
         component: () => import('@/views/test/WSPage.vue')
     },
+
+    // <-------------------- 실무테스트 -------------------->
     {
         path: '/employment/jobtests',
         name: 'EmploymentJobtests',
         component: () => import('@/views/test/EvaluationTestPage.vue'),
         props: true
+    },
+    {
+        path: '/employment/jobtests/problems',
+        name: 'JobtestProblemList',
+        component: () => import('@/views/employment/JobtestProblemListPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
     },
 ];
 
