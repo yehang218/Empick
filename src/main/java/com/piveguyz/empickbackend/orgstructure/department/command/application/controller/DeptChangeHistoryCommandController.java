@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("api/v1/dept-change-history")
-@Tag(name = "부서 이동 내역 API", description = "부서 이동 내역 생성, 조회 API")
+@Tag(name = "부서 API", description = "부서 이동 내역 생성, 조회 API")
 @RequiredArgsConstructor
 public class DeptChangeHistoryCommandController {
 
@@ -54,7 +54,7 @@ public class DeptChangeHistoryCommandController {
         return ResponseEntity.status(ResponseCode.CREATED.getHttpStatus()).body(CustomApiResponse.of(ResponseCode.CREATED, result));
     }
 
-    @PatchMapping("/{historyId}/end")
+    @PatchMapping("/{historyId}/complete")
     @Operation(summary = "부서 이동 기록 종료일 업데이트")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "업데이트 성공",
@@ -64,7 +64,7 @@ public class DeptChangeHistoryCommandController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CustomApiResponse.class)))
     })
-    public ResponseEntity<CustomApiResponse<Void>> endDeptChangeHistory(
+    public ResponseEntity<CustomApiResponse<Void>> completeDeptChangeHistory(
             @Parameter(description = "이동 기록 ID", example = "1")
             @PathVariable Integer historyId,
             @Parameter(description = "근무 종료일 (yyyy-MM-dd'T'HH:mm:ss)", example = "2025-06-30T18:00:00")

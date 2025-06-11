@@ -19,17 +19,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "채용 공고 템플릿 조회 API", description = "채용 공고 템플릿 목록 및 상세 조회")
+@Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment/template")
+@RequestMapping("/api/v1/employment/recruitments/templates")
 public class RecruitmentTemplateQueryController {
 
 	private final RecruitmentTemplateQueryService recruitmentTemplateQueryService;
 
 	@Operation(
 		summary = "채용 공고 템플릿 목록 조회",
-		description = "- 등록된 채용 공고 템플릿 목록을 조회합니다."
+		description = "등록된 채용 공고 템플릿 목록을 조회합니다."
 	)
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
@@ -45,8 +45,9 @@ public class RecruitmentTemplateQueryController {
 	@Operation(
 		summary = "채용 공고 템플릿 상세 조회",
 		description = """
-        - 템플릿 ID를 기준으로 상세 정보를 조회합니다.
-        - 템플릿 항목 리스트 (items)도 함께 반환됩니다.
+        템플릿 ID를 기준으로 상세 정보를 조회합니다.
+        
+        템플릿 항목 리스트 (items)도 함께 반환됩니다.
         """
 	)
 	@ApiResponses(value = {

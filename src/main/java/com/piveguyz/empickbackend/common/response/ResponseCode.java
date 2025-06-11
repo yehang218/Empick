@@ -37,7 +37,6 @@ public enum ResponseCode {
     MEMBER_CREATED_MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1007, "입사처리자를 찾을 수 없습니다."),
     MEMBER_CREATED_MEMBER_NO_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "입사처리자는 ROLE_HR_ACCESS 권한이 있어야 합니다."),
     NO_HR_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "ROLE_HR_ACCESS 권한이 있어야 합니다."),
-
     MEMBER_PROFILE_IMAGE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1009 , "사원의 프로필 사진을 찾을 수 없습니다." ),
     MEMBER_ID_INVALID(false, HttpStatus.BAD_REQUEST, 1010, "유효하지 않은 사원 ID 입니다."),
     DUPLICATE_EDIT_REQUEST(false, HttpStatus.CONFLICT, 1011, "같은 필드에 대해 이미 대기중인 수정 요청이 존재합니다."),
@@ -49,6 +48,8 @@ public enum ResponseCode {
     EDIT_PROPOSAL_REJECTED(true, HttpStatus.NOT_ACCEPTABLE, 1105, "변경 요청이 거절되었습니다."),
     REQUIRED_LOGIN(true, HttpStatus.NOT_ACCEPTABLE, 1106, "로그인이 필요합니다."),
     ALREDY_RESIGNED(true, HttpStatus.NOT_ACCEPTABLE, 1107, "퇴사 처리된 사원입니다."),
+    INVALID_STATUS_VALUE(true, HttpStatus.NOT_ACCEPTABLE, 1108, "요청된 상태 값이 유효하지 않습니다."),
+    EDIT_PROPOSAL_MEMBER_MISMATCH(true, HttpStatus.BAD_REQUEST, 1109, "해당 제안이 사원 정보와 일치하지 않습니다."),
 
     // 부서, 직책, 직무, 직급 관련 NOT_FOUND
     DEPARTMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1200, "요청한 부서를 찾을 수 없습니다."),
@@ -178,10 +179,7 @@ public enum ResponseCode {
 
     
 
-    //  면접 일정 - 2500 ~ 2599
-
-
-    //  면접 일정 - 2500 ~ 2599
+    //  면접 - 2500 ~ 2599
     EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2500, "존재하지 않는 면접 기준입니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2510, "내용을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_DETAIL_CONTENT(false, HttpStatus.BAD_REQUEST, 2511, "상세 내용을 입력하지 않았습니다."),
@@ -195,11 +193,15 @@ public enum ResponseCode {
     EMPLOYMENT_INTERVIEW_NO_SHEET(false, HttpStatus.BAD_REQUEST, 2541, "평가표가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_DATE(false, HttpStatus.BAD_REQUEST, 2542, "날짜가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_ADDRESS(false, HttpStatus.BAD_REQUEST, 2543, "주소가 등록되지 않았습니다."),
+    EMPLOYMENT_INTERVIEW_IMPOSSIBLE_TIME(false, HttpStatus.BAD_REQUEST, 2544, "불가능한 시간입니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2550, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE(false, HttpStatus.BAD_REQUEST, 2551, "점수를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_REVIEW(false, HttpStatus.BAD_REQUEST, 2552, "평가를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_ITEM(false, HttpStatus.BAD_REQUEST, 2553, "해당하는 평가 항목이 존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2554, "이미 평가 점수가 등록되어 있습니다."),
+    EMPLOYMENT_INTERVIEWER_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2560, "이미 해당 면접 담당자가 존재합니다."),
+    EMPLOYMENT_INTERVIEWER_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2561, "해당 면접 담당자가 존재하지 않습니다."),
+    EMPLOYMENT_INTERVIEWER_ALREADY_SCORE_INPUT(false, HttpStatus.BAD_REQUEST, 2562, "면접 담당자가 이미 점수를 입력하였습니다."),
 
 
     //  안내 메일 - 2600 ~ 2699
