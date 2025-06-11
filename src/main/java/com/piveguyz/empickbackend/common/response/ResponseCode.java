@@ -37,7 +37,6 @@ public enum ResponseCode {
     MEMBER_CREATED_MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1007, "입사처리자를 찾을 수 없습니다."),
     MEMBER_CREATED_MEMBER_NO_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "입사처리자는 ROLE_HR_ACCESS 권한이 있어야 합니다."),
     NO_HR_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "ROLE_HR_ACCESS 권한이 있어야 합니다."),
-
     MEMBER_PROFILE_IMAGE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1009 , "사원의 프로필 사진을 찾을 수 없습니다." ),
     MEMBER_ID_INVALID(false, HttpStatus.BAD_REQUEST, 1010, "유효하지 않은 사원 ID 입니다."),
     DUPLICATE_EDIT_REQUEST(false, HttpStatus.CONFLICT, 1011, "같은 필드에 대해 이미 대기중인 수정 요청이 존재합니다."),
@@ -49,6 +48,8 @@ public enum ResponseCode {
     EDIT_PROPOSAL_REJECTED(true, HttpStatus.NOT_ACCEPTABLE, 1105, "변경 요청이 거절되었습니다."),
     REQUIRED_LOGIN(true, HttpStatus.NOT_ACCEPTABLE, 1106, "로그인이 필요합니다."),
     ALREDY_RESIGNED(true, HttpStatus.NOT_ACCEPTABLE, 1107, "퇴사 처리된 사원입니다."),
+    INVALID_STATUS_VALUE(true, HttpStatus.NOT_ACCEPTABLE, 1108, "요청된 상태 값이 유효하지 않습니다."),
+    EDIT_PROPOSAL_MEMBER_MISMATCH(true, HttpStatus.BAD_REQUEST, 1109, "해당 제안이 사원 정보와 일치하지 않습니다."),
 
     // 부서, 직책, 직무, 직급 관련 NOT_FOUND
     DEPARTMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1200, "요청한 부서를 찾을 수 없습니다."),
@@ -115,6 +116,8 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
     EMPLOYMENT_APPLICANT_DUPLICATE_EMAIL(false, HttpStatus.CONFLICT, 2101, "이미 등록된 이메일입니다."),
     EMPLOYMENT_APPLICANT_DUPLICATE_PHONE(false, HttpStatus.CONFLICT, 2102, "이미 등록된 연락처입니다."),
+    APPLICATION_RESPONSE_DUPLICATE(false, HttpStatus.CONFLICT, 2103, "이미 등록된 응답입니다."),
+    APPLICATION_RESPONSE_EMPTY_CONTENT(false, HttpStatus.BAD_REQUEST, 2104, "응답 내용은 비워둘 수 없습니다."),
     EMPLOYMENT_APPLICATION_DUPLICATE_APPLICATION(false, HttpStatus.CONFLICT, 2105, "이미 해당 공고에 지원한 이력이 있습니다."),
 
 

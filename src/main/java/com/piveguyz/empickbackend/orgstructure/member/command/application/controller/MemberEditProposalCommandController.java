@@ -4,6 +4,7 @@ import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberEditProposalCommandDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberEditRejectCommandDTO;
+import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.ProposalStatusUpdateDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.service.MemberEditProposalCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,9 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "사원 정보 수정 요청 API", description = "사원 정보 변경 요청 생성, 승인, 거절 API")
+@Tag(name = "사원 API", description = "사원 정보 변경 요청 생성, 승인, 거절 API")
 @RestController
-@RequestMapping("/api/v1/member/edit")
+@RequestMapping("/api/v1/members/proposals")
 @RequiredArgsConstructor
 public class MemberEditProposalCommandController {
 
@@ -43,7 +44,7 @@ public class MemberEditProposalCommandController {
             @ApiResponse(responseCode = "404", description = "사원을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @PostMapping("/proposal")
+    @PostMapping
     public ResponseEntity<CustomApiResponse<Void>> createEditRequest(
             @RequestBody MemberEditProposalCommandDTO dto) {
 
@@ -51,8 +52,22 @@ public class MemberEditProposalCommandController {
         return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS));
     }
 
+    @Operation(
+            summary = "사원 정보 수정 요청 상태 변경",
+            description = "특정 요청의 상태를 변경합니다 (e.g., APPROVED, REJECTED).",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PatchMapping("/{proposalId}")
+    public ResponseEntity<CustomApiResponse<Void>> updateProposalStatus(
+            @PathVariable("proposalId") Integer proposalId,
+            @RequestBody ProposalStatusUpdateDTO statusUpdateDTO
+    ) {
+        memberEditCommandService.updateEditProposalStatus(null, proposalId, statusUpdateDTO);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS));
+    }
+
     @Operation(summary = "사원 정보 수정 요청 승인", description = "요청 ID와 검토자 ID를 전달해 요청을 승인합니다.", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping("/proposal/{proposalId}/approve")
+    @PatchMapping("/{proposalId}/approve")
     public ResponseEntity<CustomApiResponse<Void>> approveProposal(
             @PathVariable("proposalId") Integer proposalId) {
 
@@ -61,8 +76,9 @@ public class MemberEditProposalCommandController {
     }
 
     @Operation(summary = "사원 정보 수정 요청 거절", description = "요청 ID, 검토자 ID, 거절 사유를 전달해 요청을 거절합니다.", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping("/proposal/reject")
+    @PatchMapping("/{proposalId}/reject")
     public ResponseEntity<CustomApiResponse<Void>> rejectProposal(
+            @PathVariable("proposalId") Integer proposalId,
             @RequestBody MemberEditRejectCommandDTO dto) {
 
         memberEditCommandService.reject(dto);
