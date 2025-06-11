@@ -4,11 +4,29 @@
             <v-container class="pa-6">
                 <h2 class="text-h6 font-weight-bold mb-4">실무 테스트 문제 리스트</h2>
 
-                <JobtestListView :headers="headers" :items="items" :showCheckbox="true" :showArrow="true" />
+                <!-- 로딩 상태 -->
+                <v-progress-circular v-if="jobtestStore.loading" indeterminate color="primary"
+                    class="d-flex mx-auto my-4"></v-progress-circular>
+
+                <!-- 에러 메시지 -->
+                <v-alert v-if="jobtestStore.error" type="error" class="mb-4" closable
+                    @click:close="jobtestStore.error = null">
+                    {{ jobtestStore.error }}
+                </v-alert>
+
+                <!-- 문제 리스트 -->
+                <JobtestListView v-if="!jobtestStore.loading && !jobtestStore.error" :headers="headers"
+                    :items="jobtestStore.questions" :showCheckbox="true" :showArrow="true"
+                    @item-click="handleItemClick" />
 
                 <div class="d-flex justify-end mt-4">
-                    <v-btn color="error" variant="outlined" class="mr-2">삭제하기</v-btn>
-                    <v-btn color="success">문제 등록하기</v-btn>
+                    <v-btn color="error" variant="outlined" class="mr-2" :disabled="!jobtestStore.hasSelectedQuestions"
+                        @click="handleDelete">
+                        삭제하기
+                    </v-btn>
+                    <v-btn color="success" @click="handleCreate">
+                        문제 등록하기
+                    </v-btn>
                 </div>
             </v-container>
         </v-main>
@@ -16,66 +34,48 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import JobtestListView from '@/components/employment/JobtestListView.vue'
+import { useJobtestStore } from '@/stores/jobtestStore'
+
+const router = useRouter()
+const jobtestStore = useJobtestStore()
 
 const headers = [
-    { label: '문제 제목', key: 'title' },
+    { label: '문제 제목', key: 'content' },
     { label: '유형', key: 'type' },
     { label: '난이도', key: 'difficulty' },
-    { label: '출제자', key: 'author', type: 'avatar' },
-    { label: '채용 수정자', key: 'editor', type: 'avatar' },
+    { label: '출제자', key: 'createdMemberId' },
+    { label: '수정자', key: 'updatedMemberId' },
 ]
 
-const items = [
-    {
-        title: 'Big-O 표기법에 대한 설명으로 옳은것은?',
-        type: '선택형',
-        difficulty: '쉬움',
-        author: { name: '김현식', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-        editor: { name: '박수정', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-        selected: false,
-    },
-    {
-        title: 'TCP와 UDP의 설명으로 옳지 않은 것은?',
-        type: '선택형',
-        difficulty: '어려움',
-        author: { name: '김현식', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-        editor: { name: '박수정', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-        selected: true,
-    },
-    {
-        title: '다음 중 비선점형 스케줄링 알고리즘은?',
-        type: '선택형',
-        difficulty: '보통',
-        author: { name: '김현식', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-        editor: { name: '박수정', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-        selected: false,
-    },
-    {
-        title: '해시 테이블에서 충돌이 발생하는 이유를 설명하고, 이를 해결하는 방법은?',
-        type: '서술형',
-        difficulty: '쉬움',
-        author: { name: '김현식', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-        editor: { name: '박수정', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-        selected: false,
-    },
-    {
-        title: '스택(Stack) 자료구조의 연산 순서는 무엇인가요?',
-        type: '서술형',
-        difficulty: '쉬움',
-        author: { name: '김현식', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-        editor: { name: '박수정', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-        selected: false,
-    },
-    {
-        title: '프로세스와 스레드의 차이점을 설명하고, 스레드 기반 프로그램의 장단점은?',
-        type: '단답형',
-        difficulty: '쉬움',
-        author: { name: '김현식', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-        editor: { name: '박수정', avatar: 'https://randomuser.me/api/portraits/women/1.jpg' },
-        selected: false,
-    },
-]
+// 문제 클릭 처리
+const handleItemClick = (item) => {
+    jobtestStore.toggleQuestionSelection(item.id)
+}
+
+// 삭제 처리
+const handleDelete = () => {
+    const selectedIds = jobtestStore.getSelectedQuestionIds()
+    console.log('Selected questions:', selectedIds)
+    // TODO: 선택된 문제 삭제 로직 구현
+}
+
+// 문제 등록
+const handleCreate = () => {
+    // TODO: 문제 등록 페이지로 이동
+    console.log('Create new question')
+}
+
+// 컴포넌트 마운트 시 문제 목록 조회
+onMounted(async () => {
+    try {
+        await jobtestStore.fetchQuestions()
+    } catch (error) {
+        console.error('Failed to fetch questions:', error)
+    }
+})
 </script>
 
 <style scoped></style>
