@@ -3,6 +3,9 @@ package com.piveguyz.empickbackend.employment.jobtests.question.command.applicat
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.DeleteQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.UpdateQuestionCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionEntity;
+
+import java.util.Optional;
 
 public interface QuestionCommandService {
     CreateQuestionCommandDTO createQuestion(CreateQuestionCommandDTO createQuestionCommandDTO);
@@ -10,4 +13,6 @@ public interface QuestionCommandService {
     UpdateQuestionCommandDTO updateQuestion(int id, UpdateQuestionCommandDTO updateQuestionCommandDTO);
 
     DeleteQuestionCommandDTO deleteQuestion(int id);
+
+    Optional<QuestionEntity> findById(int questionId);
 }

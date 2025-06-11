@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class UpdateEvaluationResultCommandDTO {
     private String evaluatorComment;
-    private Integer score;
+    private Double score;
 }

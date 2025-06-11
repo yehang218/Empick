@@ -10,7 +10,6 @@ import lombok.*;
 @Builder
 public class CreateAnswerCommandDTO {
     private String content;
-    private CorrectType isCorrect;
 
     private int applicationJobTestId;
     private int questionId;

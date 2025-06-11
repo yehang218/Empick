@@ -21,7 +21,7 @@ public class EvaluationResultEntity {
     private String evaluatorComment;
 
     @Column(name = "score", nullable = false)
-    private int score;
+    private double score;
 
     @Column(name = "application_job_test_id", nullable = false)
     private int applicationJobtestId;
