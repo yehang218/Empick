@@ -67,6 +67,8 @@ public enum ResponseCode {
     EMPLOYMENT_REQUEST_MISSING_QUALIFICATION(false, HttpStatus.BAD_REQUEST, 2005, "자격 요건을 입력해야 합니다."),
     EMPLOYMENT_REQUEST_MISSING_RESPONSIBILITY(false, HttpStatus.BAD_REQUEST, 2006, "담당 업무를 입력해야 합니다."),
     EMPLOYMENT_REQUEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2007, "해당 기간 내 중복된 채용 요청이 존재합니다."),
+    EMPLOYMENT_REQUEST_INVALID_JOB_ID(false, HttpStatus.BAD_REQUEST, 2008, "유효하지 않은 직무 ID입니다."),
+    EMPLOYMENT_REQUEST_INVALID_DEPARTMENT_ID(false, HttpStatus.BAD_REQUEST, 2009, "유효하지 않은 부서 ID입니다."),
 
     // 2) 채용 템플릿
     EMPLOYMENT_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2010, "요청한 템플릿을 찾을 수 없습니다."),
