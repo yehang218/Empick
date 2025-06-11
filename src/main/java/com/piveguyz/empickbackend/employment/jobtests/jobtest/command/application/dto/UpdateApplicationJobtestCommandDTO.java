@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 public class UpdateApplicationJobtestCommandDTO {
     private String evaluatorComment;
     private LocalDateTime submittedAt;
-    private Integer gradingTotalScore;
-    private Integer evaluationScore;
+    private Double gradingTotalScore;
+    private Double evaluationScore;
     private JobtestStatus gradingStatus;
     private JobtestStatus evaluationStatus;
     private String entryCode;

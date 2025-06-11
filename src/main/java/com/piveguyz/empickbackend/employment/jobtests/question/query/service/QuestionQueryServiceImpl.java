@@ -26,7 +26,7 @@ public class QuestionQueryServiceImpl implements QuestionQueryService {
     public QuestionQueryDTO getQuestionById(int id) {
         QuestionQueryDTO dto = questionMapper.selectQuestionFullById(id);
         if (dto == null) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION);
         }
         return dto;
     }

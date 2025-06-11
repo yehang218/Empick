@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 public class CreateEvaluationResultCommandDTO {
     private String evaluatorComment;
-    private int score;
+    private Double score;
 
     private int applicationJobtestId;
     private int jobtestEvaluationCriteriaId;

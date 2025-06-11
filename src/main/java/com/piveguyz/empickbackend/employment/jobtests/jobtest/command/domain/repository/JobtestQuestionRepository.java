@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface JobtestQuestionRepository extends JpaRepository<JobtestQuestionEntity, Integer> {
 
@@ -13,4 +15,6 @@ public interface JobtestQuestionRepository extends JpaRepository<JobtestQuestion
 
     @Query("SELECT MAX(q.optionNumber) FROM JobtestQuestionEntity q WHERE q.jobTestId = :jobTestId")
     Integer findMaxOptionNumberByJobTestId(@Param("jobTestId") int jobTestId);
+
+    Optional<JobtestQuestionEntity> findByJobTestIdAndQuestionId(int jobTestId, int questionId);
 }

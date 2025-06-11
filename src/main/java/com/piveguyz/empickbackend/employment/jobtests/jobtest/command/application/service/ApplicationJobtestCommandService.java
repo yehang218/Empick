@@ -10,4 +10,6 @@ public interface ApplicationJobtestCommandService {
     UpdateApplicationJobtestCommandDTO updateApplicationJobtest(int id, @Valid UpdateApplicationJobtestCommandDTO updateApplicationJobtestCommandDTO);
 
     int deleteApplicationJobtest(int id);
+
+    void updateGradingStatusAndScore(int applicationJobTestId, double totalScore);
 }

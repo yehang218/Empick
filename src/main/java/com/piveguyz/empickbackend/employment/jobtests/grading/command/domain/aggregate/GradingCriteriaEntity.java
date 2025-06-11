@@ -15,7 +15,7 @@ public class GradingCriteriaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Id")
-    private int id;
+    private Integer id;
 
     @Column(name = "content", nullable = false)
     private String content;

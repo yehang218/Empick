@@ -72,6 +72,15 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
         return applicationJobtest.getId();
     }
 
+    // 채점 후에 점수, 채점 상태 자동 업데이트
+    @Override
+    public void updateGradingStatusAndScore(int applicationJobTestId, double totalScore) {
+        ApplicationJobtestEntity applicationJobtest = applicationJobtestRepository.findById(applicationJobTestId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_APPLICATION_JOBTEST));
+
+        applicationJobtest.completeGrading(totalScore);
+        applicationJobtestRepository.save(applicationJobtest);
+    }
 
 
     private void validateMemberExists(Integer memberId) {

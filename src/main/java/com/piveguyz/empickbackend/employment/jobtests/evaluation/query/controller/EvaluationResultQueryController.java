@@ -35,9 +35,9 @@ public class EvaluationResultQueryController {
     @ApiResponses(value = {
     })
     @GetMapping("/{applicationId}/evaluation-results")
-    public ResponseEntity<CustomApiResponse<JobTestEvaluationDetailDTO>> getEvaluationResultByApplicationId(
+    public ResponseEntity<CustomApiResponse<List<JobTestEvaluationDetailDTO>>> getEvaluationResultByApplicationId(
             @PathVariable int applicationId) {
-        JobTestEvaluationDetailDTO evaluationResultDTO = evaluationResultQueryService.getEvaluationResultByApplicationId(applicationId);
+        List<JobTestEvaluationDetailDTO> evaluationResultDTO = evaluationResultQueryService.getEvaluationResultByApplicationId(applicationId);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, evaluationResultDTO));
     }

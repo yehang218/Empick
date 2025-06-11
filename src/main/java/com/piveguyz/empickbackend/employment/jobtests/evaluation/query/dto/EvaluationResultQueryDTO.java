@@ -16,5 +16,5 @@ public class EvaluationResultQueryDTO {
     private Double criteriaScoreWeight;     // 가중치 (job_test_evaluation_criteria.score_weight)
 
     private String resultEvaluatorComment;  // 평가자 코멘트 (job_test_evaluation_result.evaluator_comment)
-    private Integer resultScore;            // 평가 점수 (job_test_evaluation_result.score)
+    private Double resultScore;            // 평가 점수 (job_test_evaluation_result.score)
 }
