@@ -30,11 +30,11 @@ public class ApplicationCommandController {
                     status는 기본값 '서류검토대기중'으로 설정됩니다.
                     """
     )
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "지원서 등록 성공"),
-//            @ApiResponse(responseCode = "400", description = "바보"),//""요청 값 오류"),
-//            @ApiResponse(responseCode = "500", description = "서버 오류")
-//    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "지원서 등록 성공"),
+            @ApiResponse(responseCode = "400", description = "바보"),//""요청 값 오류"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     @PostMapping
     public ResponseEntity<CustomApiResponse<ApplicationCommandDTO>> registerApplication(
             @RequestBody @Valid ApplicationCommandDTO dto) {
@@ -47,11 +47,11 @@ public class ApplicationCommandController {
 
     @PatchMapping("/{id}")
     @Operation(summary = "지원서 상태 변경", description = "변경하고자 하는 지원서 id와 status를 입력하세요.")
-//    @ApiResponses({
-//            @ApiResponse(responseCode = "200", description = "상태 변경 성공"),
-//            @ApiResponse(responseCode = "404", description = "지원서 없음"),
-//            @ApiResponse(responseCode = "500", description = "서버 오류")
-//    })
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "상태 변경 성공"),
+            @ApiResponse(responseCode = "404", description = "지원서 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
     public ResponseEntity<CustomApiResponse<ApplicationCommandDTO>> updateApplicationStatus(
             @PathVariable Integer id,
             @RequestBody ApplicationCommandDTO dto){
@@ -61,5 +61,20 @@ public class ApplicationCommandController {
         return ResponseEntity
                 .status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, updated));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "지원서 삭제", description = "지원서 ID에 해당하는 지원서를 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "지원서 삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "지원서 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    public ResponseEntity<CustomApiResponse<Integer>> deleteApplication(@PathVariable int id) {
+        int deletedId = applicationCommandService.deleted(id);
+
+        return ResponseEntity
+                .status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, deletedId));
     }
 }

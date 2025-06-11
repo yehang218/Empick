@@ -50,6 +50,16 @@ public class ApplicationCommandServiceImp implements ApplicationCommandService {
         return ApplicationCommandMapper.toDTO(updated);
     }
 
+    @Override
+    public Integer deleted(int id) {
+        ApplicationEntity entity = applicationRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_NOT_FOUND));
+
+        applicationRepository.delete(entity);
+        return id;
+    }
+
+
 
 }
 

@@ -8,4 +8,6 @@ public interface ApplicationCommandService  {
     ApplicationCommandDTO register(@Valid ApplicationCommandDTO dto);
 
     ApplicationCommandDTO updated(@Valid ApplicationCommandDTO dto);
+
+    Integer deleted(int id);
 }
