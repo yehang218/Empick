@@ -15,8 +15,8 @@
                 </v-alert>
 
                 <!-- 문제 리스트 -->
-                <JobtestListView v-if="!jobtestStore.loading && !jobtestStore.error" :headers="headers"
-                    :items="jobtestStore.questions" :showCheckbox="true" :showArrow="true"
+
+                <ListView :headers="headers" :data="jobtestStore.questions" :showCheckbox="true"
                     @item-click="handleItemClick" />
 
                 <div class="d-flex justify-end mt-4">
@@ -36,7 +36,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import JobtestListView from '@/components/employment/JobtestListView.vue'
+import ListView from '@/components/common/ListView.vue'
 import { useJobtestStore } from '@/stores/jobtestStore'
 
 const router = useRouter()
