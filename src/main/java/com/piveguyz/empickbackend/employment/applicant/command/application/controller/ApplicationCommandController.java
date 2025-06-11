@@ -30,11 +30,11 @@ public class ApplicationCommandController {
                     status는 기본값 '서류검토대기중'으로 설정됩니다.
                     """
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "지원서 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "바보"),//""요청 값 오류"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "지원서 등록 성공"),
+//            @ApiResponse(responseCode = "400", description = "바보"),//""요청 값 오류"),
+//            @ApiResponse(responseCode = "500", description = "서버 오류")
+//    })
     @PostMapping
     public ResponseEntity<CustomApiResponse<ApplicationCommandDTO>> registerApplication(
             @RequestBody @Valid ApplicationCommandDTO dto) {
@@ -46,12 +46,12 @@ public class ApplicationCommandController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "지원서 상태 변경", description = "지원서Id에 해당하는 상태를 변경한다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "상태 변경 성공"),
-            @ApiResponse(responseCode = "404", description = "지원서 없음"),
-            @ApiResponse(responseCode = "500", description = "서버 오류")
-    })
+    @Operation(summary = "지원서 상태 변경", description = "변경하고자 하는 지원서 id와 status를 입력하세요.")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "상태 변경 성공"),
+//            @ApiResponse(responseCode = "404", description = "지원서 없음"),
+//            @ApiResponse(responseCode = "500", description = "서버 오류")
+//    })
     public ResponseEntity<CustomApiResponse<ApplicationCommandDTO>> updateApplicationStatus(
             @PathVariable Integer id,
             @RequestBody ApplicationCommandDTO dto){
