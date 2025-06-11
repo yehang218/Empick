@@ -1,9 +1,9 @@
 export default class RecruitmentRequestResponseDTO {
-    constructor(id, positionName, headcount, requestedAt, departmentName, memberName, status) {
+    constructor(id, jobName, headcount, createdAt, departmentName, memberName, status) {
         this.id = id;
-        this.positionName = positionName;
+        this.jobName = jobName;
         this.headcount = headcount;
-        this.requestedAt = requestedAt;
+        this.createdAt = createdAt;
         this.departmentName = departmentName;
         this.memberName = memberName;
         this.status = status;
@@ -12,9 +12,9 @@ export default class RecruitmentRequestResponseDTO {
     static fromJSON(json) {
         return new RecruitmentRequestResponseDTO(
             json.id,
-            json.positionName,
+            json.jobName,
             json.headcount,
-            json.requestedAt,
+            json.createdAt,
             json.departmentName,
             json.memberName,
             json.status
