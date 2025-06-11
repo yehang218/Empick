@@ -1,10 +1,30 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
 
 const routes = [
     {
         path: '/',
         name: 'MainPage',
-        component: () => import('@/views/MainPage.vue')
+        component: () => import('@/views/MainPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/login',
+        name: 'LoginPage',
+        component: () => import('@/views/login/LoginPage.vue'),
+        meta: {
+            hideSidebar: true
+        }
+    },
+    {
+        path: '/dashboard',
+        name: 'DashboardPage',
+        component: () => import('@/views/DashboardPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
     },
     {
         path: '/counter',
@@ -88,6 +108,23 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes
+});
+
+// 네비게이션 가드
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const isAuthenticated = authStore.isAuthenticated;
+
+    if (requiresAuth && !isAuthenticated) {
+        // 인증이 필요한 페이지인데 로그인하지 않은 경우
+        next('/login');
+    } else if (to.path === '/login' && isAuthenticated) {
+        // 로그인 페이지인데 이미 로그인한 경우
+        next('/');
+    } else {
+        next();
+    }
 });
 
 export default router;
