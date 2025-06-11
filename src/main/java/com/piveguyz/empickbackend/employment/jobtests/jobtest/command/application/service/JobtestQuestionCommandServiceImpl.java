@@ -39,7 +39,7 @@ public class JobtestQuestionCommandServiceImpl implements JobtestQuestionCommand
 
         // 문제가 없는 경우
         if(!questionRepository.existsById(questionId)) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION);
         }
 
         // 이미 있는 경우
