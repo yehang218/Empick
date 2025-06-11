@@ -9,6 +9,7 @@ import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.M
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
 import com.piveguyz.empickbackend.orgstructure.member.query.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthCommandServiceImpl implements AuthCommandService {
 
     private final MemberRepository memberRepository;
@@ -31,8 +33,10 @@ public class AuthCommandServiceImpl implements AuthCommandService {
                         requestDTO.getEmployeeNumber()
                 )
         ).orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
-
+        log.error("Wrong id");
         if (!passwordEncoder.matches(requestDTO.getPassword(), member.getPassword())) {
+            log.error("Wrong password");
+            log.info(String.valueOf(requestDTO));
             throw new BusinessException(ResponseCode.BAD_REQUEST); // 로그인 실패의 정확한 원인을 밝히지 않기 위함
         }
 
