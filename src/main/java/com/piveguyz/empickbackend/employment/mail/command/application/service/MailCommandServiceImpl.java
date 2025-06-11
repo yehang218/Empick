@@ -180,8 +180,7 @@ public class MailCommandServiceImpl implements MailCommandService {
         String recruitmentTitle = dto.getRecruitmentTitle();
         Integer applicantId = dto.getApplicantId();
         String applicantName = dto.getApplicantName();
-//        String email = dto.getEmail();
-        String email = "tjalswhd1@naver.com";
+        String email = dto.getEmail();
         Integer interviewId = dto.getInterviewId();
         LocalDateTime interviewDateTime = dto.getInterviewDatetime();
         String interviewAddress = dto.getInterviewAddress();
