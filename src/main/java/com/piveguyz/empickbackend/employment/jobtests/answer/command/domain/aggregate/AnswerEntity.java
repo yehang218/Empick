@@ -30,7 +30,7 @@ public class AnswerEntity {
     @Column(name = "is_correct", nullable = true)
     private CorrectType isCorrect;
 
-    @Column(name = "score", nullable = false)
+    @Column(name = "score", nullable = true)
     private Double score;
 
     @Column(name = "application_job_test_id", nullable = false)

@@ -105,7 +105,7 @@ CREATE TABLE answer
     content                 LONGTEXT NOT NULL,
     attempt                 INT      NOT NULL DEFAULT 1,
     is_correct              TINYINT  NULL,
-    score                   DOUBLE   NOT NULL DEFAULT 0.0,
+    score                   DOUBLE   NULL DEFAULT 0.0,
     application_job_test_id INT      NOT NULL,
     question_id             INT      NOT NULL,
 
