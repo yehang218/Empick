@@ -103,6 +103,15 @@ const routes = [
         component: () => import('@/views/test/EvaluationTestPage.vue'),
         props: true
     },
+    // 신규 사원 등록 페이지
+    {
+        path: '/orgstructure/member-register',
+        name: 'MemberRegisterPage',
+        component: () => import('@/views/orgstructure/MemberRegisterPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
 ];
 
 const router = createRouter({
