@@ -100,6 +100,14 @@ const routes = [
             requiresAuth: true
         }
     },
+    {
+        path: '/orgstructure/profile',
+        name: 'ProfilePage',
+        component: () => import('@/views/orgstructure/ProfilePage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
 ];
 
 const router = createRouter({

@@ -13,7 +13,7 @@ export default class MemberSignUpRequestDTO {
         deletedMemberId = 0,
         updatedMemberId = 0,
         lastLoginAt = '',
-        status = 1,
+        status = 0, // 0 : 활성, 1 : 비활성
         departmentId = null,
         positionId = null,
         jobId = null,

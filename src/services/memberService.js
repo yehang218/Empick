@@ -16,4 +16,35 @@ export const registerMemberService = async (memberData) => {
         }
         throw error;
     }
-}; 
+};
+
+/**
+ * 내 정보 조회 서비스
+ * @returns {Promise<Object>} 내 정보
+ */
+export const getMyInfoService = async () => {
+    try {
+        const response = await api.get(API.MEMBER.ME);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateMyInfoService = async (memberData) => {
+    try {
+        const response = await api.put(API.MEMBER.ME, memberData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const profileImageFetchService = async (memberId) => {
+    try {
+        const response = await api.get(API.MEMBER.PROFILE(memberId));
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};

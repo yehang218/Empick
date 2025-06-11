@@ -61,7 +61,7 @@ const errors = reactive({
 const rules = {
   required: v => !!v || '필수 입력 항목입니다.',
   employeeNumber: v => /^\d{6}$/.test(v) || '6자리 사원번호를 입력해주세요.',
-  password: v => v.length >= 8 || '비밀번호는 8자 이상이어야 합니다.'
+  password: v => v.length >= 6 || '비밀번호는 6자 이상이어야 합니다.'
 };
 
 const clearError = (field) => {

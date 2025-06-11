@@ -71,14 +71,14 @@
         </v-row>
         <v-row class="mt-8">
             <v-col cols="12" class="d-flex flex-column align-center">
-                <v-btn color="success" @click="regStore.registerMemberWithImage" size="large">등록</v-btn>
+                <v-btn color="success" @click="onRegister" size="large">등록</v-btn>
             </v-col>
         </v-row>
     </v-container>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useMemberRegisterStore } from '@/stores/memberRegisterStore'
 
 const regStore = useMemberRegisterStore()
@@ -116,8 +116,7 @@ const onProfileImageChange = (event) => {
     else regStore.clearProfileImage()
 }
 
-// 사번이 바뀔 때마다 비밀번호를 자동 입력
-watch(() => regStore.employeeNumber, (val) => {
-    regStore.form.password = val || ''
-})
+const onRegister = async () => {
+    await regStore.registerMemberWithImage()
+}
 </script>
