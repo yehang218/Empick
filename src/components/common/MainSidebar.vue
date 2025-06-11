@@ -1,6 +1,5 @@
 <template>
-    <v-navigation-drawer permanent class="sidebar"
-        style="margin-top: 70px; z-index: 100;">
+    <v-navigation-drawer app permanent width="260" class="sidebar">
         <div class="logo-area">
             <img src="@/assets/empick_logo.png" alt="EMPICK Logo" class="logo" />
         </div>

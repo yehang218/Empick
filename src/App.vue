@@ -1,21 +1,29 @@
 <template>
   <v-app v-if="isReady">
-    <Header v-if="showHeader" />
-    <Sidebar v-if="showSidebar" />
+    <!-- 헤더 -->
+    <v-app-bar app height="70" flat v-if="showHeader">
+      <Header />
+    </v-app-bar>
 
-    <!-- ✅ 스크롤되는 영역 -->
-    <v-main class="main-content">
-      <router-view />
-    </v-main>
+    <div class="layout-wrapper">
+      <!-- 사이드바 -->
+      <div v-if="showSidebar" class="custom-sidebar">
+        <Sidebar />
+      </div>
+
+      <!-- 본문 -->
+      <div class="main-content">
+        <router-view />
+      </div>
+    </div>
   </v-app>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import Sidebar from '@/components/common/MainSidebar.vue'
-import Header from '@/components/common/Header.vue'
-import { RouterView } from 'vue-router';
+import Header from '@/components/common/Header.vue';
+import Sidebar from '@/components/common/MainSidebar.vue';
 import { useAuthStore } from '@/stores/authStore';
 
 const route = useRoute();
@@ -23,46 +31,34 @@ const router = useRouter();
 const authStore = useAuthStore();
 const isReady = ref(false);
 
-// 사이드바 표시 여부 결정
-const showSidebar = computed(() => {
-  // 로그인 페이지나 인증이 필요한 페이지가 아닌 경우 사이드바 숨김
-  return !route.meta.hideSidebar;
-});
-
-// 헤더 표시 여부 결정
-const showHeader = computed(() => {
-  // 로그인 페이지나 인증이 필요한 페이지가 아닌 경우 헤더 숨김
-  return !route.meta.hideHeader;
-});
+const showHeader = computed(() => !route.meta.hideHeader);
+const showSidebar = computed(() => !route.meta.hideSidebar);
 
 onMounted(async () => {
-  // 앱 시작 시 저장된 인증 상태 복원
   authStore.restoreAuth();
-  await router.isReady(); // 라우터가 준비될 때까지 대기
+  await router.isReady();
   isReady.value = true;
 });
 </script>
 
-<style>
-.layout-row {
+<style scoped>
+.layout-wrapper {
   display: flex;
+  margin-top: 70px; /* 헤더 높이만큼 */
 }
 
-.sidebar {
+.custom-sidebar {
   width: 260px;
-}
-
-.v-main {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
+  min-height: calc(100vh - 70px);
+  background-color: #fafcfb;
+  border-right: 1px solid #e0e0e0;
 }
 
 .main-content {
-  margin-left: 260px; /* 사이드바 폭 */
-  padding: 24px;
-  padding-top: 70px; /* ✅ AppBar height 만큼 보정 */
+  flex: 1;
   background-color: #fff;
-  min-height: 100vh;
+  padding: 24px;
+  min-height: calc(100vh - 70px);
   overflow-x: hidden;
 }
 </style>
