@@ -16,6 +16,11 @@ const routes = [
         name: 'ListViewTestPage',
         component: () => import('@/views/test/ListViewTestPage.vue')
     },
+    {
+        path: '/employment/mail',
+        name: 'MailPage',
+        component: () => import('@/views/employment/MailPage.vue')
+    },
     // 서민종 - 컴포넌트 테스트 페이지용 주소
     {
         path: '/test/mj',
