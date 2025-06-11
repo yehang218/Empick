@@ -3,7 +3,8 @@
         <!-- ✅ 메뉴 + 하위메뉴 전체를 감싸는 wrapper -->
         <div class="menu-wrapper">
             <!-- 상단 고정 AppBar -->
-            <v-app-bar flat height="70" style="background-color: #5F8D4E;" app clipped-left>
+            <v-app-bar app height="70" flat
+                style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background-color: #5F8D4E;">
                 <div class="d-flex align-center pl-16">
                     <img :src="logo" alt="로고" style="height: 32px;" class="mr-6" />
                     <div class="d-flex align-center menu-bar">
@@ -41,19 +42,21 @@
             </v-app-bar>
 
             <!-- ✅ 고정형 2단 메뉴 패널 -->
-            <v-container v-if="selectedMenu" class="menu-panel" fluid @mouseleave="selectedMenu = ''">
-                <div class="menu-columns">
-                    <div v-for="section in fullMenu[selectedMenu]" :key="section.label" class="menu-section">
-                        <h3 class="menu-title">{{ section.label }}</h3>
-                        <ul v-if="section.children.length" class="submenu-list">
-                            <li v-for="child in section.children" :key="child.label" class="submenu-item"
-                                @click="goTo(child.path)">
-                                {{ child.label }}
-                            </li>
-                        </ul>
+            <teleport to="body">
+                <v-container v-if="selectedMenu" class="menu-panel" fluid @mouseleave="selectedMenu = ''">
+                    <div class="menu-columns">
+                        <div v-for="section in fullMenu[selectedMenu]" :key="section.label" class="menu-section">
+                            <h3 class="menu-title">{{ section.label }}</h3>
+                            <ul v-if="section.children.length" class="submenu-list">
+                                <li v-for="child in section.children" :key="child.label" class="submenu-item"
+                                    @click="goTo(child.path)">
+                                    {{ child.label }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            </v-container>
+                </v-container>
+            </teleport>
         </div>
     </v-app>
 </template>
@@ -135,14 +138,18 @@ function goTo(path) {
 }
 
 .menu-panel {
+    position: fixed;
+    /* 🔥 전체 뷰포트 기준 */
+    top: 70px;
+    /* 헤더 height 맞추기 */
+    left: 0;
+    width: 100%;
     background-color: white;
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
     padding: 24px 48px 36px;
-    margin-top: 70px;
-    position: absolute;
-    width: 100%;
-    left: 0;
+    z-index: 9999;
+    /* 🔥 Vuetify Drawer보다 높게 */
 }
 
 .menu-columns {

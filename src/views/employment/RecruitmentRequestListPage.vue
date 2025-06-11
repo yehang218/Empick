@@ -1,35 +1,28 @@
 <template>
-    <v-app>
-        <Header />
-
-        <!-- 헤더 높이 + 2단 메뉴 고려하여 padding-top 넉넉히 확보 -->
-        <v-main class="pa-4" style="padding-top: 140px;">
-            <v-container fluid>
-                <v-row>
-                    <v-col cols="12">
-                        <v-card>
-                            <v-card-title class="text-h6 font-weight-bold">채용 요청서 목록</v-card-title>
-                            <ListView :headers="headers" :data="store.list" />
-                        </v-card>
-                    </v-col>
-                </v-row>
-            </v-container>
-        </v-main>
-    </v-app>
+    <v-container fluid class="pa-0 mt-0 pt-0">
+        <v-row class="ma-0 pa-0">
+            <v-col cols="12" class="pa-0">
+                <v-card class="mt-0 pa-0">
+                    <v-card-title class="text-h6 font-weight-bold">채용 요청서 목록</v-card-title>
+                    <ListView :headers="headers" :data="store.list" />
+                </v-card>
+            </v-col>
+        </v-row>
+    </v-container>
 </template>
 
 <script setup>
 import { onMounted } from 'vue';
-import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
+import { useRecruitmentStore } from '@/stores/recruitmentStore';
 import ListView from '@/components/common/ListView.vue';
-import Header from '@/components/common/Header.vue';
 
-const store = useRecruitmentRequestStore();
+const store = useRecruitmentStore();
+
 onMounted(() => {
-    store.loadList();
+    store.loadRecruitmentRequestList();
 });
 
-// 채용 요청서 테이블 헤더 정의
+// 테이블 헤더 정의
 const headers = [
     { key: 'positionName', label: '포지션명' },
     { key: 'headcount', label: '인원' },

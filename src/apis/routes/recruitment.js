@@ -1,4 +1,5 @@
-export const RecruitmentRequestAPI = {
-    LIST: '/v1/recruitment/request',
-    DETAIL: (id) => `/v1/recruitment/request/${id}`
+export const RecruitmentAPI = {
+    // 채용 요청서
+    REQUEST_LIST: '/api/v1/employment/recruitments/requests',
+    REQUEST_DETAIL: (id) => `/api/v1/employment/recruitments/requests/${id}`
 };
