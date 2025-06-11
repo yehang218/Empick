@@ -53,7 +53,7 @@
                 <v-switch hide-details inset v-model="darkMode" class="ml-auto" />
             </div>
 
-            <v-btn block color="#607285" class="logout-btn" prepend-icon="mdi-logout">
+            <v-btn block color="#607285" class="logout-btn" prepend-icon="mdi-logout" @click="authStore.logout">
                 Logout
             </v-btn>
         </div>
@@ -64,9 +64,11 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { fullMenu } from '@/json/fullMenu.js'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
 const darkMode = ref(true)
+const authStore = useAuthStore()
 
 // 우선 인사팀으로 설정
 const userRole = ref('인사팀')
