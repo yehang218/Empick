@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.introduce.command.application.controller;
+package com.piveguyz.empickbackend.employment.introduce.command.application.controller.IntroduceTemplateCommnadController;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;

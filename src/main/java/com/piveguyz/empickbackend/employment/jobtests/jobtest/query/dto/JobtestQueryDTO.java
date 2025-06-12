@@ -19,6 +19,8 @@ public class JobtestQueryDTO {
     private String updatedName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
     private List<JobtestQuestionQueryDTO> questions;
     private List<JobtestEvaluationCriteriaQueryDTO> evaluationCriteria;
+    private List<ApplicationInfoDTO> applications;  // 지원자 요약 목록
 }

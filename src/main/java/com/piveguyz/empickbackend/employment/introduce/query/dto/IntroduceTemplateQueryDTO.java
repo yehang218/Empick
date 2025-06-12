@@ -16,5 +16,4 @@ public class IntroduceTemplateQueryDTO {
     private int id;
     private String title;
     private int memberId;
-    private int introduceTemplateItemId;
 }
