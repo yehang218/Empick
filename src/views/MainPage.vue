@@ -2,12 +2,11 @@
     <div>
         <h2>페이지 링크 목록</h2>
         <v-expansion-panels>
-            <v-expansion-panel v-for="domain in domains" :key="domain.name">
-                <v-expansion-panel-title>{{ domain.name }}</v-expansion-panel-title>
+            <v-expansion-panel v-for="(routes, domain) in groupedRoutes" :key="domain">
+                <v-expansion-panel-title>{{ domain }}</v-expansion-panel-title>
                 <v-expansion-panel-text>
                     <v-list>
-                        <v-list-item v-for="route in getRoutesForDomain(domain.prefix)" :key="route.path"
-                            :to="route.path" link>
+                        <v-list-item v-for="route in routes" :key="route.path" :to="route.path" link>
                             <v-list-item-title>{{ route.path }}</v-list-item-title>
                         </v-list-item>
                     </v-list>
@@ -23,27 +22,33 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-// 여기에 새로운 도메인을 추가하면 됩니다
-const domains = [
-    { name: 'Main', prefix: '/' },
-    { name: 'Auth', prefix: '/login' },
-    { name: 'Employment', prefix: '/employment' },
-    { name: 'OrgStructure', prefix: '/orgstructure' },
-    { name: 'Test', prefix: '/test' }
-];
-
-const allRoutes = computed(() => {
-    return router.getRoutes()
+const groupedRoutes = computed(() => {
+    const routes = router.getRoutes()
         .filter(route => !route.path.includes(':')) // 동적 라우트 제외
         .sort((a, b) => a.path.localeCompare(b.path));
-});
 
-const getRoutesForDomain = (prefix) => {
-    return allRoutes.value.filter(route => {
-        if (prefix === '/') return route.path === '/';
-        return route.path.startsWith(prefix);
+    const groups = {
+        'main': [], // 메인 페이지와 대시보드를 위한 그룹
+    };
+
+    routes.forEach(route => {
+        const path = route.path;
+        if (path === '/' || path === '/dashboard') {
+            groups['main'].push(route);
+        } else {
+            const domain = path.split('/')[1];
+            if (!groups[domain]) {
+                groups[domain] = [];
+            }
+            groups[domain].push(route);
+        }
     });
-};
+
+    // 빈 그룹 제거
+    return Object.fromEntries(
+        Object.entries(groups).filter(([_, routes]) => routes.length > 0)
+    );
+});
 </script>
 
 <style scoped>
