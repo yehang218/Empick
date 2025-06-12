@@ -14,8 +14,10 @@
                 typeHandler="com.piveguyz.empickbackend.employment.jobtests.common.typehandler.JobtestDifficultyTypeHandler"/>
         <result property="createdMemberId" column="created_member_id"/>
         <result property="createdMemberName" column="created_member_name"/>
+        <result property="createMemberPictureUrl" column="created_member_picture_url"/>
         <result property="updatedMemberId" column="updated_member_id"/>
         <result property="updatedMemberName" column="updated_member_name"/>
+        <result property="updatedMemberPictureUrl" column="updated_member_picture_url"/>
     </resultMap>
 
     <!-- 문제 상세 조회 -->
@@ -77,7 +79,10 @@
                q.updated_member_id,
 
                cm.name AS created_member_name,
-               um.name AS updated_member_name
+               um.name AS updated_member_name,
+
+               cm.picture_url AS created_member_picture_url,
+               um.picture_url AS updated_member_picture_url
         FROM question q
                  LEFT JOIN member cm ON cm.id = q.created_member_id
                  LEFT JOIN member um ON um.id = q.updated_member_id

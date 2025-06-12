@@ -20,6 +20,8 @@ public class QuestionListQueryDTO {
     private JobtestDifficulty difficulty;
     private int createdMemberId;
     private String createdMemberName;
+    private String createMemberPictureUrl;
     private int updatedMemberId;
     private String updatedMemberName;
+    private String updatedMemberPictureUrl;
 }
