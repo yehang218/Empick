@@ -6,12 +6,12 @@ import com.piveguyz.empickbackend.employment.jobtests.grading.command.domain.agg
 
 public class GradingCriteriaMapper {
 
-    public static GradingCriteriaEntity toEntity(CreateGradingCriteriaCommandDTO dto) {
+    public static GradingCriteriaEntity toEntity(CreateGradingCriteriaCommandDTO dto, int questionId) {
         return GradingCriteriaEntity.builder()
                 .content(dto.getContent())
                 .detailContent(dto.getDetailContent())
                 .scoreWeight(dto.getScoreWeight())
-                .questionId(dto.getQuestionId())
+                .questionId(questionId)
                 .build();
     }
 
@@ -20,7 +20,6 @@ public class GradingCriteriaMapper {
                 .content(entity.getContent())
                 .detailContent(entity.getDetailContent())
                 .scoreWeight(entity.getScoreWeight())
-                .questionId(entity.getQuestionId())
                 .build();
     }
 
