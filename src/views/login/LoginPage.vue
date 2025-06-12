@@ -7,6 +7,27 @@
 
       <h2 class="welcome-text">Welcome to the HR Portal!</h2>
       <h3 class="login-title">Login</h3>
+      <div class="test-accounts">
+        <h4>테스트용 계정 정보</h4>
+        <div class="account-list">
+          <div class="account-item">
+            <span class="account-type">일반 사용자:</span>
+            <span class="account-info">100001 / password1234@@</span>
+          </div>
+          <div class="account-item">
+            <span class="account-type">일반 사용자:</span>
+            <span class="account-info">100002 / password5678@@</span>
+          </div>
+          <div class="account-item">
+            <span class="account-type">퇴사자:</span>
+            <span class="account-info">100003 / password9876@@</span>
+          </div>
+          <div class="account-item">
+            <span class="account-type">인사팀:</span>
+            <span class="account-info">100004 / 123qwe@@</span>
+          </div>
+        </div>
+      </div>
 
       <v-form ref="form" v-model="isFormValid" @submit.prevent="handleLogin">
         <v-text-field v-model="formData.employeeNumber" label="사원번호" :rules="[rules.required, rules.employeeNumber]"
@@ -61,7 +82,7 @@ const errors = reactive({
 const rules = {
   required: v => !!v || '필수 입력 항목입니다.',
   employeeNumber: v => /^\d{6}$/.test(v) || '6자리 사원번호를 입력해주세요.',
-  password: v => v.length >= 8 || '비밀번호는 8자 이상이어야 합니다.'
+  password: v => v.length >= 6 || '비밀번호는 6자 이상이어야 합니다.'
 };
 
 const clearError = (field) => {
