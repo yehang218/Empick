@@ -2,11 +2,12 @@
     <div>
         <h2>Available Routes by Domain</h2>
         <v-expansion-panels>
-            <v-expansion-panel v-for="(routes, domain) in groupedRoutes" :key="domain">
-                <v-expansion-panel-title>{{ domain }}</v-expansion-panel-title>
+            <v-expansion-panel v-for="domain in domains" :key="domain.name">
+                <v-expansion-panel-title>{{ domain.name }}</v-expansion-panel-title>
                 <v-expansion-panel-text>
                     <v-list>
-                        <v-list-item v-for="route in routes" :key="route.path" :to="route.path" link>
+                        <v-list-item v-for="route in getRoutesForDomain(domain.prefix)" :key="route.path"
+                            :to="route.path" link>
                             <v-list-item-title>{{ route.path }}</v-list-item-title>
                         </v-list-item>
                     </v-list>
@@ -22,39 +23,27 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const groupedRoutes = computed(() => {
-    const routes = router.getRoutes()
+// 여기에 새로운 도메인을 추가하면 됩니다
+const domains = [
+    { name: 'Main', prefix: '/' },
+    { name: 'Auth', prefix: '/login' },
+    { name: 'Employment', prefix: '/employment' },
+    { name: 'OrgStructure', prefix: '/orgstructure' },
+    { name: 'Test', prefix: '/test' }
+];
+
+const allRoutes = computed(() => {
+    return router.getRoutes()
         .filter(route => !route.path.includes(':')) // 동적 라우트 제외
         .sort((a, b) => a.path.localeCompare(b.path));
-
-    const groups = {
-        'Main': [],
-        'Auth': [],
-        'Employment': [],
-        'OrgStructure': [],
-        'Test': []
-    };
-
-    routes.forEach(route => {
-        const path = route.path;
-        if (path === '/') {
-            groups['Main'].push(route);
-        } else if (path.startsWith('/login')) {
-            groups['Auth'].push(route);
-        } else if (path.startsWith('/employment')) {
-            groups['Employment'].push(route);
-        } else if (path.startsWith('/orgstructure')) {
-            groups['OrgStructure'].push(route);
-        } else if (path.startsWith('/test')) {
-            groups['Test'].push(route);
-        }
-    });
-
-    // 빈 그룹 제거
-    return Object.fromEntries(
-        Object.entries(groups).filter(([_, routes]) => routes.length > 0)
-    );
 });
+
+const getRoutesForDomain = (prefix) => {
+    return allRoutes.value.filter(route => {
+        if (prefix === '/') return route.path === '/';
+        return route.path.startsWith(prefix);
+    });
+};
 </script>
 
 <style scoped>
