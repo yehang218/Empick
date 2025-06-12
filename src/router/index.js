@@ -1,5 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useAuthStore } from '@/stores/authStore';
+import { authRoutes } from './auth.routes';
+import { employmentRoutes } from './employment.routes';
+import { orgstructureRoutes } from './orgstructure.routes';
+import { testRoutes } from './test.routes';
+import { authGuard } from './middleware/auth.guard';
 
 const routes = [
     {
@@ -11,6 +15,7 @@ const routes = [
         }
     },
     {
+<<<<<<< HEAD
         path: '/login',
         name: 'LoginPage',
         component: () => import('@/views/login/LoginPage.vue'),
@@ -20,6 +25,8 @@ const routes = [
         }
     },
     {
+=======
+>>>>>>> develop
         path: '/dashboard',
         name: 'DashboardPage',
         component: () => import('@/views/DashboardPage.vue'),
@@ -27,6 +34,7 @@ const routes = [
             requiresAuth: true
         }
     },
+<<<<<<< HEAD
     {
         path: '/counter',
         name: 'CounterPage',
@@ -138,6 +146,12 @@ const routes = [
             requiresAuth: true
         }
     },
+=======
+    ...authRoutes,
+    ...employmentRoutes,
+    ...orgstructureRoutes,
+    ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
+>>>>>>> develop
 ];
 
 const router = createRouter({
@@ -145,21 +159,7 @@ const router = createRouter({
     routes
 });
 
-// 네비게이션 가드
-router.beforeEach((to, from, next) => {
-    const authStore = useAuthStore();
-    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-    const isAuthenticated = authStore.isAuthenticated;
-
-    if (requiresAuth && !isAuthenticated) {
-        // 인증이 필요한 페이지인데 로그인하지 않은 경우
-        next('/login');
-    } else if (to.path === '/login' && isAuthenticated) {
-        // 로그인 페이지인데 이미 로그인한 경우
-        next('/');
-    } else {
-        next();
-    }
-});
+// 인증 미들웨어 적용
+router.beforeEach(authGuard);
 
 export default router;
