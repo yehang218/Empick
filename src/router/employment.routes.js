@@ -83,7 +83,7 @@ export const employmentRoutes = [
     },
 
     //    <------------------- 채용공고 -------------------->
-    // 채용 요청서 목록 페이지지
+    // 채용 요청서 목록 페이지
     {
         path: '/employment/recruitments/requests',
         name: 'RecruitmentRequestList',
@@ -92,7 +92,7 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
-    // 채용 요청서 상세 조회 페이지지
+    // 채용 요청서 상세 조회 페이지
     {
         path: '/employment/recruitments/requests/:id',
         name: 'RecruitmentRequestDetail',

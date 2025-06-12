@@ -10,6 +10,7 @@ export default class RecruitmentRequestResponseDTO {
         workLocation,
         qualification,
         preference,
+        responsibility,
         startedAt,
         endedAt
     ) {
@@ -23,6 +24,7 @@ export default class RecruitmentRequestResponseDTO {
         this.workLocation = workLocation;
         this.qualification = qualification;
         this.preference = preference;
+        this.responsibility = responsibility;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
     }
@@ -39,6 +41,7 @@ export default class RecruitmentRequestResponseDTO {
             json.workLocation,
             json.qualification,
             json.preference,
+            json.responsibility,
             json.startedAt,
             json.endedAt
         );

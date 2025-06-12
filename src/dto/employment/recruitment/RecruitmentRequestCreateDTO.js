@@ -10,7 +10,6 @@ export default class RecruitmentRequestCreateDTO {
         responsibility,
         employmentType,
         workLocation,
-        memberId
     ) {
         this.jobId = jobId;
         this.departmentId = departmentId;
@@ -22,6 +21,5 @@ export default class RecruitmentRequestCreateDTO {
         this.responsibility = responsibility;
         this.employmentType = employmentType;
         this.workLocation = workLocation;
-        this.memberId = memberId;
     }
 }

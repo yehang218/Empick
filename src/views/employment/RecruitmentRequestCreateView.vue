@@ -27,6 +27,11 @@
                         :rules="[required]" />
                 </v-col>
 
+                <!-- 근무 지역 -->
+                <v-col cols="12">
+                    <v-text-field v-model="form.workLocation" label="근무 지역" :rules="[required]" />
+                </v-col>
+
                 <!-- 모집 시작일 -->
                 <v-col cols="12">
                     <v-text-field v-model="form.startedAt" label="모집 시작일" type="date" :rules="[required]" />
@@ -51,11 +56,6 @@
                 <v-col cols="12">
                     <v-textarea v-model="form.preference" label="우대 사항" rows="3" />
                 </v-col>
-
-                <!-- 근무 지역 -->
-                <v-col cols="12">
-                    <v-text-field v-model="form.workLocation" label="근무 지역" :rules="[required]" />
-                </v-col>
             </v-row>
 
             <v-row justify="end" class="mt-4">
@@ -72,13 +72,13 @@ import { ref } from 'vue';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
-import { jwtDecode } from 'jwt-decode';
 import { useAuthStore } from '@/stores/authStore';
 import RecruitmentRequestCreateDTO from '@/dto/employment/recruitment/RecruitmentRequestCreateDTO.js';
+import { useToast } from 'vue-toastification';
 
 const store = useRecruitmentRequestStore();
 const router = useRouter();
-const authStore = useAuthStore();
+const toast = useToast();
 
 // 폼 관련
 const isValid = ref(false);
@@ -131,11 +131,6 @@ const setDateRange = (value) => {
 
 // 제출
 const handleSubmit = async () => {
-    // 🔥 토큰에서 memberId 추출
-    const tokens = JSON.parse(localStorage.getItem('auth_tokens') || '{}');
-    const payload = tokens.accessToken ? jwtDecode(tokens.accessToken) : {};
-    console.log('📦 payload from token:', payload);
-    const memberId = payload.id || payload.memberId || payload.sub; // 실제 키 확인
 
     if (formRef.value.validate()) {
         try {
@@ -149,14 +144,15 @@ const handleSubmit = async () => {
                 form.value.preference,
                 form.value.responsibility,
                 form.value.employmentType,
-                form.value.workLocation,
-                memberId
+                form.value.workLocation
             );
             console.log('📨 최종 제출 DTO:', dto);
             await store.submitRecruitmentRequest(dto);
-            router.push('/employment/recruitment-requests');
+
+            toast.success('채용 요청서가 등록되었습니다.');
+            router.push('/employment/recruitments/requests');
         } catch (e) {
-            alert('등록 실패: ' + e.message);
+            toast.error('등록 실패: ' + e.message);
         }
     }
 };

@@ -79,8 +79,19 @@ const fields = computed(() => {
     if (!detail.value) return [];
 
     return [
+        { label: '포지션', value: detail.value.jobName },
+        { label: '부서', value: detail.value.departmentName },
         { label: '모집 인원', value: `${detail.value.headcount}명` },
-        { label: '모집 기간', value: `${formatDate(detail.value.startedAt)} ~ ${formatDate(detail.value.endedAt)}` },
+        { label: '고용 형태', value: detail.value.employmentType },
+        { label: '근무 지역', value: detail.value.workLocation },
+        {
+            label: '모집 기간',
+            value: `${formatDate(detail.value.startedAt)} ~ ${formatDate(detail.value.endedAt)}`
+        },
+        {
+            label: '주요 업무',
+            value: detail.value.responsibility ? detail.value.responsibility.split('\n') : []
+        },
         {
             label: '자격 요건',
             value: detail.value.qualification ? detail.value.qualification.split('\n') : []
@@ -89,12 +100,10 @@ const fields = computed(() => {
             label: '우대 사항',
             value: detail.value.preference ? detail.value.preference.split('\n') : []
         },
-        { label: '고용 형태', value: detail.value.employmentType },
-        { label: '근무 지역', value: detail.value.workLocation },
-        { label: '부서', value: detail.value.departmentName },
         { label: '담당자', value: detail.value.memberName }
     ];
 });
+
 
 const goToRecruitmentCreate = () => {
     router.push({
