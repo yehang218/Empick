@@ -13,7 +13,9 @@
         <result property="difficulty" column="difficulty"
                 typeHandler="com.piveguyz.empickbackend.employment.jobtests.common.typehandler.JobtestDifficultyTypeHandler"/>
         <result property="createdMemberId" column="created_member_id"/>
+        <result property="createdMemberName" column="created_member_name"/>
         <result property="updatedMemberId" column="updated_member_id"/>
+        <result property="updatedMemberName" column="updated_member_name"/>
     </resultMap>
 
     <!-- 문제 상세 조회 -->
@@ -31,7 +33,9 @@
         <result property="createdAt" column="q_created_at"/>
         <result property="updatedAt" column="q_updated_at"/>
         <result property="createdMemberId" column="q_created_member_id"/>
+        <result property="createdMemberName" column="q_created_member_name"/>
         <result property="updatedMemberId" column="q_updated_member_id"/>
+        <result property="updatedMemberName" column="q_updated_member_name"/>
 
         <!-- 1:N 관계 -->
         <collection property="options" resultMap="QuestionOptionMap"/>
@@ -70,8 +74,13 @@
                q.type,
                q.difficulty,
                q.created_member_id,
-               q.updated_member_id
+               q.updated_member_id,
+
+               cm.name AS created_member_name,
+               um.name AS updated_member_name
         FROM question q
+                 LEFT JOIN member cm ON cm.id = q.created_member_id
+                 LEFT JOIN member um ON um.id = q.updated_member_id
     </select>
 
 
@@ -86,6 +95,9 @@
                q.updated_at        AS q_updated_at,
                q.created_member_id AS q_created_member_id,
                q.updated_member_id AS q_updated_member_id,
+
+               cm.name             AS q_created_member_name,
+               um.name             AS q_updated_member_name,
 
                qo.id               AS qo_id,
                qo.option_number    AS qo_option_number,
@@ -102,6 +114,8 @@
                  LEFT JOIN job_test_question jtq ON jtq.question_id = q.id
                  LEFT JOIN job_test jt ON jt.id = jtq.job_test_id
                  LEFT JOIN question_grading_criteria qgc ON qgc.question_id = q.id
+                 LEFT JOIN member cm ON cm.id = q.created_member_id
+                 LEFT JOIN member um ON um.id = q.updated_member_id
         WHERE q.id = #{id}
     </select>
 </mapper>

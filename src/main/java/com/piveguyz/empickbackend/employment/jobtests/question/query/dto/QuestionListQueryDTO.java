@@ -19,5 +19,7 @@ public class QuestionListQueryDTO {
     private QuestionType type;
     private JobtestDifficulty difficulty;
     private int createdMemberId;
+    private String createdMemberName;
     private int updatedMemberId;
+    private String updatedMemberName;
 }
