@@ -1,7 +1,7 @@
 import api from '@/apis/apiClient';
 import { JobtestAPI } from '@/apis/routes/jobtest';
-import JobtestResponseDTO from '@/dto/employment/jobtest/JobtestResponseDTO';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import JobtestResponseDTO from '@/dto/employment/jobtest/jobtestResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 /**

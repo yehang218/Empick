@@ -1,4 +1,4 @@
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import router from '@/router';
 import { useToast } from 'vue-toastification';
 
