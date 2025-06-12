@@ -24,27 +24,42 @@ export const registerMemberService = async (memberData) => {
  */
 export const getMyInfoService = async () => {
     try {
+        console.log('내 정보 조회 API 호출 시작')
         const response = await api.get(API.MEMBER.ME);
-        return response.data;
+        console.log('내 정보 조회 API 응답 전체:', response);
+        console.log('내 정보 조회 API 응답 데이터:', response.data);
+        return response;
     } catch (error) {
+        console.error('내 정보 조회 API 오류:', error)
         throw error;
     }
 };
 
 export const updateMyInfoService = async (memberData) => {
     try {
+        console.log('내 정보 수정 API 호출 시작:', memberData)
         const response = await api.put(API.MEMBER.ME, memberData);
+        console.log('내 정보 수정 API 응답:', response.data)
         return response.data;
     } catch (error) {
+        console.error('내 정보 수정 API 오류:', error)
         throw error;
     }
 };
 
+/**
+ * 프로필 이미지 조회 서비스 (반드시 responseType: 'blob'으로 요청!)
+ * @returns {Promise<Blob>} 프로필 이미지 blob
+ */
 export const profileImageFetchService = async (memberId) => {
     try {
-        const response = await api.get(API.MEMBER.PROFILE_IMAGE(memberId));
-        return response.data;
+        const response = await api.get(API.MEMBER.PROFILE_IMAGE(memberId), {
+            responseType: 'blob' // 반드시 blob으로!
+        });
+        console.log('프로필 이미지 조회 API 응답:', response);
+        return response.data; // 이게 Blob 객체여야 함
     } catch (error) {
+        console.error('프로필 이미지 조회 API 오류:', error)
         throw error;
     }
 };

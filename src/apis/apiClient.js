@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: parseInt(import.meta.env.VITE_TIMEOUT) || 5000,
+    // responseType: 'json', // 기본값은 json, profile-image 등은 개별 요청에서 blob으로 지정
 });
 
 // 요청 인터셉터
@@ -13,12 +14,14 @@ api.interceptors.request.use(
             url: config.url,
             method: config.method,
             data: config.data,
-            headers: config.headers
+            headers: config.headers,
+            responseType: config.responseType // responseType이 blob인지 확인
         });
         const authStore = useAuthStore();
         if (authStore.accessToken) {
             config.headers.Authorization = `Bearer ${authStore.accessToken}`;
         }
+        // responseType은 개별 요청에서 지정된 값을 그대로 사용
         return config;
     },
     error => {
@@ -33,7 +36,8 @@ api.interceptors.response.use(
         console.log('API 응답 성공:', {
             url: response.config.url,
             status: response.status,
-            data: response.data
+            data: response.data,
+            responseType: response.config.responseType // responseType이 blob인지 확인
         });
         return response;
     },
