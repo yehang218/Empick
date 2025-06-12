@@ -20,8 +20,8 @@ public class InterviewScoreCommandServiceImpl implements InterviewScoreCommandSe
     @Override
     public InterviewScoreCommandDTO create(InterviewScoreCommandDTO dto) {
         Integer interviewerId = dto.getInterviewerId();
-        Integer itemId = dto.getItemId();
-        if(repository.existsByInterviewerIdAndItemId(interviewerId, itemId)) {
+        Integer criteriaId = dto.getCriteriaId();
+        if(repository.existsByInterviewerIdAndCriteriaId(interviewerId, criteriaId)) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_SCORE_ALREADY_EXIST);
         }
         Integer score = dto.getScore();
@@ -34,7 +34,7 @@ public class InterviewScoreCommandServiceImpl implements InterviewScoreCommandSe
         }
         InterviewScoreEntity entity = new InterviewScoreEntity();
         entity.setInterviewerId(dto.getInterviewerId());
-        entity.setItemId(dto.getItemId());
+        entity.setCriteriaId(dto.getCriteriaId());
         entity.setScore(dto.getScore());
         entity.setReview(dto.getReview());
         InterviewScoreEntity createdEntity = repository.save(entity);
