@@ -4,7 +4,6 @@ import MailRequestDTO from '@/dto/employment/mail/mailRequestDTO'
 import { useMemberStore } from '@/stores/memberStore'
 import { useFileStore } from '@/stores/fileStore'
 import { useMailStore } from '@/stores/mailStore'
-import { useToast } from 'vue-toastification'
 
 export const useMemberRegisterStore = defineStore('memberRegister', {
     state: () => ({
@@ -131,7 +130,6 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
         },
 
         async registerMemberWithImage() {
-            const toast = useToast()
             const requiredFields = [
                 'name', 'phone', 'pictureUrl', 'email', 'address'
             ]
@@ -168,7 +166,7 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 if (this.profileImageFile) {
                     const uploadResult = await this.uploadProfileImage(this.employeeNumber)
                     if (!uploadResult?.success && uploadResult?.error) {
-                        toast.warning(uploadResult.error)
+                        console.log(uploadResult.error)
                     }
                 }
 
@@ -181,11 +179,10 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                     })
 
                 // 4. 성공 메시지 (한 번만!)
-                // toast.success('사원 등록이 완료되었습니다.')
                 this.resetForm()
                 return true
             } catch (err) {
-                // toast.error('사원 등록에 실패했습니다.')
+                console.error(err)
                 throw err
             }
         }

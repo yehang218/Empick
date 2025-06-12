@@ -1,6 +1,6 @@
 import { FileAPI } from '@/apis/routes/file';
-import { withErrorHandling } from '@/utils/errorHandler';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
+import { throwCustomApiError } from '@/utils/errorHandler';
 
 /**
  * 파일 업로드 서비스
@@ -10,26 +10,38 @@ import ApiResponseDTO from '@/dto/common/apiResponseDTO';
  * @returns {Promise<Object>} 업로드 결과 (url 등)
  */
 export const uploadFileService = async (file, prefix = '', fileName = 'profile.png') => {
-    return withErrorHandling(async () => {
+    try {
         const formData = new FormData();
         formData.append('file', file);
         if (prefix) formData.append('prefix', prefix);
         if (fileName) formData.append('fileName', fileName);
         const response = await FileAPI.uploadFile(formData);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        return apiResponse.data;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const getFileUrl = async (fileId) => {
-    return withErrorHandling(async () => {
+    try {
         const response = await FileAPI.getFileUrl(fileId);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        return apiResponse.data;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const deleteFile = async (fileId) => {
-    return withErrorHandling(async () => {
+    try {
         const response = await FileAPI.deleteFile(fileId);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        return apiResponse.data;
+    } catch (error) {
+        throw error;
+    }
 }; 
