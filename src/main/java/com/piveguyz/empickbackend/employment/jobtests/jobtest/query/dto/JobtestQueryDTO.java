@@ -15,7 +15,7 @@ public class JobtestQueryDTO {
     private int testTime;
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
-    private String creatorName;
+    private String createdName;
     private String updatedName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
