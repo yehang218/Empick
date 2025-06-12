@@ -10,10 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "자기소개서 템플릿 항목 API", description = "자기소개서 템플릿 항목 관련 API")
 @RestController
@@ -35,4 +32,18 @@ public class IntroduceTemplateItemCommandController {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, created));
     }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "템플릿 항목 삭제", description = "자기소개서 템플릿 항목을 삭제한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "삭제 성공"),
+            @ApiResponse(responseCode = "404", description = "템플릿 항목을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    public ResponseEntity<CustomApiResponse<Integer>> delete(@PathVariable int id) {
+        int deletedId = introduceTemplateItemCommandService.delete(id);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, deletedId));
+    }
+
 }

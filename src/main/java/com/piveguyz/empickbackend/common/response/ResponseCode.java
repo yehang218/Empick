@@ -117,8 +117,9 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICANT_DUPLICATE_PHONE(false, HttpStatus.CONFLICT, 2102, "이미 등록된 연락처입니다."),
     APPLICATION_RESPONSE_DUPLICATE(false, HttpStatus.CONFLICT, 2103, "이미 등록된 응답입니다."),
     APPLICATION_RESPONSE_EMPTY_CONTENT(false, HttpStatus.BAD_REQUEST, 2104, "응답 내용은 비워둘 수 없습니다."),
-
-
+    INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2105, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
+    COMMAND_INVALID_ID_ON_CREATE(false, HttpStatus.BAD_REQUEST, 2106, "생성 요청에 ID를 포함할 수 없습니다."),
+    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2107, "이미 존재하는 템플릿 항목명입니다."),
     //  지원서 - 2200 ~ 2299
 
 

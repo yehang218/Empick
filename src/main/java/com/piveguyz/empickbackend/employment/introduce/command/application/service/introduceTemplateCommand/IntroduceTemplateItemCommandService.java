@@ -4,4 +4,6 @@ import com.piveguyz.empickbackend.employment.introduce.command.application.dto.i
 
 public interface IntroduceTemplateItemCommandService {
     IntroduceTemplateItemCommandDTO create(IntroduceTemplateItemCommandDTO dto);
+
+    int delete(int id);
 }

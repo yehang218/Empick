@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IntroduceTemplateItemRepository extends JpaRepository<IntroduceTemplateItemEntity, Integer> {
 
+    boolean existsByTitle(String title);
 }
