@@ -42,7 +42,7 @@ export const updateMyInfoService = async (memberData) => {
 
 export const profileImageFetchService = async (memberId) => {
     try {
-        const response = await api.get(API.MEMBER.PROFILE(memberId));
+        const response = await api.get(API.MEMBER.PROFILE_IMAGE(memberId));
         return response.data;
     } catch (error) {
         throw error;
