@@ -1,23 +1,23 @@
 <template>
     <div class="modal-overlay">
         <div class="modal-box">
+            <button class="close-button" @click="$emit('close')">×</button>
             <p class="modal-message">
                 템플릿을 사용하시겠습니까?
             </p>
             <div class="modal-buttons">
                 <button class="yes" @click="$emit('confirm')">예</button>
-                <button class="no" @click="$emit('cancel')">아니오</button>
+                <button class="no" @click="$emit('no')">아니오</button>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-defineEmits(['confirm', 'cancel']);
+defineEmits(['confirm', 'no', 'close']);
 </script>
 
 <style scoped>
-/* 이전 모달 스타일 재활용 */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -38,6 +38,22 @@ defineEmits(['confirm', 'cancel']);
     text-align: center;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     min-width: 320px;
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 1.4rem;
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #000;
 }
 
 .modal-message {

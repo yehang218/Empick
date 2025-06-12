@@ -27,7 +27,7 @@
                 </v-card>
             </v-col>
         </v-row>
-        <TemplateYNModal v-if="showModal" @confirm="goToTemplate" @cancel="goToEditor" />
+        <TemplateYNModal v-if="showModal" @confirm="goToTemplateSelect" @no="goToEditor" @close="closeModal" />
     </v-container>
 </template>
 
@@ -52,12 +52,21 @@ const handleClick = () => {
     showModal.value = true;
 };
 
-const goToTemplate = () => {
+// '예' → 템플릿 선택 페이지
+const goToTemplateSelect = () => {
+    showModal.value = false;
     router.push(`/employment/recruitments/template-select?id=${id}`);
 };
 
+// '아니오' → 에디터가 있는 공고 작성 페이지
 const goToEditor = () => {
+    showModal.value = false;
     router.push(`/employment/recruitments/create?id=${id}`);
+};
+
+// 'X' → 모달 닫기
+const closeModal = () => {
+    showModal.value = false;
 };
 
 const detail = computed(() => store.recruitmentRequestDetail);
