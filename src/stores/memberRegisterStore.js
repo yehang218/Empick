@@ -43,9 +43,6 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
         }
     },
     actions: {
-        generateRandomEmployeeNumber() {
-            this.employeeNumber = Math.floor(10000 + Math.random() * 90000).toString()
-        },
         setProfileImage(file) {
             this.profileImageFile = file
             const reader = new FileReader()
@@ -53,7 +50,6 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 this.profileImageUrl = e.target.result
             }
             reader.readAsDataURL(file)
-            if (!this.employeeNumber) this.generateRandomEmployeeNumber()
             this.form.pictureUrl = `profiles/${this.employeeNumber}.png`
         },
         clearProfileImage() {
@@ -145,9 +141,6 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 throw new Error('다음 항목을 입력해 주세요: ' + missing.map(key => fieldLabels[key] || key).join(', '))
             }
 
-            if (!this.employeeNumber) this.generateRandomEmployeeNumber()
-            this.form.pictureUrl = `profiles/${this.employeeNumber}.png`
-
             const body = new MemberSignUpRequestDTO({
                 ...this.form,
                 hireAt: this.form.hireAt ? new Date(this.form.hireAt).toISOString() : '',
@@ -161,6 +154,13 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 // 1. 사원 등록
                 registerResult = await memberStore.registerMember(body)
                 if (!registerResult?.success) throw new Error('사원 등록에 실패했습니다.')
+
+                // 백엔드에서 생성된 사번 저장
+                if (!registerResult.data?.employeeNumber) {
+                    throw new Error('사번이 생성되지 않았습니다.')
+                }
+                this.employeeNumber = registerResult.data.employeeNumber
+                this.form.pictureUrl = `profiles/${this.employeeNumber}.png`
 
                 // 2. 프로필 이미지 업로드 (실패해도 계속 진행)
                 if (this.profileImageFile) {
