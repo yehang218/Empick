@@ -21,7 +21,7 @@ export const sendMailService = async (dto, options = {}) => {
         const response = await api.post(MailAPI.SEND, dto);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+        return apiResponse.data;
     }, options);
 };
 

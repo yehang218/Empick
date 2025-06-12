@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia'
 import MemberSignUpRequestDTO from '@/dto/member/memberSignUpRequestDTO'
+import MailRequestDTO from '@/dto/employment/mail/mailRequestDTO'
 import { useMemberStore } from '@/stores/memberStore'
 import { useFileStore } from '@/stores/fileStore'
 import { useMailStore } from '@/stores/mailStore'
+import { useToast } from 'vue-toastification'
 
 export const useMemberRegisterStore = defineStore('memberRegister', {
     state: () => ({
@@ -85,7 +87,51 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             this.profileImageFile = null
             this.profileImageUrl = ''
         },
+
+        async sendWelcomeEmail(employeeNumber, name, email) {
+            const mailStore = useMailStore()
+
+            if (!email) {
+                return { success: false, error: '이메일 주소가 없습니다.' }
+            }
+
+            try {
+                const mailDto = new MailRequestDTO(
+                    email,
+                    '사번 및 임시 비밀번호 안내',
+                    `안녕하세요, ${name}님!\n\n` +
+                    `사원 등록이 완료되었습니다.\n\n` +
+                    `사번: ${employeeNumber}\n` +
+                    `임시 비밀번호: ${employeeNumber}\n\n` +
+                    `보안을 위해 로그인 후 반드시 비밀번호를 변경해주세요.\n\n` +
+                    `감사합니다.`
+                )
+
+                await mailStore.sendMail(mailDto)
+                return { success: true }
+            } catch (e) {
+                console.error('이메일 발송 중 오류 발생:', e)
+                return { success: false, error: e?.message || '이메일 발송에 실패했습니다.' }
+            }
+        },
+
+        async uploadProfileImage(employeeNumber) {
+            if (!this.profileImageFile) return { success: true }
+
+            try {
+                const fileStore = useFileStore()
+                const prefix = 'profiles/'
+                const fileName = `${employeeNumber}.png`
+                await fileStore.uploadProfileImage(this.profileImageFile, prefix, fileName)
+                return { success: true }
+            } catch (e) {
+                console.error('프로필 이미지 업로드 중 오류 발생:', e)
+                return { success: false, error: e?.message || '프로필 이미지 업로드에 실패했습니다.' }
+            }
+        },
+
         async registerMemberWithImage() {
+            const toast = useToast()
             const requiredFields = [
                 'name', 'phone', 'pictureUrl', 'email', 'address'
             ]
@@ -100,42 +146,46 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             if (missing.length > 0) {
                 throw new Error('다음 항목을 입력해 주세요: ' + missing.map(key => fieldLabels[key] || key).join(', '))
             }
+
             if (!this.employeeNumber) this.generateRandomEmployeeNumber()
             this.form.pictureUrl = `profiles/${this.employeeNumber}.png`
+
             const body = new MemberSignUpRequestDTO({
                 ...this.form,
                 hireAt: this.form.hireAt ? new Date(this.form.hireAt).toISOString() : '',
                 birth: this.form.birth,
             })
+
             const memberStore = useMemberStore()
+            let registerResult = null
+
             try {
-                const registerResult = await memberStore.registerMember(body)
+                // 1. 사원 등록
+                registerResult = await memberStore.registerMember(body)
+                if (!registerResult?.success) throw new Error('사원 등록에 실패했습니다.')
+
+                // 2. 프로필 이미지 업로드 (실패해도 계속 진행)
                 if (this.profileImageFile) {
-                    try {
-                        const fileStore = useFileStore()
-                        const prefix = 'profiles/'
-                        const fileName = `${this.employeeNumber}.png`
-                        await fileStore.uploadProfileImage(this.profileImageFile, prefix, fileName)
-                    } catch (e) {
-                        throw new Error('프로필 이미지 업로드에 실패했습니다.')
+                    const uploadResult = await this.uploadProfileImage(this.employeeNumber)
+                    if (!uploadResult?.success && uploadResult?.error) {
+                        toast.warning(uploadResult.error)
                     }
                 }
+
+                // 3. 이메일 발송 (비동기)
+                this.sendWelcomeEmail(this.employeeNumber, this.form.name, this.form.email)
+                    .then(result => {
+                        if (!result?.success && result?.error) {
+                            console.error(result.error)
+                        }
+                    })
+
+                // 4. 성공 메시지 (한 번만!)
+                // toast.success('사원 등록이 완료되었습니다.')
                 this.resetForm()
-                // TODO: 등록 후 이동/초기화 등 처리
-                const employeeNumber = registerResult?.data?.employeeNumber
-                const email = this.form.email
-                // TODO: 메일 전송 기능 추가 후 주석 해제
-                // if (employeeNumber && email) {
-                //     const mailStore = useMailStore()
-                //     const mailDto = new MailRequestDTO({
-                //         email: [email],
-                //         title: '사번 및 임시 비밀번호 안내',
-                //         content: `사번: ${employeeNumber}\n임시 비밀번호: ${employeeNumber}\n로그인 후 비밀번호를 꼭 변경하세요.`
-                //     })
-                //     await mailStore.createMail(mailDto)
-                // }
                 return true
             } catch (err) {
+                // toast.error('사원 등록에 실패했습니다.')
                 throw err
             }
         }
