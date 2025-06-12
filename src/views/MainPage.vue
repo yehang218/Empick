@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Available Routes by Domain</h2>
+        <h2>페이지 링크 목록</h2>
         <v-expansion-panels>
             <v-expansion-panel v-for="domain in domains" :key="domain.name">
                 <v-expansion-panel-title>{{ domain.name }}</v-expansion-panel-title>
