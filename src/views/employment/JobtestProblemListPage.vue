@@ -46,8 +46,8 @@ const headers = [
     { label: '문제 제목', key: 'content' },
     { label: '유형', key: 'type' },
     { label: '난이도', key: 'difficulty' },
-    { label: '출제자', key: 'createdMemberId' },
-    { label: '수정자', key: 'updatedMemberId' },
+    { label: '출제자', key: 'createdMemberName' },
+    { label: '수정자', key: 'updatedMemberName' },
 ]
 
 // 문제 클릭 처리

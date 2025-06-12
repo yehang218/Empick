@@ -1,11 +1,17 @@
 export default class jobtestResponseDTO {
-    constructor(id, content, type, difficulty, createdMemberId, updatedMemberId) {
+    constructor(id, content, type, difficulty, createdMemberId, updatedMemberId, createdMemberName, updatedMemberName
+        , createMemberPictureUrl, updatedMemberPictureUrl
+    ) {
         this.id = id;
         this.content = content;
         this.type = type;
         this.difficulty = difficulty;
         this.createdMemberId = createdMemberId;
         this.updatedMemberId = updatedMemberId;
+        this.createdMemberName = createdMemberName;
+        this.updatedMemberName = updatedMemberName;
+        this.createMemberPictureUrl = createMemberPictureUrl;
+        this.updatedMemberPictureUrl = updatedMemberPictureUrl;
     }
 
     static fromJSON(json) {
@@ -15,7 +21,11 @@ export default class jobtestResponseDTO {
             json.type,
             json.difficulty,
             json.createdMemberId,
-            json.updatedMemberId
+            json.updatedMemberId,
+            json.createdMemberName,
+            json.updatedMemberName,
+            json.createMemberPictureUrl,
+            json.updatedMemberPictureUrl
         );
     }
 
@@ -26,7 +36,11 @@ export default class jobtestResponseDTO {
             type: this.type,
             difficulty: this.difficulty,
             createdMemberId: this.createdMemberId,
-            updatedMemberId: this.updatedMemberId
+            updatedMemberId: this.updatedMemberId,
+            createdMemberName: this.createdMemberName,
+            updatedMemberName: this.updatedMemberName,
+            createMemberPictureUrl: this.createMemberPictureUrl,
+            updatedMemberPictureUrl: this.updatedMemberPictureUrl
         };
     }
 }
