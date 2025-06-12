@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.vue';
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue';
 import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue';
@@ -44,6 +44,10 @@ const form = ref({
     createdMemberId: 1,
     questionOptions: [],
     gradingCriteria: []
+});
+
+watch(activeTab, (newType) => {
+    form.value.type = newType;
 });
 
 const errors = ref({});
@@ -76,7 +80,7 @@ function validateForm() {
         errors.value.content = '문제 내용을 입력해주세요.';
     }
 
-    if (!form.value.answer) {
+    if (form.value.type === 'SUBJECTIVE' && !form.value.answer) {
         errors.value.answer = '정답을 입력해주세요.';
     }
 
@@ -92,9 +96,9 @@ function validateForm() {
         if (!form.value.gradingCriteria.length) {
             errors.value.gradingCriteria = '최소 1개 이상의 채점 기준을 입력해주세요.';
         } else {
-            const totalWeight = form.value.gradingCriteria.reduce((sum, criteria) => sum + criteria.scoreWeight, 0);
-            if (Math.abs(totalWeight - 1) > 0.001) { // 부동소수점 오차 고려
-                errors.value.gradingCriteria = '채점 기준의 점수 가중치 합이 100%가 되어야 합니다.';
+            const totalWeight = form.value.gradingCriteria.reduce((sum, c) => sum + c.scoreWeight, 0);
+            if (Math.abs(totalWeight - 1) > 0.001) {
+                errors.value.gradingCriteria = '채점 기준 점수 가중치 합이 100%가 되어야 합니다.';
             }
         }
     }
@@ -110,7 +114,9 @@ async function handleSubmit() {
 
     try {
         // 정답은 선택된 보기의 content로 설정
-        form.value.answer = form.value.questionOptions.find(opt => opt.isAnswer)?.content || '';
+        if (form.value.type === 'MULTIPLE') {
+            form.value.answer = form.value.questionOptions.find(opt => opt.isAnswer)?.content || '';
+        }
         const dto = CreateQuestionRequestDTO.fromForm(form.value);
         await createQuestionService(dto);
         alert('문제 등록이 완료되었습니다.');
