@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getQuestionsService } from '@/services/jobtestService';
+import { getQuestionsService } from '@/services/jobtestQuestionService';
 import { getQuestionTypeLabel } from '@/constants/employment/questionTypes';
 import { getDifficultyLabel } from '@/constants/employment/difficulty';
 
