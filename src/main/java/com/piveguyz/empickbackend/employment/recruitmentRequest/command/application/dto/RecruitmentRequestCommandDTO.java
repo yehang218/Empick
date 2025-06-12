@@ -21,7 +21,6 @@ public class RecruitmentRequestCommandDTO {
 	private String responsibility;
 	private String employmentType;
 	private String workLocation;
-	private int memberId;
 	private int departmentId;
 	private int jobId;
 }
