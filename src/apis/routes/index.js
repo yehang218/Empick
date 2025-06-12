@@ -1,6 +1,6 @@
 import { AuthAPI } from './auth';
 import { JobtestAPI } from './jobtest';
-import { InterviewAPI } from './interview',
+import { InterviewAPI } from './interview';
 import { MemberAPI } from './member';
 import { FileAPI } from './file';
 import { MailAPI } from './mail';
