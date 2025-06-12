@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
-import { registerMemberService, getMyInfoService, updateMyInfoService, profileImageFetchService } from '@/services/memberService';
-import { MemberResponseDTO } from '@/dto/member/memberResponseDTO';
+import { registerMemberService, getMyInfoService, updateMyInfoService, profileImageFetchService, profileImageUploadService } from '@/services/memberService';
 
 export const useMemberStore = defineStore('member', {
     state: () => ({
@@ -24,6 +23,7 @@ export const useMemberStore = defineStore('member', {
         loading: false,
         error: '',
         profileImageUrl: '',
+        defaultProfileImageUrl: '/images/default-profile.png'
     }),
     actions: {
         async registerMember(memberData) {
@@ -83,6 +83,17 @@ export const useMemberStore = defineStore('member', {
             this.loading = true;
             this.error = '';
             try {
+                // 입력값 검증
+                if (!this.form.name?.trim()) {
+                    throw new Error('이름을 입력해주세요.');
+                }
+                if (!/^010-\d{4}-\d{4}$/.test(this.form.phone)) {
+                    throw new Error('올바른 연락처 형식이 아닙니다.');
+                }
+                if (!/.+@.+\..+/.test(this.form.email)) {
+                    throw new Error('올바른 이메일 형식이 아닙니다.');
+                }
+
                 const result = await updateMyInfoService(this.form);
                 if (result) {
                     Object.assign(this.form, result);
@@ -108,11 +119,19 @@ export const useMemberStore = defineStore('member', {
             }
         },
 
-        setProfileImage(file) {
-            if (file) {
-                this.profileImageUrl = URL.createObjectURL(file);
-                // TODO: 이미지 업로드 API 구현 필요
+        async uploadProfileImage(memberId, formData) {
+            try {
+                const result = await profileImageUploadService(memberId, formData);
+                if (result) {
+                    // 업로드 성공 후 프로필 이미지 새로고침
+                    await this.fetchProfileImage(memberId);
+                }
+                return result;
+            } catch (err) {
+                console.error('프로필 이미지 업로드 실패:', err);
+                this.error = err.message || '프로필 이미지 업로드에 실패했습니다.';
+                throw err;
             }
-        },
+        }
     },
 }); 

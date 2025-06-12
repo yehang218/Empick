@@ -63,3 +63,17 @@ export const profileImageFetchService = async (memberId) => {
         throw error;
     }
 };
+
+export const profileImageUploadService = async (memberId, formData) => {
+    try {
+        const response = await api.post(API.MEMBER.PROFILE_IMAGE(memberId), formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('프로필 이미지 업로드 API 오류:', error)
+        throw error;
+    }
+};

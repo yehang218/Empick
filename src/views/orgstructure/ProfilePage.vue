@@ -15,7 +15,7 @@
                     color="#D3D3D3" style="position: relative; overflow: hidden;">
                     <v-img :src="profileImageSrc" width="160" height="160" cover />
                 </v-sheet>
-                <input ref="fileInputRef" type="file" accept="image/*" style="display: none;"
+                <input ref="fileInputRef" type="file" accept="image/jpeg,image/png,image/webp" style="display: none;"
                     @change="onProfileImageChange" />
                 <v-btn color="success" @click="triggerFileInput" style="width: 100px;">수정</v-btn>
             </v-col>
@@ -33,10 +33,11 @@
                     </v-col>
                     <v-col cols="6">
                         <v-text-field label="연락처" v-model="memberStore.form.phone" required placeholder="010-1234-5678"
-                            :disabled="!isEditing" />
+                            :disabled="!isEditing" :rules="[v => /^010-\d{4}-\d{4}$/.test(v) || '올바른 연락처 형식이 아닙니다']" />
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field label="이메일" v-model="memberStore.form.email" required :disabled="!isEditing" />
+                        <v-text-field label="이메일" v-model="memberStore.form.email" required :disabled="!isEditing"
+                            :rules="[v => /.+@.+\..+/.test(v) || '올바른 이메일 형식이 아닙니다']" />
                     </v-col>
                     <v-col cols="12" class="mt-6 mb-2">
                         <h3 class="text-subtitle-1 font-weight-bold">소속 정보</h3>
@@ -84,16 +85,18 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useMemberStore } from '@/stores/memberStore'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const memberStore = useMemberStore()
 const router = useRouter()
+const toast = useToast()
 const fileInputRef = ref(null)
 const isEditing = ref(false)
 const originalForm = ref(null)
 
 // 프로필 이미지 바인딩: blob url이 있으면 그걸, 없으면 기본 이미지
 const profileImageSrc = computed(() => {
-    return memberStore.profileImageUrl || require('@/assets/default-profile.png')
+    return memberStore.profileImageUrl || memberStore.defaultProfileImageUrl
 })
 
 // form 데이터 변경 감시
@@ -117,8 +120,10 @@ const saveChanges = async () => {
     try {
         await memberStore.updateMyInfo()
         isEditing.value = false
+        toast.success('기본 정보가 성공적으로 수정되었습니다.')
     } catch (error) {
         console.error('정보 수정 실패:', error)
+        toast.error('기본 정보 수정에 실패했습니다.')
     }
 }
 
@@ -128,7 +133,29 @@ const triggerFileInput = () => {
 
 const onProfileImageChange = (event) => {
     const file = event.target.files && event.target.files[0]
-    if (file) memberStore.setProfileImage(file)
+    if (file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('JPG, PNG, WEBP 형식의 이미지만 업로드할 수 있습니다.')
+            return
+        }
+        if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+            toast.error('파일 크기는 5MB를 초과할 수 없습니다.')
+            return
+        }
+        const formData = new FormData()
+        const fileName = `${memberStore.form.employeeNumber}.png`
+        const newFile = new File([file], fileName, { type: file.type })
+        formData.append('file', newFile)
+        formData.append('fileName', fileName)
+        memberStore.uploadProfileImage(memberStore.form.id, formData)
+            .then(() => {
+                toast.success('프로필 이미지가 성공적으로 업로드되었습니다.')
+            })
+            .catch(() => {
+                toast.error('프로필 이미지 업로드에 실패했습니다.')
+            })
+    }
 }
 
 const goToResult = () => {
