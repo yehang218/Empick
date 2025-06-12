@@ -1,7 +1,7 @@
 import api from '@/apis/apiClient';
 import { JobtestAPI } from '@/apis/routes/jobtest';
-import JobtestResponseDTO from '@/dto/employment/jobtest/JobtestResponseDTO';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import QuestionResponseDTO from '@/dto/employment/jobtest/questionResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 /**
@@ -17,6 +17,6 @@ export const getQuestionsService = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data.map(item => JobtestResponseDTO.fromJSON(item));
+        return apiResponse.data.map(item => QuestionResponseDTO.fromJSON(item));
     }, options);
 };

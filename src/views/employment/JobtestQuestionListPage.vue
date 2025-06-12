@@ -15,8 +15,8 @@
                 </v-alert>
 
                 <!-- 문제 리스트 -->
-                <JobtestListView v-if="!jobtestStore.loading && !jobtestStore.error" :headers="headers"
-                    :items="jobtestStore.questions" :showCheckbox="true" :showArrow="true"
+
+                <ListView :headers="headers" :data="jobtestStore.questions" :showCheckbox="true"
                     @item-click="handleItemClick" />
 
                 <div class="d-flex justify-end mt-4">
@@ -36,8 +36,8 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import JobtestListView from '@/components/employment/JobtestListView.vue'
-import { useJobtestStore } from '@/stores/jobtestStore'
+import ListView from '@/components/common/ListView.vue'
+import { useJobtestStore } from '@/stores/jobtestQuestionStore'
 
 const router = useRouter()
 const jobtestStore = useJobtestStore()
@@ -46,8 +46,8 @@ const headers = [
     { label: '문제 제목', key: 'content' },
     { label: '유형', key: 'type' },
     { label: '난이도', key: 'difficulty' },
-    { label: '출제자', key: 'createdMemberId' },
-    { label: '수정자', key: 'updatedMemberId' },
+    { label: '출제자', key: 'createdMemberName' },
+    { label: '수정자', key: 'updatedMemberName' },
 ]
 
 // 문제 클릭 처리
