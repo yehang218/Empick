@@ -4,6 +4,7 @@
         <v-table class="mt-5">
             <thead>
                 <tr>
+                    <th v-if="showCheckbox" style="width: 48px;"></th>
                     <th v-for="header in headers" :key="header.key">
                         {{ header.label }}
                     </th>
@@ -12,6 +13,9 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in data" :key="index">
+                    <td v-if="showCheckbox">
+                        <v-checkbox v-model="item.selected" :ripple="false" hide-details density="compact" />
+                    </td>
                     <td v-for="header in headers" :key="header.key">
                         <template v-if="header.key === 'avatarName' && item.avatar && item.name">
                             <div class="d-flex align-center">
@@ -60,6 +64,10 @@ export default {
             type: Array,
             required: true,
             default: () => []
+        },
+        showCheckbox: {
+            type: Boolean,
+            default: false
         }
     }
 }
