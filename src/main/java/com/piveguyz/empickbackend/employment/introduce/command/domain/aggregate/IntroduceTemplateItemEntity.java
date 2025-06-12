@@ -1,5 +1,5 @@
 
-package com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.introduceTemplateCommand;
+package com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.introduce.command.application.dto.introduceTemplate;
+package com.piveguyz.empickbackend.employment.introduce.command.application.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
