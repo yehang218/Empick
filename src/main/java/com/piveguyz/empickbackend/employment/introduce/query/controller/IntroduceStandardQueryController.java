@@ -2,8 +2,6 @@ package com.piveguyz.empickbackend.employment.introduce.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO;
-import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceStandard;
 import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardItemQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO;
 import com.piveguyz.empickbackend.employment.introduce.query.service.IntroduceStandardQueryService;
