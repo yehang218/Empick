@@ -3,8 +3,8 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.piveguyz.empickbackend.employment.interviewCriteria.query.mapper.InterviewCriteriaMapper">
-    <resultMap id="InterviewCriteriaResultMap" type="com.piveguyz.empickbackend.employment.interviewCriteria.query.dto.InterviewCriteriaQueryDTO">
+<mapper namespace="com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.mapper.InterviewCriteriaMapper">
+    <resultMap id="InterviewCriteriaResultMap" type="com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.dto.InterviewCriteriaQueryDTO">
         <id column="id" property="id"/>
         <result column="content" property="content"/>
         <result column="detail_content" property="detailContent"/>

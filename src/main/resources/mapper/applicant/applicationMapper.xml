@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.applicant.query.mapper.ApplicationMapper">
+    <resultMap id="ApplicationResultMap" type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQueryDTO">
+        <result property="id" column="id"/>
+        <result property="recruitmentId" column="recruitment_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result column="status" property="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApplicationStatusHandler"/>
+        <result property="applicantId" column="applicant_id"/>
+        <result property="introduceRatingResultId" column="introduce_rating_result_id"/>
+        <result property="interviewId" column="interview_id"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="updatedBy" column="updated_by"/>
+    </resultMap>
+
+    <select id="findAllApplication" resultMap="ApplicationResultMap">
+        SELECT
+            a.id,
+            a.recruitment_id,
+            a.created_at,
+            a.status,
+            a.applicant_id,
+            a.introduce_rating_result_id,
+            a.updated_at,
+            a.updated_by
+        FROM application a
+                 LEFT JOIN recruitment r ON a.recruitment_id = r.id
+                 LEFT JOIN applicant ap ON a.applicant_id = ap.id
+                 LEFT JOIN introduce_rating_result irr ON a.introduce_rating_result_id = irr.id
+                 LEFT JOIN member m ON a.updated_by = m.id
+    </select>
+</mapper>

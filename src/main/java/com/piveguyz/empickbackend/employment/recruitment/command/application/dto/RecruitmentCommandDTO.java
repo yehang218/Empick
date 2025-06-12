@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.piveguyz.empickbackend.employment.applicationItem.query.dto.ApplicationItemCreateDTO;
 import com.piveguyz.empickbackend.employment.recruitment.command.domain.enums.RecruitType;
+import com.piveguyz.empickbackend.employment.recruitmentProcess.command.application.dto.RecruitmentProcessCreateDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,4 +29,5 @@ public class RecruitmentCommandDTO {
 	private Integer recruitmentRequestId;
 
 	private List<ApplicationItemCreateDTO> applicationItems; // 지원서 항목
+	private List<RecruitmentProcessCreateDTO> recruitmentProcesses; // 채용 프로세스
 }

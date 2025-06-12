@@ -20,6 +20,8 @@ CREATE TABLE job_test
     title             VARCHAR(255) NOT NULL,
     difficulty        TINYINT      NOT NULL,
     test_time         INT          NOT NULL,
+    started_at        DATETIME     NULL COMMENT '시험 시작 일시',
+    ended_at          DATETIME     NULL COMMENT '시험 종료 일시',
     created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME     NULL,
     created_member_id INT          NOT NULL,
@@ -33,19 +35,20 @@ CREATE TABLE job_test
 # ========================== 지원서별 실무 테스트
 CREATE TABLE application_job_test
 (
-    id                  INT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    assigned_at         DATETIME NOT NULL,
-    evaluator_comment   LONGTEXT NULL,
-    submitted_at        DATETIME NOT NULL,
-    grading_total_score INT      NULL,
-    evaluation_score    INT      NULL,
-    grading_status      TINYINT  NOT NULL DEFAULT 0,
-    evaluation_status   TINYINT  NOT NULL DEFAULT 0,
-    application_id      INT      NOT NULL,
-    job_test_id         INT      NOT NULL,
-    member_id           INT      NOT NULL,
+    id                  INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    evaluator_comment   LONGTEXT     NULL COMMENT '평가자 코멘트',
+    submitted_at        DATETIME     NOT NULL COMMENT '제출 일시',
+    grading_total_score DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '채점 총 점수',
+    evaluation_score    DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '평가 점수',
+    grading_status      TINYINT      NOT NULL DEFAULT 0 COMMENT '채점 상태',
+    evaluation_status   TINYINT      NOT NULL DEFAULT 0 COMMENT '평가 상태',
+    entry_code          VARCHAR(255) NULL COMMENT '입장 코드',
 
-    FOREIGN KEY (`application_id`) REFERENCES `application`(`id`),
+    application_id      INT          NOT NULL COMMENT '지원서 id',
+    job_test_id         INT          NOT NULL COMMENT '실무테스트 id',
+    member_id           INT          NULL COMMENT '평가자 id',
+
+    FOREIGN KEY (`application_id`) REFERENCES `application` (`id`),
     FOREIGN KEY (`job_test_id`) REFERENCES `job_test` (`id`),
     FOREIGN KEY (`member_id`) REFERENCES `member` (`id`)
 );
@@ -102,11 +105,12 @@ CREATE TABLE answer
     content                 LONGTEXT NOT NULL,
     attempt                 INT      NOT NULL DEFAULT 1,
     is_correct              TINYINT  NULL,
+    score                   DOUBLE   NULL DEFAULT 0.0,
     application_job_test_id INT      NOT NULL,
-    job_test_question_id    INT      NOT NULL,
+    question_id             INT      NOT NULL,
 
     FOREIGN KEY (`application_job_test_id`) REFERENCES `application_job_test` (`id`),
-    FOREIGN KEY (`job_test_question_id`) REFERENCES `job_test_question` (`id`)
+    FOREIGN KEY (`question_id`) REFERENCES `question` (`id`)
 );
 
 
@@ -132,8 +136,8 @@ CREATE TABLE grading_result
     answer_id                    INT        NOT NULL,
     question_grading_criteria_id INT        NOT NULL,
 
-    FOREIGN KEY (`answer_id`) REFERENCES `answer` (`id`)
-
+    FOREIGN KEY (`answer_id`) REFERENCES `answer` (`id`),
+    FOREIGN KEY (`question_grading_criteria_id`) REFERENCES `question_grading_criteria` (`id`)
 );
 
 
@@ -155,7 +159,7 @@ CREATE TABLE job_test_evaluation_result
 (
     id                              INT      NOT NULL AUTO_INCREMENT PRIMARY KEY,
     evaluator_comment               LONGTEXT NULL,
-    score                           INT      NOT NULL,
+    score                           DOUBLE   NOT NULL DEFAULT 0.0,
     application_job_test_id         INT      NOT NULL,
     job_test_evaluation_criteria_id INT      NOT NULL,
 

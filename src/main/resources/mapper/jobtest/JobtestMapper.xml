@@ -26,6 +26,8 @@
         <result property="title" column="job_test_title"/>
         <result property="difficulty" column="difficulty"/>
         <result property="testTime" column="test_time"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="endedAt" column="ended_at"/>
         <result property="creatorName" column="creator_name"/>
         <result property="updatedName" column="updated_name"/>
         <result property="createdAt" column="created_at"/>
@@ -41,8 +43,8 @@
 
 
     <!--    상세조회-->
-    <resultMap id="ApplicationJobtestMap"
-               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationJobtestQueryDTO">
+    <resultMap id="ApplicationInfoMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationInfoDTO">
         <id property="applicationId" column="application_id"/>
         <result property="applicantId" column="applicant_id"/>
         <result property="applicantName" column="applicant_name"/>
@@ -54,6 +56,8 @@
         <result property="title" column="job_test_title"/>
         <result property="difficulty" column="difficulty"/>
         <result property="testTime" column="test_time"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="endedAt" column="ended_at"/>
         <result property="creatorName" column="creator_name"/>
         <result property="updatedName" column="updated_name"/>
         <result property="createdAt" column="created_at"/>
@@ -61,7 +65,7 @@
 
         <collection property="questions" resultMap="JobTestQuestionMap"/>
         <collection property="evaluationCriteria" resultMap="JobTestEvalCriteriaMap"/>
-        <collection property="applications" resultMap="ApplicationJobtestMap"/>
+        <collection property="applications" resultMap="ApplicationInfoMap"/>
     </resultMap>
 
 
@@ -73,6 +77,8 @@
                jt.title AS job_test_title,
                jt.difficulty,
                jt.test_time,
+               jt.started_at,
+               jt.ended_at,
                cm.name  AS creator_name,
                um.name  AS updated_name,
                jt.created_at,
@@ -89,6 +95,8 @@
                jt.title            AS job_test_title,
                jt.difficulty,
                jt.test_time,
+               jt.started_at,
+               jt.ended_at,
                cm.name             AS creator_name,
                um.name             AS updated_name,
                jt.created_at,

@@ -19,7 +19,7 @@ public class LoginRequestDTO {
     private String employeeNumber;
 
     @NotBlank(message = "비밀번호는 필수 입력값입니다.")
-    @Size(min = 8, max = 30, message = "비밀번호는 8자 이상 30자 이하로 입력하세요.")
+    @Size(min = 6, max = 30, message = "비밀번호는 6자 이상 30자 이하로 입력하세요.")
     private String password;
 
 }

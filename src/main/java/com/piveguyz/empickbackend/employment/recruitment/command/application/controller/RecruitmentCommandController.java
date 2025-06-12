@@ -1,6 +1,8 @@
 package com.piveguyz.empickbackend.employment.recruitment.command.application.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,10 +22,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "채용 공고 커맨드 API", description = "채용 공고 등록/수정/삭제")
+@Tag(name = "채용 공고 API", description = "채용 공고 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/employment/recruitment")
+@RequestMapping("/api/v1/employment/recruitments")
 public class RecruitmentCommandController {
 	private final RecruitmentCommandService recruitmentCommandService;
 
@@ -62,7 +64,7 @@ public class RecruitmentCommandController {
 		@ApiResponse(responseCode = "2043", description = "잘못된 상태 전환입니다."),
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
 	})
-	@PutMapping("/status/{id}")
+	@PatchMapping("/{id}/status")
 	public ResponseEntity<CustomApiResponse<Void>> updateStatus(@PathVariable int id, @RequestParam int status) {
 		recruitmentCommandService.updateStatus(id, status);
 		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
@@ -76,7 +78,7 @@ public class RecruitmentCommandController {
 		@ApiResponse(responseCode = "2032", description = "이미 삭제된 채용 공고입니다."),
 		@ApiResponse(responseCode = "500", description = "서버 내부 오류입니다.")
 	})
-	@PutMapping("/delete/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<CustomApiResponse<Void>> delete(@PathVariable int id) {
 		recruitmentCommandService.deleteRecruitment(id);
 		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())

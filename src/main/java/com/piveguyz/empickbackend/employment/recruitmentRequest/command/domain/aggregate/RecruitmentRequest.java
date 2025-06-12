@@ -57,4 +57,7 @@ public class RecruitmentRequest {
 
 	@Column(name = "department_id")
 	private int departmentId;
+
+	@Column(name = "job_id")
+	private int jobId;
 }

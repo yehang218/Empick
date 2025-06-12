@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.applicationItem.command.domain.aggregate;
 
+import com.piveguyz.empickbackend.common.handler.YnBooleanConverter;
 import com.piveguyz.empickbackend.employment.recruitment.command.domain.aggregate.Recruitment;
 
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.*;
 @Entity
 @Table(name = "application_item")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,11 +19,8 @@ public class ApplicationItem {
 	private int id;
 
 	@Column(name = "is_required", nullable = false)
-	private String isRequiredYn;
-
-	public boolean isRequired() {
-		return "Y".equalsIgnoreCase(isRequiredYn);
-	}
+	@Convert(converter = YnBooleanConverter.class)
+	private Boolean isRequiredYn;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "application_item_category_id")

@@ -26,6 +26,9 @@ public class MailEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "content")
     private String content;
 

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,6 +16,7 @@ public class MailCommandDTO {
     private Integer id;
     private Integer applicantId;
     private String email;
+    private String title;
     private String content;
     private Integer senderId;
     private LocalDateTime sendedAt;
