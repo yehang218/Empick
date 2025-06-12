@@ -1,4 +1,4 @@
 package com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate;
 
-public class IntroduceTemplate {
+public class IntroduceStandardEntity {
 }
