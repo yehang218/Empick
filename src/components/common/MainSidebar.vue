@@ -24,7 +24,7 @@
                         </template>
 
                         <v-list-item v-for="(subItem, j) in section.children" :key="j" :title="subItem.label"
-                            :to="subItem.path" link :active="route.path === subItem.path" class="menu-item"
+                            :to="subItem.path" link :active="route.path === subItem.path || route.path.startsWith(subItem.path)" class="menu-item"
                             active-class="active-item" />
                     </v-list-group>
                 </template>

@@ -5,6 +5,20 @@ import { orgstructureRoutes } from './orgstructure.routes';
 import { testRoutes } from './test.routes';
 import { authGuard } from './middleware/auth.guard';
 
+const allRouteModules = [
+    ...authRoutes,
+    ...employmentRoutes,
+    ...orgstructureRoutes,
+    ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
+];
+
+// fullMenu.js 에서 사용하기 위해
+export const routeMap = Object.fromEntries(
+    allRouteModules
+        .filter(route => route.name && route.path)
+        .map(route => [route.name, route.path])
+);
+
 const routes = [
     {
         path: '/',
@@ -22,10 +36,7 @@ const routes = [
             requiresAuth: true
         }
     },
-    ...authRoutes,
-    ...employmentRoutes,
-    ...orgstructureRoutes,
-    ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
+    ...allRouteModules
 ];
 
 const router = createRouter({
