@@ -12,6 +12,8 @@ import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class QuestionCommandServiceImpl implements QuestionCommandService {
 
@@ -49,7 +51,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     public UpdateQuestionCommandDTO updateQuestion(int id, UpdateQuestionCommandDTO updateQuestionCommandDTO) {
         // 문제 있는지 확인
         QuestionEntity question = questionRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION));
 
         // 수정자가 없는 회원이라면
         if (!memberRepository.existsById(updateQuestionCommandDTO.getUpdatedMemberId())) {
@@ -68,7 +70,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     public DeleteQuestionCommandDTO deleteQuestion(int id) {
         // 문제 있는지 확인
         QuestionEntity question = questionRepository.findById(id)
-                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION));
 
         try {
             questionRepository.delete(question);
@@ -78,5 +80,10 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         }
 
         return QuestionMapper.toDeleteDto(question);
+    }
+
+    @Override
+    public Optional<QuestionEntity> findById(int questionId) {
+        return questionRepository.findById(questionId);
     }
 }

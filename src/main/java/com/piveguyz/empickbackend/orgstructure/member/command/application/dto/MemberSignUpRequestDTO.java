@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 public class MemberSignUpRequestDTO {
 
-    @NotBlank
     private String password;
 
     @NotBlank
@@ -34,7 +33,6 @@ public class MemberSignUpRequestDTO {
 
     private Integer vacationCount = 0;
 
-    @NotNull
     private LocalDateTime hireAt;
 
     private LocalDateTime resignAt;

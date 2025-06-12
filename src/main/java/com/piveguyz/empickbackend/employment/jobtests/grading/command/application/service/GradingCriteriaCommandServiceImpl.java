@@ -26,7 +26,7 @@ public class GradingCriteriaCommandServiceImpl implements GradingCriteriaCommand
     public CreateGradingCriteriaCommandDTO createGradingCriteria(CreateGradingCriteriaCommandDTO createGradingCriteriaCommandDTO) {
         // 존재하지 않는 문제인 경우
         if (!questionRepository.existsById(createGradingCriteriaCommandDTO.getQuestionId())) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_NOT_FOUND);
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION);
         }
 
         // 가중치가 0 ~ 1이 아닌 경우

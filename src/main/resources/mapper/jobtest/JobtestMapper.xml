@@ -4,7 +4,17 @@
 
 <mapper namespace="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.mapper.JobtestMapper">
 
-<!--    전체 조회-->
+<!--    전체 조회  -->
+    <resultMap id="JobTestMap" type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestListQueryDTO">
+        <id property="id" column="job_test_id"/>
+        <result property="title" column="job_test_title"/>
+        <result property="difficulty" column="difficulty"/>
+        <result property="creatorName" column="creator_name"/>
+        <result property="updatedName" column="updated_name"/>
+    </resultMap>
+
+
+    <!--    상세조회  -->
     <resultMap id="JobTestQuestionMap"
                type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionQueryDTO">
         <id property="id" column="job_test_question_id"/>
@@ -21,28 +31,7 @@
         <result property="scoreWeight" column="score_weight"/>
     </resultMap>
 
-    <resultMap id="JobTestMap" type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQueryDTO">
-        <id property="id" column="job_test_id"/>
-        <result property="title" column="job_test_title"/>
-        <result property="difficulty" column="difficulty"/>
-        <result property="testTime" column="test_time"/>
-        <result property="startedAt" column="started_at"/>
-        <result property="endedAt" column="ended_at"/>
-        <result property="creatorName" column="creator_name"/>
-        <result property="updatedName" column="updated_name"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="updatedAt" column="updated_at"/>
 
-        <collection property="questions"
-                    ofType="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionQueryDTO"
-                    resultMap="JobTestQuestionMap"/>
-        <collection property="evaluationCriteria"
-                    ofType="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestEvaluationCriteriaQueryDTO"
-                    resultMap="JobTestEvalCriteriaMap"/>
-    </resultMap>
-
-
-    <!--    상세조회-->
     <resultMap id="ApplicationInfoMap"
                type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.ApplicationInfoDTO">
         <id property="applicationId" column="application_id"/>
@@ -51,7 +40,7 @@
     </resultMap>
 
     <resultMap id="JobTestApplicationsMap"
-               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestApplicationsDTO">
+               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQueryDTO">
         <id property="id" column="job_test_id"/>
         <result property="title" column="job_test_title"/>
         <result property="difficulty" column="difficulty"/>

@@ -72,11 +72,11 @@ public class MemberCommandController {
                 .body(CustomApiResponse.of(ResponseCode.CREATED, result));
     }
 
-    @PostMapping("/{memberId}/resign")
+    @PatchMapping("/{memberId}")
     @Operation(
             summary = "사원 퇴사 처리",
             description = """
-            - 해당 사원을 퇴사 처리합니다.
+            - 해당 사원의 상태를 '퇴사'로 변경합니다.
             - `resign_at`(퇴사일)을 현재 시간으로 업데이트하고, `status`를 비활성(0)으로 설정합니다.
             """,
             security = @SecurityRequirement(name = "bearerAuth")

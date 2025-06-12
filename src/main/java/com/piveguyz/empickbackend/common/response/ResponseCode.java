@@ -2,7 +2,6 @@ package com.piveguyz.empickbackend.common.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -37,7 +36,6 @@ public enum ResponseCode {
     MEMBER_CREATED_MEMBER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1007, "입사처리자를 찾을 수 없습니다."),
     MEMBER_CREATED_MEMBER_NO_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "입사처리자는 ROLE_HR_ACCESS 권한이 있어야 합니다."),
     NO_HR_PERMISSION(false, HttpStatus.FORBIDDEN, 1008, "ROLE_HR_ACCESS 권한이 있어야 합니다."),
-
     MEMBER_PROFILE_IMAGE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1009 , "사원의 프로필 사진을 찾을 수 없습니다." ),
     MEMBER_ID_INVALID(false, HttpStatus.BAD_REQUEST, 1010, "유효하지 않은 사원 ID 입니다."),
     DUPLICATE_EDIT_REQUEST(false, HttpStatus.CONFLICT, 1011, "같은 필드에 대해 이미 대기중인 수정 요청이 존재합니다."),
@@ -49,6 +47,8 @@ public enum ResponseCode {
     EDIT_PROPOSAL_REJECTED(true, HttpStatus.NOT_ACCEPTABLE, 1105, "변경 요청이 거절되었습니다."),
     REQUIRED_LOGIN(true, HttpStatus.NOT_ACCEPTABLE, 1106, "로그인이 필요합니다."),
     ALREDY_RESIGNED(true, HttpStatus.NOT_ACCEPTABLE, 1107, "퇴사 처리된 사원입니다."),
+    INVALID_STATUS_VALUE(true, HttpStatus.NOT_ACCEPTABLE, 1108, "요청된 상태 값이 유효하지 않습니다."),
+    EDIT_PROPOSAL_MEMBER_MISMATCH(true, HttpStatus.BAD_REQUEST, 1109, "해당 제안이 사원 정보와 일치하지 않습니다."),
 
     // 부서, 직책, 직무, 직급 관련 NOT_FOUND
     DEPARTMENT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1200, "요청한 부서를 찾을 수 없습니다."),
@@ -67,6 +67,8 @@ public enum ResponseCode {
     EMPLOYMENT_REQUEST_MISSING_QUALIFICATION(false, HttpStatus.BAD_REQUEST, 2005, "자격 요건을 입력해야 합니다."),
     EMPLOYMENT_REQUEST_MISSING_RESPONSIBILITY(false, HttpStatus.BAD_REQUEST, 2006, "담당 업무를 입력해야 합니다."),
     EMPLOYMENT_REQUEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2007, "해당 기간 내 중복된 채용 요청이 존재합니다."),
+    EMPLOYMENT_REQUEST_INVALID_JOB_ID(false, HttpStatus.BAD_REQUEST, 2008, "유효하지 않은 직무 ID입니다."),
+    EMPLOYMENT_REQUEST_INVALID_DEPARTMENT_ID(false, HttpStatus.BAD_REQUEST, 2009, "유효하지 않은 부서 ID입니다."),
 
     // 2) 채용 템플릿
     EMPLOYMENT_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2010, "요청한 템플릿을 찾을 수 없습니다."),
@@ -115,6 +117,14 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICANT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2100, "요청한 ID가 존재하지 않습니다."),
     EMPLOYMENT_APPLICANT_DUPLICATE_EMAIL(false, HttpStatus.CONFLICT, 2101, "이미 등록된 이메일입니다."),
     EMPLOYMENT_APPLICANT_DUPLICATE_PHONE(false, HttpStatus.CONFLICT, 2102, "이미 등록된 연락처입니다."),
+    APPLICATION_RESPONSE_DUPLICATE(false, HttpStatus.CONFLICT, 2103, "이미 등록된 응답입니다."),
+    APPLICATION_RESPONSE_EMPTY_CONTENT(false, HttpStatus.BAD_REQUEST, 2104, "응답 내용은 비워둘 수 없습니다."),
+    EMPLOYMENT_APPLICATION_DUPLICATE_APPLICATION(false, HttpStatus.CONFLICT, 2105, "이미 해당 공고에 지원한 이력이 있습니다."),
+    EMPLOYMENT_APPLICATION_NOT_FOUND(false,HttpStatus.NOT_FOUND, 2106, "지원서를 찾을 수 없습니다."),
+    APPLICATION_STATUS_UPDATED(true, HttpStatus.OK, 2107, "지원서 상태가 성공적으로 변경되었습니다."),
+    INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
+    COMMAND_INVALID_ID_ON_CREATE(false, HttpStatus.BAD_REQUEST, 2109, "생성 요청에 ID를 포함할 수 없습니다."),
+    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2110, "이미 존재하는 템플릿 항목명입니다."),
 
 
     //  지원서 - 2200 ~ 2299
@@ -135,7 +145,7 @@ public enum ResponseCode {
     EMPLOYMENT_QUESTION_FAIL(false, HttpStatus.INTERNAL_SERVER_ERROR, 2410, "실무테스트 문제 등록에 실패했습니다."),
     EMPLOYMENT_QUESTION_DUPLICATE(false, HttpStatus.CONFLICT, 2411, "동일한 문제가 이미 등록되어 있습니다."),
     EMPLOYMENT_INVALID_QUESTION_TYPE(false, HttpStatus.BAD_REQUEST, 2412, "유효하지 않은 실무테스트 문제 유형입니다."),
-    EMPLOYMENT_QUESTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2413, "요청한 문제를 찾을 수 없습니다."),
+    EMPLOYMENT_INVALID_QUESTION(false, HttpStatus.NOT_FOUND, 2413, "요청한 문제를 찾을 수 없습니다."),
     EMPLOYMENT_QUESTION_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2414, "이 문제는 다른 곳에서 사용 중이므로 삭제할 수 없습니다."),
 
     EMPLOYMENT_OPTION_COUNT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2416, "선택지는 최대 5개까지만 등록할 수 있습니다."),

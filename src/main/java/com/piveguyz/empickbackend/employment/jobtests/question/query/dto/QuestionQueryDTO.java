@@ -23,7 +23,9 @@ public class QuestionQueryDTO {
     private JobtestDifficulty difficulty;
     private String answer;
     private int createdMemberId;
+    private String createdMemberName;
     private Integer updatedMemberId;
+    private String updatedMemberName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

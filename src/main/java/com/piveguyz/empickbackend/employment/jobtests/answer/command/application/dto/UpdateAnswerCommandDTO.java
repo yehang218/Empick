@@ -10,4 +10,5 @@ import lombok.*;
 @Builder
 public class UpdateAnswerCommandDTO {
     private CorrectType isCorrect;
+    private Double score;
 }

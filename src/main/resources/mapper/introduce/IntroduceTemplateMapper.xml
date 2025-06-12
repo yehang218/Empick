@@ -9,8 +9,7 @@
         SELECT
             id,
             title,
-            member_id AS memberId,
-            introduce_template_item_id AS introduceTemplateItemId
+            member_id AS memberId
         FROM
             introduce_template
     </select>
