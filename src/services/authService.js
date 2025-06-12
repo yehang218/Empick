@@ -1,6 +1,9 @@
 import api from '@/apis/apiClient';
 import { API } from '@/apis/routes';
 import LoginResponseDTO from '@/dto/auth/loginResponseDTO';
+import { AuthAPI } from '@/apis/routes/auth';
+import { withErrorHandling } from '@/utils/errorHandler';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 
 /**
  * 로그인 서비스
@@ -121,4 +124,32 @@ export const getCurrentUserService = async () => {
         }
         throw error;
     }
+};
+
+export const login = async (credentials) => {
+    return withErrorHandling(async () => {
+        const response = await AuthAPI.login(credentials);
+        return ApiResponseDTO.fromJSON(response.data);
+    });
+};
+
+export const logout = async () => {
+    return withErrorHandling(async () => {
+        const response = await AuthAPI.logout();
+        return ApiResponseDTO.fromJSON(response.data);
+    });
+};
+
+export const refreshToken = async () => {
+    return withErrorHandling(async () => {
+        const response = await AuthAPI.refreshToken();
+        return ApiResponseDTO.fromJSON(response.data);
+    });
+};
+
+export const getCurrentUser = async () => {
+    return withErrorHandling(async () => {
+        const response = await AuthAPI.getCurrentUser();
+        return ApiResponseDTO.fromJSON(response.data);
+    });
 };
