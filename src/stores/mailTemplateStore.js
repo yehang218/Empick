@@ -1,27 +1,26 @@
 import { defineStore } from 'pinia';
 import {
-  createMailService,
-  sendMailService,
-  sendJobtestMailService,
-  sendInterviewMailService,
-  findAllMailsService,
-  findMailByIdService,
-  findMailsByEmailService,
-} from '@/services/mailService';
+  createTemplateService,
+  updateTemplateService,
+  deleteTemplateService,
+  findAllTemplatesService,
+  findTemplateByIdService,
+  searchTemplateByTitleService,
+} from '@/services/mailTemplateService';
 
-export const useMailStore = defineStore('mail', {
+export const useMailTemplateStore = defineStore('mailTemplate', {
   state: () => ({
-    mails: [],
-    currentMail: null,
+    templates: [],
+    currentTemplate: null,
     loading: false,
     error: null,
   }),
 
   actions: {
-    async createMail(dto) {
+    async createTemplate(dto) {
       this.loading = true;
       try {
-        const result = await createMailService(dto);
+        const result = await createTemplateService(dto);
         return result;
       } catch (e) {
         this.error = e.message;
@@ -31,10 +30,10 @@ export const useMailStore = defineStore('mail', {
       }
     },
 
-    async sendMail(dto) {
+    async updateTemplate(id, dto) {
       this.loading = true;
       try {
-        const result = await sendMailService(dto);
+        const result = await updateTemplateService(id, dto);
         return result;
       } catch (e) {
         this.error = e.message;
@@ -44,10 +43,10 @@ export const useMailStore = defineStore('mail', {
       }
     },
 
-    async sendJobtestMail(id) {
+    async deleteTemplate(id) {
       this.loading = true;
       try {
-        const result = await sendJobtestMailService(id);
+        const result = await deleteTemplateService(id);
         return result;
       } catch (e) {
         this.error = e.message;
@@ -57,23 +56,10 @@ export const useMailStore = defineStore('mail', {
       }
     },
 
-    async sendInterviewMail(id) {
+    async fetchAllTemplates() {
       this.loading = true;
       try {
-        const result = await sendInterviewMailService(id);
-        return result;
-      } catch (e) {
-        this.error = e.message;
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async fetchAllMails() {
-      this.loading = true;
-      try {
-        this.mails = await findAllMailsService();
+        this.templates = await findAllTemplatesService();
       } catch (e) {
         this.error = e.message;
       } finally {
@@ -81,10 +67,10 @@ export const useMailStore = defineStore('mail', {
       }
     },
 
-    async fetchMailById(id) {
+    async fetchTemplateById(id) {
       this.loading = true;
       try {
-        this.currentMail = await findMailByIdService(id);
+        this.currentTemplate = await findTemplateByIdService(id);
       } catch (e) {
         this.error = e.message;
       } finally {
@@ -92,10 +78,10 @@ export const useMailStore = defineStore('mail', {
       }
     },
 
-    async fetchMailsByEmail(email) {
+    async searchTemplateByTitle(title) {
       this.loading = true;
       try {
-        this.mails = await findMailsByEmailService(email);
+        this.templates = await searchTemplateByTitleService(title);
       } catch (e) {
         this.error = e.message;
       } finally {
