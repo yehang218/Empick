@@ -27,6 +27,8 @@ import SubjectiveForm from '@/components/employment/SubjectiveForm.vue';
 import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue';
 import { createQuestionService } from '@/services/jobtestQuestionService';
 import CreateQuestionRequestDTO from '@/dto/employment/jobtest/createQuestionRequestDTO';
+import { useToast } from 'vue-toastification';
+import { withErrorHandling } from '@/utils/errorHandler';
 
 const activeTab = ref('MULTIPLE');
 const difficultyOptions = [
@@ -73,6 +75,9 @@ function resetForm() {
     };
 }
 
+const toast = useToast();
+
+// 내용 등록하기 전에 빠진 내용이 있는지 확인
 function validateForm() {
     errors.value = {};
 
@@ -89,6 +94,8 @@ function validateForm() {
             errors.value.questionOptions = '최소 1개 이상의 선택지를 입력해주세요.';
         } else if (form.value.questionOptions.some(option => !option.content)) {
             errors.value.questionOptions = '모든 선택지의 내용을 입력해주세요.';
+        } else if (!form.value.questionOptions.some(option => option.isAnswer)) {
+            errors.value.questionOptions = '하나 이상의 선택지를 정답으로 지정해주세요.';
         }
     }
 
@@ -103,56 +110,52 @@ function validateForm() {
         }
     }
 
-    return Object.keys(errors.value).length === 0;
-}
+    // 에러 메시지 정리
+    const errorMessages = [];
 
-async function handleSubmit() {
-    if (!validateForm()) {
-        alert('입력값을 확인해주세요.');
-        return;
+    for (const key in errors.value) {
+        const val = errors.value[key];
+        if (Array.isArray(val)) {
+            errorMessages.push(...val);
+        } else if (typeof val === 'object' && val !== null) {
+            errorMessages.push(...Object.values(val));
+        } else if (typeof val === 'string') {
+            errorMessages.push(val);
+        }
     }
 
+    // 차례로 토스트 띄우기
+    if (errorMessages.length > 0) {
+        errorMessages.forEach(msg => toast.error(msg));
+        return false;
+    }
+
+    return true;
+}
+
+
+async function handleSubmit() {
+    if (!validateForm()) return;
+
     try {
-        // 정답은 선택된 보기의 content로 설정
         if (form.value.type === 'MULTIPLE') {
             form.value.answer = form.value.questionOptions.find(opt => opt.isAnswer)?.content || '';
         }
+
         const dto = CreateQuestionRequestDTO.fromForm(form.value);
-        await createQuestionService(dto);
-        alert('문제 등록이 완료되었습니다.');
+
+        await withErrorHandling(() => createQuestionService(dto), {
+            showToast: true,
+            redirect: false
+        });
+
+        toast.success('문제 등록이 완료되었습니다.');
         resetForm();
-    } catch (error) {
-        console.error('문제 등록 실패:', error);
-        alert(error.response?.data?.message || '문제 등록에 실패했습니다.');
+    } catch (e) {
+        // 이미 withErrorHandling에서 처리하는 중
     }
 }
 
-function addOption() {
-    const updated = {
-        ...form.value,
-        questionOptions: [...form.value.questionOptions, { content: '', isAnswer: false }]
-    };
-    form.value = updated;
-}
-
-function removeOption(index) {
-    const updated = {
-        ...form.value,
-        questionOptions: form.value.questionOptions.filter((_, i) => i !== index)
-    };
-    form.value = updated;
-}
-
-function updateOption(index, value) {
-    const updatedOptions = form.value.questionOptions.map((opt, i) =>
-        i === index ? { ...opt, content: value } : opt
-    );
-    const updated = {
-        ...form.value,
-        questionOptions: updatedOptions
-    };
-    form.value = updated;
-}
 </script>
 
 <style scoped></style>
