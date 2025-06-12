@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate;
+package com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate.applicationBookmark;
 
 import lombok.*;
 

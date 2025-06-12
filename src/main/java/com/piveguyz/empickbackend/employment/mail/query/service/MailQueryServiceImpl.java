@@ -36,9 +36,6 @@ public class MailQueryServiceImpl implements MailQueryService {
         if(!email.contains("@")){
             throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_INADEQUATE_EMAIL);
         }
-        if(mailQueryDTOList.isEmpty()){
-            throw new BusinessException(ResponseCode.EMPLOYMENT_MAIL_NOT_FOUND);
-        }
         return mailQueryDTOList;
     }
 }

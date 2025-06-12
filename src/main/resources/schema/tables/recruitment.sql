@@ -23,10 +23,12 @@ CREATE TABLE IF NOT EXISTS recruitment_request (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     member_id INT NOT NULL,
     department_id INT NOT NULL,
+    job_id INT NOT NULL,
 
     CONSTRAINT pk_recruitment_request PRIMARY KEY (id),
     CONSTRAINT fk_recruitment_request_member_id FOREIGN KEY (member_id) REFERENCES member(id),
-    CONSTRAINT fk_recruitment_request_department_id FOREIGN KEY (department_id) REFERENCES department(id)
+    CONSTRAINT fk_recruitment_request_department_id FOREIGN KEY (department_id) REFERENCES department(id),
+    CONSTRAINT fk_recruitment_request_job_id FOREIGN KEY (job_id) REFERENCES job(id)
 );
 
 

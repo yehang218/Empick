@@ -1,8 +1,8 @@
 package com.piveguyz.empickbackend.employment.applicant.command.application.service;
 
 import com.piveguyz.empickbackend.employment.applicant.command.application.dto.ApplicantBookmarkCommandDTO;
-import com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate.ApplicantBookmarkEntity;
-import com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate.ApplicantBookmarkId;
+import com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate.applicationBookmark.ApplicantBookmarkEntity;
+import com.piveguyz.empickbackend.employment.applicant.command.domain.aggregate.applicationBookmark.ApplicantBookmarkId;
 import com.piveguyz.empickbackend.employment.applicant.command.domain.repository.ApplicantBookmarkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,6 @@ public class ApplicantBookmarkCommandServiceImp implements ApplicantBookmarkComm
             applicantBookmarkRepository
                     .findById(new ApplicantBookmarkId(dto.getMemberId(), dto.getApplicantId()))
                     .ifPresent(applicantBookmarkRepository::delete);
-
             return dto;
         }
     }
