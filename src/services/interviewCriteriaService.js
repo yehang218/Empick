@@ -3,7 +3,7 @@ import api from '@/apis/apiClient';
 import { InterviewAPI } from '../apis/routes/interview';
 
 import InterviewCriteriaResponseDTO from '../dto/employment/interview/interviewCriteriaResponseDTO';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
@@ -78,7 +78,7 @@ export const getCriteriaByIdService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(InterviewAPI.GET_CRITERIA_BY_ID(id));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if(!apiResponse.success) {
+        if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
         return apiResponse.data.map(item => InterviewCriteriaResponseDTO.fromJSON(item));
@@ -90,7 +90,7 @@ export const searchCriteriaByContentService = async (content, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(InterviewAPI.SEARCH_CRITERIA_BY_CONTENT(content));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if(!apiResponse.success) {
+        if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
         return apiResponse.data.map(item => InterviewCriteriaResponseDTO.fromJSON(item));
