@@ -33,11 +33,8 @@ CREATE TABLE introduce
     content VARCHAR(255) NOT NULL,
     member_id INT NOT NULL,
     introduce_template_id INT NOT NULL,
-    updated_by INT NULL,
-    updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (member_id) REFERENCES member(id),
     FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
-    FOREIGN KEY (updated_by) REFERENCES member(id)
 );
 
 -- introduce
@@ -62,11 +59,8 @@ CREATE TABLE introduce_standard_item
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(255) NOT NULL,
     member_id INT NOT NULL,
-    updated_by INT NULL,
-    updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     introduce_standard_id INT NOT NULL,
     FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (updated_by) REFERENCES member(id),
     FOREIGN KEY (introduce_standard_id) REFERENCES introduce_standard(id)
 );
 
