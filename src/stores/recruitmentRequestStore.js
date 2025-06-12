@@ -3,7 +3,8 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import {
     fetchRecruitmentRequestList,
-    fetchRecruitmentRequestDetail
+    fetchRecruitmentRequestDetail,
+    createRecruitmentRequest
 } from '@/services/recruitmentRequestService';
 
 export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () => {
@@ -16,6 +17,10 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
     const recruitmentRequestDetail = ref(null);
     const loadingDetail = ref(false);
     const detailError = ref(null);
+
+    // 요청서 등록 로딩 상태 및 에러 메시지
+    const submitting = ref(false);
+    const submitError = ref(null);
 
     // 목록 불러오기
     const loadRecruitmentRequestList = async () => {
@@ -46,6 +51,21 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
         }
     };
 
+    // 등록 함수
+    const submitRecruitmentRequest = async (formDTO) => {
+        submitting.value = true;
+        submitError.value = null;
+
+        try {
+            await createRecruitmentRequest(formDTO);
+        } catch (err) {
+            submitError.value = err.message;
+            throw err;
+        } finally {
+            submitting.value = false;
+        }
+    };
+
     return {
         // 목록 관련
         recruitmentRequestList,
@@ -58,5 +78,10 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
         loadingDetail,
         detailError,
         loadRecruitmentRequestDetail,
+
+        // 등록 관련
+        submitting,
+        submitError,
+        submitRecruitmentRequest
     };
 });
