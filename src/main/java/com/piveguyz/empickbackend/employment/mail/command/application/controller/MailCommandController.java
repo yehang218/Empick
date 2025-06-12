@@ -64,10 +64,9 @@ public class MailCommandController {
     @PostMapping("/send")
     public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendMail(@RequestBody MailCommandDTO mailCommandDTO) {
         MailCommandDTO sendedDTO = mailFacade.sendMail(mailCommandDTO);
-        MailCommandDTO createdDTO = mailCommandService.createMail(sendedDTO);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, createdDTO));
+                .body(CustomApiResponse.of(result, sendedDTO));
 
     }
 
