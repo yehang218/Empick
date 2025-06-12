@@ -14,7 +14,7 @@ CREATE TABLE `member`
     `email`             VARCHAR(255) NOT NULL COMMENT '이메일',
     `address`           VARCHAR(255) NOT NULL COMMENT '주소',
     `vacation_count`    INT          NOT NULL DEFAULT 0 COMMENT '휴가 일수',
-    `hire_at`           DATETIME     NOT NULL COMMENT '입사일',
+    `hire_at`           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '입사일',
     `resign_at`         DATETIME     NULL COMMENT '퇴사일',
     `created_at`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `updated_at`        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
