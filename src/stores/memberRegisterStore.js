@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import MemberSignUpRequestDTO from '@/dto/member/memberSignUpRequestDTO'
 import { useMemberStore } from '@/stores/memberStore'
 import { useFileStore } from '@/stores/fileStore'
-import MailRequestDTO from '@/dto/mail/mailRequestDTO'
 import { useMailStore } from '@/stores/mailStore'
 
 export const useMemberRegisterStore = defineStore('memberRegister', {
@@ -125,15 +124,16 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 // TODO: 등록 후 이동/초기화 등 처리
                 const employeeNumber = registerResult?.data?.employeeNumber
                 const email = this.form.email
-                if (employeeNumber && email) {
-                    const mailStore = useMailStore()
-                    const mailDto = new MailRequestDTO({
-                        email: [email],
-                        title: '사번 및 임시 비밀번호 안내',
-                        content: `사번: ${employeeNumber}\n임시 비밀번호: ${employeeNumber}\n로그인 후 비밀번호를 꼭 변경하세요.`
-                    })
-                    await mailStore.createMail(mailDto)
-                }
+                // TODO: 메일 전송 기능 추가 후 주석 해제
+                // if (employeeNumber && email) {
+                //     const mailStore = useMailStore()
+                //     const mailDto = new MailRequestDTO({
+                //         email: [email],
+                //         title: '사번 및 임시 비밀번호 안내',
+                //         content: `사번: ${employeeNumber}\n임시 비밀번호: ${employeeNumber}\n로그인 후 비밀번호를 꼭 변경하세요.`
+                //     })
+                //     await mailStore.createMail(mailDto)
+                // }
                 return true
             } catch (err) {
                 throw err
