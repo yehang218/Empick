@@ -33,7 +33,6 @@ public class AuthCommandServiceImpl implements AuthCommandService {
                         requestDTO.getEmployeeNumber()
                 )
         ).orElseThrow(() -> new BusinessException(ResponseCode.BAD_REQUEST));
-        log.error("Wrong id");
         if (!passwordEncoder.matches(requestDTO.getPassword(), member.getPassword())) {
             log.error("Wrong password");
             log.info(String.valueOf(requestDTO));
@@ -44,7 +43,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
             throw new BusinessException(ResponseCode.MEMBER_RESIGNED);
         }
 
-        if (member.getStatus() != 0) {
+        if (member.getStatus() == 0) {
             throw new BusinessException(ResponseCode.MEMBER_STATUS_SUSPENDED);
         }
 
