@@ -125,6 +125,7 @@ public enum ResponseCode {
     INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
     COMMAND_INVALID_ID_ON_CREATE(false, HttpStatus.BAD_REQUEST, 2109, "생성 요청에 ID를 포함할 수 없습니다."),
     DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2110, "이미 존재하는 템플릿 항목명입니다."),
+    DUPLICATE_INTRODUCE_FOR_TEMPLATE(false, HttpStatus.CONFLICT, 2112, "이미 해당 템플릿에 대한 지원자의 자기소개서가 존재합니다."),
 
 
     //  지원서 - 2200 ~ 2299

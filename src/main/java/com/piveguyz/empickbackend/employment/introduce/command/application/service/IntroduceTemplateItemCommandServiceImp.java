@@ -1,11 +1,11 @@
-package com.piveguyz.empickbackend.employment.introduce.command.application.service.introduceTemplateCommand;
+package com.piveguyz.empickbackend.employment.introduce.command.application.service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.introduce.command.application.dto.introduceTemplate.IntroduceTemplateItemCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceTemplateItemCommandDTO;
 import com.piveguyz.empickbackend.employment.introduce.command.application.mapper.IntroduceTemplateItemMapper;
-import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.introduceTemplateCommand.IntroduceTemplateItemEntity;
-import com.piveguyz.empickbackend.employment.introduce.command.domain.repository.introduceTemplateCommand.IntroduceTemplateItemRepository;
+import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceTemplateItemEntity;
+import com.piveguyz.empickbackend.employment.introduce.command.domain.repository.IntroduceTemplateItemRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
