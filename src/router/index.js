@@ -110,7 +110,13 @@ const routes = [
             requiresAuth: true
         }
     },
-    
+    {
+        path: '/employment/recruitments/requests/create',
+        name: 'RecruitmentRequestCreate',
+        component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
+        meta: { requiresAuth: true }
+    },
+
     {
         path: '/WSPage',
         name: 'WSPage',

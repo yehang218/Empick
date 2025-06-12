@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>채용 요청서 상세 조회</h2>
+        <h2>채용 요청서 작성</h2>
     </div>
 </template>
 
