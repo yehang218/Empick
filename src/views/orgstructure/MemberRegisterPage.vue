@@ -25,8 +25,8 @@
                     <template v-else>
                         <v-icon size="48" color="grey darken-2">mdi-camera</v-icon>
                     </template>
-                    <input ref="fileInputRef" type="file" accept="image/*" style="display: none;"
-                        @change="onProfileImageChange" />
+                    <input ref="fileInputRef" type="file" accept="image/jpeg,image/png,image/webp"
+                        style="display: none;" @change="onProfileImageChange" />
                 </v-sheet>
                 <v-btn :color="regStore.profileImageFile ? 'success' : 'primary'" @click="triggerFileInput"
                     style="width: 100px;">{{
@@ -80,8 +80,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useMemberRegisterStore } from '@/stores/memberRegisterStore'
+import { useToast } from 'vue-toastification'
 
 const regStore = useMemberRegisterStore()
+const toast = useToast()
 const fileInputRef = ref(null)
 
 const departments = [
@@ -112,11 +114,32 @@ const triggerFileInput = () => {
 
 const onProfileImageChange = (event) => {
     const file = event.target.files && event.target.files[0]
-    if (file) regStore.setProfileImage(file)
-    else regStore.clearProfileImage()
+    if (file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('JPG, PNG, WEBP 형식의 이미지만 업로드할 수 있습니다.')
+            return
+        }
+        if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+            toast.error('파일 크기는 5MB를 초과할 수 없습니다.')
+            return
+        }
+        regStore.setProfileImage(file)
+    } else {
+        regStore.clearProfileImage()
+    }
 }
 
 const onRegister = async () => {
-    await regStore.registerMemberWithImage()
+    try {
+        const result = await regStore.registerMemberWithImage()
+        if (result) {
+            toast.success('사원 등록이 완료되었습니다!')
+            // 등록 성공 후 폼 초기화
+            regStore.resetForm()
+        }
+    } catch (error) {
+        toast.error(error.message || '사원 등록에 실패했습니다.')
+    }
 }
 </script>

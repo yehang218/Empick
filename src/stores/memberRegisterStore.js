@@ -30,8 +30,6 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
         employeeNumber: '',
         profileImageFile: null,
         profileImageUrl: '',
-        alertMessage: '',
-        alertVisible: false,
     }),
     getters: {
         isFormValid(state) {
@@ -49,10 +47,6 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             this.employeeNumber = Math.floor(10000 + Math.random() * 90000).toString()
         },
         setProfileImage(file) {
-            if (!file.type.startsWith('image/')) {
-                this.showAlert('이미지 파일만 업로드할 수 있습니다.')
-                return
-            }
             this.profileImageFile = file
             const reader = new FileReader()
             reader.onload = e => {
@@ -92,14 +86,6 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             this.profileImageFile = null
             this.profileImageUrl = ''
         },
-        showAlert(msg) {
-            this.alertMessage = msg
-            this.alertVisible = true
-            setTimeout(() => {
-                this.alertVisible = false
-                this.alertMessage = ''
-            }, 2000)
-        },
         async registerMemberWithImage() {
             const requiredFields = [
                 'name', 'phone', 'pictureUrl', 'email', 'address'
@@ -113,8 +99,7 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             }
             const missing = requiredFields.filter(key => !this.form[key] || this.form[key].toString().trim() === '')
             if (missing.length > 0) {
-                this.showAlert('다음 항목을 입력해 주세요: ' + missing.map(key => fieldLabels[key] || key).join(', '))
-                return false
+                throw new Error('다음 항목을 입력해 주세요: ' + missing.map(key => fieldLabels[key] || key).join(', '))
             }
             if (!this.employeeNumber) this.generateRandomEmployeeNumber()
             this.form.pictureUrl = `profiles/${this.employeeNumber}.png`
@@ -126,16 +111,14 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             const memberStore = useMemberStore()
             try {
                 const registerResult = await memberStore.registerMember(body)
-                this.showAlert('사원 등록이 완료되었습니다!')
                 if (this.profileImageFile) {
                     try {
                         const fileStore = useFileStore()
                         const prefix = 'profiles/'
                         const fileName = `${this.employeeNumber}.png`
                         await fileStore.uploadProfileImage(this.profileImageFile, prefix, fileName)
-                        this.showAlert('프로필 이미지 업로드가 완료되었습니다!')
                     } catch (e) {
-                        this.showAlert('프로필 이미지 업로드에 실패했습니다.')
+                        throw new Error('프로필 이미지 업로드에 실패했습니다.')
                     }
                 }
                 this.resetForm()
@@ -153,8 +136,7 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 }
                 return true
             } catch (err) {
-                this.showAlert('사원 등록에 실패했습니다.')
-                return false
+                throw err
             }
         }
     }
