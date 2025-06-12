@@ -1,4 +1,4 @@
-// 📁 src/services/recruitmentService.js
+// 📁 src/services/recruitmentRequestService.js
 import api from '@/apis/apiClient';
 import { API } from '@/apis/routes';
 import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
