@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IntroduceStandardItemQueryDTO {
-    private Long id;
+    private Integer id;
     private String content;
-    private Long memberId;
-    private Long updatedBy;
+    private Integer memberId;
+    private Integer updatedBy;
     private LocalDateTime updatedAt;
+    private Integer introduceStandardId;
 }

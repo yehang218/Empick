@@ -12,7 +12,6 @@
             content,
             member_id AS memberId,
             introduce_id AS introduceId,
-            introduce_standard_item_id AS introduceStandardItemId,
             updated_by AS updatedBy,
             updated_at AS updatedAt
         FROM
