@@ -23,5 +23,37 @@ export const employmentRoutes = [
         meta: {
             requiresAuth: true
         }
+    },
+    // 채용 공고 관련
+    {
+        path: '/employment/recruitments/requests',
+        name: 'RecruitmentRequestList',
+        component: () => import('@/views/employment/RecruitmentRequestListPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/recruitments/requests/:id',
+        name: 'RecruitmentRequestDetail',
+        component: () => import('@/views/employment/RecruitmentRequestDetailPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/recruitments/requests',
+        name: 'RecruitmentRequestList',
+        component: () => import('@/views/employment/RecruitmentRequestListPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/recruitments/requests/create',
+        name: 'RecruitmentRequestCreate',
+        component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
+        meta: { requiresAuth: true }
     }
 ]; 
