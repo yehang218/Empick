@@ -1,4 +1,4 @@
-export default class JobtestResponseDTO {
+export default class QuestionResponseDTO {
     constructor(id, content, type, difficulty, createdMemberId, updatedMemberId, createdMemberName, updatedMemberName
         , createMemberPictureUrl, updatedMemberPictureUrl
     ) {
@@ -15,7 +15,7 @@ export default class JobtestResponseDTO {
     }
 
     static fromJSON(json) {
-        return new JobtestResponseDTO(
+        return new QuestionResponseDTO(
             json.id,
             json.content,
             json.type,

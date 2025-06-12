@@ -37,7 +37,7 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ListView from '@/components/common/ListView.vue'
-import { useJobtestStore } from '@/stores/jobtestStore'
+import { useJobtestStore } from '@/stores/jobtestQuestionStore'
 
 const router = useRouter()
 const jobtestStore = useJobtestStore()

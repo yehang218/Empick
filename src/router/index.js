@@ -106,9 +106,9 @@ const routes = [
         props: true
     },
     {
-        path: '/employment/jobtests/problems',
-        name: 'JobtestProblemList',
-        component: () => import('@/views/employment/JobtestProblemListPage.vue'),
+        path: '/employment/jobtests/questions',
+        name: 'JobtestQuestionList',
+        component: () => import('@/views/employment/JobtestQuestionListPage.vue'),
         meta: {
             requiresAuth: true
         }
