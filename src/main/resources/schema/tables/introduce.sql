@@ -34,7 +34,7 @@ CREATE TABLE introduce
     member_id INT NOT NULL,
     introduce_template_id INT NOT NULL,
     FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
+    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id)
 );
 
 -- introduce
