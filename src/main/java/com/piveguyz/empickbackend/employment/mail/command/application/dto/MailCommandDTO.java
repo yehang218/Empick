@@ -15,7 +15,7 @@ import java.util.List;
 public class MailCommandDTO {
     private Integer id;
     private Integer applicantId;
-    private List<String> email;
+    private String email;
     private String title;
     private String content;
     private Integer senderId;
