@@ -123,8 +123,11 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICATION_NOT_FOUND(false,HttpStatus.NOT_FOUND, 2106, "지원서를 찾을 수 없습니다."),
     APPLICATION_STATUS_UPDATED(true, HttpStatus.OK, 2107, "지원서 상태가 성공적으로 변경되었습니다."),
     INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
-    COMMAND_INVALID_ID_ON_CREATE(false, HttpStatus.BAD_REQUEST, 2109, "생성 요청에 ID를 포함할 수 없습니다."),
-    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2110, "이미 존재하는 템플릿 항목명입니다."),
+    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2109, "이미 존재하는 템플릿 항목명입니다."),
+    DUPLICATE_STANDARD_CONTENT(false, HttpStatus.CONFLICT, 2110, "이미 존재하는 자기소개서 평가 기준표 내용입니다."),
+    INTRODUCE_STANDARD_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2111, "해당 자기소개서 평가 기준표를 찾을 수 없습니다."),
+    COMMAND_INVALID_ID_ON_CREATE(false, HttpStatus.BAD_REQUEST, 2112, "생성 요청에 ID를 포함할 수 없습니다."),
+    DUPLICATE_TEMPLATE_TITLE(false, HttpStatus.CONFLICT, 2113, "이미 존재하는 템플릿 항목명입니다."),
 
 
     //  지원서 - 2200 ~ 2299

@@ -1,9 +1,9 @@
-package com.piveguyz.empickbackend.employment.introduce.command.application.controller.IntroduceTemplateCommnadController;
+package com.piveguyz.empickbackend.employment.introduce.command.application.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.introduce.command.application.dto.introduceTemplate.IntroduceTemplateItemCommandDTO;
-import com.piveguyz.empickbackend.employment.introduce.command.application.service.introduceTemplateCommand.IntroduceTemplateItemCommandService;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceTemplateItemCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.service.IntroduceTemplateItemCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
