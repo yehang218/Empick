@@ -1,7 +1,6 @@
 import api from '@/apis/apiClient';
 import { API } from '@/apis/routes';
-import LoginRequestDTO from '@/dto/LoginRequestDTO';
-import LoginResponseDTO from '@/dto/LoginResponseDTO';
+import LoginResponseDTO from '@/dto/auth/loginResponseDTO';
 
 /**
  * 로그인 서비스
