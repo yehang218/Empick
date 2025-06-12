@@ -127,8 +127,6 @@ public enum ResponseCode {
     INTRODUCE_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2107, "요청한 자기소개서 템플릿 ID가 존재하지 않습니다."),
     INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
     DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2109, "이미 존재하는 템플릿 항목명입니다."),
-    DUPLICATE_STANDARD_CONTENT(false, HttpStatus.CONFLICT, 2110, "이미 존재하는 자기소개서 평가 기준표 내용입니다."),
-    INTRODUCE_STANDARD_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2111, "해당 자기소개서 평가 기준표를 찾을 수 없습니다."),
 
 
     //  지원서 - 2200 ~ 2299
