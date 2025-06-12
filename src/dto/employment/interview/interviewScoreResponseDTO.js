@@ -9,7 +9,7 @@ export default class InterviewScoreResponseDTO {
     }
 
     static fromJSON(json) {
-        return new InterviewResponseDTO (
+        return new InterviewScoreResponseDTO (
             json.id,
             json.interviewerId,
             json.itemId,

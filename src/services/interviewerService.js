@@ -17,7 +17,7 @@ export const createInterviewerService = async (dto, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -29,7 +29,7 @@ export const updateInterviewerScoreService = async (id, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -41,7 +41,7 @@ export const updateInterviewerReviewService = async (id, review, options = {}) =
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -53,7 +53,7 @@ export const deleteInterviewerService = async (id, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -83,7 +83,7 @@ export const getInterviewerByIdService = async (id, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 

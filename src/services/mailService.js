@@ -1,7 +1,7 @@
 import api from '@/apis/apiClient';
 import { MailAPI } from '@/apis/routes/mail';
 import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
-import MailDTO from '@/dto/employment/mail/mailDTO';
+import MailDTO from '@/dto/employment/mail/mailResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 // Command

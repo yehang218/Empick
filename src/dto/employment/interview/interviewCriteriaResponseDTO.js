@@ -10,7 +10,7 @@ export default class InterviewCriteriaResponseDTO {
     }
 
     static fromJSON(json) {
-        return new InterviewResponseDTO (
+        return new InterviewCriteriaResponseDTO (
             json.id,
             json.content,
             json.detailContent,

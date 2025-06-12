@@ -81,7 +81,7 @@ export const getCriteriaByIdService = async (id, options = {}) => {
         if(!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewCriteriaResponseDTO.fromJSON(item));
+        return InterviewCriteriaResponseDTO.fromJSON(apiResponse.data);
     }, options);
 }
 
