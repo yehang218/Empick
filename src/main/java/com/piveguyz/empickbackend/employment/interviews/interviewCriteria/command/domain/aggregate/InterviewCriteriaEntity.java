@@ -20,11 +20,17 @@ public class InterviewCriteriaEntity {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "sheet_id")
+    private Integer sheetId;
+
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "content")
     private String content;
 
-    @Column(name = "detail_content")
-    private String detailContent;
+    @Column(name = "weight")
+    private Double weight;
 
     @Column(name = "is_deleted")
     private String isDeleted;

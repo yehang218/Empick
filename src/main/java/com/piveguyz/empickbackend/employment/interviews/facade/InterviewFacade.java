@@ -5,16 +5,14 @@ import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.interviews.interview.command.application.dto.InterviewCommandDTO;
 import com.piveguyz.empickbackend.employment.interviews.interview.command.application.service.InterviewCommandService;
 import com.piveguyz.empickbackend.employment.interviews.interview.query.service.InterviewQueryService;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.dto.InterviewCriteriaQueryDTO;
+import com.piveguyz.empickbackend.employment.interviews.interviewCriteria.query.service.InterviewCriteriaQueryService;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.dto.InterviewScoreCommandDTO;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.service.InterviewScoreCommandService;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.domain.aggregate.InterviewScoreEntity;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.domain.repository.InterviewScoreRepository;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.query.dto.InterviewScoreQueryDTO;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.query.service.InterviewScoreQueryService;
-import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.command.application.dto.InterviewSheetItemCommandDTO;
-import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.command.domain.repository.InterviewSheetItemRepository;
-import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.query.dto.InterviewSheetItemQueryDTO;
-import com.piveguyz.empickbackend.employment.interviews.interviewSheetItem.query.service.InterviewSheetItemQueryService;
 import com.piveguyz.empickbackend.employment.interviews.interviewer.command.application.dto.InterviewerCommandDTO;
 import com.piveguyz.empickbackend.employment.interviews.interviewer.command.application.mapper.InterviewerCommandMapper;
 import com.piveguyz.empickbackend.employment.interviews.interviewer.command.application.service.InterviewerCommandService;
@@ -34,12 +32,11 @@ public class InterviewFacade {
     private final InterviewCommandService interviewCommandService;
     private final InterviewScoreQueryService interviewScoreQueryService;
     private final InterviewQueryService interviewQueryService;
-    private final InterviewSheetItemQueryService interviewSheetItemQueryService;
     private final InterviewerRepository interviewerRepository;
     private final InterviewerCommandMapper interviewerCommandMapper;
-    private final InterviewScoreCommandService interviewScoreCommandService;
     private final InterviewerCommandService interviewerCommandService;
     private final InterviewerMapper interviewerMapper;
+    private final InterviewCriteriaQueryService interviewCriteriaQueryService;
 
     public InterviewCommandDTO createInterview(InterviewCommandDTO interviewCommandDTO){
         LocalDateTime interviewTime = interviewCommandDTO.getDatetime();
@@ -61,21 +58,21 @@ public class InterviewFacade {
         return dto;
     }
 
-    public InterviewerCommandDTO updateInterviewerScore(Integer id) {
-        InterviewerEntity entity = interviewerRepository.findById(id)
+    public InterviewerCommandDTO updateInterviewerScore(Integer interviewerId) {
+        InterviewerEntity interviewerEntity = interviewerRepository.findById(interviewerId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_NOT_FOUND));
         Double totalScore = (double) 0;
-        List<InterviewScoreQueryDTO> dtoList = interviewScoreQueryService.findByInterviewerId(id);
-        for(InterviewScoreQueryDTO scoreDTO : dtoList){
+        List<InterviewScoreQueryDTO> interviewScoreDTOList = interviewScoreQueryService.findByInterviewerId(interviewerId);
+        for(InterviewScoreQueryDTO scoreDTO : interviewScoreDTOList){
             Integer score = scoreDTO.getScore();
-            Integer itemId = scoreDTO.getItemId();
-            InterviewSheetItemQueryDTO itemDTO = interviewSheetItemQueryService.findById(itemId);
-            Double weight = itemDTO.getWeight();
+            Integer criteriaId = scoreDTO.getCriteriaId();
+            InterviewCriteriaQueryDTO interviewCriteriaQueryDTO = interviewCriteriaQueryService.findById(criteriaId);
+            Double weight = interviewCriteriaQueryDTO.getWeight();
             totalScore += score * weight;
         }
-        entity.setScore(totalScore);
-        interviewerRepository.save(entity);
-        return interviewerCommandMapper.toDTO(entity);
+        interviewerEntity.setScore(totalScore);
+        interviewerRepository.save(interviewerEntity);
+        return interviewerCommandMapper.toDTO(interviewerEntity);
     }
 
     public InterviewerCommandDTO deleteInterviewer(Integer id) {

@@ -15,7 +15,7 @@ import java.util.List;
 
 @Tag(name="면접 평가표 API", description="면접 평가표 관리")
 @RestController
-@RequestMapping("/api/v1/employment/interviewSheet")
+@RequestMapping("/api/v1/employment/interview-sheet")
 public class InterviewSheetQueryController {
     private final InterviewSheetQueryService service;
 
