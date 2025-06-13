@@ -18,7 +18,6 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
-
     // 실무테스트 문제 등록 페이지
     {
         path: '/employment/jobtest-questions/create',
@@ -82,7 +81,9 @@ export const employmentRoutes = [
         props: true,
         meta: { requiresAuth: true }
     },
-    // 채용 공고 관련
+
+    //    <------------------- 채용공고 -------------------->
+    // 채용 요청서 목록 페이지
     {
         path: '/employment/recruitments/requests',
         name: 'RecruitmentRequestList',
@@ -91,6 +92,7 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
+    // 채용 요청서 상세 조회 페이지
     {
         path: '/employment/recruitments/requests/:id',
         name: 'RecruitmentRequestDetail',
@@ -100,10 +102,13 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
+    // 채용 요청서 등록 페이지
     {
         path: '/employment/recruitments/requests/create',
         name: 'RecruitmentRequestCreate',
         component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
-        meta: { requiresAuth: true }
+        meta: { 
+            requiresAuth: true 
+        }
     },
 ]; 
