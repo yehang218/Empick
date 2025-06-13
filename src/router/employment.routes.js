@@ -1,12 +1,4 @@
 export const employmentRoutes = [
-    {
-        path: '/employment/recruitment',
-        name: 'RecruitmentPage',
-        component: () => import('@/views/employment/RecruitmentPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
-    },
 
     //    <------------------- 실무테스트 -------------------->
     // 실무테스트 문제 목록 페이지
@@ -107,6 +99,35 @@ export const employmentRoutes = [
         path: '/employment/recruitment-requests/create',
         name: 'RecruitmentRequestCreate',
         component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
+        meta: { 
+            requiresAuth: true 
+        }
+    },
+    
+    // 채용 공고 목록 페이지
+    {
+        path: '/employment/recruitments',
+        name: 'RecruitmentList',
+        component: () => import('@/views/employment/RecruitmentListPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    // 채용 공고 상세 조회 페이지
+    {
+        path: '/employment/recruitments/:id',
+        name: 'RecruitmentDetail',
+        component: () => import('@/views/employment/RecruitmentDetailPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    // 채용 공고 등록 페이지
+    {
+        path: '/employment/recruitments/create',
+        name: 'RecruitmentCreate',
+        component: () => import('@/views/employment/RecruitmentCreatePage.vue'),
         meta: { 
             requiresAuth: true 
         }
