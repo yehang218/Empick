@@ -27,7 +27,7 @@ export default class InterviewCriteriaResponseDTO {
     toJSON() {
         return {
             id: this.id,
-            sheetId: this.sheetId,
+            sheetId: this.content,
             title: this.title,
             content: this.content,
             weight: this.weight,
