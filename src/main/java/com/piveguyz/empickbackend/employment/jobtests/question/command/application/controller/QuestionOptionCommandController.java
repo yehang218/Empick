@@ -36,8 +36,10 @@ public class QuestionOptionCommandController {
             @ApiResponse(responseCode = "2416", description = "선택지는 최대 5개까지만 등록할 수 있습니다."),
     })
     @PostMapping
-    public ResponseEntity<CustomApiResponse<CreateQuestionOptionResponse>> createQuestion(@RequestBody @Valid CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO) {
-        CreateQuestionOptionResponse newOptionDTO = questionOptionCommandService.createQuestionOption(createQuestionOptionCommandDTO);
+    public ResponseEntity<CustomApiResponse<CreateQuestionOptionResponse>> createQuestion(@RequestBody @Valid CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO,
+                                                                                          @RequestBody int questionId) {
+        CreateQuestionOptionResponse newOptionDTO = questionOptionCommandService.createQuestionOption(createQuestionOptionCommandDTO,
+                questionId);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newOptionDTO));
     }

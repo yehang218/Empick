@@ -5,7 +5,7 @@ import com.piveguyz.empickbackend.employment.jobtests.grading.command.applicatio
 import jakarta.validation.Valid;
 
 public interface GradingCriteriaCommandService {
-    CreateGradingCriteriaCommandDTO createGradingCriteria(@Valid CreateGradingCriteriaCommandDTO createGradingCriteriaCommandDTO);
+    CreateGradingCriteriaCommandDTO createGradingCriteria(@Valid CreateGradingCriteriaCommandDTO createGradingCriteriaCommandDTO, int questionId);
 
     UpdateGradingCriteriaCommandDTO updateGradingCriteria(int id, UpdateGradingCriteriaCommandDTO updateGradingCriteriaCommandDTO);
 

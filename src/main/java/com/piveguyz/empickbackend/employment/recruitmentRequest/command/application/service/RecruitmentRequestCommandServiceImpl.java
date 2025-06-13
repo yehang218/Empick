@@ -5,13 +5,13 @@ import static com.piveguyz.empickbackend.common.response.ResponseCode.*;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.employment.recruitmentRequest.command.application.dto.RecruitmentRequestCommandDTO;
 import com.piveguyz.empickbackend.employment.recruitmentRequest.command.domain.aggregate.RecruitmentRequest;
 import com.piveguyz.empickbackend.employment.recruitmentRequest.command.domain.repository.RecruitmentRequestRepository;
 import com.piveguyz.empickbackend.orgstructure.job.command.domain.repository.JobRepository;
+import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,11 +20,12 @@ import lombok.RequiredArgsConstructor;
 public class RecruitmentRequestCommandServiceImpl implements RecruitmentRequestCommandService {
 
 	private final RecruitmentRequestRepository recruitmentRequestRepository;
+	private final MemberRepository memberRepository;
 	private final JobRepository jobRepository;
 	// private final DepartmentRepository departmentRepository;
 
 	@Override
-	public void create(RecruitmentRequestCommandDTO dto) {
+	public void create(RecruitmentRequestCommandDTO dto, int memberId) {
 		// 직무 존재 여부 확인
 		if (!jobRepository.existsById(dto.getJobId())) {
 			throw new BusinessException(EMPLOYMENT_REQUEST_INVALID_JOB_ID);
@@ -44,7 +45,7 @@ public class RecruitmentRequestCommandServiceImpl implements RecruitmentRequestC
 			.responsibility(dto.getResponsibility())
 			.employmentType(dto.getEmploymentType())
 			.workLocation(dto.getWorkLocation())
-			.memberId(dto.getMemberId())
+			.memberId(memberId)
 			.departmentId(dto.getDepartmentId())
 			.jobId(dto.getJobId())
 			.createdAt(LocalDateTime.now())

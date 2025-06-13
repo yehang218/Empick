@@ -3,25 +3,26 @@ package com.piveguyz.empickbackend.employment.jobtests.question.command.applicat
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionResponseDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.DeleteQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.UpdateQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.service.QuestionCommandService;
+import com.piveguyz.empickbackend.facade.QuestionFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/employment/questions")
 public class QuestionCommandController {
     private final QuestionCommandService questionCommandService;
-
-    public QuestionCommandController(QuestionCommandService questionCommandService) {
-        this.questionCommandService = questionCommandService;
-    }
+    private final QuestionFacade questionFacade;
 
     // 실무 테스트 문제 등록
     @Operation(
@@ -39,8 +40,8 @@ public class QuestionCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2412", description = "작성자 정보가 유효하지 않습니다.")
     })
     @PostMapping
-    public ResponseEntity<CustomApiResponse<CreateQuestionCommandDTO>> createQuestion(@RequestBody @Valid CreateQuestionCommandDTO createQuestionCommandDTO) {
-        CreateQuestionCommandDTO newQuestionDTO = questionCommandService.createQuestion(createQuestionCommandDTO);
+    public ResponseEntity<CustomApiResponse<CreateQuestionResponseDTO>> createQuestion(@RequestBody @Valid CreateQuestionCommandDTO createQuestionCommandDTO) {
+        CreateQuestionResponseDTO newQuestionDTO = questionFacade.createQuestionWithDetails(createQuestionCommandDTO);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newQuestionDTO));
     }

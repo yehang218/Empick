@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto;
 
+import com.piveguyz.empickbackend.employment.jobtests.common.enums.JobtestDifficulty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,11 +12,11 @@ import java.util.List;
 public class JobtestQueryDTO {
     private int id;
     private String title;
-    private int difficulty;
+    private JobtestDifficulty difficulty;
     private int testTime;
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
-    private String creatorName;
+    private String createdName;
     private String updatedName;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
