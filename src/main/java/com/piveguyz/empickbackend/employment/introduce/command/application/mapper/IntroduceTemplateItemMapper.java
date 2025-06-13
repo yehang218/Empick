@@ -1,7 +1,7 @@
 package com.piveguyz.empickbackend.employment.introduce.command.application.mapper;
 
-import com.piveguyz.empickbackend.employment.introduce.command.application.dto.introduceTemplate.IntroduceTemplateItemCommandDTO;
-import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.introduceTemplateCommand.IntroduceTemplateItemEntity;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceTemplateItemCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceTemplateItemEntity;
 
 public class IntroduceTemplateItemMapper {
 

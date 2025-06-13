@@ -1,6 +1,4 @@
 package com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate;
 
-
-public class IntroduceStandardEntity {
-
+public class IntroduceStandardItemEntity {
 }
