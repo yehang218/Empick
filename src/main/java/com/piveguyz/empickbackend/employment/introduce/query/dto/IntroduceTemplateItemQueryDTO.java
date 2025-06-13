@@ -9,8 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IntroduceTemplateItemQueryDTO {
-    private int Id;
-    private String Title;
-    private int MemberId;
-    private Integer IntroduceTemplateId;
+    private int id;
+    private String title;
+    private int memberId;
+    private Integer introduceTemplateId;
 }
