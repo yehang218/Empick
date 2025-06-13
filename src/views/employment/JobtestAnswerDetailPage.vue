@@ -38,6 +38,8 @@
             </div>
             <!-- 선택지가 없는 경우: 주관식 -->
             <div v-else>
+              <span class="font-weight-bold">정답:</span>
+              <span class="ml-2">{{ answer.question.answer }}</span> <br>
               <span class="font-weight-bold">답변:</span>
               <span class="ml-2">{{ answer.content }}</span>
             </div>
@@ -59,80 +61,25 @@
 
 
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import  AnswerResponseDTO  from '@/dto/employment/jobtest/answerResponseDTO';
+import { useAnswerStore } from '@/stores/answerStore';
 
-const rawData = [
-  {
-    "id": 5,
-    "content": "함수",
-    "attempt": 3,
-    "isCorrect": "CORRECT",
-    "score": 20,
-    "applicationJobTestId": 5,
-    "questionId": 5,
-    "question": {
-      "id": 5,
-      "content": "반복문과 조건문의 차이점 중 옳은 것은?",
-      "detailContent": "",
-      "type": "SUBJECTIVE",
-      "difficulty": "MEDIUM",
-      "answer": "함수"
-    }
-  },
-  {
-    "id": 11,
-    "content": 3,
-    "attempt": 3,
-    "isCorrect": "CORRECT",
-    "score": 10,
-    "applicationJobTestId": 5,
-    "questionId": 1,
-    "question": {
-      "id": 1,
-      "content": "가상 DOM과 가장 DOM 중 옳은 것은?",
-      "detailContent": "",
-      "type": "SUBJECTIVE",
-      "difficulty": "MEDIUM",
-      "answer": "가상 DOM",
-      "options": [
-        { "id": 1, "optionNumber": 1, "content": "빠른 렌더링" },
-        { "id": 2, "optionNumber": 2, "content": "양방향 바인딩" },
-        { "id": 3, "optionNumber": 3, "content": "가상 DOM" },
-        { "id": 4, "optionNumber": 4, "content": "템플릿 기반" }
-      ]
-    }
-  },
-  {
-    "id": 12,
-    "content": "4",
-    "attempt": 1,
-    "isCorrect": "WRONG",
-    "score": 0,
-    "applicationJobTestId": 5,
-    "questionId": 2,
-    "question": {
-      "id": 2,
-      "content": "Spring Boot에서 DI가 중요한 이유는?",
-      "detailContent": "",
-      "type": "SUBJECTIVE",
-      "difficulty": "EASY",
-      "answer": "의존성 명확화",
-      "options": [
-        { "id": 5, "optionNumber": 1, "content": "결합도 증가" },
-        { "id": 6, "optionNumber": 2, "content": "의존성 명확화" },
-        { "id": 7, "optionNumber": 3, "content": "애노테이션 미사용" },
-        { "id": 8, "optionNumber": 4, "content": "테스트 어려움" }
-      ]
-    }
-  }
-  // ... (DESCRIPTIVE 문제 제외)
-];
+const props = defineProps(['applicationJobtestId']);
+// 1. Pinia에서 가져오기
+const answerStore = useAnswerStore();
 
-// DESCRIPTIVE가 아닌 것만
-const filteredAnswers = computed(() =>
-  rawData.filter(a => a.question.type !== 'DESCRIPTIVE')
+// 2. DTO 변환 (만약 아직 변환 전 원본 JSON 상태라면)
+const answers = computed(() =>
+  answerStore.answers.map(AnswerResponseDTO.fromJSON)
 );
+
+// 3. DESCRIPTIVE 아닌 것만
+const filteredAnswers = computed(() =>
+  answers.value.filter(a => a.question.type !== 'DESCRIPTIVE')
+);
+
+console.log(filteredAnswers.value);
 
 // 선택지가 있는지 체크
 function hasOptions(answer) {
@@ -181,4 +128,12 @@ function getResultLabel(status) {
       return '미채점';
   }
 }
+
+onMounted(async () => {
+    try {
+        await answerStore.fetchAnswers(Number(props.applicationJobtestId));
+    } catch (error) {
+        console.error('Failed to fetch answer:', error)
+    }
+})
 </script>

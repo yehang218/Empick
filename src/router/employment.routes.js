@@ -59,7 +59,7 @@ export const employmentRoutes = [
     },
     // 실무테스트 답안 상세 조회 페이지
     {
-        path: '/employment/jobtest-answers/:answerId',
+        path: '/employment/jobtest-answers/:applicationJobtestId',
         name: 'JobtestAnswerDetail',
         component: () => import('@/views/employment/JobtestAnswerDetailPage.vue'),
         props: true,
