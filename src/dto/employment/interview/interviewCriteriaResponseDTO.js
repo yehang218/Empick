@@ -1,19 +1,23 @@
 export default class InterviewCriteriaResponseDTO {
 
-    constructor(id, content, detailContent, isDeleted, memberId, updatedAt) {
+    constructor(id, sheetId, title, content, weight, isDeleted, memberId, updatedAt) {
         this.id = id;
+        this.sheetId = sheetId;
+        this.title = title;
         this.content = content;
-        this.detailContent = detailContent;
+        this.weight = weight;
         this.isDeleted = isDeleted;
         this.memberId = memberId;
         this.updatedAt = updatedAt;
     }
 
     static fromJSON(json) {
-        return new InterviewResponseDTO (
+        return new InterviewCriteriaResponseDTO (
             json.id,
+            json.sheetId,
+            json.title,
             json.content,
-            json.detailContent,
+            json.weight,
             json.isDeleted,
             json.memberId,
             json.updatedAt
@@ -23,10 +27,12 @@ export default class InterviewCriteriaResponseDTO {
     toJSON() {
         return {
             id: this.id,
+            sheetId: this.sheetId,
+            title: this.title,
             content: this.content,
-            detailContent: this.detailContent,
+            weight: this.weight,
             isDeleted: this.isDeleted,
-            memberId: this.addmemberIdress,
+            memberId: this.memberId,
             updatedAt: this.updatedAt
         };
     }

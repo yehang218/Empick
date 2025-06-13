@@ -1,13 +1,12 @@
 export default class InterviewResponseDTO {
 
-    constructor(id, applicationId, sheetId, datetime, address, score, interviewReview) {
+    constructor(id, applicationId, sheetId, datetime, address, score) {
         this.id = id;
         this.applicationId = applicationId;
         this.sheetId = sheetId;
         this.datetime = datetime;
         this.address = address;
         this.score = score;
-        this.interviewReview = interviewReview;
     }
 
     static fromJSON(json) {
@@ -17,8 +16,7 @@ export default class InterviewResponseDTO {
             json.sheetId,
             json.datetime,
             json.address,
-            json.score,
-            json.interviewReview
+            json.score
         );
     }
 
@@ -29,8 +27,7 @@ export default class InterviewResponseDTO {
             sheetId: this.sheetId,
             datetime: this.datetime,
             address: this.address,
-            score: this.score,
-            interviewReview: this.interviewReview
+            score: this.score
         };
     }
 }

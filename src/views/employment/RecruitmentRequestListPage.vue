@@ -26,11 +26,11 @@
 <script setup>
 import { onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useRecruitmentStore } from '@/stores/recruitmentStore';
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
 import ListView from '@/components/common/ListView.vue';
 import dayjs from 'dayjs';
 
-const store = useRecruitmentStore();
+const store = useRecruitmentRequestStore();
 const router = useRouter();
 
 onMounted(() => {
