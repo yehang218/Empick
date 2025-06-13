@@ -39,5 +39,4 @@ public class IntroduceStandardCommandServiceImp implements IntroduceStandardComm
         introduceStandardRepository.delete(entity);
         return id;
     }
-
 }

@@ -1,4 +1,8 @@
 package com.piveguyz.empickbackend.employment.introduce.command.domain.repository;
 
-public class IntroduceTemplateRepository {
+import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceTemplateEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface IntroduceTemplateRepository extends JpaRepository<IntroduceTemplateEntity, Integer> {
+    boolean existsByTitle(String title);
 }

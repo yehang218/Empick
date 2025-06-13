@@ -7,9 +7,10 @@ import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.ag
 
 public class QuestionOptionMapper {
 
-    public static QuestionOptionEntity toEntity(CreateQuestionOptionCommandDTO dto, int optionNumber) {
+    public static QuestionOptionEntity toEntity(CreateQuestionOptionCommandDTO dto, int optionNumber,
+                                                int questionId) {
         return QuestionOptionEntity.builder()
-                .questionId(dto.getQuestionId())
+                .questionId(questionId)
                 .content(dto.getContent())
                 .optionNumber(optionNumber)
                 .build();
@@ -17,9 +18,7 @@ public class QuestionOptionMapper {
 
     public static CreateQuestionOptionCommandDTO toCreateDto(QuestionOptionEntity entity) {
         return CreateQuestionOptionCommandDTO.builder()
-                .questionId(entity.getQuestionId())
                 .content(entity.getContent())
-                .optionNumber(entity.getOptionNumber())
                 .build();
     }
 
