@@ -81,14 +81,14 @@ export const getCriteriaByIdService = async (id, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewCriteriaResponseDTO.fromJSON(item));
+        return InterviewCriteriaResponseDTO.fromJSON(apiResponse.data);
     }, options);
 }
 
 // 내용으로 면접 평가 기준을 검색하는 서비스
-export const searchCriteriaByContentService = async (content, options = {}) => {
+export const searchCriteriaByTitleService = async (title, options = {}) => {
     return withErrorHandling(async () => {
-        const response = await api.get(InterviewAPI.SEARCH_CRITERIA_BY_CONTENT(content));
+        const response = await api.get(InterviewAPI.SEARCH_CRITERIA_BY_TITLE(title));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
