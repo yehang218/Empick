@@ -5,7 +5,7 @@
         <v-tabs v-model="activeTab">
             <v-tab value="MULTIPLE">선택형</v-tab>
             <v-tab value="SUBJECTIVE">단답형</v-tab>
-            <v-tab value="DESCRIPTIVE">서술형</v-tab>
+            <!-- <v-tab value="DESCRIPTIVE">서술형</v-tab> -->
         </v-tabs>
         <div class="mt-4">
             <v-select v-model="form.difficulty" :items="difficultyOptions" label="난이도" variant="outlined"
@@ -17,18 +17,25 @@
             <v-btn variant="tonal" @click="resetForm">취소하기</v-btn>
             <v-btn color="primary" class="ml-2" @click="handleSubmit">등록하기</v-btn>
         </div>
+
     </v-container>
+    <SuccessModal v-if="showSuccessModal" message="문제 등록이 완료되었습니다." @confirm="handleSuccessConfirm"
+        @cancel="showSuccessModal = false" />
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue';
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification';
+
 import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.vue';
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue';
 import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue';
+import SuccessModal from '@/components/common/AlertModal.vue'
+
 import { createQuestionService } from '@/services/jobtestQuestionService';
-import CreateQuestionRequestDTO from '@/dto/employment/jobtest/createQuestionRequestDTO';
-import { useToast } from 'vue-toastification';
 import { withErrorHandling } from '@/utils/errorHandler';
+import CreateQuestionRequestDTO from '@/dto/employment/jobtest/createQuestionRequestDTO';
 
 const activeTab = ref('MULTIPLE');
 const difficultyOptions = [
@@ -47,6 +54,9 @@ const form = ref({
     questionOptions: [],
     gradingCriteria: []
 });
+
+const showSuccessModal = ref(false)
+const router = useRouter()
 
 watch(activeTab, (newType) => {
     form.value.type = newType;
@@ -73,6 +83,7 @@ function resetForm() {
         questionOptions: [],
         gradingCriteria: []
     };
+    router.push({ name: 'JobtestQuestionList' });
 }
 
 const toast = useToast();
@@ -133,6 +144,10 @@ function validateForm() {
     return true;
 }
 
+function handleSuccessConfirm() {
+    showSuccessModal.value = false
+    router.push({ name: 'JobtestQuestionList' });
+}
 
 async function handleSubmit() {
     if (!validateForm()) return;
@@ -149,7 +164,7 @@ async function handleSubmit() {
             redirect: false
         });
 
-        toast.success('문제 등록이 완료되었습니다.');
+        showSuccessModal.value = true
         resetForm();
     } catch (e) {
         // 이미 withErrorHandling에서 처리하는 중
