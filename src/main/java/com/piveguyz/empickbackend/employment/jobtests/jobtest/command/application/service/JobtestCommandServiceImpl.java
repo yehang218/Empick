@@ -11,6 +11,8 @@ import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class JobtestCommandServiceImpl implements JobtestCommandService {
     private final JobtestRepository jobtestRepository;
@@ -25,7 +27,7 @@ public class JobtestCommandServiceImpl implements JobtestCommandService {
 
     // 실무테스트 등록
     @Override
-    public CreateJobtestCommandDTO createJobtest(CreateJobtestCommandDTO createJobtestCommandDTO) {
+    public int createJobtest(CreateJobtestCommandDTO createJobtestCommandDTO) {
         // 같은 이름이 이미 존재하는 경우
         if (jobtestRepository.existsByTitle(createJobtestCommandDTO.getTitle())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_JOBTEST_DUPLICATE);
@@ -39,7 +41,7 @@ public class JobtestCommandServiceImpl implements JobtestCommandService {
         JobtestEntity jobtestEntity = JobtestMapper.toEntity(createJobtestCommandDTO);
         JobtestEntity saved = jobtestRepository.save(jobtestEntity);
 
-        return JobtestMapper.toCreateDto(saved);
+        return saved.getId();
     }
 
     // 실무테스트 수정
@@ -72,5 +74,10 @@ public class JobtestCommandServiceImpl implements JobtestCommandService {
         }
 
         return jobtest.getId();
+    }
+
+    @Override
+    public Optional<JobtestEntity> findById(int jobtestId) {
+        return jobtestRepository.findById(jobtestId);
     }
 }
