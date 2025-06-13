@@ -12,6 +12,7 @@ import lombok.*;
 @Builder
 public class IntroduceStandardItemEntity {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

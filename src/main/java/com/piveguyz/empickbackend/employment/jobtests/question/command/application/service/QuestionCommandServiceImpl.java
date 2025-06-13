@@ -28,7 +28,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
 
     // 실무 테스트 문제 등록
     @Override
-    public CreateQuestionCommandDTO createQuestion(CreateQuestionCommandDTO createQuestionCommandDTO) {
+    public int createQuestion(CreateQuestionCommandDTO createQuestionCommandDTO) {
         // 이미 존재할 경우
         if (questionRepository.existsByContent(createQuestionCommandDTO.getContent())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_DUPLICATE);
@@ -42,7 +42,7 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         QuestionEntity questionEntity = QuestionMapper.toEntity(createQuestionCommandDTO);
         QuestionEntity saved = questionRepository.save(questionEntity);
 
-        return QuestionMapper.toCreateDto(saved);
+        return saved.getId();
     }
 
 

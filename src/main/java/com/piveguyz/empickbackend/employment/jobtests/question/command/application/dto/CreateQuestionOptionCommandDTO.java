@@ -5,14 +5,8 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @ToString
-@Setter
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class CreateQuestionOptionCommandDTO {
     private String content;
-    private int questionId;
-
-    @Builder
-    public CreateQuestionOptionCommandDTO(int optionNumber, String content, int questionId) {
-        this.content = content;
-        this.questionId = questionId;
-    }
 }

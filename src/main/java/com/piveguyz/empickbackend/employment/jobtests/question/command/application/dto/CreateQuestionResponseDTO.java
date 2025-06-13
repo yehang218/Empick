@@ -7,20 +7,20 @@ import lombok.*;
 
 import java.util.List;
 
-@ToString
 @Getter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateQuestionCommandDTO {
+public class CreateQuestionResponseDTO {
+    private Integer id;
     private String content;
     private String detailContent;
     private QuestionType type;
     private JobtestDifficulty difficulty;
     private String answer;
-
     private int createdMemberId;
 
-    private List<CreateQuestionOptionCommandDTO> questionOptions;       // 선택지
-    private List<CreateGradingCriteriaCommandDTO> gradingCriteria;      // 채점 기준
+    private List<CreateQuestionOptionResponse> questionOptions;
+    private List<CreateGradingCriteriaCommandDTO> gradingCriteria;
 }

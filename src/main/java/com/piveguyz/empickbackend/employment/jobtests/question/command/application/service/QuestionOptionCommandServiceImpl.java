@@ -23,13 +23,14 @@ public class QuestionOptionCommandServiceImpl implements QuestionOptionCommandSe
 
     // 선택지 등록
     @Override
-    public CreateQuestionOptionResponse createQuestionOption(CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO) {
-        int count = questionOptionRepository.countByQuestionId(createQuestionOptionCommandDTO.getQuestionId());
+    public CreateQuestionOptionResponse createQuestionOption(CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO,
+                                                             int questionId) {
+        int count = questionOptionRepository.countByQuestionId(questionId);
         if (count >= 5) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_OPTION_COUNT_EXCEEDED);
         }
 
-        QuestionOptionEntity entity = QuestionOptionMapper.toEntity(createQuestionOptionCommandDTO, count + 1);
+        QuestionOptionEntity entity = QuestionOptionMapper.toEntity(createQuestionOptionCommandDTO, count + 1, questionId);
         QuestionOptionEntity saved = questionOptionRepository.save(entity);
 
         return QuestionOptionMapper.toCreateResponse(saved);

@@ -42,7 +42,7 @@
         <!-- 1:N 관계 -->
         <collection property="options" resultMap="QuestionOptionMap"/>
         <collection property="usedJobTests" resultMap="UsedJobTestMap"/>
-        <collection property="gradingCriterias" resultMap="GradingCriteriaMap"/>
+        <collection property="gradingCriteria" resultMap="GradingCriteriaMap"/>
     </resultMap>
 
 
@@ -78,8 +78,8 @@
                q.created_member_id,
                q.updated_member_id,
 
-               cm.name AS created_member_name,
-               um.name AS updated_member_name,
+               cm.name        AS created_member_name,
+               um.name        AS updated_member_name,
 
                cm.picture_url AS created_member_picture_url,
                um.picture_url AS updated_member_picture_url
