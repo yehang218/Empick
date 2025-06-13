@@ -1,7 +1,7 @@
 import api from '@/apis/apiClient';
 import { MailAPI } from '@/apis/routes/mail';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
-import MailDTO from '@/dto/employment/mail/mailDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
+import MailDTO from '@/dto/employment/mail/mailResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 // Command
@@ -21,7 +21,7 @@ export const sendMailService = async (dto, options = {}) => {
         const response = await api.post(MailAPI.SEND, dto);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+        return apiResponse.data;
     }, options);
 };
 

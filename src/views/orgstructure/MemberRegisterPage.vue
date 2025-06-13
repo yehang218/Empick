@@ -25,8 +25,8 @@
                     <template v-else>
                         <v-icon size="48" color="grey darken-2">mdi-camera</v-icon>
                     </template>
-                    <input ref="fileInputRef" type="file" accept="image/*" style="display: none;"
-                        @change="onProfileImageChange" />
+                    <input ref="fileInputRef" type="file" accept="image/jpeg,image/png,image/webp"
+                        style="display: none;" @change="onProfileImageChange" />
                 </v-sheet>
                 <v-btn :color="regStore.profileImageFile ? 'success' : 'primary'" @click="triggerFileInput"
                     style="width: 100px;">{{
@@ -74,15 +74,26 @@
                 <v-btn color="success" @click="onRegister" size="large">등록</v-btn>
             </v-col>
         </v-row>
+
+        <!-- 확인 모달 -->
+        <AlertModal v-if="showConfirmDialog" message="입력하신 내용이 모두 삭제됩니다. 정말로 나가시겠습니까?" @confirm="confirmLeave"
+            @cancel="cancelLeave" />
     </v-container>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useMemberRegisterStore } from '@/stores/memberRegisterStore'
+import { useToast } from 'vue-toastification'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
+import AlertModal from '@/components/common/AlertModal.vue'
 
 const regStore = useMemberRegisterStore()
+const toast = useToast()
 const fileInputRef = ref(null)
+const router = useRouter()
+const showConfirmDialog = ref(false)
+const pendingNavigation = ref(null)
 
 const departments = [
     { label: '인사', value: 1 },
@@ -112,11 +123,62 @@ const triggerFileInput = () => {
 
 const onProfileImageChange = (event) => {
     const file = event.target.files && event.target.files[0]
-    if (file) regStore.setProfileImage(file)
-    else regStore.clearProfileImage()
+    if (file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('JPG, PNG, WEBP 형식의 이미지만 업로드할 수 있습니다.')
+            return
+        }
+        if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+            toast.error('파일 크기는 5MB를 초과할 수 없습니다.')
+            return
+        }
+        regStore.setProfileImage(file)
+    } else {
+        regStore.clearProfileImage()
+    }
 }
 
 const onRegister = async () => {
-    await regStore.registerMemberWithImage()
+    try {
+        const result = await regStore.registerMemberWithImage()
+        if (result) {
+            toast.success('사원 등록이 완료되었습니다!')
+            // 등록 성공 후 폼 초기화
+            regStore.resetForm()
+        }
+    } catch (error) {
+        toast.error(error.message || '사원 등록에 실패했습니다.')
+    }
+}
+
+// 페이지를 나가기 전에 확인
+onBeforeRouteLeave((to, from, next) => {
+    // 입력값이 있는지 확인
+    const hasInput = Object.values(regStore.form).some(value => value !== null && value !== '') || regStore.profileImageFile
+
+    if (hasInput) {
+        pendingNavigation.value = next
+        showConfirmDialog.value = true
+    } else {
+        next()
+    }
+})
+
+const confirmLeave = () => {
+    regStore.resetForm()
+    showConfirmDialog.value = false
+    if (pendingNavigation.value) {
+        pendingNavigation.value()
+        pendingNavigation.value = null
+    }
+}
+
+const cancelLeave = () => {
+    showConfirmDialog.value = false
+    if (pendingNavigation.value) {
+        pendingNavigation.value(false)
+        pendingNavigation.value = null
+    }
 }
 </script>
