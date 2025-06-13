@@ -3,7 +3,7 @@ import api from '@/apis/apiClient';
 import { InterviewAPI } from '@/apis/routes/interview';
 
 import InterviewSheetItemResponseDTO from '@/dto/employment/interview/interviewSheetItemResponseDTO';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 

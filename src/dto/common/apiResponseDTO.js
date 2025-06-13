@@ -1,4 +1,4 @@
-export default class apiResponseDTO {
+export default class ApiResponseDTO {
     constructor(success, code, message, data) {
         this.success = success;
         this.code = code;
@@ -7,7 +7,7 @@ export default class apiResponseDTO {
     }
 
     static fromJSON(json) {
-        return new apiResponseDTO(
+        return new ApiResponseDTO(
             json.success,
             json.code,
             json.message,

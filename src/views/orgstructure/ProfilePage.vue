@@ -11,10 +11,11 @@
         <v-row>
             <!-- 프로필 사진 영역 -->
             <v-col cols="2" class="d-flex flex-column align-center">
-                <template v-if="memberStore.profileImageUrl">
-                    <v-img :src="memberStore.profileImageUrl" width="160" height="200" class="mb-4" cover />
-                </template>
-                <input ref="fileInputRef" type="file" accept="image/*" style="display: none;"
+                <v-sheet width="160" height="160" elevation="1" rounded class="d-flex align-center justify-center mb-4"
+                    color="#D3D3D3" style="position: relative; overflow: hidden;">
+                    <v-img :src="profileImageSrc" width="160" height="160" cover />
+                </v-sheet>
+                <input ref="fileInputRef" type="file" accept="image/jpeg,image/png,image/webp" style="display: none;"
                     @change="onProfileImageChange" />
                 <v-btn color="success" @click="triggerFileInput" style="width: 100px;">수정</v-btn>
             </v-col>
@@ -25,49 +26,48 @@
                         <h3 class="text-subtitle-1 font-weight-bold">인적 정보</h3>
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field label="이름" v-model="memberStore.form.name" required />
+                        <v-text-field label="이름" v-model="memberStore.form.name" required :disabled="!isEditing" />
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field label="생년월일" v-model="memberStore.form.birth" type="date" required />
+                        <v-text-field label="사번" v-model="memberStore.form.employeeNumber" disabled />
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field label="연락처" v-model="memberStore.form.phone" required
-                            placeholder="010-1234-5678" />
+                        <v-text-field label="연락처" v-model="memberStore.form.phone" required placeholder="010-1234-5678"
+                            :disabled="!isEditing" :rules="[v => /^010-\d{4}-\d{4}$/.test(v) || '올바른 연락처 형식이 아닙니다']" />
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field label="이메일" v-model="memberStore.form.email" required />
-                    </v-col>
-                    <v-col cols="12">
-                        <v-text-field label="주소" v-model="memberStore.form.address" />
+                        <v-text-field label="이메일" v-model="memberStore.form.email" required :disabled="!isEditing"
+                            :rules="[v => /.+@.+\..+/.test(v) || '올바른 이메일 형식이 아닙니다']" />
                     </v-col>
                     <v-col cols="12" class="mt-6 mb-2">
                         <h3 class="text-subtitle-1 font-weight-bold">소속 정보</h3>
                     </v-col>
                     <v-col cols="6">
-                        <v-select label="부서" :items="departments" v-model="memberStore.form.departmentId"
-                            item-title="label" item-value="value" required />
+                        <v-text-field label="부서" v-model="memberStore.form.departmentName" disabled />
                     </v-col>
                     <v-col cols="6">
-                        <v-select label="직책" :items="positions" v-model="memberStore.form.positionId" item-title="label"
-                            item-value="value" required />
+                        <v-text-field label="직책" v-model="memberStore.form.positionName" disabled />
                     </v-col>
                     <v-col cols="6">
-                        <v-text-field label="입사일" v-model="memberStore.form.hireAt" type="date" required />
+                        <v-text-field label="입사일" v-model="memberStore.form.hireAt" type="date" disabled />
                     </v-col>
                     <v-col cols="6">
-                        <v-select label="직무" :items="jobs" v-model="memberStore.form.jobId" item-title="label"
-                            item-value="value" required />
+                        <v-text-field label="직무" v-model="memberStore.form.jobName" disabled />
                     </v-col>
                     <v-col cols="6">
-                        <v-select label="직급" :items="ranks" v-model="memberStore.form.rankId" item-title="label"
-                            item-value="value" required />
+                        <v-text-field label="직급" v-model="memberStore.form.rankName" disabled />
                     </v-col>
                 </v-row>
             </v-col>
         </v-row>
         <v-row class="mt-8">
             <v-col cols="12" class="d-flex flex-row align-center justify-center gap-4">
-                <v-btn color="grey" style="min-width:120px;" disabled>수정요청</v-btn>
+                <v-btn v-if="!isEditing" color="primary" style="min-width:120px;" @click="startEditing">수정</v-btn>
+                <template v-else>
+                    <v-btn color="error" style="min-width:120px;" @click="cancelEditing">취소</v-btn>
+                    <v-btn color="success" style="min-width:120px;" @click="saveChanges"
+                        :loading="memberStore.loading">저장</v-btn>
+                </template>
             </v-col>
         </v-row>
         <v-row>
@@ -82,35 +82,50 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useMemberStore } from '@/stores/memberStore'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const memberStore = useMemberStore()
 const router = useRouter()
+const toast = useToast()
 const fileInputRef = ref(null)
+const isEditing = ref(false)
+const originalForm = ref(null)
 
-const departments = [
-    { label: '백엔드', value: 1 },
-    { label: '프론트엔드', value: 2 },
-    { label: '기획', value: 3 },
-    { label: '디자인', value: 4 },
-]
-const positions = [
-    { label: '미지정', value: 0 },
-    { label: '팀장', value: 1 },
-    { label: '부장', value: 2 },
-]
-const jobs = [
-    { label: '미지정', value: 0 },
-    { label: '개발자', value: 1 },
-    { label: '디자이너', value: 2 },
-]
-const ranks = [
-    { label: '사원', value: 0 },
-    { label: '대리', value: 1 },
-    { label: '과장', value: 2 },
-]
+// 프로필 이미지 바인딩: blob url이 있으면 그걸, 없으면 기본 이미지
+const profileImageSrc = computed(() => {
+    return memberStore.profileImageUrl || memberStore.defaultProfileImageUrl
+})
+
+// form 데이터 변경 감시
+watch(() => memberStore.form, (newVal) => {
+    console.log('form 데이터 변경:', newVal)
+    console.log('form 데이터 타입:', typeof newVal)
+    console.log('form 데이터 키:', Object.keys(newVal))
+}, { deep: true, immediate: true })
+
+const startEditing = () => {
+    originalForm.value = JSON.parse(JSON.stringify(memberStore.form))
+    isEditing.value = true
+}
+
+const cancelEditing = () => {
+    memberStore.form = JSON.parse(JSON.stringify(originalForm.value))
+    isEditing.value = false
+}
+
+const saveChanges = async () => {
+    try {
+        await memberStore.updateMyInfo()
+        isEditing.value = false
+        toast.success('기본 정보가 성공적으로 수정되었습니다.')
+    } catch (error) {
+        console.error('정보 수정 실패:', error)
+        toast.error('기본 정보 수정에 실패했습니다.')
+    }
+}
 
 const triggerFileInput = () => {
     if (fileInputRef.value) fileInputRef.value.click()
@@ -118,7 +133,29 @@ const triggerFileInput = () => {
 
 const onProfileImageChange = (event) => {
     const file = event.target.files && event.target.files[0]
-    if (file) memberStore.setProfileImage(file)
+    if (file) {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('JPG, PNG, WEBP 형식의 이미지만 업로드할 수 있습니다.')
+            return
+        }
+        if (file.size > 5 * 1024 * 1024) { // 5MB 제한
+            toast.error('파일 크기는 5MB를 초과할 수 없습니다.')
+            return
+        }
+        const formData = new FormData()
+        const fileName = `${memberStore.form.employeeNumber}.png`
+        const newFile = new File([file], fileName, { type: file.type })
+        formData.append('file', newFile)
+        formData.append('fileName', fileName)
+        memberStore.uploadProfileImage(memberStore.form.id, formData)
+            .then(() => {
+                toast.success('프로필 이미지가 성공적으로 업로드되었습니다.')
+            })
+            .catch(() => {
+                toast.error('프로필 이미지 업로드에 실패했습니다.')
+            })
+    }
 }
 
 const goToResult = () => {
@@ -126,9 +163,13 @@ const goToResult = () => {
 }
 
 onMounted(async () => {
-    await memberStore.getMyInfo()
+    await memberStore.getMyInfo();
+    console.log('form.id:', memberStore.form.id);
     if (memberStore.form.id) {
-        await memberStore.fetchProfileImage(memberStore.form.id)
+        console.log('fetchProfileImage 호출, memberId:', memberStore.form.id);
+        await memberStore.fetchProfileImage(memberStore.form.id);
+    } else {
+        console.warn('form.id가 없음! 프로필 이미지 요청 안함');
     }
-})
+});
 </script>

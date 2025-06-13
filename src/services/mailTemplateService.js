@@ -1,6 +1,6 @@
 import api from '@/apis/apiClient';
 import { MailTemplateAPI } from '@/apis/routes/mail';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import MailTemplateDTO from '@/dto/employment/mail/mailTemplateDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
