@@ -20,7 +20,7 @@ public class DepartmentEntity {
     private String code;
 
     @Column(nullable = false)
-    private Boolean isActive;
+    private Integer isActive;
 
     private String description;
 

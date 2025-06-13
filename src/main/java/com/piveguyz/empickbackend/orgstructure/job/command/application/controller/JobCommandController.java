@@ -1,10 +1,10 @@
 package com.piveguyz.empickbackend.orgstructure.job.command.application.controller;
 
+import com.piveguyz.empickbackend.common.enums.IsActive;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.orgstructure.job.command.application.dto.JobCommandDTO;
 import com.piveguyz.empickbackend.orgstructure.job.command.application.service.JobCommandService;
-import com.piveguyz.empickbackend.orgstructure.job.command.domain.enums.IsActive;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

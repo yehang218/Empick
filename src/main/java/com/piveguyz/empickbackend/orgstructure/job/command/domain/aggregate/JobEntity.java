@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.orgstructure.job.command.domain.aggregate;
 
-import com.piveguyz.empickbackend.orgstructure.job.command.domain.enums.IsActive;
+import com.piveguyz.empickbackend.common.enums.IsActive;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

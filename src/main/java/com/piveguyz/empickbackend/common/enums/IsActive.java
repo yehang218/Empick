@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.orgstructure.job.command.domain.enums;
+package com.piveguyz.empickbackend.common.enums;
 
 public enum IsActive {
     INACTIVE(0),

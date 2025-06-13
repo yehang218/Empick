@@ -1,8 +1,8 @@
 package com.piveguyz.empickbackend.orgstructure.job.command.application.service;
 
+import com.piveguyz.empickbackend.common.enums.IsActive;
 import com.piveguyz.empickbackend.orgstructure.job.command.application.dto.JobCommandDTO;
 import com.piveguyz.empickbackend.orgstructure.job.command.domain.aggregate.JobEntity;
-import com.piveguyz.empickbackend.orgstructure.job.command.domain.enums.IsActive;
 import com.piveguyz.empickbackend.orgstructure.job.command.domain.repository.JobRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
