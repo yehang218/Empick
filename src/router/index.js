@@ -22,14 +22,6 @@ const routes = [
             requiresAuth: true
         }
     },
-    {
-        path: '/createInterviewSheet',
-        name: 'CreateInterviewSheetPage',
-        component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
-    },
     ...authRoutes,
     ...employmentRoutes,
     ...orgstructureRoutes,
