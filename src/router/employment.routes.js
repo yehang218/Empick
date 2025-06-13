@@ -18,10 +18,6 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
     // 실무테스트 문제 등록 페이지
     {
         path: '/employment/jobtest-questions/create',
