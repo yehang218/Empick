@@ -33,6 +33,14 @@ const routes = [
             requiresAuth: true
         }
     },
+    {
+        path: '/employment/interview-criteria/create',
+        name: 'CreateInterviewSheetPage',
+        component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
 
     // <---------- 안내      메일 ---------->
     ...authRoutes,
