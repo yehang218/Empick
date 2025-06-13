@@ -1,7 +1,7 @@
 // 📁 src/services/recruitmentRequestService.js
 import api from '@/apis/apiClient';
 import { API } from '@/apis/routes';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import RecruitmentRequestResponseDTO from '@/dto/employment/recruitment/RecruitmentRequestResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
