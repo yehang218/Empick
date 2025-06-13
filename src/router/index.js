@@ -22,11 +22,7 @@ export const routeMap = Object.fromEntries(
 const routes = [
     {
         path: '/',
-        name: 'MainPage',
-        component: () => import('@/views/MainPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
+        redirect: '/dashboard'
     },
     {
         path: '/dashboard',

@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer app permanent class="sidebar">
+    <v-navigation-drawer app permanent width="260" class="sidebar">
         <div class="logo-area">
             <img src="@/assets/empick_logo.png" alt="EMPICK Logo" class="logo" />
         </div>
@@ -112,6 +112,10 @@ const menu = computed(() => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+}
+
+.v-navigation-drawer {
+    z-index: 100 !important;
 }
 
 .logo-area {
