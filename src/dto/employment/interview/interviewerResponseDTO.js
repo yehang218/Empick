@@ -1,5 +1,5 @@
 export default class InterviewerResponseDTO {
- 
+
     constructor(id, interviewId, interviewerId, score, review) {
         this.id = id;
         this.interviewId = interviewId;
@@ -9,7 +9,7 @@ export default class InterviewerResponseDTO {
     }
 
     static fromJSON(json) {
-        return new InterviewResponseDTO (
+        return new InterviewerResponseDTO (
             json.id,
             json.interviewId,
             json.interviewerId,
