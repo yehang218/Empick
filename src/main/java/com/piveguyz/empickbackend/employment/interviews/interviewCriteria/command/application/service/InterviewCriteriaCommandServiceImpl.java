@@ -37,8 +37,10 @@ public class InterviewCriteriaCommandServiceImpl implements InterviewCriteriaCom
             throw new BusinessException(ResponseCode.BAD_REQUEST);
         }
         InterviewCriteriaEntity entity = new InterviewCriteriaEntity();
+        entity.setSheetId(dto.getSheetId());
         entity.setTitle(title);
         entity.setContent(content);
+        entity.setWeight(weight);
         entity.setIsDeleted("N");
         entity.setMemberId(1);      // 나중에 로그인 JWT토큰으로부터 받아올 예정
         entity.setUpdatedAt(LocalDateTime.now());
@@ -65,6 +67,7 @@ public class InterviewCriteriaCommandServiceImpl implements InterviewCriteriaCom
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND));
         entity.setTitle(title);
         entity.setContent(content);
+        entity.setWeight(dto.getWeight());
         entity.setIsDeleted("N");
         entity.setMemberId(1);     // 나중에 로그인 JWT토큰으로부터 받아올 예정
         entity.setUpdatedAt(LocalDateTime.now());
