@@ -31,10 +31,10 @@ CREATE TABLE introduce
 (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(255) NOT NULL,
-    member_id INT NOT NULL,
+    applicant_id INT NOT NULL,
     introduce_template_id INT NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
+    FOREIGN KEY (applicant_id) REFERENCES applicant(id),
+    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id)
 );
 
 -- introduce

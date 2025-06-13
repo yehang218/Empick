@@ -23,9 +23,10 @@ public class GradingCriteriaCommandServiceImpl implements GradingCriteriaCommand
     }
 
     @Override
-    public CreateGradingCriteriaCommandDTO createGradingCriteria(CreateGradingCriteriaCommandDTO createGradingCriteriaCommandDTO) {
+    public CreateGradingCriteriaCommandDTO createGradingCriteria(CreateGradingCriteriaCommandDTO createGradingCriteriaCommandDTO,
+                                                                 int questionId) {
         // 존재하지 않는 문제인 경우
-        if (!questionRepository.existsById(createGradingCriteriaCommandDTO.getQuestionId())) {
+        if (!questionRepository.existsById(questionId)) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION);
         }
 
@@ -35,7 +36,7 @@ public class GradingCriteriaCommandServiceImpl implements GradingCriteriaCommand
             throw new BusinessException(ResponseCode.EMPLOYMENT_JOBTEST_EVALUATION_CRITERIA_OVER_WEIGHT);
         }
 
-        GradingCriteriaEntity gradingCriteriaEntity = GradingCriteriaMapper.toEntity(createGradingCriteriaCommandDTO);
+        GradingCriteriaEntity gradingCriteriaEntity = GradingCriteriaMapper.toEntity(createGradingCriteriaCommandDTO, questionId);
         GradingCriteriaEntity saved = gradingCriteriaRepository.save(gradingCriteriaEntity);
 
         return GradingCriteriaMapper.toCreateDto(saved);
