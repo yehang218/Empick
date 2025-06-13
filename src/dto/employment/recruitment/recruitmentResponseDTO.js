@@ -1,5 +1,5 @@
 export default class recruitmentResponseDTO {
-    constructor(id, title, recruitType, startedAt, endedAt, departmentName, status, writer) {
+    constructor(id, title, recruitType, startedAt, endedAt, departmentName, status, memberName) {
         this.id = id
         this.title = title
         this.recruitType = recruitType
@@ -7,7 +7,7 @@ export default class recruitmentResponseDTO {
         this.endedAt = endedAt
         this.departmentName = departmentName
         this.status = status
-        this.writer = writer
+        this.memberName = memberName
     }
 
     static fromJSON(json) {
@@ -19,7 +19,7 @@ export default class recruitmentResponseDTO {
             json.endedAt,
             json.departmentName,
             json.status,
-            json.writer
+            json.memberName 
         )
     }
 }

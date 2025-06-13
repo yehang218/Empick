@@ -6,12 +6,12 @@
         <!-- 공고 현황 요약 -->
         <v-row class="mb-4" align="center">
             <v-col cols="12" md="2" class="text-center">
-                <div class="text-h6 font-weight-bold">{{ summary.approved }}</div>
-                <div class="text-caption">승인된 채용 공고 수</div>
+                <div class="text-h6 font-weight-bold">{{ summary.waiting }}</div>
+                <div class="text-caption">대기 중 공고</div>
             </v-col>
             <v-col cols="12" md="2" class="text-center">
                 <div class="text-h6 font-weight-bold">{{ summary.ongoing }}</div>
-                <div class="text-caption">진행 중 공고</div>
+                <div class="text-caption">게시 중 공고</div>
             </v-col>
             <v-col cols="12" md="2" class="text-center">
                 <div class="text-h6 font-weight-bold">{{ summary.totalApplicants }}</div>
@@ -37,26 +37,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ListView from '@/components/common/ListView.vue'
-import { fetchRecruitmentList } from '@/services/recruitmentService'
-import recruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
+import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 
 const router = useRouter()
 const page = ref(1)
 const totalPages = ref(1)
-const recruitments = ref([])
-const summary = ref({ approved: 0, ongoing: 0, totalApplicants: 0 })
-
-const headers = [
-    { key: 'title', label: '제목' },
-    { key: 'recruitType', label: '유형' },
-    { key: 'startedAt', label: '시작일' },
-    { key: 'endedAt', label: '마감일' },
-    { key: 'departmentName', label: '부서' },
-    { key: 'status', label: '상태' },
-    { key: 'writer', label: '작성자' }
-]
+const store = useRecruitmentStore()
 
 function goToCreate() {
     router.push('/employment/recruitments/create')
@@ -66,24 +54,31 @@ function goToDetail(item) {
     router.push(`/employment/recruitments/${item.id}`)
 }
 
-async function loadRecruitments() {
-    const data = await fetchRecruitmentList()
-    recruitments.value = data.map(item => recruitmentResponseDTO.fromJSON(item))
+onMounted(() => {
+    store.loadRecruitmentList()
+})
 
-    summary.value.approved = recruitments.value.filter(r => r.status === 'APPROVED').length
-    summary.value.ongoing = recruitments.value.filter(r => r.status === 'PUBLISHED').length
-    summary.value.totalApplicants = 150 // TODO: 실제 API가 제공하면 교체
-}
+const headers = [
+    { key: 'title', label: '제목' },
+    { key: 'recruitType', label: '유형' },
+    { key: 'startedAt', label: '시작일' },
+    { key: 'endedAt', label: '마감일' },
+    { key: 'departmentName', label: '부서' },
+    { key: 'status', label: '상태' },
+    { key: 'memberName', label: '작성자' }
+]
 
-const recruitmentsForDisplay = computed(() => {
-    return recruitments.value.map(r => ({
+const summary = computed(() => ({
+    waiting: store.list.filter(r => r.status === 'WAITING').length,
+    ongoing: store.list.filter(r => r.status === 'PUBLISHED').length,
+    totalApplicants: 150 // TODO: 실제 API 연결 시 수정
+}))
+
+const recruitmentsForDisplay = computed(() =>
+    store.list.map(r => ({
         ...r,
         recruitType: getRecruitTypeLabel(r.recruitType),
         status: getRecruitStatusLabel(r.status)
     }))
-})
-
-onMounted(() => {
-    loadRecruitments()
-})
+)
 </script>
