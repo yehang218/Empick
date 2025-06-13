@@ -32,6 +32,10 @@ public class InterviewCriteriaCommandServiceImpl implements InterviewCriteriaCom
         if (repository.existsByContentAndIsDeleted(content, "N")) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_DUPLICATE_CONTENT);
         }
+        Double weight = dto.getWeight();
+        if(weight > 1 || weight <= 0) {
+            throw new BusinessException(ResponseCode.BAD_REQUEST);
+        }
         InterviewCriteriaEntity entity = new InterviewCriteriaEntity();
         entity.setTitle(title);
         entity.setContent(content);
