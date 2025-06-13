@@ -127,6 +127,8 @@ public enum ResponseCode {
     INTRODUCE_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2107, "요청한 자기소개서 템플릿 ID가 존재하지 않습니다."),
     INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
     DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2109, "이미 존재하는 템플릿 항목명입니다."),
+    INTRODUCE_RATING_RESULT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2110, "요청한 자기소개서 평가 결과 ID가 존재하지 않습니다."),
+
 
 
     //  지원서 - 2200 ~ 2299

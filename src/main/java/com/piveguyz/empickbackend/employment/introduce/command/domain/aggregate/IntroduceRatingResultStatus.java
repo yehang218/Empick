@@ -1,7 +1,7 @@
 package com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate;
 
 
-public enum IntroduceResultStatus {
+public enum IntroduceRatingResultStatus {
     BEFORE_CONFIRM(0, "확인 전"),
     CONFIRMED(1, "확인만"),
     PASS(2, "합격"),
@@ -10,7 +10,7 @@ public enum IntroduceResultStatus {
     private final int code;
     private final String description;
 
-    IntroduceResultStatus(int code, String description) {
+    IntroduceRatingResultStatus(int code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -23,8 +23,8 @@ public enum IntroduceResultStatus {
         return description;
     }
 
-    public static IntroduceResultStatus fromCode(int code) {
-        for (IntroduceResultStatus status : values()) {
+    public static IntroduceRatingResultStatus fromCode(int code) {
+        for (IntroduceRatingResultStatus status : values()) {
             if (status.code == code) {
                 return status;
             }
