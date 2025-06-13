@@ -35,9 +35,10 @@ public class GradingCriteriaCommandController {
     })
     @PostMapping
     public ResponseEntity<CustomApiResponse<CreateGradingCriteriaCommandDTO>> createGradingCriteria(
-            @RequestBody @Valid CreateGradingCriteriaCommandDTO createGradingCriteriaCommandDTO) {
+            @RequestBody @Valid CreateGradingCriteriaCommandDTO createGradingCriteriaCommandDTO,
+            @RequestBody int questionId) {
         CreateGradingCriteriaCommandDTO newGradingCriteriaDTO =
-                gradingCriteriaCommandService.createGradingCriteria(createGradingCriteriaCommandDTO);
+                gradingCriteriaCommandService.createGradingCriteria(createGradingCriteriaCommandDTO, questionId);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newGradingCriteriaDTO));
     }

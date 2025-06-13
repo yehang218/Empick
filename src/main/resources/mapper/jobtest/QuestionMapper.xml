@@ -42,7 +42,7 @@
         <!-- 1:N 관계 -->
         <collection property="options" resultMap="QuestionOptionMap"/>
         <collection property="usedJobTests" resultMap="UsedJobTestMap"/>
-        <collection property="gradingCriterias" resultMap="GradingCriteriaMap"/>
+        <collection property="gradingCriteria" resultMap="GradingCriteriaMap"/>
     </resultMap>
 
 

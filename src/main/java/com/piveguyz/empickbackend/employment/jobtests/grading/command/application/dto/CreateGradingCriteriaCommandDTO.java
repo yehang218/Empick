@@ -6,11 +6,9 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class CreateGradingCriteriaCommandDTO {
     private String content;
     private String detailContent;
     private Double scoreWeight;
-
-    private int questionId;
 }
