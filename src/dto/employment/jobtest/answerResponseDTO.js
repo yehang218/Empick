@@ -89,7 +89,7 @@ class QuestionQueryDTO {
 class AnswerQueryDTO {
     constructor({
         id, content, attempt, isCorrect, score, applicationJobTestId, questionId,
-        question
+        question, maxScore
         // , gradingResults
     }) {
         this.id = id;
@@ -97,6 +97,7 @@ class AnswerQueryDTO {
         this.attempt = attempt;
         this.isCorrect = isCorrect;
         this.score = score;
+        this.maxScore = maxScore;
         this.applicationJobTestId = applicationJobTestId;
         this.questionId = questionId;
         this.question = question ? QuestionQueryDTO.fromJSON(question) : null;
