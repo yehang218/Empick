@@ -85,7 +85,7 @@ export const employmentRoutes = [
     //    <------------------- 채용공고 -------------------->
     // 채용 요청서 목록 페이지
     {
-        path: '/employment/recruitments/requests',
+        path: '/employment/recruitment-requests',
         name: 'RecruitmentRequestList',
         component: () => import('@/views/employment/RecruitmentRequestListPage.vue'),
         meta: {
@@ -94,7 +94,7 @@ export const employmentRoutes = [
     },
     // 채용 요청서 상세 조회 페이지
     {
-        path: '/employment/recruitments/requests/:id',
+        path: '/employment/recruitment-requests/:id',
         name: 'RecruitmentRequestDetail',
         component: () => import('@/views/employment/RecruitmentRequestDetailPage.vue'),
         props: true,
@@ -104,7 +104,7 @@ export const employmentRoutes = [
     },
     // 채용 요청서 등록 페이지
     {
-        path: '/employment/recruitments/requests/create',
+        path: '/employment/recruitment-requests/create',
         name: 'RecruitmentRequestCreate',
         component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
         meta: { 

@@ -38,7 +38,7 @@ onMounted(() => {
 });
 
 const goToCreate = () => {
-    router.push('/employment/recruitments/requests/create');
+    router.push('/employment/recruitment-requests/create');
 };
 
 // 행 클릭 시 상세 페이지로 이동
@@ -49,7 +49,7 @@ const handleRowClick = (e) => {
     const index = tr.rowIndex - 1;
     const item = formattedList.value[index];
     if (item?.id) {
-        router.push(`/employment/recruitments/requests/${item.id}`);
+        router.push(`/employment/recruitment-requests/${item.id}`);
     }
 };
 
