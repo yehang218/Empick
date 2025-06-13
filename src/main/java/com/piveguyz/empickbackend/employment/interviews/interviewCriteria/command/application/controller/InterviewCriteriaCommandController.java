@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "면접 평가 기준 API", description = "면접 평가 기준 관리")
 @RestController
-@RequestMapping("/api/v1/employment/interviewCriteria")
+@RequestMapping("/api/v1/employment/interview-criteria")
 public class InterviewCriteriaCommandController {
     private final InterviewCriteriaCommandService interviewCriteriaCommandService;
 

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "안내 메일 템플릿 API", description = "안내 메일 템플릿 관리")
 @RestController
-@RequestMapping("/api/v1/employment/mailTemplate")
+@RequestMapping("/api/v1/employment/mail-template")
 public class MailTemplateCommandController {
     private final MailTemplateCommandService mailTemplateCommandService;
 
