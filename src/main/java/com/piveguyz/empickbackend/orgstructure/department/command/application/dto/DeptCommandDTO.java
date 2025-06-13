@@ -22,7 +22,7 @@ public class DeptCommandDTO {
     @Schema(description = "부서 코드", example = "HR001")
     private String code;
 
-    @Schema(description = "부서 활성 여부", example = "true")
+    @Schema(description = "부서 활성 여부", example = "1")
     private Integer isActive;
 
     @Schema(description = "부서 설명", example = "사내 인사 관련 업무를 담당합니다.")

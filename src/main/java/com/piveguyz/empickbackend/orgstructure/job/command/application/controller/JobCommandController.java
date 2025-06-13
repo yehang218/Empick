@@ -64,9 +64,8 @@ public class JobCommandController {
     @PatchMapping("/{id}/active")
     public ResponseEntity<CustomApiResponse<Integer>> updateJobActiveStatus(
             @PathVariable int id,
-            @RequestParam("isActive") int isActive) {
-        IsActive isActiveEnum = IsActive.fromValue(isActive);
-        Integer updatedId = jobCommandService.updateJobActiveStatus(id, isActiveEnum);
+            @RequestParam("isActive") IsActive isActive) {
+        Integer updatedId = jobCommandService.updateJobActiveStatus(id, isActive);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, updatedId));
     }

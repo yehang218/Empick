@@ -11,7 +11,7 @@ public class DeptResponseQueryDTO {
     private Integer id;
     private String name;
     private String code;
-    private Boolean isActive;
+    private Integer isActive;
     private String description;
     private Integer roleId;
     private LocalDateTime createdAt;

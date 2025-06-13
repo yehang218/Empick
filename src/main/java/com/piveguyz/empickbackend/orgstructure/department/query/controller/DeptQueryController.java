@@ -2,6 +2,8 @@ package com.piveguyz.empickbackend.orgstructure.department.query.controller;
 
 import com.piveguyz.empickbackend.orgstructure.department.query.dto.DeptResponseQueryDTO;
 import com.piveguyz.empickbackend.orgstructure.department.query.service.DeptQueryService;
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -9,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +30,10 @@ public class DeptQueryController {
             @ApiResponse(responseCode = "200", description = "부서 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = DeptResponseQueryDTO.class)))
     })
-    public List<DeptResponseQueryDTO> getDepartments() {
-        return deptQueryService.getDepartments();
+    public ResponseEntity<CustomApiResponse<List<DeptResponseQueryDTO>>> getDepartments() {
+        List<DeptResponseQueryDTO> list = deptQueryService.getDepartments();
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, list));
     }
 
     @GetMapping("/{id}")
@@ -38,7 +43,9 @@ public class DeptQueryController {
                     content = @Content(schema = @Schema(implementation = DeptResponseQueryDTO.class))),
             @ApiResponse(responseCode = "404", description = "해당 부서를 찾을 수 없음")
     })
-    public DeptResponseQueryDTO getDepartmentById(@PathVariable Integer id) {
-        return deptQueryService.getDepartmentById(id);
+    public ResponseEntity<CustomApiResponse<DeptResponseQueryDTO>> getDepartmentById(@PathVariable Integer id) {
+        DeptResponseQueryDTO dto = deptQueryService.getDepartmentById(id);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, dto));
     }
 }
