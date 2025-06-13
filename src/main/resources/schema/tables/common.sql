@@ -37,7 +37,7 @@ CREATE TABLE `job`
     `id`          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '직무 id',
     `name`        VARCHAR(255) NOT NULL COMMENT '직무 이름',
     `code`        VARCHAR(255) NOT NULL COMMENT '직무 코드',
-    `is_active`   BOOLEAN      NOT NULL DEFAULT TRUE COMMENT '활성 여부',
+    `is_active`   TINYINT      NOT NULL DEFAULT TRUE COMMENT '활성 여부',
     `created_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `updated_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     `description` TEXT         NULL COMMENT '설명',

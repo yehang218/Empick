@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.piveguyz.empickbackend.orgstructure.job.query.mapper.JobMapper">
+    <select id="selectAllJobs" resultType="com.piveguyz.empickbackend.orgstructure.job.query.dto.JobResponseDTO">
+        SELECT id
+             , name
+             , code
+             , is_active AS isActive
+             , description
+             , role_id
+             , created_at
+             , updated_at
+        FROM job
+        ORDER BY id
+    </select>
+</mapper>
