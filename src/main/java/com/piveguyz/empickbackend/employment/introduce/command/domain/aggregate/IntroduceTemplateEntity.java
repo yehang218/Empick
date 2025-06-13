@@ -12,7 +12,6 @@ import lombok.*;
 @Builder
 public class IntroduceTemplateEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

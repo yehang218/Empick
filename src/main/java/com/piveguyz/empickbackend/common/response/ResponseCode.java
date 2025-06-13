@@ -122,14 +122,16 @@ public enum ResponseCode {
     EMPLOYMENT_APPLICATION_DUPLICATE_APPLICATION(false, HttpStatus.CONFLICT, 2105, "이미 해당 공고에 지원한 이력이 있습니다."),
     EMPLOYMENT_APPLICATION_NOT_FOUND(false,HttpStatus.NOT_FOUND, 2106, "지원서를 찾을 수 없습니다."),
     APPLICATION_STATUS_UPDATED(true, HttpStatus.OK, 2107, "지원서 상태가 성공적으로 변경되었습니다."),
-    COMMAND_INVALID_ID_ON_CREATE(false, HttpStatus.BAD_REQUEST, 2108, "생성 요청에 ID를 포함할 수 없습니다."),
-    DUPLICATE_TEMPLATE_TITLE(false, HttpStatus.CONFLICT, 2109, "이미 존재하는 템플릿 제목입니다."),
-    INTRODUCE_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2110, "요청한 자기소개서 템플릿 ID가 존재하지 않습니다."),
-    INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2111, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
+    COMMAND_INVALID_ID_ON_CREATE(false, HttpStatus.BAD_REQUEST, 2105, "생성 요청에 ID를 포함할 수 없습니다."),
+    DUPLICATE_TEMPLATE_TITLE(false, HttpStatus.CONFLICT, 2106, "이미 존재하는 템플릿 제목입니다."),
+    INTRODUCE_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2107, "요청한 자기소개서 템플릿 ID가 존재하지 않습니다."),
+    INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
     DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2112, "이미 존재하는 템플릿 항목명입니다."),
     INTRODUCE_STANDARD_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2113, "해당 자기소개서 기준표 항목을 찾을 수 없습니다."),
     DUPLICATE_STANDARD_ITEM_CONTENT(false, HttpStatus.CONFLICT, 2114, "이미 존재하는 자기소개서 기준표 항목입니다."),
     DUPLICATE_STANDARD_ITEM_CONTENT_TITLE(false, HttpStatus.CONFLICT, 2115, "이미 존재하는 자기소개서 기준표 항목명입니다."),
+
+
 
 
     //  지원서 - 2200 ~ 2299
