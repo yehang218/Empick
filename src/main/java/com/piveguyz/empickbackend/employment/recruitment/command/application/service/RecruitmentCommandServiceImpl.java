@@ -229,8 +229,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		RecruitmentStatus nextStatus = RecruitmentStatus.fromCode(statusCode);
 
 		boolean valid =
-			(currentStatus == RecruitmentStatus.WAITING && nextStatus == RecruitmentStatus.APPROVED) ||
-				(currentStatus == RecruitmentStatus.APPROVED && nextStatus == RecruitmentStatus.PUBLISHED) ||
+			(currentStatus == RecruitmentStatus.WAITING && nextStatus == RecruitmentStatus.PUBLISHED) ||
 				(currentStatus == RecruitmentStatus.PUBLISHED && nextStatus == RecruitmentStatus.CLOSED);
 
 		if (!valid) {

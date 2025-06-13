@@ -57,6 +57,7 @@ public class RecruitmentCommandController {
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS));
 	}
 
+	// 추후 삭제 예정
 	@Operation(summary = "채용 공고 상태 변경", description = "채용 공고의 상태를 승인/게시/종료로 변경합니다.")
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "상태 변경이 성공적으로 처리되었습니다."),
