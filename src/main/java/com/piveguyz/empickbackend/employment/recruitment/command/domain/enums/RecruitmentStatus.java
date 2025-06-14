@@ -7,9 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RecruitmentStatus {
 	WAITING(0),    // 대기
-	APPROVED(1),   // 승인
-	PUBLISHED(2),  // 게시
-	CLOSED(3);     // 종료
+	PUBLISHED(1),  // 게시
+	CLOSED(2);     // 종료
 
 	private final int code;
 

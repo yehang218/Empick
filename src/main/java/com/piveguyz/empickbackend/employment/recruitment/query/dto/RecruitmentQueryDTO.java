@@ -17,7 +17,7 @@ public class RecruitmentQueryDTO {
 	private String title;
 	private String content;
 	private RecruitType recruitType;        // 0: 상시, 1: 공채
-	private RecruitmentStatus status;             // 0: 대기, 1: 승인, 2: 게시, 3: 종료
+	private RecruitmentStatus status;             // 0: 대기, 1: 게시, 2: 종료
 	private String imageUrl;
 	private String startedAt;
 	private String endedAt;
