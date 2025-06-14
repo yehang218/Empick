@@ -15,19 +15,23 @@ export const useJobtestStore = defineStore('jobtest', () => {
         return questions.value.some(q => q.selected);
     });
 
-    // 문제 목록 조회
+    // 문제 목록 id 큰 순 조회
     const fetchQuestions = async () => {
         loading.value = true;
         error.value = null;
 
         try {
             const response = await getQuestionsService();
-            questions.value = response.map(question => ({
-                ...question,
-                selected: false,
-                type: getQuestionTypeLabel(question.type),
-                difficulty: getDifficultyLabel(question.difficulty)
-            }));
+            const mapped = response
+                .sort((a, b) => b.id - a.id)
+                .map(question => ({
+                    ...question,
+                    id: Number(question.id), // 숫자로!
+                    selected: false,
+                    type: getQuestionTypeLabel(question.type),
+                    difficulty: getDifficultyLabel(question.difficulty)
+                }));
+            questions.value.splice(0, questions.value.length, ...mapped);
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -35,6 +39,7 @@ export const useJobtestStore = defineStore('jobtest', () => {
             loading.value = false;
         }
     };
+
 
     // 문제 선택 토글
     const toggleQuestionSelection = (questionId) => {
