@@ -78,4 +78,22 @@ public class InterviewCriteriaQueryController {
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, dtoList));
     }
+
+    @Operation(
+            summary = "면접 평가표 id로 면접 평가 기준 검색",
+            description = """
+    - 면접 평가표 id로 면접 평가 기준을 검색합니다.
+    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
+    })
+    @GetMapping("/sheet/{sheetId}")
+    public ResponseEntity<CustomApiResponse<List<InterviewCriteriaQueryDTO>>> findBySheetId(@PathVariable("sheetId") Integer sheetId) {
+        List<InterviewCriteriaQueryDTO> dtoList = service.findBySheetId(sheetId);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dtoList));
+    }
 }

@@ -10,4 +10,6 @@ public interface InterviewCriteriaQueryService {
     InterviewCriteriaQueryDTO findById(Integer id);
 
     List<InterviewCriteriaQueryDTO> searchByTitle(String title);
+
+    List<InterviewCriteriaQueryDTO> findBySheetId(Integer sheetId);
 }
