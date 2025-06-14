@@ -1,13 +1,23 @@
 <template>
     <v-container fluid class="pa-6">
+
         <v-row justify="space-between" align="center" class="mb-6">
-            <h2 class="text-h5 font-weight-bold">
-                {{ detail?.jobName }} 채용 요청서
-            </h2>
-            <v-btn color="success" class="text-white" prepend-icon="mdi-plus" @click="handleClick">
-                채용 공고 작성하기
-            </v-btn>
+            <v-col cols="auto" class="d-flex align-center">
+                <v-icon @click="$router.back()" class="me-2 cursor-pointer" size="28" color="black">
+                    mdi-arrow-left
+                </v-icon>
+                <h2 class="text-h5 font-weight-bold">
+                    {{ detail?.jobName }} 채용 요청서
+                </h2>
+            </v-col>
+
+            <v-col cols="auto">
+                <v-btn color="success" class="text-white" prepend-icon="mdi-plus" @click="handleClick">
+                    채용 공고 작성하기
+                </v-btn>
+            </v-col>
         </v-row>
+
 
         <v-skeleton-loader v-if="loading" type="article" />
 
