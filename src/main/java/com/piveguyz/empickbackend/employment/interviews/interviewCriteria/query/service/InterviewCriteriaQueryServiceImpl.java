@@ -36,4 +36,10 @@ public class InterviewCriteriaQueryServiceImpl implements InterviewCriteriaQuery
         List<InterviewCriteriaQueryDTO> dtoList = mapper.searchByTitle(title);
         return dtoList;
     }
+
+    @Override
+    public List<InterviewCriteriaQueryDTO> findBySheetId(Integer sheetId) {
+        List<InterviewCriteriaQueryDTO> dtoList = mapper.findBySheetId(sheetId);
+        return dtoList;
+    }
 }
