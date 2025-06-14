@@ -111,7 +111,35 @@ export const employmentRoutes = [
             requiresAuth: true 
         }
     },
-
+    
+    // 채용 공고 목록 페이지
+    {
+        path: '/employment/recruitments',
+        name: 'RecruitmentList',
+        component: () => import('@/views/employment/RecruitmentListPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    // 채용 공고 상세 조회 페이지
+    {
+        path: '/employment/recruitments/:id',
+        name: 'RecruitmentDetail',
+        component: () => import('@/views/employment/RecruitmentDetailPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    // 채용 공고 등록 페이지
+    {
+        path: '/employment/recruitments/create',
+        name: 'RecruitmentCreate',
+        component: () => import('@/views/employment/RecruitmentCreatePage.vue'),
+        meta: { 
+            requiresAuth: true 
+        }
+    },
         // <---------- 면         접 ---------->
     
         {
@@ -140,6 +168,6 @@ export const employmentRoutes = [
             hideSidebar: false,
             requiresAuth: true
             }
-        },
+        }
     
 ]; 

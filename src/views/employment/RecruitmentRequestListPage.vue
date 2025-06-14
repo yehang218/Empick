@@ -1,12 +1,12 @@
 <template>
     <v-container fluid class="pa-4">
         <v-row justify="center">
-            <v-col cols="12" md="10" lg="8">
-                <v-card class="pa-6">
+            <v-col cols="12">
+                <v-card class="pa-6" flat>
 
                     <!-- 상단 타이틀 + 작성 버튼 -->
                     <div class="d-flex justify-space-between align-center mb-4">
-                        <h2 class="text-h6 font-weight-bold">채용 요청서 목록</h2>
+                        <h2 class="text-h5 font-weight-bold mb-6">채용 요청서 목록</h2>
                         <v-btn color="success" class="text-white" @click="goToCreate" prepend-icon="mdi-plus">
                             채용 요청서 작성하기
                         </v-btn>
@@ -38,7 +38,7 @@ onMounted(() => {
 });
 
 const goToCreate = () => {
-    router.push('/employment/recruitments/requests/create');
+    router.push('/employment/recruitment-requests/create');
 };
 
 // 행 클릭 시 상세 페이지로 이동
@@ -49,7 +49,7 @@ const handleRowClick = (e) => {
     const index = tr.rowIndex - 1;
     const item = formattedList.value[index];
     if (item?.id) {
-        router.push(`/employment/recruitments/requests/${item.id}`);
+        router.push(`/employment/recruitment-requests/${item.id}`);
     }
 };
 

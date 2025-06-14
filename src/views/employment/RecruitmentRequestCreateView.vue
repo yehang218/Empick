@@ -150,7 +150,7 @@ const handleSubmit = async () => {
             await store.submitRecruitmentRequest(dto);
 
             toast.success('채용 요청서가 등록되었습니다.');
-            router.push('/employment/recruitments/requests');
+            router.push('/employment/recruitment-requests');
         } catch (e) {
             toast.error('등록 실패: ' + e.message);
         }
