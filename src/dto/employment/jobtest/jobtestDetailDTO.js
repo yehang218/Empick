@@ -125,9 +125,9 @@ export default class JobtestDetailDTO {
     static fromJSON(json) {
         return new JobtestDetailDTO({
             ...json,
-            questions: json.questions?.map(JobtestQuestionSummaryDTO.fromJSON) || [],
+            questions: (json.questions || []).filter(q => q.questionId !== 0).map(JobtestQuestionSummaryDTO.fromJSON),
             evaluationCriteria: json.evaluationCriteria?.map(EvaluationCriteriaDTO.fromJSON) || [],
-            applications: json.applications?.map(JobtestApplicationDTO.fromJSON) || []
+            applications: (json.applications || []).filter(a => a.applicationId !== 0 && a.applicantName !== null).map(JobtestApplicationDTO.fromJSON),
         });
     }
 

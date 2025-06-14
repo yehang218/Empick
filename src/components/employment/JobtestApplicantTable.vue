@@ -21,10 +21,10 @@
                     <td>{{ index + 1 }}</td>
                     <td>{{ app.applicantName }}</td>
                     <td>{{ app.recruitmentTitle }}</td>
-                    <td>{{ statusLabel(app.gradingStatus) }}</td>
+                    <td>{{ getStatusLabel(app.gradingStatus) }}</td>
                     <td>{{ app.gradingScore ?? '-' }}</td>
                     <td>{{ app.gradingMemberName ?? '-' }}</td>
-                    <td>{{ statusLabel(app.evaluationStatus) }}</td>
+                    <td>{{ getStatusLabel(app.evaluationStatus) }}</td>
                     <td>{{ app.evaluationScore ?? '-' }}</td>
                     <td>{{ app.evaluationMemberName ?? '-' }}</td>
                 </tr>
@@ -34,16 +34,10 @@
 </template>
 
 <script setup>
+import { getStatusLabel } from '@/constants/employment/jobtestStatus';
+
 defineProps({
     applications: Array
 })
 
-const statusLabel = (status) => {
-    switch (status) {
-        case 'COMPLETED': return '완료'
-        case 'IN_PROGRESS': return '진행중'
-        case 'NOT_STARTED': return '미시작'
-        default: return '-'
-    }
-}
 </script>
