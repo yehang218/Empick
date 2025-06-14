@@ -34,8 +34,9 @@ public class JobtestQuestionCommandController {
     })
     @PostMapping
     public ResponseEntity<CustomApiResponse<CreateJobtestQuestionResponseDTO>> createJobtestQuestion(
-            @RequestBody @Valid CreateJobtestQuestionCommandDTO createJobtestQuestionCommandDTO) {
-        CreateJobtestQuestionResponseDTO newDTO = jobtestQuestionCommandService.createJobtestQuestion(createJobtestQuestionCommandDTO);
+            @RequestBody @Valid CreateJobtestQuestionCommandDTO createJobtestQuestionCommandDTO,
+            @RequestBody int jobtestId) {
+        CreateJobtestQuestionResponseDTO newDTO = jobtestQuestionCommandService.createJobtestQuestion(createJobtestQuestionCommandDTO, jobtestId);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newDTO));
     }
