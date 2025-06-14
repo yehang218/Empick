@@ -75,7 +75,7 @@ export const fullMenu = {
             label: "지원자",
             role: ["인사팀"],
             children: [
-                { label: "지원자 목록", path: "/employment/applicants" }
+                { label: "지원자 목록", path: "/employment/applicant" }
             ]
         },
         {

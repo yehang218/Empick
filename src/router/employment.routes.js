@@ -130,5 +130,16 @@ export const employmentRoutes = [
                 requiresAuth: true
             }
         },
+        
+        {
+            path: '/employment/application',
+            name: 'ApplicationPage',
+            component : () => import('@/views/employment/ApplicationPage.vue'),
+            meta: {
+            hideHeader: false,
+            hideSidebar: false,
+            requiresAuth: true
+            }
+        },
     
 ]; 
