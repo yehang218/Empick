@@ -43,6 +43,21 @@
             </v-row>
         </div>
     </div>
+    <div>
+        <h2>페이지 링크 목록</h2>
+        <v-expansion-panels>
+            <v-expansion-panel v-for="(routes, domain) in groupedRoutes" :key="domain">
+                <v-expansion-panel-title>{{ domain }}</v-expansion-panel-title>
+                <v-expansion-panel-text>
+                    <v-list>
+                        <v-list-item v-for="route in routes" :key="route.path" :to="route.path" link>
+                            <v-list-item-title>{{ route.path }}</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-expansion-panel-text>
+            </v-expansion-panel>
+        </v-expansion-panels>
+    </div>
 </template>
 
 <script setup>
@@ -68,6 +83,40 @@ onMounted(() => {
     // TODO: 실제 데이터 로드
     console.log('Dashboard mounted');
 });
+
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
+const groupedRoutes = computed(() => {
+    const routes = router.getRoutes()
+        .filter(route => !route.path.includes(':')) // 동적 라우트 제외
+        .sort((a, b) => a.path.localeCompare(b.path));
+
+    const groups = {
+        'main': [], // 메인 페이지와 대시보드를 위한 그룹
+    };
+
+    routes.forEach(route => {
+        const path = route.path;
+        if (path === '/' || path === '/dashboard') {
+            groups['main'].push(route);
+        } else {
+            const domain = path.split('/')[1];
+            if (!groups[domain]) {
+                groups[domain] = [];
+            }
+            groups[domain].push(route);
+        }
+    });
+
+    // 빈 그룹 제거
+    return Object.fromEntries(
+        Object.entries(groups).filter(([_, routes]) => routes.length > 0)
+    );
+});
+
 </script>
 
 <style scoped>

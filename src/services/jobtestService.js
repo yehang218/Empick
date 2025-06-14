@@ -18,3 +18,20 @@ export const getQuestionsService = async (options = {}) => {
         return apiResponse.data.map(item => JobtestListResponseDTO.fromJSON(item));
     }, options);
 };
+
+// 실무테스트 등록 서비스
+export const createJobtestService = async (
+    dto,
+    options = {}
+) => {
+    return withErrorHandling(async () => {
+        const response = await api.post(JobtestAPI.JOBTESTS, dto.toJSON());
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.message;
+    }, options);
+}
