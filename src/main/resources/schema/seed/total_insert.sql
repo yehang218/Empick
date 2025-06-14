@@ -129,19 +129,19 @@ INSERT INTO member (
              2000 -- rank_id
          );
 
-INSERT INTO introduce_template_item (id, title, member_id) VALUES
-                                                               (2000, '자기주도성 평가', 2000),
-                                                               (2001, '팀워크 능력 평가', 2000),
-                                                               (2002, '문제해결 능력 평가', 2000),
-                                                               (2003, '기술 역량 평가', 2000),
-                                                               (2004, '커뮤니케이션 능력 평가', 2000);
+INSERT INTO introduce_template_item (id, title, member_id, introduce_template_id) VALUES
+                                                               (2000, '자기주도성 평가', 2000, 2000),
+                                                               (2001, '팀워크 능력 평가', 2000, 2000),
+                                                               (2002, '문제해결 능력 평가', 2000, 2000),
+                                                               (2003, '기술 역량 평가', 2000, 2000),
+                                                               (2004, '커뮤니케이션 능력 평가', 2000, 2000);
 
-INSERT INTO introduce_template (id, title, member_id, introduce_template_item_id) VALUES
-                                                                                      (2000, '자기주도성 평가 템플릿', 2000, 2000),
-                                                                                      (2001, '팀워크 능력 평가 템플릿', 2000, 2001),
-                                                                                      (2002, '문제해결 능력 평가 템플릿', 2000, 2002),
-                                                                                      (2003, '기술 역량 평가 템플릿', 2000, 2003),
-                                                                                      (2004, '커뮤니케이션 능력 평가 템플릿', 2000, 2004);
+INSERT INTO introduce_template (id, title, member_id) VALUES
+                                                                                      (2000, '자기주도성 평가 템플릿', 2000),
+                                                                                      (2001, '팀워크 능력 평가 템플릿', 2000),
+                                                                                      (2002, '문제해결 능력 평가 템플릿', 2000),
+                                                                                      (2003, '기술 역량 평가 템플릿', 2000),
+                                                                                      (2004, '커뮤니케이션 능력 평가 템플릿', 2000);
 
 INSERT INTO introduce (
     id,
@@ -446,50 +446,44 @@ INSERT INTO interview_sheet (
 
 INSERT INTO interview_criteria (
     id,
+    sheet_id,
+    title,
     content,
-    detail_content,
+    weight,
     is_deleted,
     member_id,
     updated_at
 ) VALUES
-      (2000, '전문성', '지원 직무와 관련된 전문적인 지식과 기술 수준을 평가합니다.', 'N', 2000, NOW()),
-      (2001, '의사소통 능력', '질문에 대한 명확한 답변과 커뮤니케이션 능력을 확인합니다.', 'N', 2000, NOW()),
-      (2002, '문제 해결 능력', '상황에 따른 분석력 및 문제 해결 방식에 대해 평가합니다.', 'N', 2000, NOW()),
-      (2003, '조직 적응력', '조직 문화에 적응하고 팀워크를 발휘할 수 있는지 평가합니다.', 'N', 2000, NOW()),
-      (2004, '성장 가능성', '자기 개발 의지와 장기적인 성장 가능성을 중심으로 평가합니다.', 'N', 2000, NOW());
+      (2000, 2000,'전문성', '지원 직무와 관련된 전문적인 지식과 기술 수준을 평가합니다.', 20,'N', 2000, NOW()),
+      (2001, 2000,'의사소통 능력', '질문에 대한 명확한 답변과 커뮤니케이션 능력을 확인합니다.', 20,'N', 2000, NOW()),
+      (2002, 2000,'문제 해결 능력', '상황에 따른 분석력 및 문제 해결 방식에 대해 평가합니다.', 20,'N', 2000, NOW()),
+      (2003, 2000,'조직 적응력', '조직 문화에 적응하고 팀워크를 발휘할 수 있는지 평가합니다.',20, 'N', 2000, NOW()),
+      (2004,2000, '성장 가능성', '자기 개발 의지와 장기적인 성장 가능성을 중심으로 평가합니다.',20, 'N', 2000, NOW());
 
-INSERT INTO interview_sheet_item (id, sheet_id, criteria_id, weight, member_id)
-VALUES
-    (2000, 2000, 2000, 0.2, 2000),
-    (2001, 2000, 2001, 0.25, 2000),
-    (2002, 2000, 2002, 0.15, 2000),
-    (2003, 2000, 2003, 0.2, 2000),
-    (2004, 2000, 2004, 0.2, 2000);
-
-INSERT INTO interview (id, application_id, sheet_id, datetime, address, score, interview_review)
-VALUES (2000, 2000, 2000, '2025-06-11 10:00:00', 'https://zoom.us/j/1234567890?pwd=abcdefg', NULL, NULL);
+INSERT INTO interview (id, application_id, sheet_id, datetime, address, score)
+VALUES (2000, 2000, 2000, '2025-06-11 10:00:00', 'https://zoom.us/j/1234567890?pwd=abcdefg', NULL);
 
 INSERT INTO interviewer (id, interview_id, interviewer_id, score, review)
 VALUES (2000, 2000, 2000, NULL, NULL);
 
-INSERT INTO interview_score (id, interviewer_id, item_id, score, review) VALUES
+INSERT INTO interview_score (id, interviewer_id, criteria_id, score, review) VALUES
                                                                              (2000, 2000, 2000, 85, '평가 코멘트 1'),
                                                                              (2001, 2000, 2001, 90, '평가 코멘트 2'),
                                                                              (2002, 2000, 2002, 88, '평가 코멘트 3'),
                                                                              (2003, 2000, 2003, 92, '평가 코멘트 4'),
                                                                              (2004, 2000, 2004, 87, '평가 코멘트 5');
 
-INSERT INTO answer (id, content, attempt, is_correct, score, application_job_test_id, question_id) VALUES
-                                                                                                       (2000, '답변 내용 1', 1, 1, 20,2000, 2000),
-                                                                                                       (2001, '답변 내용 2', 1, 0, 20,2000, 2001),
-                                                                                                       (2002, '답변 내용 3', 1, 1, 20,2000, 2002),
-                                                                                                       (2003, '답변 내용 4', 1, 1, 20,2000, 2003),
-                                                                                                       (2004, '답변 내용 5', 1, 0, 20,2000, 2004),
-                                                                                                       (2005, '답변 내용 6', 1, 1, 20,2000, 2005),
-                                                                                                       (2006, '답변 내용 7', 1, 0, 20,2000, 2006),
-                                                                                                       (2007, '답변 내용 8', 1, 1, 20,2000, 2007),
-                                                                                                       (2008, '답변 내용 9', 1, 1, 20,2000, 2008),
-                                                                                                       (2009, '답변 내용 10', 1, 0, 20,2000, 2009);
+INSERT INTO answer (id, content, attempt, is_correct, application_job_test_id, job_test_question_id) VALUES
+                                                                                                       (2000, '답변 내용 1', 20, 1, 2000, 2000),
+                                                                                                       (2001, '답변 내용 2', 20, 0, 2000, 2001),
+                                                                                                       (2002, '답변 내용 3', 20, 1, 2000, 2002),
+                                                                                                       (2003, '답변 내용 4', 20, 1, 2000, 2003),
+                                                                                                       (2004, '답변 내용 5', 20, 0, 2000, 2004),
+                                                                                                       (2005, '답변 내용 6', 20, 1,2000, 2005),
+                                                                                                       (2006, '답변 내용 7', 20, 0, 2000, 2006),
+                                                                                                       (2007, '답변 내용 8', 20, 1, 2000, 2007),
+                                                                                                       (2008, '답변 내용 9', 20, 1, 2000, 2008),
+                                                                                                       (2009, '답변 내용 10', 20, 0, 2000, 2009);
 
 INSERT INTO application_item_category (id, name, input_type, display_order, application_item_category_id) VALUES
                                                                                                               (2000, '개인 정보', 1, 1, NULL),

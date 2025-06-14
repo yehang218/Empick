@@ -20,5 +20,4 @@ public class InterviewCommandDTO {
     private LocalDateTime datetime;
     private String address;
     private Double score;
-    private String interviewReview;
 }
