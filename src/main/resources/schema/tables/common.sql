@@ -13,6 +13,7 @@ CREATE TABLE `department`
     `is_active`   BOOLEAN      NOT NULL DEFAULT TRUE COMMENT '활성여부',
     `description` TEXT         NULL COMMENT '설명',
     `role_id`     INT          NULL COMMENT '권한 id',
+    CONSTRAINT `uk_department_code` UNIQUE (`code`),
     CONSTRAINT `fk_department_role`
         FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE
 )
@@ -22,11 +23,13 @@ CREATE TABLE `position`
 (
     `id`          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '직책 id',
     `name`        VARCHAR(255) NOT NULL COMMENT '직책 이름',
+    `code`        VARCHAR(255) NOT NULL COMMENT '직책 코드',
     `is_active`   BOOLEAN      NOT NULL DEFAULT TRUE COMMENT '활성여부',
     `created_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
     `updated_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     `description` TEXT         NULL COMMENT '설명',
     `role_id`     INT          NULL COMMENT '권한 id',
+    CONSTRAINT `uk_position_code` UNIQUE (`code`),
     CONSTRAINT `fk_position_role`
         FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE
 )
@@ -42,6 +45,7 @@ CREATE TABLE `job`
     `updated_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     `description` TEXT         NULL COMMENT '설명',
     `role_id`     INT          NULL COMMENT '권한 id',
+    CONSTRAINT `uk_job_code` UNIQUE (`code`),
     CONSTRAINT `fk_job_role`
         FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE
 )
@@ -57,6 +61,7 @@ CREATE TABLE `rank`
     `updated_at`  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
     `salary_band` INT          NULL COMMENT '급여 밴드',
     `role_id`     INT          NULL COMMENT '권한 id',
+    CONSTRAINT `uk_rank_code` UNIQUE (`code`),
     CONSTRAINT `fk_rank_role`
         FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE CASCADE
 )
