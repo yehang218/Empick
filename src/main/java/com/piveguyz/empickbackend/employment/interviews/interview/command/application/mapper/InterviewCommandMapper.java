@@ -14,7 +14,6 @@ public class InterviewCommandMapper {
         dto.setDatetime(entity.getDatetime());
         dto.setAddress(entity.getAddress());
         dto.setScore(entity.getScore());
-        dto.setInterviewReview(entity.getInterviewReview());
         return dto;
     }
 
@@ -26,7 +25,6 @@ public class InterviewCommandMapper {
         entity.setDatetime(dto.getDatetime());
         entity.setAddress(dto.getAddress());
         entity.setScore(dto.getScore());
-        entity.setInterviewReview(dto.getInterviewReview());
         return entity;
     }
 }

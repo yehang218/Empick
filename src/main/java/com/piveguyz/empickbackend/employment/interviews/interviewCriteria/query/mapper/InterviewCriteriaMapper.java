@@ -11,5 +11,5 @@ public interface InterviewCriteriaMapper {
 
     InterviewCriteriaQueryDTO findById(Integer id);
 
-    List<InterviewCriteriaQueryDTO> searchByContent(String content);
+    List<InterviewCriteriaQueryDTO> searchByTitle(String title);
 }

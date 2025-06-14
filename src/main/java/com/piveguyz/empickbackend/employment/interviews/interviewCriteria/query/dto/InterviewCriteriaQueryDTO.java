@@ -13,8 +13,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class InterviewCriteriaQueryDTO {
     private Integer id;
+    private Integer sheetId;
+    private String title;
     private String content;
-    private String detailContent;
+    private Double weight;
     private String isDeleted;
     private Integer memberId;
     private LocalDateTime updatedAt;

@@ -9,7 +9,5 @@ import lombok.*;
 @Builder
 public class CreateJobtestQuestionCommandDTO {
     private int score;
-
-    private int jobTestId;
     private int questionId;
 }

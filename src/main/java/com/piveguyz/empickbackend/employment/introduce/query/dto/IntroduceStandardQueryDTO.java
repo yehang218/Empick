@@ -14,6 +14,4 @@ public class IntroduceStandardQueryDTO {
     private String content;
     private Integer memberId;
     private Integer introduceId;
-    private Integer updatedBy;
-    private LocalDateTime updatedAt;
 }

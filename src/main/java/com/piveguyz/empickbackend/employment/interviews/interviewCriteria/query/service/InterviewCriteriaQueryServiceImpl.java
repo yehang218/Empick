@@ -14,26 +14,26 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class InterviewCriteriaQueryServiceImpl implements InterviewCriteriaQueryService {
-    private final InterviewCriteriaMapper interviewCriteriaMapper;
+    private final InterviewCriteriaMapper mapper;
 
     @Override
     public List<InterviewCriteriaQueryDTO> findAll() {
-        List<InterviewCriteriaQueryDTO> interviewCriteriaQueryDTOList = interviewCriteriaMapper.findAll();
-        return interviewCriteriaQueryDTOList;
+        List<InterviewCriteriaQueryDTO> dtoList = mapper.findAll();
+        return dtoList;
     }
 
     @Override
     public InterviewCriteriaQueryDTO findById(Integer id) {
-        InterviewCriteriaQueryDTO interviewCriteriaQueryDTO = interviewCriteriaMapper.findById(id);
-        if(interviewCriteriaQueryDTO == null) {
+        InterviewCriteriaQueryDTO dto = mapper.findById(id);
+        if(dto == null) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND);
         }
-        return interviewCriteriaQueryDTO;
+        return dto;
     }
 
     @Override
-    public List<InterviewCriteriaQueryDTO> searchByContent(String content) {
-        List<InterviewCriteriaQueryDTO> interviewCriteriaQueryDTOList = interviewCriteriaMapper.searchByContent(content);
-        return interviewCriteriaQueryDTOList;
+    public List<InterviewCriteriaQueryDTO> searchByTitle(String title) {
+        List<InterviewCriteriaQueryDTO> dtoList = mapper.searchByTitle(title);
+        return dtoList;
     }
 }

@@ -1,10 +1,10 @@
 package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.mapper;
 
-import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateJobtestCommandDTO;
-import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateJobtestCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.*;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.JobtestEntity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class JobtestMapper {
 
@@ -30,6 +30,19 @@ public class JobtestMapper {
                 .startedAt(entity.getStartedAt())
                 .endedAt(entity.getEndedAt())
                 .createdMemberId(entity.getCreatedMemberId())
+                .build();
+    }
+
+    // Entity -> 실무테스트 생성 응답 DTO
+    public static CreateJobtestResponseDTO toCreateDto(JobtestEntity entity, List<CreateJobtestQuestionResponseDTO> jobtestQuestions) {
+        return CreateJobtestResponseDTO.builder()
+                .title(entity.getTitle())
+                .difficulty(entity.getDifficulty())
+                .testTime(entity.getTestTime())
+                .startedAt(entity.getStartedAt())
+                .endedAt(entity.getEndedAt())
+                .createdMemberId(entity.getCreatedMemberId())
+                .jobtestQuestions(jobtestQuestions)
                 .build();
     }
 

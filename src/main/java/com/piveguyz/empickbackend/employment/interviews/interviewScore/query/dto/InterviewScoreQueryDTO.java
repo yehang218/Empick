@@ -12,7 +12,7 @@ import lombok.Setter;
 public class InterviewScoreQueryDTO {
     private Integer id;
     private Integer interviewerId;
-    private Integer itemId;
+    private Integer criteriaId;
     private Integer score;
     private String review;
 }

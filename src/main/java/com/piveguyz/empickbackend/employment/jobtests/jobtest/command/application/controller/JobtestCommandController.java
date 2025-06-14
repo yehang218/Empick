@@ -3,30 +3,31 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicati
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateJobtestCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateJobtestResponseDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.JobtestCommandService;
+import com.piveguyz.empickbackend.facade.JobtestFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/employment/jobtests")
 public class JobtestCommandController {
     private final JobtestCommandService jobtestCommandService;
-
-    public JobtestCommandController(JobtestCommandService jobtestCommandService) {
-        this.jobtestCommandService = jobtestCommandService;
-    }
+    private final JobtestFacade jobtestFacade;
 
     // 실무테스트 등록
     @Operation(
             summary = "실무테스트 등록",
             description = """
-                     실무테스트를 등록합니다.
+                    실무테스트를 등록합니다.
                     - difficulty : EASY / MEDIUM / HARD
                     """
     )
@@ -36,8 +37,8 @@ public class JobtestCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2400", description = "유효하지 않은 난이도입니다."),
     })
     @PostMapping
-    public ResponseEntity<CustomApiResponse<CreateJobtestCommandDTO>> createJobtest(@RequestBody @Valid CreateJobtestCommandDTO createJobtestCommandDTO) {
-        CreateJobtestCommandDTO newJobtestDTO = jobtestCommandService.createJobtest(createJobtestCommandDTO);
+    public ResponseEntity<CustomApiResponse<CreateJobtestResponseDTO>> createJobtest(@RequestBody @Valid CreateJobtestCommandDTO createJobtestCommandDTO) {
+        CreateJobtestResponseDTO newJobtestDTO = jobtestFacade.createJobtest(createJobtestCommandDTO);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newJobtestDTO));
     }
