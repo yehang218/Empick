@@ -33,6 +33,8 @@
         :headers="tableheaders"
         :items="filteredApplicants"
         :items-per-page="8"
+        item-value="id"
+        show-select
         class="elevation-1"
         show-headers
       >
@@ -43,7 +45,7 @@
           </v-chip>
         </template>
 
-        <!-- ✅ 지원서 확인 버튼 (텍스트 버튼으로 변경됨) -->
+        <!-- 지원서 확인 텍스트 버튼 -->
         <template #item.actions="{ item }">
           <v-btn color="primary" variant="text" size="small" @click="viewDetail(item)">
             지원서 확인
