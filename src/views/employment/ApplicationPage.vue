@@ -72,7 +72,9 @@
                   {{ row.result }}
                 </td>
                 <td>
-                  <v-btn size="x-small" variant="outlined">상세 보기</v-btn>
+                  <v-btn size="x-small" variant="outlined" @click="selectEvaluation(row.type)">
+                    상세 보기
+                  </v-btn>
                 </td>
               </tr>
             </tbody>
@@ -82,13 +84,36 @@
 
       <!-- 우측: 평가 결과 영역 (6/12) -->
       <v-col cols="12" md="6">
-        <slot name="evaluation" />
+        <component :is="evaluationComponent" />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import IntroduceResult from '@/components/employment/IntroduceResult.vue'
+// import InterviewResult from '@/components/employment/InterviewResult.vue'
+// import TestResult from '@/components/employment/TestResult.vue'
+
+const evaluationComponent = ref(IntroduceResult)
+
+const selectEvaluation = (type) => {
+  switch (type) {
+    case '자기소개서':
+      evaluationComponent.value = IntroduceResult
+      break
+    case '실무 테스트':
+      evaluationComponent.value = TestResult
+      break
+    case '면접':
+      evaluationComponent.value = InterviewResult
+      break
+    default:
+      evaluationComponent.value = IntroduceResult
+  }
+}
+
 const applicant = {
   name: '박지민',
   birth: '1994-11-23',
