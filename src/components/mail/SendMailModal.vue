@@ -6,30 +6,9 @@
       </v-card-title>
 
       <v-card-text class="d-flex flex-column gap-4" style="height: calc(100% - 96px); overflow-y: auto;">
-        <v-text-field
-          v-model="email"
-          label="받는 사람 이메일"
-          type="email"
-          outlined
-          dense
-          required
-        />
-        <v-text-field
-          v-model="title"
-          label="제목"
-          outlined
-          dense
-          required
-        />
-        <v-textarea
-          v-model="content"
-          label="내용"
-          outlined
-          rows="6"
-          auto-grow
-          dense
-          required
-        />
+        <v-text-field v-model="email" label="받는 사람 이메일" type="email" outlined dense required />
+        <v-text-field v-model="title" label="제목" outlined dense required />
+        <v-textarea v-model="content" label="내용" outlined rows="6" auto-grow dense required />
       </v-card-text>
 
       <v-card-actions class="justify-end">
@@ -42,6 +21,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { sendMailService } from '@/services/mailService'
 
 const isOpen = ref(false)
 const email = ref('')
@@ -57,23 +37,32 @@ const close = () => {
 }
 
 // 실제 메일 전송 처리 (예: API 호출)
-const sendMail = () => {
+const sendMail = async() => {
   if (!email.value || !title.value || !content.value) {
     alert('모든 필드를 입력해주세요.')
     return
   }
 
-  console.log('메일 전송:', {
-    email: email.value,
-    title: title.value,
-    content: content.value
-  })
+  try {
+    const dto = {
+      email: email.value,
+      title: title.value,
+      content: content.value
+    }
 
-  // 성공 후 초기화 및 닫기
-  email.value = ''
-  title.value = ''
-  content.value = ''
-  close()
+    await sendMailService(dto)
+
+    alert('메일이 성공적으로 전송되었습니다.')
+
+    // 성공 후 초기화 및 닫기
+    email.value = ''
+    title.value = ''
+    content.value = ''
+    close()
+  } catch (error) {
+    console.error('메일 전송 실패:', error)
+    alert('메일 전송에 실패했습니다.')
+  }
 }
 
 defineExpose({
