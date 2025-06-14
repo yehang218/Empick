@@ -57,6 +57,17 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
             loadingDetail.value = false;
         }
     };
+    
+    // 초안 저장
+    const draftRecruitment = ref(null)
+
+    const setDraftRecruitment = (formData) => {
+        draftRecruitment.value = formData
+    }
+
+    const clearDraftRecruitment = () => {
+        draftRecruitment.value = null
+    }
 
     // 등록
     const submitRecruitment = async (dto) => {
@@ -64,7 +75,8 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         submitError.value = null;
 
         try {
-            await createRecruitment(dto);
+            const createdId = await createRecruitment(dto);
+            return createdId; // 등록된 ID 리턴
         } catch (err) {
             submitError.value = err.message;
             throw err;
@@ -98,6 +110,10 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         loadingDetail,
         detailError,
         loadRecruitmentDetail,
+
+        draftRecruitment,
+        setDraftRecruitment,
+        clearDraftRecruitment,
 
         submitting,
         submitError,

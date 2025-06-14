@@ -13,4 +13,7 @@ export const RecruitmentAPI = {
 
     // 채용 프로세스
     PROCESS_LIST: (recruitmentId) => `/api/v1/employment/recruitments/processes/${recruitmentId}`,
+
+    // 지원서 항목 카테고리
+    APPLICATION_ITEM_CATEGORIES: '/api/v1/employment/applications/item-categories',
 };

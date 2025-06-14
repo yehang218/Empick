@@ -6,3 +6,8 @@ export const RECRUIT_TYPE_MAP = {
 export const getRecruitTypeLabel = (type) => {
     return RECRUIT_TYPE_MAP[type] || type
 }
+
+export const recruitTypeOptions = [
+    { value: 'REGULAR', label: '상시' },
+    { value: 'SEASONAL', label: '공채' }
+];
