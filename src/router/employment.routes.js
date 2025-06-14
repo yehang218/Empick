@@ -106,4 +106,10 @@ export const employmentRoutes = [
         component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
         meta: { requiresAuth: true }
     },
+    {
+        path: '/employment/applicant',
+        name: 'ApplicantList',
+        component: () => import('@/views/employment/ApplicantListPage.vue'),
+        meta: { requiresAuth: true }
+    },
 ]; 
