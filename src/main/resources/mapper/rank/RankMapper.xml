@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.orgstructure.rank.query.mapper.RankMapper">
+
+    <!-- 기본 ResultMap -->
+    <resultMap id="RankQueryDTO" type="com.piveguyz.empickbackend.orgstructure.rank.query.dto.RankQueryDTO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="isActiveValue" column="is_active"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="salaryBand" column="salary_band"/>
+        <result property="roleId" column="role_id"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="memberCount" column="member_count"/>
+        <result property="activeMemberCount" column="active_member_count"/>
+    </resultMap>
+
+    <!-- 모든 직급 조회 -->
+    <select id="findAll" resultMap="RankQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            created_at,
+            updated_at,
+            salary_band,
+            role_id
+        FROM rank
+        ORDER BY salary_band ASC, name ASC
+    </select>
+
+    <!-- 활성 여부별 직급 조회 -->
+    <select id="findByIsActive" parameterType="Integer" resultMap="RankQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            created_at,
+            updated_at,
+            salary_band,
+            role_id
+        FROM rank
+        WHERE is_active = #{isActive}
+        ORDER BY salary_band ASC, name ASC
+    </select>
+
+    <!-- ID로 직급 단건 조회 -->
+    <select id="findById" parameterType="Integer" resultMap="RankQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            created_at,
+            updated_at,
+            salary_band,
+            role_id
+        FROM rank
+        WHERE id = #{id}
+    </select>
+
+    <!-- 코드로 직급 단건 조회 -->
+    <select id="findByCode" parameterType="String" resultMap="RankQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            created_at,
+            updated_at,
+            salary_band,
+            role_id
+        FROM rank
+        WHERE code = #{code}
+    </select>
+
+    <!-- 권한 정보를 포함한 직급 조회 -->
+    <select id="findWithRoleInfo" resultMap="RankQueryDTO">
+        SELECT
+            r.id,
+            r.name,
+            r.code,
+            r.is_active,
+            r.created_at,
+            r.updated_at,
+            r.salary_band,
+            r.role_id,
+            ro.code as role_code,
+            ro.name as role_name
+        FROM rank r
+                 LEFT JOIN role ro ON r.role_id = ro.id
+        ORDER BY r.salary_band ASC, r.name ASC
+    </select>
+
+    <!-- 사원 수 정보를 포함한 직급 조회 -->
+    <select id="findWithMemberCount" resultMap="RankQueryDTO">
+        SELECT
+            r.id,
+            r.name,
+            r.code,
+            r.is_active,
+            r.created_at,
+            r.updated_at,
+            r.salary_band,
+            r.role_id,
+            COALESCE(COUNT(m.id), 0) as member_count,
+            COALESCE(SUM(CASE WHEN m.status = 1 AND m.resign_at IS NULL THEN 1 ELSE 0 END), 0) as active_member_count
+        FROM rank r
+                 LEFT JOIN member m ON r.id = m.rank_id
+        GROUP BY r.id, r.name, r.code, r.is_active, r.created_at, r.updated_at, r.salary_band, r.role_id
+        ORDER BY r.salary_band ASC, r.name ASC
+    </select>
+
+    <!-- 권한 정보와 사원 수 정보를 모두 포함한 상세 직급 조회 -->
+    <select id="findWithFullDetails" resultMap="RankQueryDTO">
+        SELECT
+            r.id,
+            r.name,
+            r.code,
+            r.is_active,
+            r.created_at,
+            r.updated_at,
+            r.salary_band,
+            r.role_id,
+            ro.code as role_code,
+            ro.name as role_name,
+            COALESCE(COUNT(m.id), 0) as member_count,
+            COALESCE(SUM(CASE WHEN m.status = 1 AND m.resign_at IS NULL THEN 1 ELSE 0 END), 0) as active_member_count
+        FROM rank r
+                 LEFT JOIN role ro ON r.role_id = ro.id
+                 LEFT JOIN member m ON r.id = m.rank_id
+        GROUP BY r.id, r.name, r.code, r.is_active, r.created_at, r.updated_at, r.salary_band, r.role_id, ro.code, ro.name
+        ORDER BY r.salary_band ASC, r.name ASC
+    </select>
+
+    <!-- 특정 권한을 가진 직급 조회 -->
+    <select id="findByRoleId" parameterType="Integer" resultMap="RankQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            created_at,
+            updated_at,
+            salary_band,
+            role_id
+        FROM rank
+        WHERE role_id = #{roleId}
+        ORDER BY salary_band ASC, name ASC
+    </select>
+
+    <!-- 급여 밴드 범위로 직급 조회 -->
+    <select id="findBySalaryBandRange" resultMap="RankQueryDTO">
+        SELECT
+        id,
+        name,
+        code,
+        is_active,
+        created_at,
+        updated_at,
+        salary_band,
+        role_id
+        FROM rank
+        <where>
+            <if test="minSalaryBand != null">
+                AND salary_band &gt;= #{minSalaryBand}
+            </if>
+            <if test="maxSalaryBand != null">
+                AND salary_band &lt;= #{maxSalaryBand}
+            </if>
+        </where>
+        ORDER BY salary_band ASC, name ASC
+    </select>
+
+    <!-- 사원이 있는 직급만 조회 -->
+    <select id="findRanksWithMembers" resultMap="RankQueryDTO">
+        SELECT
+            r.id,
+            r.name,
+            r.code,
+            r.is_active,
+            r.created_at,
+            r.updated_at,
+            r.salary_band,
+            r.role_id,
+            COUNT(m.id) as member_count,
+            SUM(CASE WHEN m.status = 1 AND m.resign_at IS NULL THEN 1 ELSE 0 END) as active_member_count
+        FROM rank r
+                 INNER JOIN member m ON r.id = m.rank_id
+        GROUP BY r.id, r.name, r.code, r.is_active, r.created_at, r.updated_at, r.salary_band, r.role_id
+        HAVING COUNT(m.id) &gt; 0
+        ORDER BY r.salary_band ASC, r.name ASC
+    </select>
+
+    <!-- 사원이 없는 직급만 조회 -->
+    <select id="findRanksWithoutMembers" resultMap="RankQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            created_at,
+            updated_at,
+            salary_band,
+            role_id,
+            0 as member_count,
+            0 as active_member_count
+        FROM rank
+        WHERE NOT EXISTS (
+            SELECT 1 FROM member WHERE rank_id = rank.id
+        )
+        ORDER BY salary_band ASC, name ASC
+    </select>
+
+</mapper>
