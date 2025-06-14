@@ -17,3 +17,17 @@ export const fetchApplicationItemCategories = async (options = {}) => {
         return apiResponse.data.map(applicationItemCategoryDTO.fromJSON);
     }, options);
 };
+
+// 채용공고별 지원서 항목 조회
+export const fetchApplicationItemsByRecruitment = async (recruitmentId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(API.RECRUITMENT.APPLICATION_ITEMS_BY_RECRUITMENT(recruitmentId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.data;
+    }, options);
+};

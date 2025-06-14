@@ -83,9 +83,11 @@ import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import recruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
 import { fetchApplicationItemCategories } from '@/services/applicationItemService'
 import { getInputTypeLabel } from '@/constants/employment/inputTypes'
+import { useMemberStore } from '@/stores/memberStore'
 
 const router = useRouter()
 const store = useRecruitmentStore()
+const memberStore = useMemberStore()
 
 const categoryList = ref([])
 const selectedIds = ref([])
@@ -111,7 +113,11 @@ const groupedCategories = computed(() => {
     }))
 })
 
+
+
 onMounted(async () => {
+    await memberStore.getMyInfo()
+
     const result = await fetchApplicationItemCategories()
     categoryList.value = result
 
@@ -122,25 +128,6 @@ onMounted(async () => {
         }
     })
 })
-
-const submit = async () => {
-    const draft = store.draftRecruitment
-    if (!draft) return
-
-    const applicationItems = selectedIds.value.map(id => ({
-        applicationItemCategoryId: id,
-        isRequired: requiredIds.value.includes(id)
-    }))
-
-    const dto = recruitmentCreateDTO.fromForm({
-        ...draft,
-        applicationItems
-    })
-
-    await store.submitRecruitment(dto)
-    store.clearDraftRecruitment()
-    router.push('/employment/recruitments')
-}
 
 const getInputComponent = (inputType) => {
     switch (inputType) {
@@ -166,6 +153,32 @@ const getInputComponentProps = (inputType) => {
 
 const inputTypeIsReadonly = (inputType) => {
     return ![6, 7].includes(inputType)
+}
+
+const submit = async () => {
+    const draft = store.draftRecruitment
+    if (!draft) return
+
+    const applicationItems = selectedIds.value.map(id => ({
+        applicationItemCategoryId: id,
+        isRequired: requiredIds.value.includes(id)
+    }))
+
+    console.log('✅ memberStore.form.id:', memberStore.form.id)
+    console.log('✅ 최종 draft:', draft)
+
+    const dto = recruitmentCreateDTO.fromForm({
+        ...draft,
+        applicationItems,
+        introduceTemplateId: 1, // 모달 미구현 시 임시
+        memberId: memberStore.form.id // ✅ 로그인한 작성자 ID 추가
+    })
+
+    console.log('📦 전송 DTO:', dto)
+    
+    await store.submitRecruitment(dto)
+    store.clearDraftRecruitment()
+    router.push('/employment/recruitments')
 }
 </script>
 

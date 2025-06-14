@@ -10,7 +10,8 @@ export default class recruitmentCreateDTO {
         introduceTemplateId,
         recruitmentRequestId,
         applicationItems,
-        recruitmentProcesses
+        recruitmentProcesses,
+        memberId
     ) {
         this.title = title
         this.content = content
@@ -23,6 +24,7 @@ export default class recruitmentCreateDTO {
         this.recruitmentRequestId = recruitmentRequestId
         this.applicationItems = applicationItems || []
         this.recruitmentProcesses = recruitmentProcesses || []
+        this.memberId = memberId
     }
 
     static fromForm(form) {
@@ -37,7 +39,8 @@ export default class recruitmentCreateDTO {
             form.introduceTemplateId ?? null,
             form.recruitmentRequestId ?? null,
             form.applicationItems ?? [],
-            form.recruitmentProcesses ?? []
+            form.recruitmentProcesses ?? [],
+            form.memberId ?? null
         )
     }
 }
