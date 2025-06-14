@@ -15,13 +15,13 @@ import java.util.List;
 
 @Tag(name = "면접 평가 기준 API", description = "면접 평가 기준 관리")
 @RestController
-@RequestMapping("/api/v1/employment/interviewCriteria")
+@RequestMapping("/api/v1/employment/interview-criteria")
 public class InterviewCriteriaQueryController {
-    private final InterviewCriteriaQueryService interviewCriteriaQueryService;
+    private final InterviewCriteriaQueryService service;
 
     @Autowired
-    public InterviewCriteriaQueryController(InterviewCriteriaQueryService interviewCriteriaQueryService) {
-        this.interviewCriteriaQueryService = interviewCriteriaQueryService;
+    public InterviewCriteriaQueryController(InterviewCriteriaQueryService service) {
+        this.service = service;
     }
 
     @Operation(
@@ -36,10 +36,10 @@ public class InterviewCriteriaQueryController {
     })
     @GetMapping
     public ResponseEntity<CustomApiResponse<List<InterviewCriteriaQueryDTO>>> findAll() {
-        List<InterviewCriteriaQueryDTO> interviewCriteriaQueryDTOList = interviewCriteriaQueryService.findAll();
+        List<InterviewCriteriaQueryDTO> dtoList = service.findAll();
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, interviewCriteriaQueryDTOList));
+                .body(CustomApiResponse.of(result, dtoList));
     }
 
     @Operation(
@@ -55,27 +55,27 @@ public class InterviewCriteriaQueryController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewCriteriaQueryDTO>> findById(@PathVariable("id") Integer id) {
-        InterviewCriteriaQueryDTO interviewCriteriaQueryDTO = interviewCriteriaQueryService.findById(id);
+        InterviewCriteriaQueryDTO dto = service.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, interviewCriteriaQueryDTO));
+                .body(CustomApiResponse.of(result, dto));
     }
 
     @Operation(
-            summary = "내용으로 면접 평가 기준 검색",
+            summary = "제목으로 면접 평가 기준 검색",
             description = """
-    - 내용을 가지는 면접 평가 기준을 검색합니다.
+    - 제목으로 면접 평가 기준을 검색합니다.
     """
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @GetMapping("/content")
-    public ResponseEntity<CustomApiResponse<List<InterviewCriteriaQueryDTO>>> searchByContent(@RequestParam("content") String content) {
-        List<InterviewCriteriaQueryDTO> interviewCriteriaQueryDTOList = interviewCriteriaQueryService.searchByContent(content);
+    @GetMapping("/title")
+    public ResponseEntity<CustomApiResponse<List<InterviewCriteriaQueryDTO>>> searchByTitle(@RequestParam("title") String title) {
+        List<InterviewCriteriaQueryDTO> dtoList = service.searchByTitle(title);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, interviewCriteriaQueryDTOList));
+                .body(CustomApiResponse.of(result, dtoList));
     }
 }

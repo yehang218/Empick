@@ -21,8 +21,8 @@ public class InterviewScoreEntity {
     @Column(name = "interviewer_id")
     private Integer interviewerId;
 
-    @Column(name = "item_id")
-    private Integer itemId;
+    @Column(name = "criteria_id")
+    private Integer criteriaId;
 
     @Column(name = "score")
     private Integer score;

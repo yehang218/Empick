@@ -15,7 +15,5 @@ public class IntroduceStandardItemQueryDTO {
     private Integer id;
     private String content;
     private Integer memberId;
-    private Integer updatedBy;
-    private LocalDateTime updatedAt;
     private Integer introduceStandardId;
 }

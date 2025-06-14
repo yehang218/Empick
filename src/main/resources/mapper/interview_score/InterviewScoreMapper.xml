@@ -7,7 +7,7 @@
     <resultMap id="InterviewScoreResultMap" type="com.piveguyz.empickbackend.employment.interviews.interviewScore.query.dto.InterviewScoreQueryDTO">
         <id column="id" property="id"/>
         <result column="interviewer_id" property="interviewerId"/>
-        <result column="item_id" property="itemId"/>
+        <result column="criteria_id" property="criteriaId"/>
         <result column="score" property="score"/>
         <result column="review" property="review"/>
     </resultMap>
@@ -16,7 +16,7 @@
         SELECT
             id,
             interviewer_id,
-            item_id,
+            criteria_id,
             score,
             review
         FROM interview_score;
@@ -26,7 +26,7 @@
         SELECT
             id,
             interviewer_id,
-            item_id,
+            criteria_id,
             score,
             review
         FROM interview_score
@@ -37,7 +37,7 @@
         SELECT
             id,
             interviewer_id,
-            item_id,
+            criteria_id,
             score,
             review
         FROM interview_score

@@ -27,7 +27,6 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
         entity.setDatetime(dto.getDatetime());
         entity.setAddress(dto.getAddress());
         entity.setScore(dto.getScore());
-        entity.setInterviewReview(dto.getInterviewReview());
         InterviewEntity createdEntity = repository.save(entity);
         return mapper.toDto(createdEntity);
     }
@@ -40,7 +39,6 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
         entity.setDatetime(dto.getDatetime());
         entity.setAddress(dto.getAddress());
         entity.setScore(dto.getScore());
-        entity.setInterviewReview(dto.getInterviewReview());
         InterviewEntity updatedEntity = repository.save(entity);
         return mapper.toDto(updatedEntity);
     }
