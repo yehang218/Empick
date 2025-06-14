@@ -1,6 +1,11 @@
 <template>
     <v-container fluid class="pa-6">
-        <h2 class="text-h5 font-weight-bold mb-4">지원서 항목 선택</h2>
+        <v-row justify="space-between" align="center" class="mb-4">
+            <h2 class="text-h5 font-weight-bold">지원서 항목 선택</h2>
+            <v-btn color="secondary" @click="selectIntroduceTemplate">
+                자기소개서 템플릿 선택 (임시)
+            </v-btn>
+        </v-row>
 
         <v-row>
             <!-- 중앙: 미리보기 영역 -->
@@ -88,6 +93,11 @@ const requiredIds = ref([])
 const dateValues = ref({})
 const menuStates = ref({})
 const openGroup = ref(null)
+
+const selectIntroduceTemplate = () => {
+    store.draftRecruitment.introduceTemplateId = 1 // 임시 템플릿 ID 설정
+    alert('자기소개서 템플릿이 임시로 선택되었습니다.')
+}
 
 const selectedItemsByGroup = (children) => {
     return children.filter(item => selectedIds.value.includes(item.id))
