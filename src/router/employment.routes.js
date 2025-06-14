@@ -132,4 +132,24 @@ export const employmentRoutes = [
             requiresAuth: true 
         }
     },
+
+        // <---------- 면         접 ---------->
+    
+        {
+            path: '/employment/interview-criteria',
+            name: 'InterviewSheetPage',
+            component: () => import('@/views/employment/InterviewSheetPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/employment/interview-criteria/create',
+            name: 'CreateInterviewSheetPage',
+            component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+    
 ]; 
