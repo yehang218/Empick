@@ -2,6 +2,13 @@
   <v-container fluid>
     <h2 class="text-h6 font-weight-bold mb-6">자기소개서 평가</h2>
     <v-card class="pa-6 introduce-card">
+      <!-- 지원서 상태 수정 버튼 -->
+      <div class="d-flex justify-end mb-4">
+        <v-btn color="primary" @click="updateStatus">
+          지원서 상태 수정
+        </v-btn>
+      </div>
+
       <div v-for="(item, index) in questions" :key="index" class="mb-6">
         <!-- 기준 항목 -->
         <v-card class="pa-4 mb-2 criteria-card">
@@ -11,21 +18,23 @@
           </div>
         </v-card>
 
-        <!-- 평가 + 점수 입력 박스 -->
+        <!-- 평가 + 점수 박스 -->
         <v-card class="score-card d-flex align-center pa-4">
           <textarea
             v-model="item.input"
             class="evaluation-textarea no-border"
             :placeholder="item.description"
           />
-          <div class="score-wrapper">
-            <input
+          <div class="d-flex align-center">
+            <v-text-field
               v-model.number="item.score"
+              hide-details
+              density="compact"
+              variant="outlined"
               type="number"
-              class="raw-score-input"
-              placeholder=""
+              class="score-input"
             />
-            <span class="score-suffix">/100</span>
+            <span class="ml-1 grey--text text-subtitle-2">/100</span>
           </div>
         </v-card>
       </div>
@@ -33,14 +42,16 @@
       <!-- 총 평가 점수 -->
       <div class="d-flex align-center justify-space-between mt-6">
         <span class="font-weight-bold">자기소개서 총 평가</span>
-        <div class="score-wrapper">
-          <input
+        <div class="d-flex align-center">
+          <v-text-field
             v-model.number="finalScore"
+            hide-details
+            density="compact"
+            variant="outlined"
             type="number"
-            class="raw-score-input"
-            placeholder=""
+            class="score-input"
           />
-          <span class="score-suffix">/100</span>
+          <span class="ml-1 grey--text text-subtitle-2">/100</span>
         </div>
       </div>
 
@@ -58,9 +69,9 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 
-const questions = reactive([
+const questions = ref([
   {
     title: '자신감',
     weight: 10,
@@ -79,6 +90,10 @@ const questions = reactive([
 
 const finalScore = ref(null)
 const overallFeedback = ref('')
+
+const updateStatus = () => {
+  alert('지원서 상태 수정 로직 연결 예정!')
+}
 </script>
 
 <style scoped>
@@ -88,13 +103,11 @@ const overallFeedback = ref('')
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   background-color: #fff;
 }
-
 .criteria-card {
   background-color: #f9f9f9;
   border: 1px solid #ccc;
   border-radius: 8px;
 }
-
 .score-card {
   border: 1px solid #ccc;
   background-color: #ffffff;
@@ -104,9 +117,8 @@ const overallFeedback = ref('')
   display: flex;
   justify-content: space-between;
 }
-
 .evaluation-textarea {
-  width: calc(100% - 100px);
+  width: calc(100% - 80px);
   resize: none;
   padding: 12px;
   font-size: 14px;
@@ -116,36 +128,19 @@ const overallFeedback = ref('')
   color: #333;
   height: 100%;
 }
-
 .evaluation-textarea::placeholder {
   color: #999;
 }
-
 .no-border {
   border: none !important;
   outline: none;
 }
-
-.score-wrapper {
-  display: flex;
-  align-items: center;
+.score-input {
+  width: 60px;
+  min-width: 74px;
+  max-width: 60px;
+  align-self: center;
 }
-
-.raw-score-input {
-  width: 50px;
-  height: 36px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 14px;
-  margin-right: 4px;
-}
-
-.score-suffix {
-  color: #999;
-  font-size: 14px;
-}
-
 .font-weight-medium {
   font-weight: 500;
   color: #666;
