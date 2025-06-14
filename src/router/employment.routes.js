@@ -107,28 +107,52 @@ export const employmentRoutes = [
         path: '/employment/recruitments/requests/create',
         name: 'RecruitmentRequestCreate',
         component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
-        meta: { 
-            requiresAuth: true 
+        meta: {
+            requiresAuth: true
         }
     },
 
-        // <---------- 면         접 ---------->
-    
-        {
-            path: '/employment/interview-criteria',
-            name: 'InterviewSheetPage',
-            component: () => import('@/views/employment/InterviewSheetPage.vue'),
-            meta: {
-                requiresAuth: true
-            }
-        },
-        {
-            path: '/employment/interview-criteria/create',
-            name: 'CreateInterviewSheetPage',
-            component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
-            meta: {
-                requiresAuth: true
-            }
-        },
-    
+    // <---------- 면         접 ---------->
+
+    {
+        path: '/employment/interview-criteria',
+        name: 'InterviewSheetPage',
+        component: () => import('@/views/employment/InterviewSheetPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interview-criteria/create',
+        name: 'CreateInterviewSheetPage',
+        component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interviews',
+        name: 'InterviewPage',
+        component: () => import('@/views/employment/InterviewPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interviews/detail/:applicationId',
+        name: 'InterviewDetailPage',
+        component: () => import('@/views/employment/InterviewDetailPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interviews/create',
+        name: 'CreateInterviewPage',
+        component: () => import('@/views/employment/CreateInterviewPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+
 ]; 

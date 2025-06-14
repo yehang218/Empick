@@ -10,7 +10,7 @@ import {
   findSheetItemByIdService,
   findSheetItemsBySheetIdService,
   findSheetItemsByCriteriaIdService
-} from '@/services/interview/interviewSheetItemService';
+} from '@/services/interviewSheetItemService';
 
 export const useInterviewSheetItemStore = defineStore('interviewSheetItem', () => {
   // 상태

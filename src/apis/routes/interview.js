@@ -13,6 +13,7 @@ export const InterviewAPI = {
     // 🔹 조회 (Query)
     GET_ALL_INTERVIEWS: '/api/v1/employment/interview',
     GET_INTERVIEW_BY_ID: (id) => `/api/v1/employment/interview/${id}`,
+    GET_INTERVIEW_BY_APPLICATION_ID: (applicationId) => `/api/v1/employment/interview/application/${applicationId}`,
     GET_INTERVIEWS_BY_DATE: (date) =>
         `/api/v1/employment/interview/date?date=${encodeURIComponent(date)}`,
     CHECK_AVAILABLE_DATETIME: (datetime) =>
@@ -28,6 +29,7 @@ export const InterviewAPI = {
     // 🔹 조회 (Query)
     GET_ALL_CRITERIA: '/api/v1/employment/interview-criteria',
     GET_CRITERIA_BY_ID: (id) => `/api/v1/employment/interview-criteria/${id}`,
+    GET_CRITERIA_BY_SHEET_ID: (sheetId) => `/api/v1/employment/interview-criteria/sheet/${sheetId}`,
     SEARCH_CRITERIA_BY_TITLE: (title) => `/api/v1/employment/interview-criteria/title?title=${encodeURIComponent(title)}`,
 
     

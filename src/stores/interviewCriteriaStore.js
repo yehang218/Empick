@@ -7,8 +7,8 @@ import {
     deleteCriteriaService,
     getAllCriteriaService,
     getCriteriaByIdService,
-    searchCriteriaByContentService,
-} from '@/services/interview/interviewCriteriaService';
+    searchCriteriaByTitleService,
+} from '@/services/interviewCriteriaService';
 
 export const useInterviewCriteriaStore = defineStore('interviewCriteria', () => {
     // 🔹 상태
@@ -50,11 +50,11 @@ export const useInterviewCriteriaStore = defineStore('interviewCriteria', () => 
         }
     };
 
-    const searchCriteriaByContent = async (content) => {
+    const searchCriteriaByTitle = async (title) => {
         loading.value = true;
         error.value = null;
         try {
-            searchResults.value = await searchCriteriaByContentService(content);
+            searchResults.value = await searchCriteriaByTitleService(content);
         } catch (err) {
             error.value = err.message;
         } finally {
@@ -140,7 +140,7 @@ export const useInterviewCriteriaStore = defineStore('interviewCriteria', () => 
         // 액션
         fetchAllCriteria,
         fetchCriteriaById,
-        searchCriteriaByContent,
+        searchCriteriaByTitle,
         createCriteria,
         updateCriteria,
         deleteCriteria,
