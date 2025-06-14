@@ -18,17 +18,14 @@
                 <div class="text-caption">전체 지원자 수</div>
             </v-col>
             <v-col cols="12" md="6" class="d-flex justify-end">
-                <v-btn class="mr-2" variant="outlined" color="primary">채용 달력보기</v-btn>
-                <v-btn color="green-darken-2" dark @click="goToCreate">+ 채용 공고 작성하기</v-btn>
+                <v-btn class="mr-2" variant="outlined" color="success">채용 달력보기</v-btn>
+                <v-btn color="success" dark @click="goToCreate">+ 채용 공고 작성하기</v-btn>
             </v-col>
         </v-row>
 
         <!-- 채용 공고 목록 테이블 -->
-        <ListView :headers="headers" :data="recruitmentsForDisplay" @click:row="goToDetail" />
-
-        <!-- 페이지네이션 -->
-        <div class="d-flex justify-center mt-4">
-            <v-pagination v-model="page" :length="totalPages" />
+        <div @click="handleRowClick">
+            <ListView :headers="headers" :data="recruitmentsForDisplay" />
         </div>
     </v-container>
 </template>
@@ -50,13 +47,20 @@ function goToCreate() {
     router.push('/employment/recruitments/create')
 }
 
-function goToDetail(item) {
-    router.push(`/employment/recruitments/${item.id}`)
-}
-
 onMounted(() => {
     store.loadRecruitmentList()
 })
+
+const handleRowClick = (e) => {
+    const tr = e.target.closest('tr')
+    if (!tr || tr.rowIndex === 0) return
+
+    const index = tr.rowIndex - 1
+    const item = recruitmentsForDisplay.value[index]
+    if (item?.id) {
+        router.push(`/employment/recruitments/${item.id}`)
+    }
+}
 
 const headers = [
     { key: 'title', label: '제목' },
@@ -82,3 +86,9 @@ const recruitmentsForDisplay = computed(() =>
     }))
 )
 </script>
+
+<style scoped>
+::v-deep tbody tr {
+    cursor: pointer;
+}
+</style>

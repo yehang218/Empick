@@ -6,6 +6,7 @@ import {
     createRecruitment,
     updateRecruitment
 } from '@/services/recruitmentService';
+import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestService'
 
 export const useRecruitmentStore = defineStore('recruitment', () => {
     // 목록
@@ -21,6 +22,9 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
     // 등록/수정 로딩
     const submitting = ref(false);
     const submitError = ref(null);
+
+    // 요청서 상세
+    const requestDetail = ref(null)
 
     // 목록 로딩
     const loadRecruitmentList = async () => {
@@ -44,8 +48,10 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
 
         try {
             const result = await fetchRecruitmentDetail(id);
+            console.log('🔍 상세 응답 확인:', result);
             detail.value = result;
         } catch (err) {
+            console.error('❌ 상세 응답 에러 발생:', err);
             detailError.value = err.message;
         } finally {
             loadingDetail.value = false;
@@ -96,6 +102,7 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         submitting,
         submitError,
         submitRecruitment,
-        updateExistingRecruitment
+        updateExistingRecruitment,
+        requestDetail
     };
 });

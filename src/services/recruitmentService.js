@@ -2,6 +2,8 @@ import api from '@/apis/apiClient'
 import { API } from '@/apis/routes'
 import ApiResponseDTO from '@/dto/common/apiResponseDTO'
 import recruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
+import recruitmentDetailResponseDTO from '@/dto/employment/recruitment/RecruitmentDetailResponseDTO'
+
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler'
 
 // 채용 공고 목록 조회
@@ -19,17 +21,18 @@ export const fetchRecruitmentList = async (options = {}) => {
 }
 
 // 채용 공고 상세 조회
-export const fetchRecruitmentDetail = async (id) => {
+export const fetchRecruitmentDetail = async (id, options = {}) => {
     return withErrorHandling(async () => {
-        const response = await api.get(`${API.RECRUITMENT.RECRUITMENT_DETAIL}/${id}`)
+        const response = await api.get(API.RECRUITMENT.RECRUITMENT_DETAIL(id))
+        console.log('📦 raw response:', response);
         const apiResponse = ApiResponseDTO.fromJSON(response.data)
 
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400)
         }
 
-        return recruitmentResponseDTO.fromJSON(apiResponse.data)
-    })
+        return recruitmentDetailResponseDTO.fromJSON(apiResponse.data)
+    }, options) ?? {};
 }
 
 // 채용 공고 등록

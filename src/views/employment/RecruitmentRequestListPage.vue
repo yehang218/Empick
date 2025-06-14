@@ -1,12 +1,12 @@
 <template>
     <v-container fluid class="pa-4">
         <v-row justify="center">
-            <v-col cols="12" md="10" lg="8">
-                <v-card class="pa-6">
+            <v-col cols="12">
+                <v-card class="pa-6" flat>
 
                     <!-- 상단 타이틀 + 작성 버튼 -->
                     <div class="d-flex justify-space-between align-center mb-4">
-                        <h2 class="text-h6 font-weight-bold">채용 요청서 목록</h2>
+                        <h2 class="text-h5 font-weight-bold mb-6">채용 요청서 목록</h2>
                         <v-btn color="success" class="text-white" @click="goToCreate" prepend-icon="mdi-plus">
                             채용 요청서 작성하기
                         </v-btn>
