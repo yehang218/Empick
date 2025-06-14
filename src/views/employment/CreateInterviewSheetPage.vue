@@ -45,7 +45,7 @@
 
             <!-- 하단 버튼 -->
             <v-row justify="end">
-                <v-btn class="mr-2" variant="outlined" color="grey" @click="resetForm">취소하기</v-btn>
+                <v-btn class="mr-2" variant="outlined" color="grey" @click="goBackToCriteriaPage">취소하기</v-btn>
                 <v-btn color="success" @click="submitSheet">등록하기</v-btn>
             </v-row>
         </v-card>
@@ -54,6 +54,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { createSheetService } from '@/services/interviewSheetService'
 import { createCriteriaService } from '@/services/interviewCriteriaService'
 import InterviewSheetResponseDTO from '@/dto/employment/interview/interviewSheetResponseDTO'
@@ -79,9 +80,11 @@ const addCriterion = () => {
     criteria.value.push({ title: '', content: '', weight: 0 })
 }
 
-const resetForm = () => {
+const router = useRouter();
+const goBackToCriteriaPage = () => {
     sheetName.value = ''
     criteria.value = [{ title: '', content: '', weight: 0 }]
+    router.push('/employment/interview-criteria');
 }
 
 const submitSheet = async () => {
@@ -97,16 +100,10 @@ const submitSheet = async () => {
 
     // ✅ 가중치 총합 검증
     const totalWeight = criteria.value.reduce((sum, criterion) => sum + criterion.weight, 0);
-    if (totalWeight > 100) {
-        alert(`가중치 총합이 100%를 초과했습니다. 현재 총합: ${totalWeight}%`);
-        return;
-    }
 
-    if (totalWeight < 100) {
-        const confirmProceed = confirm(`가중치 총합이 100%가 아닙니다. (${totalWeight}%) 그래도 등록하시겠습니까?`);
-        if (!confirmProceed) {
-            return;
-        }
+    if (totalWeight !== 100) {
+        alert(`가중치 총합이 반드시 100%여야 합니다. 현재 총합: ${totalWeight}%`);
+        return;
     }
 
     const timestamp = new Date().toISOString();
@@ -143,7 +140,7 @@ const submitSheet = async () => {
         }
 
         alert('평가표와 기준들이 성공적으로 등록되었습니다!');
-        resetForm();
+        goBackToCriteriaPage();
     } catch (error) {
         console.error('등록 실패:', error);
         alert('등록 중 오류가 발생했습니다.');
