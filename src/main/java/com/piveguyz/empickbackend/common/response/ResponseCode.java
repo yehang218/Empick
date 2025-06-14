@@ -141,8 +141,8 @@ public enum ResponseCode {
     INTRODUCE_STANDARD_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2113, "해당 자기소개서 기준표 항목을 찾을 수 없습니다."),
     DUPLICATE_STANDARD_ITEM_CONTENT(false, HttpStatus.CONFLICT, 2114, "이미 존재하는 자기소개서 기준표 항목입니다."),
     DUPLICATE_STANDARD_ITEM_CONTENT_TITLE(false, HttpStatus.CONFLICT, 2115, "이미 존재하는 자기소개서 기준표 항목명입니다."),
-
-
+    INTRODUCE_STANDARD_NOT_FOUND(false, HttpStatus.NOT_FOUND , 2116 ,"자기소개서 기준표 id를 찾을 수 없습니다" ),
+    DUPLICATE_STANDARD_CONTENT(false,HttpStatus.CONFLICT ,2117 ,"중복된 내용입니다" ),
 
 
     //  지원서 - 2200 ~ 2299
