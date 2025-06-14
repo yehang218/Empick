@@ -10,4 +10,7 @@ export const RecruitmentAPI = {
     RECRUITMENT_CREATE: '/api/v1/employment/recruitments',
     RECRUITMENT_UPDATE: (id) => `/api/v1/employment/recruitments/${id}`,
     RECRUITMENT_DELETE: (id) => `/api/v1/employment/recruitments/${id}`,
+
+    // 채용 프로세스
+    PROCESS_LIST: (recruitmentId) => `/api/v1/employment/recruitments/processes/${recruitmentId}`,
 };

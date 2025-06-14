@@ -2,12 +2,15 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
+import { fetchRecruitmentProcesses } from '@/services/recruitmentProcessService'
 import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestService'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
+import { getStepTypeLabel } from '@/constants/employment/stepType'
 
 const route = useRoute()
 const store = useRecruitmentStore()
+const processList = ref([])
 
 // 로딩 상태와 에러 상태 추가
 const loading = computed(() => store.loadingDetail)
@@ -22,10 +25,14 @@ onMounted(async () => {
     const id = route.params.id
     try {
         await store.loadRecruitmentDetail(id)
-        // 연관된 요청서 정보도 불러오기
+        // 연관된 요청서 정보 불러오기
         if (detail.value.recruitment.recruitmentRequestId) {
             requestDetail.value = await fetchRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
         }
+
+        processList.value = await fetchRecruitmentProcesses(id)
+        console.log('📌 processList:', processList.value)
+
     } catch (err) {
         console.error('채용 공고 상세 로딩 실패:', err)
     }
@@ -131,6 +138,18 @@ function formatDate(date) {
             <v-card v-if="requestDetail" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">우대 사항</div>
                 <div class="white-space-pre-line">{{ requestDetail.preference }}</div>
+            </v-card>
+
+            <!-- 채용 프로세스 정보 추가 -->
+            <v-card v-if="processList.length" class="mb-4 pa-4">
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">채용 프로세스</div>
+                <div>
+                    <span v-for="(p, index) in processList.slice().sort((a, b) => a.displayOrder - b.displayOrder)"
+                        :key="p.id">
+                        <span>{{ getStepTypeLabel(p.stepType) }}</span>
+                        <span v-if="index !== processList.length - 1"> → </span>
+                    </span>
+                </div>
             </v-card>
         </v-card>
 
