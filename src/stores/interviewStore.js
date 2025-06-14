@@ -13,7 +13,7 @@ import {
   getInterviewByIdService,
   getInterviewsByDateService,
   checkAvailableDatetimeService
-} from '@/services/interview/interviewService';
+} from '@/services/interviewService';
 
 export const useInterviewStore = defineStore('interview', () => {
   // 상태

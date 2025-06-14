@@ -85,7 +85,7 @@ export const getCriteriaByIdService = async (id, options = {}) => {
     }, options);
 }
 
-// 내용으로 면접 평가 기준을 검색하는 서비스
+// 제목으로 면접 평가 기준을 검색하는 서비스
 export const searchCriteriaByTitleService = async (title, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(InterviewAPI.SEARCH_CRITERIA_BY_TITLE(title));

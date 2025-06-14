@@ -55,11 +55,26 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { createSheetService } from '@/services/interviewSheetService'
-import { createCriteriaService } from '@/services/interviewCriteriaService'
-import InterviewSheetResponseDTO from '@/dto/employment/interview/interviewSheetResponseDTO'
-import InterviewCriteriaResponseDTO from '@/dto/employment/interview/interviewCriteriaResponseDTO'
 
+import { useInterviewSheetStore } from '@/stores/interviewSheetStore'
+import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
+import { useAuthStore } from '@/stores/authStore'
+
+const sheetStore = useInterviewSheetStore()
+const criteriaStore = useInterviewCriteriaStore()
+const authStore = useAuthStore()
+const memberId = authStore.userInfo?.id
+
+const router = useRouter()
+
+const sheetName = ref('')
+const criteria = ref([
+    { title: '', content: '', weight: 0 }
+])
+
+const addCriterion = () => {
+    criteria.value.push({ title: '', content: '', weight: 0 })
+}
 
 const removeCriterion = (index) => {
     if (criteria.value.length === 1) {
@@ -67,24 +82,12 @@ const removeCriterion = (index) => {
         return;
     }
     criteria.value.splice(index, 1);
-};
-
-const sheetName = ref('')
-const criteria = ref([
-    { title: '', content: '', weight: 0 }
-])
-
-const memberId = 1
-
-const addCriterion = () => {
-    criteria.value.push({ title: '', content: '', weight: 0 })
 }
 
-const router = useRouter();
 const goBackToCriteriaPage = () => {
     sheetName.value = ''
     criteria.value = [{ title: '', content: '', weight: 0 }]
-    router.push('/employment/interview-criteria');
+    router.push('/employment/interview-criteria')
 }
 
 const submitSheet = async () => {
@@ -93,59 +96,54 @@ const submitSheet = async () => {
         return;
     }
 
-    if (criteria.length === 0) {
+    if (criteria.value.length === 0) {
         alert('최소 하나 이상의 평가 기준을 추가해주세요.');
         return;
     }
 
-    // ✅ 가중치 총합 검증
     const totalWeight = criteria.value.reduce((sum, criterion) => sum + criterion.weight, 0);
-
     if (totalWeight !== 100) {
         alert(`가중치 총합이 반드시 100%여야 합니다. 현재 총합: ${totalWeight}%`);
         return;
     }
 
-    const timestamp = new Date().toISOString();
-
-    // 1. 평가표 등록
-    const sheetDTO = {
-        id: null,
-        name: sheetName.value,
-        isDeleted: false,
-        memberId: 1,
-        updatedAt: timestamp
-    };
+    const timestamp = new Date().toISOString()
+    console.log('userInfo:', authStore.userInfo)
 
     try {
-        const sheetResponse = await createSheetService(sheetDTO);
-        console.log(sheetResponse);
-        const sheetId = sheetResponse.id;
+        // ✅ 1. Store 통해 평가표 생성
+        const sheetDTO = {
+            id: null,
+            name: sheetName.value,
+            isDeleted: false,
+            memberId: memberId,
+            updatedAt: timestamp
+        }
+        const sheetResponse = await sheetStore.createSheet(sheetDTO)
+        const sheetId = sheetResponse.id
 
-
-        // 2. 각 평가 기준 등록
-        for (const criterion of criteria.value) {
+        // ✅ 2. Store 통해 각 기준 생성
+        for (const c of criteria.value) {
             const criteriaDTO = {
                 id: null,
-                sheetId: sheetId,
-                title: criterion.title,
-                content: criterion.content,
-                weight: criterion.weight / 100,
+                sheetId,
+                title: c.title,
+                content: c.content,
+                weight: c.weight / 100, // 0~1 로 변환
                 isDeleted: 'N',
-                memberId: 1,
+                memberId: memberId,
                 updatedAt: timestamp
-            };
-
-            await createCriteriaService(criteriaDTO);
+            }
+            await criteriaStore.createCriteria(criteriaDTO)
         }
 
-        alert('평가표와 기준들이 성공적으로 등록되었습니다!');
-        goBackToCriteriaPage();
+        alert('평가표와 기준들이 성공적으로 등록되었습니다!')
+        goBackToCriteriaPage()
     } catch (error) {
-        console.error('등록 실패:', error);
-        alert('등록 중 오류가 발생했습니다.');
+        console.error('등록 실패:', error)
+        alert('등록 중 오류가 발생했습니다.')
     }
-};
+}
 
 </script>
 

@@ -37,7 +37,7 @@
             <v-col cols="12" class="d-flex">
                 <v-card outlined class="pa-4 flex-grow-1 w-100" style="height: 90%; overflow-y: auto;">
                     <div class="text-subtitle-1 font-weight-bold mb-2">상세 내용</div>
-                    <div>{{ selectedCriteria.content || '선택된 항목이 없습니다.' }}</div>
+                    <div>{{ selectedCriteria?.content || '선택된 항목이 없습니다.' }}</div>
                 </v-card>
             </v-col>
         </v-row>
@@ -48,80 +48,69 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import OneColumnList from '@/components/OneColumnList.vue'
 import Modal from '@/components/common/Modal.vue'
-import { getAllSheetsService, deleteSheetService } from '@/services/interviewSheetService'
-import { getCriteriaBySheetIdService } from '@/services/interviewCriteriaService'
 
-const sheets = ref([])
+import { useInterviewSheetStore } from '@/stores/interviewSheetStore'
+import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
+
+const sheetStore = useInterviewSheetStore()
+const criteriaStore = useInterviewCriteriaStore()
+
+const sheets = computed(() => sheetStore.sheetList)
 const selectedSheet = ref(null)
-const criteriaList = ref([])
-const selectedCriteria = ref({})
+
+const criteriaList = computed(() => criteriaStore.criteriaList)
+const selectedCriteria = computed(() => criteriaStore.selectedCriteria)
+
 const router = useRouter()
 
+// ✅ 페이지 이동
 const goToCreatePage = () => {
     router.push('/employment/interview-criteria/create')
 }
 
-// 평가표 전체 조회
-const fetchSheets = async () => {
-    sheets.value = await getAllSheetsService()
+// ✅ 초기 로딩
+onMounted(async () => {
+    await sheetStore.fetchAllSheets()
+})
+
+
+// ✅ 평가표 선택 시 평가 기준 가져오기
+const onSelectSheet = async (sheetName) => {
+    const targetSheet = sheets.value.find(s => s.name === sheetName)
+    if (!targetSheet) return
+
+    selectedSheet.value = targetSheet
+    await criteriaStore.fetchCriteriaBySheetId(targetSheet.id)
 }
 
-// 평가표 선택 시 평가 기준 목록 불러오기
-const onSelectSheet = async (selectedSheetName) => {
-    const sheet = sheets.value.find(sheet => sheet.name === selectedSheetName)
-    if (!sheet) {
-        console.warn('선택된 이름에 해당하는 평가표를 찾을 수 없습니다:', selectedSheetName)
-        return
-    }
-
-    selectedSheet.value = sheet
-
-    try {
-        const loadedCriteria = await getCriteriaBySheetIdService(sheet.id)
-        criteriaList.value = loadedCriteria.map(dto => ({
-            id: dto.id,
-            title: dto.title,       // 평가 기준 제목
-            content: dto.content,   // 평가 기준 설명
-            weight: dto.weight
-        }))
-        selectedCriteria.value = {} // 선택 초기화
-    } catch (error) {
-        console.error('평가 기준 조회 실패:', error)
-        alert('평가 기준을 불러오는 데 실패했습니다.')
-    }
-}
-
-// 평가 기준 선택
+// ✅ 평가 기준 선택
 const onSelectItemByTitle = (label) => {
-    const titleOnly = label.replace(/\s*\(\d+%?\)\s*$/, '') // "제목 (70%)" → "제목"
-    const selected = criteriaList.value.find(c => c.title === titleOnly)
-    selectedCriteria.value = selected || {}
+    const title = label.replace(/\s*\(\d+%?\)\s*$/, '')
+    const found = criteriaList.value.find(c => c.title === title)
+    if (found) criteriaStore.selectedCriteria = found
 }
-
-// 초기 로딩
-onMounted(fetchSheets)
 
 const showDeleteModal = ref(false)
 
-const openDeleteModal = () => {
-    showDeleteModal.value = true
-}
-const closeDeleteModal = () => {
-    showDeleteModal.value = false
-}
+// ✅ 삭제
+const openDeleteModal = () => showDeleteModal.value = true
+const closeDeleteModal = () => showDeleteModal.value = false
 
 const confirmDelete = async () => {
     try {
-        await deleteSheetService(selectedSheet.value.id)
+        await sheetStore.deleteSheet(selectedSheet.value.id)
+        selectedSheet.value = null
+        criteriaStore.criteriaList = []
         closeDeleteModal()
-        fetchSheets()
     } catch (err) {
-        console.error(err)
+        console.error('삭제 오류:', err)
         alert('삭제 중 오류가 발생했습니다.')
     }
 }
+
+
 </script>
