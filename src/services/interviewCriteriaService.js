@@ -3,7 +3,7 @@ import api from '@/apis/apiClient';
 import { InterviewAPI } from '../apis/routes/interview';
 
 import InterviewCriteriaResponseDTO from '../dto/employment/interview/interviewCriteriaResponseDTO';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
@@ -78,7 +78,7 @@ export const getCriteriaByIdService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(InterviewAPI.GET_CRITERIA_BY_ID(id));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if(!apiResponse.success) {
+        if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
         return InterviewCriteriaResponseDTO.fromJSON(apiResponse.data);
@@ -86,11 +86,11 @@ export const getCriteriaByIdService = async (id, options = {}) => {
 }
 
 // 내용으로 면접 평가 기준을 검색하는 서비스
-export const searchCriteriaByContentService = async (content, options = {}) => {
+export const searchCriteriaByTitleService = async (title, options = {}) => {
     return withErrorHandling(async () => {
-        const response = await api.get(InterviewAPI.SEARCH_CRITERIA_BY_CONTENT(content));
+        const response = await api.get(InterviewAPI.SEARCH_CRITERIA_BY_TITLE(title));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if(!apiResponse.success) {
+        if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
         return apiResponse.data.map(item => InterviewCriteriaResponseDTO.fromJSON(item));

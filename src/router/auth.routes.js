@@ -4,7 +4,8 @@ export const authRoutes = [
         name: 'LoginPage',
         component: () => import('@/views/login/LoginPage.vue'),
         meta: {
-            hideSidebar: true
+            hideSidebar: true,
+            hideHeader: true
         }
     }
 ]; 

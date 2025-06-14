@@ -5,14 +5,24 @@ import { orgstructureRoutes } from './orgstructure.routes';
 import { testRoutes } from './test.routes';
 import { authGuard } from './middleware/auth.guard';
 
+const allRouteModules = [
+    ...authRoutes,
+    ...employmentRoutes,
+    ...orgstructureRoutes,
+    ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
+];
+
+// fullMenu.js 에서 사용하기 위해
+export const routeMap = Object.fromEntries(
+    allRouteModules
+        .filter(route => route.name && route.path)
+        .map(route => [route.name, route.path])
+);
+
 const routes = [
     {
         path: '/',
-        name: 'MainPage',
-        component: () => import('@/views/MainPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
+        redirect: '/dashboard'
     },
     {
         path: '/dashboard',
@@ -23,29 +33,10 @@ const routes = [
         }
     },
 
-    // <---------- 면         접 ---------->
-
-    {
-        path: '/employment/interview-criteria',
-        name: 'InterviewSheetPage',
-        component: () => import('@/views/employment/InterviewSheetPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
-    },
-    {
-        path: '/employment/interview-criteria/create',
-        name: 'CreateInterviewSheetPage',
-        component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
-    },
-
-    // <---------- 안내      메일 ---------->
     ...authRoutes,
     ...employmentRoutes,
     ...orgstructureRoutes,
+    ...allRouteModules,
     ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
 ];
 

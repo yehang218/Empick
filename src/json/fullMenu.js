@@ -1,3 +1,5 @@
+import { routeMap } from '@/router/index.js';
+
 // 메뉴 구조
 export const fullMenu = {
     내정보: [
@@ -54,21 +56,19 @@ export const fullMenu = {
             label: "채용 공고",
             role: ["인사팀"],
             children: [
-                { label: "채용 공고", path: "/employment/announcement" },
-                { label: "채용 요청서", path: "/employment/request" },
-                { label: "채용 공고 템플릿", path: "/employment/template" },
-                { label: "자기소개서 템플릿", path: "/employment/resume-template" }
+                { label: "채용 공고", path: "/employment/recruitments" },
+                { label: "채용 요청서", path: "/employment/recruitments/requests" },
+                { label: "채용 공고 템플릿", path: "/employment/recruitments/templates" },
+                { label: "자기소개서 템플릿", path: "/employment/recruitments/resumes" }
             ]
         },
         {
             label: "실무테스트 관리",
             role: ["인사팀"],
             children: [
-                { label: "실무테스트 유형", path: "/employment/jobtest-types" },
-                { label: "실무테스트 템플릿", path: "/employment/jobtest-templates" },
-                { label: "실무테스트 문제", path: "/employment/jobtest-questions" },
-                { label: "실무테스트", path: "/employment/jobtests" },
-                { label: "실무테스트 답안", path: "/employment/jobtest-answers" }
+                { label: "실무테스트 문제", path: routeMap.JobtestQuestionList },
+                { label: "실무테스트", path: routeMap.JobtestList },
+                { label: "실무테스트 답안", path: routeMap.JobtestAnswerList }
             ]
         },
         {

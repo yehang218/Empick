@@ -1,9 +1,9 @@
 export default class InterviewScoreResponseDTO {
 
-    constructor(id, interviewerId, itemId, score, review) {
+    constructor(id, interviewerId, criteriaId, score, review) {
         this.id = id;
         this.interviewerId = interviewerId;
-        this.itemId = itemId;
+        this.criteriaId = criteriaId;
         this.score = score;
         this.review = review;
     }
@@ -12,7 +12,7 @@ export default class InterviewScoreResponseDTO {
         return new InterviewScoreResponseDTO (
             json.id,
             json.interviewerId,
-            json.itemId,
+            json.criteriaId,
             json.score,
             json.review
         );
@@ -22,7 +22,7 @@ export default class InterviewScoreResponseDTO {
         return {
             id: this.id,
             interviewerId: this.interviewerId,
-            itemId: this.itemId,
+            criteriaId: this.criteriaId,
             score: this.score,
             review: this.review
         };
