@@ -65,6 +65,24 @@ public class InterviewQueryController {
     }
 
     @Operation(
+            summary = "지원서 id로 면접 조회",
+            description = """
+                    - 면접 일정을 지원서id로 조회합니다.
+                    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
+    })
+    @GetMapping("/application/{applicationId}")
+    public ResponseEntity<CustomApiResponse<InterviewQueryDTO>> findByApplicationId(@PathVariable("applicationId") Integer applicationId){
+        InterviewQueryDTO dto = service.findByApplicationId(applicationId);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dto));
+    }
+
+    @Operation(
             summary = "면접 날짜로 조회",
             description = """
                     - 면접 일정을 날짜별로 조회합니다.
@@ -77,7 +95,7 @@ public class InterviewQueryController {
     @GetMapping("/date")
     public ResponseEntity<CustomApiResponse<List<InterviewQueryDTO>>> findByDate(@RequestParam("date")
                                                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                                                 LocalDate date){
+                                                                                 LocalDate date) {
         List<InterviewQueryDTO> dtoList = service.findByDate(date);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
