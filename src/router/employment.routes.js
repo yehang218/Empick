@@ -51,7 +51,7 @@ export const employmentRoutes = [
     },
     // 실무테스트 답안 상세 조회 페이지
     {
-        path: '/employment/jobtest-answers/:answerId',
+        path: '/employment/jobtest-answers/:applicationJobtestId',
         name: 'JobtestAnswerDetail',
         component: () => import('@/views/employment/JobtestAnswerDetailPage.vue'),
         props: true,
@@ -132,4 +132,23 @@ export const employmentRoutes = [
             requiresAuth: true 
         }
     },
+        // <---------- 면         접 ---------->
+    
+        {
+            path: '/employment/interview-criteria',
+            name: 'InterviewSheetPage',
+            component: () => import('@/views/employment/InterviewSheetPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/employment/interview-criteria/create',
+            name: 'CreateInterviewSheetPage',
+            component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+   
 ]; 

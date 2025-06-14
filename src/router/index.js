@@ -32,7 +32,12 @@ const routes = [
             requiresAuth: true
         }
     },
-    ...allRouteModules
+
+    ...authRoutes,
+    ...employmentRoutes,
+    ...orgstructureRoutes,
+    ...allRouteModules,
+    ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
 ];
 
 const router = createRouter({
