@@ -18,4 +18,10 @@ public class ApplicationQueryServiceImp implements ApplicationQueryService {
 
         return applicationMapper.findAllApplication();
     }
+
+    @Override
+    public List<ApplicationQueryDTO> findApplicationById(int id) {
+        return applicationMapper.findApplicationById(id);
+    }
+
 }
