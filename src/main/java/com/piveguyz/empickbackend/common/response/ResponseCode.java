@@ -62,6 +62,10 @@ public enum ResponseCode {
     RANK_NAME_DUPLICATE(false, HttpStatus.CONFLICT, 1206, "이미 존재하는 직급명입니다."),
     RANK_IN_USE(false, HttpStatus.CONFLICT, 1207, "해당 직급을 사용하는 사원이 있어 삭제할 수 없습니다."),
 
+    POSITION_NAME_DUPLICATE(false, HttpStatus.CONFLICT, 1208, "이미 존재하는 직책명입니다."),
+    POSITION_NAME_INVALID_FORMAT(false, HttpStatus.BAD_REQUEST, 1209, "직책명 형식이 올바르지 않습니다."),
+    POSITION_IN_USE(false, HttpStatus.CONFLICT, 1210, "해당 직책을 사용하는 사원이 있어 삭제할 수 없습니다."),
+    POSITION_DESCRIPTION_TOO_LONG(false, HttpStatus.BAD_REQUEST, 1211, "직책 설명이 너무 깁니다."),
 
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
