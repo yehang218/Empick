@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface ApplicationQueryService {
     List<ApplicationQueryDTO> findAllApplication();
+
+
+    List<ApplicationQueryDTO> findApplicationById(int id);
 }

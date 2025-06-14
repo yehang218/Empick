@@ -5,5 +5,8 @@ import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQuer
 import java.util.List;
 
 public interface ApplicationMapper {
+    
     List<ApplicationQueryDTO> findAllApplication();
+
+    List<ApplicationQueryDTO> findApplicationById(int id);
 }
