@@ -1,8 +1,7 @@
-// ✅ 파일: src/apis/applicant.js
-
+// src/apis/routes/applicant.js
 export const ApplicantAPI = {
-  BASE: '/api/v1/applicants',
-  FETCH_ALL: '/api/v1/applicants',
-  ASSIGN_TEST: '/api/v1/applicants/assign-test',
-  UPDATE_STATUS: (id) => `/api/v1/applicants/${id}/status`,
-};
+  LIST: '/api/v1/employment/applicant',  // ← 목록용 엔드포인트
+  CREATE: '/api/v1/employment/applicant/create'
+  // UPDATE: '/api/v1/employment/applicant/update',
+  // DELETE: '/api/v1/employment/applicant/delete'
+}
