@@ -152,7 +152,7 @@
 
 #             실무테스트 문제
                  LEFT JOIN job_test_question jtq ON jtq.job_test_id = jt.id
-                 LEFT JOIN question q ON jtq.question_id = q.id AND jtq.id IS NOT NULL
+                 LEFT JOIN question q ON jtq.question_id = q.id
 
 #             지원서별 실무테스트
                  LEFT JOIN application_job_test ajt ON jt.id = ajt.job_test_id
@@ -164,7 +164,7 @@
 
 #             지원서
                  LEFT JOIN application a ON a.id = ajt.application_id
-                 LEFT JOIN applicant ap ON a.applicant_id = ap.id AND a.id IS NOT NULL
+                 LEFT JOIN applicant ap ON a.applicant_id = ap.id
                  LEFT JOIN recruitment r ON a.recruitment_id = r.id
         WHERE jt.id = #{id}
     </select>
