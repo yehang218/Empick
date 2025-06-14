@@ -2,7 +2,7 @@ import api from '@/apis/apiClient'
 import { API } from '@/apis/routes'
 import ApiResponseDTO from '@/dto/common/apiResponseDTO'
 import recruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
-import recruitmentDetailResponseDTO from '@/dto/employment/recruitment/RecruitmentDetailResponseDTO'
+import recruitmentDetailResponseDTO from '@/dto/employment/recruitment/recruitmentDetailResponseDTO'
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler'
 

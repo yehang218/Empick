@@ -138,5 +138,25 @@ export const employmentRoutes = [
         name: 'ApplicationItemSelectPage',
         component: () => import('@/views/employment/ApplicationItemSelectPage.vue'),
         meta: { requiresAuth: true }
-    }
+    },
+
+        // <---------- 면         접 ---------->
+    
+        {
+            path: '/employment/interview-criteria',
+            name: 'InterviewSheetPage',
+            component: () => import('@/views/employment/InterviewSheetPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/employment/interview-criteria/create',
+            name: 'CreateInterviewSheetPage',
+            component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+
 ]; 

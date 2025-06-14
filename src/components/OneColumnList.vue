@@ -6,7 +6,7 @@
       class="pa-3"
       outlined
       rounded="lg"
-      style="max-height: 250px; overflow-y: auto"
+      style="height: 100%; overflow-y: auto"
     >
       <v-list density="compact">
         <v-list-item
@@ -54,7 +54,8 @@ const selectItem = (index) => {
 <style scoped>
 .selector-wrapper {
   position: relative;
-  width: 200px;
+  width: 100%; /* 또는 아예 제거 */
+  height: 100%;
   margin-top: 20px;
 }
 .title {
