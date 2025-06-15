@@ -95,6 +95,7 @@ const handleEntry = async () => {
         const resultMessage = await jobtestEntryStore.verifyEntryCode(Number(props.jobtestId), entryCodeInput.value);
         modalMessage.value = resultMessage
         // router.push({ name: 'JobtestStart' });
+        window.location.href = 'https://school.programmers.co.kr/learn/courses/30/lessons/12932';
     } catch (err) {
 
     } finally {
