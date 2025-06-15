@@ -14,8 +14,10 @@
 
                     <!-- 리스트 클릭 이벤트 감지용 래퍼 div -->
                     <div @click="handleRowClick">
-                        <ListView :headers="headers" :data="formattedList" />
+                        <ListView :headers="headers" :data="pagedList" />
                     </div>
+
+                    <Pagination v-model="page" :length="totalPages" />
 
                 </v-card>
             </v-col>
@@ -24,14 +26,18 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
 import ListView from '@/components/common/ListView.vue';
 import dayjs from 'dayjs';
+import Pagination from '@/components/common/Pagination.vue'
 
 const store = useRecruitmentRequestStore();
 const router = useRouter();
+
+const itemsPerPage = ref(10)
+const page = ref(1)
 
 onMounted(() => {
     store.loadRecruitmentRequestList();
@@ -61,6 +67,14 @@ const formattedList = computed(() =>
         createdAt: dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
     }))
 );
+
+const pagedList = computed(() => {
+    const start = (page.value - 1) * itemsPerPage.value
+    const end = start + itemsPerPage.value
+    return formattedList.value.slice(start, end)
+})
+
+const totalPages = computed(() => Math.ceil(formattedList.value.length / itemsPerPage.value))
 
 // 테이블 헤더 정의
 const headers = [
