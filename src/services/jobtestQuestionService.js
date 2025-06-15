@@ -24,16 +24,16 @@ export const getQuestionsService = async (options = {}) => {
 };
 
 // 실무테스트 문제 상세 조회 서비스
-export const getQuestionDetailService = async (options = {}) => {
+export const getQuestionDetailService = async (questionId, options = {}) => {
     return withErrorHandling(async () => {
-        const response = await api.get(JobtestAPI.QUESTION_DETAIL);
+        const response = await api.get(JobtestAPI.QUESTION_DETAIL(questionId));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data.map(item => QuestionDetailResponseDTO.fromJSON(item));
+        return QuestionDetailResponseDTO.fromJSON(apiResponse.data);
     }, options);
 }
 
