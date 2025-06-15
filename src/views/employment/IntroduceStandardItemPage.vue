@@ -98,3 +98,48 @@ function focusInput() {
 }
 .criteria-card {
   background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+.criteria-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.criteria-number {
+  color: #888;
+  font-weight: bold;
+}
+.criteria-title {
+  flex: 1;
+  font-weight: bold;
+}
+.delete-btn {
+  margin-left: auto;
+}
+.new-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  background: #f8f9fa;
+  border-style: dashed;
+}
+.criteria-input {
+  flex: 1;
+  margin-bottom: 0;
+}
+.register-btn {
+  min-width: 100px;
+  font-weight: bold;
+}
+.add-btn {
+  margin-top: 18px;
+  font-weight: bold;
+}
+</style>

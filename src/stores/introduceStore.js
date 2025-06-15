@@ -5,6 +5,8 @@ import {
   createIntroduceItemService,
   deleteIntroduceItemService
 } from '@/services/introduceService'
+import { createTemplate } from '@/services/introduceTemplateService'
+import api from '@/apis/apiClient'
 
 export const useIntroduceStore = defineStore('introduce', () => {
   const items = ref([])
@@ -57,3 +59,16 @@ export const useIntroduceStore = defineStore('introduce', () => {
     fetchItems, addItem, removeItem
   }
 })
+
+export const useIntroduceTemplateStore = defineStore('introduceTemplate', {
+  actions: {
+    async addTemplate(title, memberId, itemIds) {
+      return await createTemplate({ title, memberId, itemIds })
+    }
+  }
+})
+
+export const fetchTemplates = async () => {
+  const res = await api.get('/api/v1/employment/introduce-template')
+  return res.data.data
+}

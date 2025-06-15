@@ -59,7 +59,7 @@ export const fullMenu = {
                 { label: "채용 공고", path: routeMap.RecruitmentList },
                 { label: "채용 요청서", path: routeMap.RecruitmentRequestList },
                 { label: "채용 공고 템플릿", path: "/employment/recruitments/templates" },
-                { label: "자기소개서 템플릿", path: "/employment/recruitments/resumes" }
+                { label: "자기소개서 템플릿", path: "/employment/recruitments/introduce-templates" }
             ]
         },
         {
