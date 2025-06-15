@@ -132,6 +132,13 @@ export const employmentRoutes = [
             requiresAuth: true 
         }
     },
+    // 지원서 항목 구성 페이지
+    {
+        path: '/employment/application-items/select',
+        name: 'ApplicationItemSelectPage',
+        component: () => import('@/views/employment/ApplicationItemSelectPage.vue'),
+        meta: { requiresAuth: true }
+    },
 
         // <---------- 면         접 ---------->
     

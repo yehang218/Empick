@@ -2,7 +2,7 @@ import api from '@/apis/apiClient'
 import { API } from '@/apis/routes'
 import ApiResponseDTO from '@/dto/common/apiResponseDTO'
 import recruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
-import recruitmentDetailResponseDTO from '@/dto/employment/recruitment/RecruitmentDetailResponseDTO'
+import recruitmentDetailResponseDTO from '@/dto/employment/recruitment/recruitmentDetailResponseDTO'
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler'
 
@@ -38,16 +38,16 @@ export const fetchRecruitmentDetail = async (id, options = {}) => {
 // 채용 공고 등록
 export const createRecruitment = async (dto) => {
     return withErrorHandling(async () => {
-        const response = await api.post(API.RECRUITMENT.RECRUITMENT_CREATE, dto)
-        const apiResponse = ApiResponseDTO.fromJSON(response.data)
+        const { data } = await api.post(API.RECRUITMENT.RECRUITMENT_CREATE, dto);
+        const apiResponse = ApiResponseDTO.fromJSON(data);
 
         if (!apiResponse.success) {
-            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+            throwCustomApiError(apiResponse.code, apiResponse.message);
         }
 
-        return apiResponse.data
-    })
-}
+        return apiResponse.data;
+    });
+};
 
 // 채용 공고 수정
 export const updateRecruitment = async (id, dto) => {
