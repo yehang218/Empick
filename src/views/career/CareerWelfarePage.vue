@@ -85,23 +85,23 @@ const welfares = [
 }
 
 .icon-box {
-  height: 100px;
-  margin-bottom: 16px;
+  height: 120px;
+  margin-bottom: 20px;
 }
 
 .icon {
-  height: 64px;
+  height: 140px;
 }
 
 .title {
   font-weight: 700;
-  font-size: 18px;
-  margin-bottom: 10px;
+  font-size: 20px;
+  margin-bottom: 12px;
 }
 
 .desc {
-  font-size: 15px;
+  font-size: 16px;
   color: #444;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 </style>
