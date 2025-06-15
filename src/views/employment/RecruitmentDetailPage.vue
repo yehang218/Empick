@@ -70,6 +70,17 @@ const handleDelete = async () => {
         toast.error('삭제 실패: ' + e)
     }
 }
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case 'WAITING': return 'grey'
+        case 'PUBLISHED': return 'green'
+        case 'CLOSED': return 'red'
+        default: return 'grey'
+
+    }
+}
+
 </script>
 
 <template>
@@ -80,9 +91,16 @@ const handleDelete = async () => {
         <v-card v-else-if="detail" class="pa-6" flat>
             <v-row align="center" justify="space-between" class="mb-6">
                 <v-col cols="auto" class="d-flex align-center">
-                    <v-icon @click="$router.back()" class="me-2 cursor-pointer" size="28"
-                        color="black">mdi-arrow-left</v-icon>
-                    <h2 class="text-h5 font-weight-bold">채용 공고 상세</h2>
+                    <v-icon @click="$router.back()" class="me-2 cursor-pointer" size="28" color="black">
+                        mdi-arrow-left
+                    </v-icon>
+                    <h2 class="text-h5 font-weight-bold me-3">
+                        채용 공고 상세
+                    </h2>
+                    <v-chip v-if="detail?.recruitment?.status !== undefined"
+                        :color="getStatusColor(detail.recruitment.status)" text-color="white" class="ml-2" size="small">
+                        {{ getRecruitStatusLabel(detail.recruitment.status) }}
+                    </v-chip>
                 </v-col>
 
                 <v-col cols="auto" class="d-flex gap-2">
@@ -104,16 +122,12 @@ const handleDelete = async () => {
                 <div>{{ detail.recruitment.title }}</div>
             </v-card>
             <v-card class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">내용</div>
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">상세 내용</div>
                 <div v-html="detail.recruitment.content"></div>
             </v-card>
             <v-card class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">유형</div>
                 <div>{{ getRecruitTypeLabel(detail.recruitment.recruitType) }}</div>
-            </v-card>
-            <v-card class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">상태</div>
-                <div>{{ getRecruitStatusLabel(detail.recruitment.status) }}</div>
             </v-card>
             <v-card class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">모집 기간</div>
@@ -125,20 +139,24 @@ const handleDelete = async () => {
                 <div class="white-space-pre-line">{{ requestDetail.jobName }}</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">고용 형태</div>
-                <div class="white-space-pre-line">{{ requestDetail.employmentType }}</div>
-            </v-card>
-            <v-card v-if="requestDetail" class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">주요 업무</div>
-                <div class="white-space-pre-line">{{ requestDetail.responsibility }}</div>
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">부서명</div>
+                <div class="white-space-pre-line">{{ requestDetail.departmentName }}</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">모집 인원</div>
                 <div>{{ requestDetail.headcount }}명</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">고용 형태</div>
+                <div class="white-space-pre-line">{{ requestDetail.employmentType }}</div>
+            </v-card>
+            <v-card v-if="requestDetail" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">근무 지역</div>
                 <div>{{ requestDetail.workLocation }}</div>
+            </v-card>
+            <v-card v-if="requestDetail" class="mb-4 pa-4">
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">주요 업무</div>
+                <div class="white-space-pre-line">{{ requestDetail.responsibility }}</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">자격 요건</div>

@@ -5,19 +5,23 @@
 
         <!-- 공고 현황 요약 -->
         <v-row class="mb-4" align="center">
-            <v-col cols="12" md="2" class="text-center">
-                <div class="text-h6 font-weight-bold">{{ summary.waiting }}</div>
+            <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'ALL'" style="cursor:pointer">
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'ALL' }">{{ summary.total }}</div>
+                <div class="text-caption">전체 공고</div>
+            </v-col>
+            <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'WAITING'" style="cursor:pointer">
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'WAITING' }">{{ summary.waiting }}</div>
                 <div class="text-caption">대기 중 공고</div>
             </v-col>
-            <v-col cols="12" md="2" class="text-center">
-                <div class="text-h6 font-weight-bold">{{ summary.ongoing }}</div>
+            <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'PUBLISHED'" style="cursor:pointer">
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'PUBLISHED' }">{{ summary.ongoing }}</div>
                 <div class="text-caption">게시 중 공고</div>
             </v-col>
-            <v-col cols="12" md="2" class="text-center">
-                <div class="text-h6 font-weight-bold">{{ summary.totalApplicants }}</div>
-                <div class="text-caption">전체 지원자 수</div>
+            <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'CLOSED'" style="cursor:pointer">
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'CLOSED' }">{{ summary.closed }}</div>
+                <div class="text-caption">종료 된 공고</div>
             </v-col>
-            <v-col cols="12" md="6" class="d-flex justify-end">
+            <v-col cols="12" md="4" class="d-flex justify-end">
                 <v-btn class="mr-2" variant="outlined" color="success">채용 달력보기</v-btn>
                 <v-btn color="success" dark @click="goToCreate">+ 채용 공고 작성하기</v-btn>
             </v-col>
@@ -47,6 +51,8 @@ const toast = useToast()
 const itemsPerPage = ref(10)
 const page = ref(1)
 const store = useRecruitmentStore()
+
+const selectedStatus = ref('ALL')
 
 function goToCreate() {
     router.push('/employment/recruitments/create')
@@ -82,17 +88,20 @@ const headers = [
 ]
 
 const summary = computed(() => ({
+    total: store.list.length,
     waiting: store.list.filter(r => r.status === 'WAITING').length,
     ongoing: store.list.filter(r => r.status === 'PUBLISHED').length,
-    totalApplicants: 150 // TODO: 실제 API 연결 시 수정
+    closed: store.list.filter(r => r.status === 'CLOSED').length,
 }))
 
 const recruitmentsForDisplay = computed(() =>
-    store.list.map(r => ({
-        ...r,
-        recruitType: getRecruitTypeLabel(r.recruitType),
-        status: getRecruitStatusLabel(r.status)
-    }))
+    store.list
+        .filter(r => selectedStatus.value === 'ALL' ? true : r.status === selectedStatus.value)
+        .map(r => ({
+            ...r,
+            recruitType: getRecruitTypeLabel(r.recruitType),
+            status: getRecruitStatusLabel(r.status)
+        }))
 )
 
 const pagedRecruitments = computed(() => {
