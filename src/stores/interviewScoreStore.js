@@ -10,7 +10,7 @@ import {
     findAllInterviewScoresService,
     findInterviewScoreByIdService,
     findInterviewScoresByInterviewerIdService
-} from '@/services/interview/interviewScoreService';
+} from '@/services/interviewScoreService';
 
 export const useInterviewScoreStore = defineStore('interviewScore', () => {
     // 상태

@@ -29,6 +29,7 @@ export const InterviewAPI = {
     GET_ALL_CRITERIA: '/api/v1/employment/interview-criteria',
     GET_CRITERIA_BY_ID: (id) => `/api/v1/employment/interview-criteria/${id}`,
     SEARCH_CRITERIA_BY_TITLE: (title) => `/api/v1/employment/interview-criteria/title?title=${encodeURIComponent(title)}`,
+    SEARCH_CRITERIA_BY_SHEET_ID: (sheetId) => `/api/v1/employment/interview-criteria/sheet/${sheetId}`,
 
     
     // interviewer
