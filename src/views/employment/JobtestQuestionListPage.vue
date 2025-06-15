@@ -34,20 +34,28 @@
                 <ListView :headers="headers" :data="jobtestStore.questions" :showCheckbox="true"
                     @item-click="handleItemClick" />
 
-
+                <QuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail" />
             </v-container>
         </v-main>
     </v-app>
+
+    <QuestionDetailModal v-model="showModal" :question="selectedQuestion" @close="showModal = false" />
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import ListView from '@/components/common/ListView.vue'
 import { useJobtestStore } from '@/stores/jobtestQuestionStore'
 
+import { getQuestionDetailService } from '@/services/jobtestQuestionService'
+import QuestionQueryDTO from '@/dto/employment/jobtest/questionDetailResponseDTO'
+import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
+
 const router = useRouter()
 const jobtestStore = useJobtestStore()
+const detailDialogVisible = ref(false)
+const selectedQuestionDetail = ref(null)
 
 const headers = [
     { label: '문제 제목', key: 'content' },
@@ -57,11 +65,15 @@ const headers = [
     { label: '수정자', key: 'updatedMemberName' },
 ]
 
-// 문제 클릭 처리
-const handleItemClick = (item) => {
-    jobtestStore.toggleQuestionSelection(item.id)
+const handleItemClick = async (item) => {
+    try {
+        const detail = await getQuestionDetailService(item.id)
+        selectedQuestionDetail.value = detail
+        detailDialogVisible.value = true
+    } catch (err) {
+        console.error('문제 상세 조회 실패:', err)
+    }
 }
-
 // 삭제 처리
 const handleDelete = () => {
     const selectedIds = jobtestStore.getSelectedQuestionIds()
@@ -82,6 +94,8 @@ onMounted(async () => {
         console.error('Failed to fetch questions:', error)
     }
 })
+
+onMounted(() => jobtestStore.fetchQuestions())
 </script>
 
 <style scoped></style>

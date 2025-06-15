@@ -9,7 +9,7 @@ export const JobtestAPI = {
 
     // 실무테스트
     JOBTESTS: '/api/v1/employment/jobtests',
-    JOBTEST_DETAIL: (id) => `/api/v1/employment/jobtests/${id}`,
+    JOBTEST_DETAIL: (jobtestId) => `/api/v1/employment/jobtests/${jobtestId}`,
 
     // 실무테스트별 문제
     JOBTEST_QUESTIONS: '/api/v1/employment/jobtest-questions',

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getQuestionsService } from '@/services/jobtestService';
+import { getJobtestListService } from '@/services/jobtestService';
 import { getDifficultyLabel } from '@/constants/employment/difficulty';
 
 export const useJobtestListStore = defineStore('jobtestList', () => {
@@ -15,7 +15,7 @@ export const useJobtestListStore = defineStore('jobtestList', () => {
         loading.value = true;
         error.value = null;
         try {
-            const response = await getQuestionsService(); // ✅ 서비스 사용
+            const response = await getJobtestListService(); // ✅ 서비스 사용
             jobtests.value = response.map(item => ({
                 ...item,
                 difficulty: getDifficultyLabel(item.difficulty)

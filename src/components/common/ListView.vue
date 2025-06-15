@@ -12,7 +12,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in data" :key="index">
+                <tr v-for="(item, index) in data" :key="index" @click="$emit('item-click', item)" style="cursor: pointer;">
                     <td v-if="showCheckbox">
                         <v-checkbox v-model="item.selected" :ripple="false" hide-details density="compact" />
                     </td>

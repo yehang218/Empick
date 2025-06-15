@@ -30,7 +30,7 @@
 
       <!-- 📋 지원자 테이블 -->
       <v-data-table
-        :headers="tableheaders"
+        :headers="tableHeaders"
         :items="filteredApplicants"
         :items-per-page="8"
         item-value="id"
@@ -74,7 +74,7 @@ const dummyApplicants = ref([
   { id: 9, name: '이도윤', email: 'doyoon@example.com', birth: '1999-12-12', phone: '010-9999-0000', status: '서류합격', recruitment: '백엔드 개발자' }
 ])
 
-const tableheaders = [
+const tableHeaders = [
   { text: '이름', value: 'name', sortable: true },
   { text: '이메일', value: 'email', sortable: true },
   { text: '생년월일', value: 'birth', sortable: true },
