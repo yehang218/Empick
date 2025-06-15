@@ -1,7 +1,13 @@
 <template>
     <v-container fluid class="pa-6">
         <v-row justify="space-between" align="center" class="mb-4">
-            <h2 class="text-h5 font-weight-bold">지원서 항목 선택</h2>
+            <div class="d-flex align-center">
+                <v-btn variant="text" size="small" icon @click="goBack">
+                    <v-icon>mdi-arrow-left</v-icon>
+                </v-btn>
+                <h2 class="text-h5 font-weight-bold ml-2">지원서 항목 선택</h2>
+            </div>
+
             <v-btn color="secondary" @click="selectIntroduceTemplate">
                 자기소개서 템플릿 선택 (임시)
             </v-btn>
@@ -89,16 +95,29 @@ const router = useRouter()
 const store = useRecruitmentStore()
 const memberStore = useMemberStore()
 
-const categoryList = ref([])
-const selectedIds = ref([])
-const requiredIds = ref([])
+const categoryList = computed(() => store.applicationItemCategoryList)
+const selectedIds = computed({
+  get: () => store.selectedApplicationItemIds,
+  set: (val) => store.selectedApplicationItemIds = val
+})
+
+const requiredIds = computed({
+  get: () => store.requiredApplicationItemIds,
+  set: (val) => store.requiredApplicationItemIds = val
+})
 const dateValues = ref({})
 const menuStates = ref({})
 const openGroup = ref(null)
 
+const goBack = () => {
+    router.back()
+}
+
 const selectIntroduceTemplate = () => {
-    store.draftRecruitment.introduceTemplateId = 1 // 임시 템플릿 ID 설정
-    alert('자기소개서 템플릿이 임시로 선택되었습니다.')
+    if (store.draftRecruitment) {
+        store.draftRecruitment.introduceTemplateId = 1
+        alert('자기소개서 템플릿이 임시로 선택되었습니다.')
+    }
 }
 
 const selectedItemsByGroup = (children) => {
@@ -113,20 +132,15 @@ const groupedCategories = computed(() => {
     }))
 })
 
-
-
 onMounted(async () => {
     await memberStore.getMyInfo()
 
-    const result = await fetchApplicationItemCategories()
-    categoryList.value = result
+    // store에 없을 때만 fetch
+    if (!store.applicationItemCategoryList.length) {
+        const result = await fetchApplicationItemCategories()
+        store.setApplicationItemCategoryList(result)
+    }
 
-    result.forEach(item => {
-        if (item.inputType === 4) {
-            dateValues.value[item.id] = new Date().toISOString().slice(0, 10)
-            menuStates.value[item.id] = false
-        }
-    })
 })
 
 const getInputComponent = (inputType) => {
@@ -156,6 +170,8 @@ const inputTypeIsReadonly = (inputType) => {
 }
 
 const submit = async () => {
+    store.setDraftApplicationItems(selectedIds.value, requiredIds.value)
+
     const draft = store.draftRecruitment
     if (!draft) return
 
@@ -164,20 +180,19 @@ const submit = async () => {
         isRequired: requiredIds.value.includes(id)
     }))
 
-    console.log('✅ memberStore.form.id:', memberStore.form.id)
-    console.log('✅ 최종 draft:', draft)
-
     const dto = recruitmentCreateDTO.fromForm({
         ...draft,
         recruitType: draft.recruitType,
         applicationItems,
-        introduceTemplateId: 1, // 모달 미구현 시 임시
-        memberId: memberStore.form.id // ✅ 로그인한 작성자 ID 추가
+        introduceTemplateId: draft.introduceTemplateId || 1,
+        memberId: memberStore.form.id
     })
 
-    console.log('📦 전송 DTO:', dto)
     await store.submitRecruitment(dto)
     store.clearDraftRecruitment()
+    store.clearDraftApplicationItems()
+    store.clearApplicationItemCategoryList()
+
     router.push('/employment/recruitments')
 }
 </script>

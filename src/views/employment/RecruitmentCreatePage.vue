@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { recruitTypeOptions } from '@/constants/employment/recruitTypes'
 import { QuillEditor } from '@vueup/vue-quill'
@@ -117,6 +117,12 @@ const form = ref({
     startedAt: '',
     endedAt: '',
     recruitmentProcesses: []
+})
+
+onMounted(() => {
+    if (store.draftRecruitment) {
+        Object.assign(form.value, store.draftRecruitment)
+    }
 })
 
 const rules = {
