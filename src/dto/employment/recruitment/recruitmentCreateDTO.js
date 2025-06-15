@@ -13,18 +13,26 @@ export default class recruitmentCreateDTO {
         recruitmentProcesses,
         memberId
     ) {
-        this.title = title
-        this.content = content
-        this.recruitType = recruitType
-        this.imageUrl = imageUrl
-        this.startedAt = startedAt
-        this.endedAt = endedAt
-        this.recruitmentTemplateId = recruitmentTemplateId
-        this.introduceTemplateId = introduceTemplateId
-        this.recruitmentRequestId = recruitmentRequestId
-        this.applicationItems = applicationItems || []
-        this.recruitmentProcesses = recruitmentProcesses || []
-        this.memberId = memberId
+        this.title = title;
+        this.content = content;
+
+        // recruitType을 숫자로 안전하게 변환
+        this.recruitType = recruitType;
+
+        // 빈 문자열이면 null로 처리
+        this.imageUrl = imageUrl || null;
+
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
+
+        this.recruitmentTemplateId = recruitmentTemplateId ?? null;
+        this.introduceTemplateId = introduceTemplateId ?? null;
+        this.recruitmentRequestId = recruitmentRequestId ?? null;
+
+        this.applicationItems = applicationItems || [];
+        this.recruitmentProcesses = recruitmentProcesses || [];
+
+        this.memberId = memberId ?? null;
     }
 
     static fromForm(form) {
@@ -32,7 +40,7 @@ export default class recruitmentCreateDTO {
             form.title,
             form.content,
             form.recruitType,
-            form.imageUrl,
+            form.imageUrl || null,             // "" → null 처리
             form.startedAt,
             form.endedAt,
             form.recruitmentTemplateId ?? null,
@@ -41,6 +49,6 @@ export default class recruitmentCreateDTO {
             form.applicationItems ?? [],
             form.recruitmentProcesses ?? [],
             form.memberId ?? null
-        )
+        );
     }
 }

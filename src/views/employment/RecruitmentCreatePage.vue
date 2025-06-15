@@ -18,10 +18,8 @@
                 </v-col>
 
                 <!-- 유형 선택 -->
-                <v-col cols="12" md="6">
-                    <v-select v-model="form.recruitType" :items="recruitTypeOptions" label="공고 유형" item-title="label"
-                        item-value="value" :rules="[rules.required]" />
-                </v-col>
+                <v-select v-model="form.recruitType" :items="recruitTypeOptions" item-title="label" item-value="value"
+                    label="채용 유형" />
 
                 <!-- 이미지 URL -->
                 <v-col cols="12" md="6">

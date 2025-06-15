@@ -169,13 +169,13 @@ const submit = async () => {
 
     const dto = recruitmentCreateDTO.fromForm({
         ...draft,
+        recruitType: draft.recruitType,
         applicationItems,
         introduceTemplateId: 1, // 모달 미구현 시 임시
         memberId: memberStore.form.id // ✅ 로그인한 작성자 ID 추가
     })
 
     console.log('📦 전송 DTO:', dto)
-    
     await store.submitRecruitment(dto)
     store.clearDraftRecruitment()
     router.push('/employment/recruitments')
