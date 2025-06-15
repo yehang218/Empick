@@ -10,4 +10,6 @@ public interface IntroduceTemplateMapper {
     List<IntroduceTemplateQueryDTO> findAllIntroduceTemplate();
 
     List<IntroduceTemplateQueryDTO> findAllIntroduceTemplateItem();
+
+    IntroduceTemplateQueryDTO findIntroduceTemplateById(int id);
 }

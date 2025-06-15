@@ -8,4 +8,6 @@ public interface IntroduceTemplateQueryService {
     List<IntroduceTemplateQueryDTO> findAllIntroduceTemplate();
 
     List<IntroduceTemplateQueryDTO> findAllIntroduceTemplateItem();
+
+    IntroduceTemplateQueryDTO getIntroduceTemplateById(int id);
 }

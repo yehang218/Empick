@@ -15,4 +15,15 @@
     FROM
         introduce_template_item
 </select>
+
+<!--    <select id="findIntroduceTemplateById" parameterType="int" resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateQueryDTO">-->
+<!--        SELECT-->
+<!--            id,-->
+<!--            title,-->
+<!--            member_id AS memberId-->
+<!--        FROM-->
+<!--            introduce_template-->
+<!--        WHERE-->
+<!--            id = #{id}-->
+<!--    </select>-->
 </mapper>

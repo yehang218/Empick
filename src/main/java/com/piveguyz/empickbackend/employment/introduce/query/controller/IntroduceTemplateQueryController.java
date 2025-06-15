@@ -9,8 +9,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,5 +53,19 @@ public class IntroduceTemplateQueryController {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS,
                         introduceTemplateQueryService.findAllIntroduceTemplateItem()));
+    }
+
+    @Operation(summary = "템플릿 상세 조회", description = "템플릿 ID로 템플릿 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "템플릿을 찾을 수 없음")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<IntroduceTemplateQueryDTO> getIntroduceTemplateById(@PathVariable int id) {
+        IntroduceTemplateQueryDTO template = introduceTemplateQueryService.getIntroduceTemplateById(id);
+        if (template == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(template);
     }
 }
