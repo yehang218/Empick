@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row>
-      <!-- 좌측: 지원자 정보 및 통계 (6/12) -->
+      <!-- 좌측: 지원자 정보 및 통계 -->
       <v-col cols="12" md="6">
         <!-- 🧍‍♂️ 지원자 정보 -->
         <v-card class="mb-4 pa-4 elevated-card">
@@ -23,8 +23,15 @@
                 <v-col cols="6"><strong>이메일:</strong> {{ applicant.email }}</v-col>
               </v-row>
               <v-divider class="my-1" />
-              <v-row class="info-line">
-                <v-col cols="12"><strong>주소:</strong> {{ applicant.address }}</v-col>
+              <v-row class="info-line align-center">
+                <v-col cols="8">
+                  <strong>주소:</strong> {{ applicant.address }}
+                </v-col>
+                <v-col cols="4" class="d-flex justify-end">
+                  <v-btn color="primary" size="small" @click="updateStatus">
+                    지원서 상태 변경
+                  </v-btn>
+                </v-col>
               </v-row>
             </v-col>
           </v-row>
@@ -82,7 +89,7 @@
         </v-card>
       </v-col>
 
-      <!-- 우측: 평가 결과 영역 (6/12) -->
+      <!-- 우측: 평가 컴포넌트 -->
       <v-col cols="12" md="6">
         <component :is="evaluationComponent" />
       </v-col>
@@ -92,7 +99,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import IntroduceResult from '@/components/employment/IntroduceResult.vue'
+import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 // import InterviewResult from '@/components/employment/InterviewResult.vue'
 // import TestResult from '@/components/employment/TestResult.vue'
 
@@ -112,6 +119,10 @@ const selectEvaluation = (type) => {
     default:
       evaluationComponent.value = IntroduceResult
   }
+}
+
+const updateStatus = () => {
+  alert('지원서 상태를 변경합니다.')
 }
 
 const applicant = {
@@ -138,7 +149,6 @@ const applicant = {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #ccc;
 }
-
 .info-line {
   margin-bottom: 8px;
 }

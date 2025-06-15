@@ -99,11 +99,11 @@ export const employmentRoutes = [
         path: '/employment/recruitment-requests/create',
         name: 'RecruitmentRequestCreate',
         component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
-        meta: { 
-            requiresAuth: true 
+        meta: {
+            requiresAuth: true
         }
     },
-    
+
     // 채용 공고 목록 페이지
     {
         path: '/employment/recruitments',
@@ -128,9 +128,16 @@ export const employmentRoutes = [
         path: '/employment/recruitments/create',
         name: 'RecruitmentCreate',
         component: () => import('@/views/employment/RecruitmentCreatePage.vue'),
-        meta: { 
-            requiresAuth: true 
+        meta: {
+            requiresAuth: true
         }
+    },
+    // 지원서 항목 구성 페이지
+    {
+        path: '/employment/application-items/select',
+        name: 'ApplicationItemSelectPage',
+        component: () => import('@/views/employment/ApplicationItemSelectPage.vue'),
+        meta: { requiresAuth: true }
     },
 
         // <---------- 면         접 ---------->
@@ -151,6 +158,18 @@ export const employmentRoutes = [
                 requiresAuth: true
             }
         },
+
+
+
+          {
+        path: '/employment/applicant',
+        name: 'ApplicantPage',
+        component: () => import('@/views/employment/ApplicantPage.vue'),
+        meta: { requiresAuth: true }
+},
+    
+
+
         
         // <---------- 지원서 / 지원자 ---------->
         {
@@ -163,5 +182,4 @@ export const employmentRoutes = [
             requiresAuth: true
             }
         }
-    
 ]; 
