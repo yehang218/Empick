@@ -36,7 +36,7 @@ export const employmentRoutes = [
     },
     // 실무테스트 상세 조회 페이지
     {
-        path: '/employment/jobtests/:id',
+        path: '/employment/jobtests/:jobtestId',
         name: 'JobtestDetail',
         component: () => import('@/views/employment/JobtestDetailPage.vue'),
         props: true,
