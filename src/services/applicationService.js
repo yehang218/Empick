@@ -1,8 +1,7 @@
 import api from '@/apis/apiClient';
 import { ApplicationAPI } from '@/apis/routes/application';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import ApplicationCommandDTO from '@/dto/employment/application/applicationCommandDTO';
-import ApplicationResponseDTO from '@/dto/employment/application/applicationResponseDTO';
+import ApplicationResponseDTO from '@/dto/employment/applicant/applicationResponseDTO'; // ✅ 이거 하나로 통일
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 export const getAllApplicationsService = async (options = {}) => {
@@ -35,12 +34,12 @@ export const createApplicationService = async (dto, options = {}) => {
   return withErrorHandling(async () => {
     const response = await api.post(ApplicationAPI.CREATE_APPLICATION, dto);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
-    
+
     if (!apiResponse.success) {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationCommandDTO.fromJSON(apiResponse.data);
+    return ApplicationResponseDTO.fromJSON(apiResponse.data); // ✅ 여기
   }, options);
 };
 
@@ -53,7 +52,7 @@ export const updateApplicationStatusService = async (id, dto, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationCommandDTO.fromJSON(apiResponse.data);
+    return ApplicationResponseDTO.fromJSON(apiResponse.data); // ✅ 여기
   }, options);
 };
 

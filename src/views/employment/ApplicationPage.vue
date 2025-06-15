@@ -28,9 +28,15 @@
                   <strong>주소:</strong> {{ applicant.address }}
                 </v-col>
                 <v-col cols="4" class="d-flex justify-end">
-                  <v-btn color="primary" size="small" @click="updateStatus">
-                    지원서 상태 변경
-                  </v-btn>
+                  <v-select
+                    v-model="selectedStatus"
+                    :items="statusOptions"
+                    label="지원서 상태"
+                    dense
+                    outlined
+                    hide-details
+                    @update:modelValue="updateStatus"
+                  />
                 </v-col>
               </v-row>
             </v-col>
@@ -98,48 +104,62 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
-// import InterviewResult from '@/components/employment/InterviewResult.vue'
-// import TestResult from '@/components/employment/TestResult.vue'
+import { useApplicationStore } from '@/stores/applicationStore'
+
+const route = useRoute()
+const applicationStore = useApplicationStore()
+const applicationId = Number(route.params.id)
 
 const evaluationComponent = ref(IntroduceResult)
+const selectedStatus = ref('')
+const statusOptions = [
+  '서류합격', '실무테스트합격', '면접합격', '최종합격', '불합격'
+]
+
+const applicant = ref({
+  name: '',
+  birth: '',
+  phone: '',
+  email: '',
+  address: '',
+  pictureUrl: '',
+  motivation: '',
+  experience: '',
+  skills: '',
+  evaluationStats: []
+})
+
+onMounted(async () => {
+  const data = await applicationStore.fetchApplication(applicationId)
+  if (data) {
+    applicant.value = data
+    selectedStatus.value = data.status
+  }
+})
+
+const updateStatus = async () => {
+  await fetchAllApplications();
+}
+
+
 
 const selectEvaluation = (type) => {
   switch (type) {
     case '자기소개서':
       evaluationComponent.value = IntroduceResult
       break
-    case '실무 테스트':
-      evaluationComponent.value = TestResult
-      break
-    case '면접':
-      evaluationComponent.value = InterviewResult
-      break
+    // case '실무 테스트':
+    //   evaluationComponent.value = () => import('@/components/employment/TestResult.vue')
+    //   break
+    // case '면접':
+    //   evaluationComponent.value = () => import('@/components/employment/InterviewResult.vue')
+    //   break
     default:
       evaluationComponent.value = IntroduceResult
   }
-}
-
-const updateStatus = () => {
-  alert('지원서 상태를 변경합니다.')
-}
-
-const applicant = {
-  name: '박지민',
-  birth: '1994-11-23',
-  phone: '010-5678-1234',
-  email: 'jimin@example.com',
-  address: '서울시 강남구 역삼동',
-  pictureUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
-  motivation: '성장할 수 있는 환경을 찾아 지원했습니다.',
-  experience: '백엔드 개발 3년 경력, Spring Boot 사용',
-  skills: 'Java, Spring, JPA, Vue.js',
-  evaluationStats: [
-    { type: '자기소개서', score: 85, average: 76, result: '합격' },
-    { type: '실무 테스트', score: 90, average: 65, result: '합격' },
-    { type: '면접', score: 71, average: 78, result: '불합격' }
-  ]
 }
 </script>
 

@@ -8,7 +8,7 @@ import {
   updateApplicationStatusService,
   deleteApplicationService,
   createApplicationResponseService
-} from '@/services/employment/applicationService';
+} from '@/services/applicationService';
 
 export const useApplicationStore = defineStore('application', () => {
   // 상태
