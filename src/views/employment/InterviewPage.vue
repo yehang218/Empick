@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApplicationStore } from '@/stores/applicationStore';
 import { useApplicantStore } from '@/stores/applicantStore';
@@ -36,7 +36,9 @@ const applicationStore = useApplicationStore();
 const applicantStore = useApplicantStore();
 const recruitmentStore = useRecruitmentRequestStore();
 
-const applications = ref([]);
+const applicationsRaw = ref([]);
+const applications = computed(() => applicationsRaw.value); // ✅ 반응성 유지용 computed
+
 const applicantMap = ref({});
 const recruitmentMap = ref({});
 const router = useRouter();
@@ -50,9 +52,9 @@ const fetchApplications = async () => {
     console.log('[fetchApplications] 호출됨');
     try {
         const res = await applicationStore.fetchAllApplications();
-        console.log('[fetchApplications] 결과:', res); // 👈 확인
-        applications.value = res;
-        
+        console.log('[fetchApplications] 결과:', res);
+        applicationsRaw.value = res; // ✅ raw에 저장
+
         const applicantIds = [...new Set(res.map(a => a.applicantId))];
         const recruitmentIds = [...new Set(res.map(a => a.recruitmentId))];
 
@@ -76,7 +78,7 @@ const fetchApplications = async () => {
 
     } catch (error) {
         console.error('지원서 목록 조회 실패', error);
-        applications.value = [];
+        applicationsRaw.value = [];
     }
 };
 

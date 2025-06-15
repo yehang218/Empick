@@ -62,7 +62,7 @@ const criteriaStore = useInterviewCriteriaStore()
 const sheets = computed(() => sheetStore.sheetList)
 const selectedSheet = ref(null)
 
-const criteriaList = computed(() => criteriaStore.criteriaList)
+const criteriaList = computed(() => criteriaStore.criteriaList)  // 이건 OK
 const selectedCriteria = computed(() => criteriaStore.selectedCriteria)
 
 const router = useRouter()
@@ -85,6 +85,7 @@ const onSelectSheet = async (sheetName) => {
 
     selectedSheet.value = targetSheet
     await criteriaStore.fetchCriteriaBySheetId(targetSheet.id)
+    console.log('✅ 불러온 기준 목록:', criteriaList.value)
 }
 
 // ✅ 평가 기준 선택

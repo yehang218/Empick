@@ -93,7 +93,9 @@ export const getCriteriaBySheetIdService = async (sheetId, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return InterviewCriteriaResponseDTO.fromJSON(apiResponse.data);
+
+        // ✅ 배열일 경우 map 처리!
+        return apiResponse.data.map(item => InterviewCriteriaResponseDTO.fromJSON(item));
     }, options);
 }
 

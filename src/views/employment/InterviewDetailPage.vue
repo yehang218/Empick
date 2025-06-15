@@ -192,16 +192,26 @@ const startEditing = () => {
     dialog.value = true;
 };
 
+const formatDateLocal = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // getMonth()는 0부터 시작
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 const saveChanges = async () => {
     if (!confirm('면접 정보를 수정하시겠습니까?')) return;
 
     try {
-        const datetimeStr = `${editDatetime.value}T${selectedHour.value}:${selectedMinute.value}:00`;
+        const datePart = formatDateLocal(editDatetime.value); // ✅ 로컬 기준 날짜
+        const datetimeStr = `${datePart}T${selectedHour.value}:${selectedMinute.value}:00`;
+
+        console.log('[debug] 최종 datetimeStr:', datetimeStr);
 
         await interviewStore.updateInterviewDatetime(interview.value.id, datetimeStr);
         await interviewStore.updateInterviewAddress(interview.value.id, editAddress.value);
 
-        // 최신 정보로 업데이트
         await interviewStore.fetchInterviewById(interview.value.id);
 
         alert('면접 정보가 성공적으로 수정되었습니다.');
