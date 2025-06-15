@@ -40,7 +40,7 @@ const headers = [
 ];
 
 const handleItemClick = (item) => {
-    store.toggleSelection(item.id);
+    router.push({ name: 'JobtestDetail', params: { jobtestId: item.id } });
 };
 
 const handleCreate = () => {

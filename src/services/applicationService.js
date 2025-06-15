@@ -1,0 +1,84 @@
+import api from '@/apis/apiClient';
+import { ApplicationAPI } from '@/apis/routes/application';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
+import ApplicationCommandDTO from '@/dto/employment/application/applicationCommandDTO';
+import ApplicationResponseDTO from '@/dto/employment/application/applicationResponseDTO';
+import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
+
+export const getAllApplicationsService = async (options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.get(ApplicationAPI.GET_ALL_APPLICATION);
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    return apiResponse.data.map(ApplicationResponseDTO.fromJSON);
+  }, options);
+};
+
+export const getApplicationByIdService = async (id, options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.get(ApplicationAPI.GET_APPLICATION_BY_ID(id));
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    return apiResponse.data.map(ApplicationResponseDTO.fromJSON);
+  }, options);
+};
+
+export const createApplicationService = async (dto, options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.post(ApplicationAPI.CREATE_APPLICATION, dto);
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+    
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    return ApplicationCommandDTO.fromJSON(apiResponse.data);
+  }, options);
+};
+
+export const updateApplicationStatusService = async (id, dto, options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(id), dto);
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    return ApplicationCommandDTO.fromJSON(apiResponse.data);
+  }, options);
+};
+
+export const deleteApplicationService = async (id, options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.delete(ApplicationAPI.DELETE_APPLICATION(id));
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    return apiResponse.data;
+  }, options);
+};
+
+export const createApplicationResponseService = async (dto, options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.post(ApplicationAPI.CREATE_APPLICATION_RESPONSE, dto);
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    return apiResponse.data;
+  }, options);
+};

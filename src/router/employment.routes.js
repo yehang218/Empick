@@ -1,12 +1,4 @@
 export const employmentRoutes = [
-    {
-        path: '/employment/recruitment',
-        name: 'RecruitmentPage',
-        component: () => import('@/views/employment/RecruitmentPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
-    },
 
     //    <------------------- 실무테스트 -------------------->
     // 실무테스트 문제 목록 페이지
@@ -36,7 +28,7 @@ export const employmentRoutes = [
     },
     // 실무테스트 상세 조회 페이지
     {
-        path: '/employment/jobtests/:id',
+        path: '/employment/jobtests/:jobtestId',
         name: 'JobtestDetail',
         component: () => import('@/views/employment/JobtestDetailPage.vue'),
         props: true,
@@ -85,7 +77,7 @@ export const employmentRoutes = [
     //    <------------------- 채용공고 -------------------->
     // 채용 요청서 목록 페이지
     {
-        path: '/employment/recruitments/requests',
+        path: '/employment/recruitment-requests',
         name: 'RecruitmentRequestList',
         component: () => import('@/views/employment/RecruitmentRequestListPage.vue'),
         meta: {
@@ -94,7 +86,7 @@ export const employmentRoutes = [
     },
     // 채용 요청서 상세 조회 페이지
     {
-        path: '/employment/recruitments/requests/:id',
+        path: '/employment/recruitment-requests/:id',
         name: 'RecruitmentRequestDetail',
         component: () => import('@/views/employment/RecruitmentRequestDetailPage.vue'),
         props: true,
@@ -104,7 +96,7 @@ export const employmentRoutes = [
     },
     // 채용 요청서 등록 페이지
     {
-        path: '/employment/recruitments/requests/create',
+        path: '/employment/recruitment-requests/create',
         name: 'RecruitmentRequestCreate',
         component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
         meta: {
@@ -140,6 +132,13 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
+    // 지원서 항목 구성 페이지
+    {
+        path: '/employment/application-items/select',
+        name: 'ApplicationItemSelectPage',
+        component: () => import('@/views/employment/ApplicationItemSelectPage.vue'),
+        meta: { requiresAuth: true }
+    },
 
         // <---------- 면         접 ---------->
     
@@ -160,6 +159,7 @@ export const employmentRoutes = [
             }
         },
         
+        // <---------- 지원서 / 지원자 ---------->
         {
             path: '/employment/application',
             name: 'ApplicationPage',
