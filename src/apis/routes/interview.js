@@ -63,7 +63,7 @@ export const InterviewAPI = {
     DELETE_INTERVIEW_SCORE: (id) => `/api/v1/employment/interview-score/${id}`,
 
     // 🔹 조회 (Query)
-    FIND_ALL_INTERVIEW_SCORE: '/api/v1/employment/interviewScore',
+    FIND_ALL_INTERVIEW_SCORE: '/api/v1/employment/interview-score',
     FIND_INTERVIEW_SCORE_BY_ID: (id) => `/api/v1/employment/interview-score/${id}`,
     FIND_INTERVIEW_SCORE_BY_INTERVIEWER_ID: (interviewerId) => `/api/v1/employment/interview-score/interview/${interviewerId}`,
 };

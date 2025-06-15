@@ -158,6 +158,14 @@ export const employmentRoutes = [
                 requiresAuth: true
             }
         },
+        {
+            path: '/employment/interview-score',
+            name: 'InputInterviewScorePage',
+            component: () => import('@/views/employment/InputInterviewScorePage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
         
         // <---------- 지원서 / 지원자 ---------->
         {
