@@ -24,7 +24,7 @@ export const careerRoutes = [
 
 {
     path: '/career/recruitments/:id',
-    name: 'CareerRecruitmentDetail',
+    name: 'RecruitmentDetail',
     component: () => import('@/views/career/CareerRecruitmentDetail.vue'),
     props: true,
     meta: {
