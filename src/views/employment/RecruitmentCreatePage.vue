@@ -4,7 +4,7 @@
         <v-row justify="space-between" align="center" class="mb-6">
             <h2 class="text-h5 font-weight-bold">채용 공고 작성</h2>
             <div>
-                <v-btn variant="tonal" class="mr-2" @click="$router.back()">취소하기</v-btn>
+                <v-btn variant="tonal" class="mr-2" @click="cancel">취소하기</v-btn>
                 <v-btn color="success" variant="elevated" @click="goToApplicationItem">지원서 항목 선택</v-btn>
             </div>
         </v-row>
@@ -87,6 +87,8 @@
             </v-row>
         </v-form>
     </v-container>
+    <ConfirmModal v-if="showCancelConfirm" message="작성을 취소하시겠습니까?" @confirm="confirmCancel"
+        @cancel="showCancelConfirm = false" />
 </template>
 
 <script setup>
@@ -96,12 +98,14 @@ import { recruitTypeOptions } from '@/constants/employment/recruitTypes'
 import { QuillEditor } from '@vueup/vue-quill'
 import { stepTypeOptions, getStepTypeLabel } from '@/constants/employment/stepType'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
+import ConfirmModal from '@/components/common/Modal.vue'
 
 const router = useRouter()
 const route = useRoute()
 const store = useRecruitmentStore()
 const isValid = ref(true)
 const formRef = ref()
+const showCancelConfirm = ref(false)
 
 const newStep = ref({
     stepType: '',
@@ -124,6 +128,16 @@ onMounted(() => {
         Object.assign(form.value, store.draftRecruitment)
     }
 })
+
+const cancel = () => {
+    showCancelConfirm.value = true
+}
+
+const confirmCancel = () => {
+    store.clearDraftRecruitment()
+    store.clearDraftApplicationItems()
+    router.push('/employment/recruitments')
+}
 
 const rules = {
     required: v => !!v || '필수 입력 항목입니다.'
