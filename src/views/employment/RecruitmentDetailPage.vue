@@ -87,7 +87,7 @@ function formatDate(date) {
             </v-card>
             <v-card class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">내용</div>
-                <div>{{ detail.recruitment.content }}</div>
+                <div v-html="detail.recruitment.content"></div>
             </v-card>
             <v-card class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">유형</div>
