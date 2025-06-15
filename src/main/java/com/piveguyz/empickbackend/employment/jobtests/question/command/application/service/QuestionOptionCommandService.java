@@ -10,5 +10,5 @@ public interface QuestionOptionCommandService {
 
     UpdateQuestionOptionCommandDTO updateQuestionOption(int id, @Valid UpdateQuestionOptionCommandDTO updateQuestionOptionCommandDTO);
 
-    Integer deleteQuestionOption(int id);
+    void deleteQuestionOption(int questionId);
 }
