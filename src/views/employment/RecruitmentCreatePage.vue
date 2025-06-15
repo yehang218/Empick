@@ -9,6 +9,67 @@
             </div>
         </v-row>
 
+        <v-card v-if="requestDetail" class="mb-6 pa-6" elevation="1" color="#f8faf9">
+            <h3 class="text-subtitle-1 font-weight-bold d-flex align-center mb-4">
+                <v-icon class="mr-2" color="success">mdi-clipboard-text</v-icon>
+                채용 요청서 정보
+            </h3>
+
+            <v-row dense>
+                <!-- 포지션 / 부서 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">포지션명</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.jobName }}</div>
+                </v-col>
+                <v-col cols="12">
+                    <div class="text-caption text-grey">부서명</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.departmentName }}</div>
+                </v-col>
+
+                <!-- 모집 인원 / 고용 형태 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">모집 인원</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.headcount }}명</div>
+                </v-col>
+                <v-col cols="12">
+                    <div class="text-caption text-grey">고용 형태</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.employmentType }}</div>
+                </v-col>
+
+                <!-- 근무 지역 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">근무 지역</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.workLocation }}</div>
+                </v-col>
+
+                <!-- 주요 업무 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">주요 업무</div>
+                    <div class="text-body-1 font-weight-medium" style="white-space: pre-line;">
+                        {{ requestDetail.responsibility }}
+                    </div>
+                </v-col>
+
+                <!-- 자격 요건 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">자격 요건</div>
+                    <div class="text-body-1 font-weight-medium" style="white-space: pre-line;">
+                        {{ requestDetail.qualification }}
+                    </div>
+                </v-col>
+
+                <!-- 우대 사항 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">우대 사항</div>
+                    <div class="text-body-1 font-weight-medium" style="white-space: pre-line;">
+                        {{ requestDetail.preference }}
+                    </div>
+                </v-col>
+            </v-row>
+        </v-card>
+
+
+
         <!-- 입력 폼 -->
         <v-form ref="formRef" v-model="isValid">
             <v-row dense>
@@ -99,13 +160,18 @@ import { QuillEditor } from '@vueup/vue-quill'
 import { stepTypeOptions, getStepTypeLabel } from '@/constants/employment/stepType'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import ConfirmModal from '@/components/common/Modal.vue'
+import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestService'
 
 const router = useRouter()
 const route = useRoute()
+const requestId = route.query.requestId;
+
 const store = useRecruitmentStore()
 const isValid = ref(true)
 const formRef = ref()
 const showCancelConfirm = ref(false)
+
+const requestDetail = ref(null)
 
 const newStep = ref({
     stepType: '',
@@ -120,12 +186,20 @@ const form = ref({
     imageUrl: '',
     startedAt: '',
     endedAt: '',
-    recruitmentProcesses: []
+    recruitmentProcesses: [],
+    recruitmentRequestId: route.query.id || null
 })
 
-onMounted(() => {
+onMounted(async () => {
     if (store.draftRecruitment) {
         Object.assign(form.value, store.draftRecruitment)
+    }
+
+    const requestId = route.query.id
+    console.log('requestId:', requestId) // 1. requestId 값 확인
+    if (requestId) {
+        requestDetail.value = await fetchRecruitmentRequestDetail(requestId)
+        console.log('requestDetail:', requestDetail.value) // 2. 데이터 도착 확인
     }
 })
 
