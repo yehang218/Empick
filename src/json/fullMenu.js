@@ -51,6 +51,16 @@ export const fullMenu = {
             children: []
         }
     ],
+    결재: [
+        {
+            label: "결재",
+            role: ["사원", "인사팀"],
+            children: [
+                { label: "받은 결재", path: routeMap.ApprovalInboxList },
+                { label: "요청한 결재", path: routeMap.ApprovalSentList }
+            ]
+        }
+    ],
     채용: [
         {
             label: "채용 공고",
