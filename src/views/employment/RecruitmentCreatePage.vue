@@ -196,10 +196,16 @@ onMounted(async () => {
     }
 
     const requestId = route.query.id
-    console.log('requestId:', requestId) // 1. requestId 값 확인
+
     if (requestId) {
         requestDetail.value = await fetchRecruitmentRequestDetail(requestId)
-        console.log('requestDetail:', requestDetail.value) // 2. 데이터 도착 확인
+
+        if (requestDetail.value?.startedAt) {
+            form.value.startedAt = requestDetail.value.startedAt.slice(0, 16)
+        }
+        if (requestDetail.value?.endedAt) {
+            form.value.endedAt = requestDetail.value.endedAt.slice(0, 16)
+        }
     }
 })
 
