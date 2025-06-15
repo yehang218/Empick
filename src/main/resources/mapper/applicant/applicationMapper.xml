@@ -49,6 +49,23 @@
                  LEFT JOIN introduce_rating_result irr ON a.introduce_rating_result_id = irr.id
                  LEFT JOIN member m ON a.updated_by = m.id
         WHERE a.id = #{id}
+    </select>
 
+    <select id="findApplicationByApplicantId" resultMap="ApplicationResultMap">
+        SELECT
+            a.id,
+            a.recruitment_id,
+            a.created_at,
+            a.status,
+            a.applicant_id,
+            a.introduce_rating_result_id,
+            a.updated_at,
+            a.updated_by
+        FROM application a
+                 LEFT JOIN recruitment r ON a.recruitment_id = r.id
+                 LEFT JOIN applicant ap ON a.applicant_id = ap.id
+                 LEFT JOIN introduce_rating_result irr ON a.introduce_rating_result_id = irr.id
+                 LEFT JOIN member m ON a.updated_by = m.id
+        WHERE a.applicant_id = #{applicantId}
     </select>
 </mapper>
