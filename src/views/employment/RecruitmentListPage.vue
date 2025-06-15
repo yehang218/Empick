@@ -32,13 +32,16 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import ListView from '@/components/common/ListView.vue'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 
 const router = useRouter()
+const route = useRoute()
+const toast = useToast()
 const page = ref(1)
 const totalPages = ref(1)
 const store = useRecruitmentStore()
@@ -49,6 +52,10 @@ function goToCreate() {
 
 onMounted(() => {
     store.loadRecruitmentList()
+    if (route.query.toast === 'deleted') {
+        toast.success('채용공고가 삭제되었습니다.')
+        router.replace({ query: { ...route.query, toast: undefined } })
+    }
 })
 
 const handleRowClick = (e) => {

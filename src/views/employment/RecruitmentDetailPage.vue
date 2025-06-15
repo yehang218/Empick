@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
 import { fetchRecruitmentProcesses } from '@/services/recruitmentProcessService'
@@ -8,17 +8,22 @@ import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestServ
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 import { getStepTypeLabel } from '@/constants/employment/stepType'
+import ConfirmModal from '@/components/common/Modal.vue'
+import { useToast } from 'vue-toastification'
 
 const route = useRoute()
+const router = useRouter()
 const store = useRecruitmentStore()
 const applicationItemStore = useApplicationItemStore()
 const processList = ref([])
+const toast = useToast()
 
 const loading = computed(() => store.loadingDetail)
 const error = computed(() => store.detailError)
 const detail = computed(() => store.detail)
 const requestDetail = ref(null)
 const applicationItemDialog = ref(false)
+const deleteDialog = ref(false)
 
 const getInputComponent = (type) => {
     switch (type) {
@@ -38,7 +43,7 @@ onMounted(async () => {
     const id = route.params.id
     try {
         await store.loadRecruitmentDetail(id)
-        
+
         // 연관된 요청서 정보 불러오기
         if (detail.value.recruitment.recruitmentRequestId) {
             requestDetail.value = await fetchRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
@@ -55,6 +60,15 @@ onMounted(async () => {
 function formatDate(date) {
     if (!date) return ''
     return new Date(date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+const handleDelete = async () => {
+    try {
+        await store.deleteExistingRecruitment(detail.value.recruitment.id)
+        router.push({ path: '/employment/recruitments', query: { toast: 'deleted' } })
+    } catch (e) {
+        toast.error('삭제 실패: ' + e)
+    }
 }
 </script>
 
@@ -76,8 +90,11 @@ function formatDate(date) {
                         :to="`/employment/applicants?recruitmentId=${detail.recruitment.id}`">
                         지원자 현황 보기
                     </v-btn>
-                    <v-btn variant="outlined" color="success" @click="applicationItemDialog = true">
+                    <v-btn class="mr-2" variant="outlined" color="success" @click="applicationItemDialog = true">
                         지원서 항목 보기
+                    </v-btn>
+                    <v-btn variant="outlined" color="error" @click="deleteDialog = true">
+                        삭제
                     </v-btn>
                 </v-col>
             </v-row>
@@ -143,6 +160,9 @@ function formatDate(date) {
                 </div>
             </v-card>
 
+            <ConfirmModal v-if="deleteDialog" message="정말 삭제하시겠습니까?" @confirm="handleDelete"
+                @cancel="deleteDialog = false" />
+
         </v-card>
 
         <v-dialog v-model="applicationItemDialog" max-width="700px">
@@ -168,7 +188,6 @@ function formatDate(date) {
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
 
     </v-container>
 </template>
