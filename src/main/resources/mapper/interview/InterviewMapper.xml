@@ -36,6 +36,18 @@
         WHERE id = #{id}
     </select>
 
+    <select id="findByApplicationId" resultMap="InterviewResultMap">
+        SELECT
+            id,
+            application_id,
+            sheet_id,
+            datetime,
+            address,
+            score
+        FROM interview
+        WHERE application_id = #{applicationId}
+    </select>
+
     <select id="findByDate" resultMap="InterviewResultMap">
         SELECT
             id,

@@ -6,4 +6,8 @@ import java.util.List;
 
 public interface ApplicantQueryService {
     List<ApplicantQueryDTO> findAllApplicant();
+
+    ApplicantQueryDTO findApplicantById(Integer id);
+
+    List<ApplicantQueryDTO> searchApplicantsByName(String name);
 }

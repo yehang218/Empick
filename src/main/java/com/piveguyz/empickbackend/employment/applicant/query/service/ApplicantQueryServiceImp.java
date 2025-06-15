@@ -17,4 +17,16 @@ public class ApplicantQueryServiceImp implements ApplicantQueryService {
     public List<ApplicantQueryDTO> findAllApplicant() {
         return applicantMapper.findAllApplicant();
     }
+
+    @Override
+    public ApplicantQueryDTO findApplicantById(Integer id) {
+        ApplicantQueryDTO dto = applicantMapper.findApplicantById(id);
+        return dto;
+    }
+
+    @Override
+    public List<ApplicantQueryDTO> searchApplicantsByName(String name) {
+        List<ApplicantQueryDTO> dtoList = applicantMapper.searchApplicantsByName(name);
+        return dtoList;
+    }
 }

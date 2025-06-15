@@ -59,4 +59,19 @@
           AND is_deleted = 'N';
     </select>
 
+    <select id="findBySheetId" resultMap="InterviewCriteriaResultMap">
+        SELECT
+            id,
+            sheet_id,
+            title,
+            content,
+            weight,
+            is_deleted,
+            member_id,
+            updated_at
+        FROM interview_criteria
+        WHERE sheet_id = #{sheetId}
+          AND is_deleted = 'N';
+    </select>
+
 </mapper>

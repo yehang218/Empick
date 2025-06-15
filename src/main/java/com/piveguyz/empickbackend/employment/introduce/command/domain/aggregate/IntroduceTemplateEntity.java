@@ -22,3 +22,4 @@ public class IntroduceTemplateEntity {
     @Column(name = "member_id", nullable = false)
     private Integer memberId;
 }
+
