@@ -8,6 +8,7 @@ import { RecruitmentAPI } from './recruitment';
 import { ApplicantAPI, ApplicantBookmarkAPI, ApplicationAPI, ApplicationResponseAPI } from './application';
 
 
+
 export const API = {
     AUTH: AuthAPI,
     JOBTEST: JobtestAPI,
@@ -21,3 +22,4 @@ export const API = {
     APPLICATION: ApplicationAPI,
     APPLICATIONRESPONSE: ApplicationResponseAPI,
 };
+
