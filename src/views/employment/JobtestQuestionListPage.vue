@@ -49,7 +49,6 @@ import ListView from '@/components/common/ListView.vue'
 import { useJobtestStore } from '@/stores/jobtestQuestionStore'
 
 import { getQuestionDetailService } from '@/services/jobtestQuestionService'
-import QuestionQueryDTO from '@/dto/employment/jobtest/questionDetailResponseDTO'
 import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
 
 const router = useRouter()
