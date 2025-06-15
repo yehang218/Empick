@@ -8,7 +8,7 @@
             <v-col cols="6" class="d-flex justify-end">
                 <div>
                     <v-btn color="primary" class="mr-2" size="small" @click="goToCreatePage">+ 평가표 추가</v-btn>
-                    <v-btn color="secondary" class="mr-2" size="small">✏️ 평가표 수정</v-btn>
+                    <!-- <v-btn color="secondary" class="mr-2" size="small" @click="goToEditPage">✏️ 평가표 수정</v-btn> -->
                     <v-btn color="error" size="small" @click="openDeleteModal">🗑 평가표 삭제</v-btn>
                 </div>
             </v-col>
@@ -67,7 +67,7 @@ const selectedCriteria = computed(() => criteriaStore.selectedCriteria)
 
 const router = useRouter()
 
-// ✅ 페이지 이동
+// ✅ 평가표 등록 페이지 이동
 const goToCreatePage = () => {
     router.push('/employment/interview-criteria/create')
 }
