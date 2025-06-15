@@ -56,8 +56,6 @@
 import { ref } from 'vue'
 import { createSheetService } from '@/services/interviewSheetService'
 import { createCriteriaService } from '@/services/interviewCriteriaService'
-import InterviewSheetResponseDTO from '@/dto/employment/interview/interviewSheetResponseDTO'
-import InterviewCriteriaResponseDTO from '@/dto/employment/interview/interviewCriteriaResponseDTO'
 
 
 const removeCriterion = (index) => {

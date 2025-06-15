@@ -1,4 +1,4 @@
-export default class applicationResponseDTO {
+export default class ApplicationResponseDTO {
 
     constructor(id, recruitmentId, createdAt, status, applicantId, introduceRatingResultId, updatedAt, updatedBy) {
         this.id = id;
@@ -12,7 +12,7 @@ export default class applicationResponseDTO {
     }
 
     static fromJSON(json) {
-        return new InterviewerResponseDTO (
+        return new ApplicationResponseDTO (
             json.id,
             json.recruitmentId,
             json.createdAt,

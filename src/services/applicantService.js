@@ -1,8 +1,7 @@
-import { ApplicantAPI } from '@/apis/routes/applicant';
+import { ApplicantAPI } from '@/apis/routes/application';
 import api from '@/apis/apiClient';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import ApplicantCommandDTO from '@/dto/employment/applicant/applicantCommandDTO';
-import ApplicantResponseDTO from '@/dto/employment/applicant/applicantResponseDTO';
+import ApplicantResponseDTO from '@/dto/employment/application/applicantResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 export const getAllApplicantsService = async (options = {}) => {
@@ -53,7 +52,7 @@ export const createApplicantService = async (dto, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicantCommandDTO.fromJSON(apiResponse.data);
+    return ApplicantResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };
 
@@ -70,7 +69,7 @@ export const getBookmarksByMemberIdService = async (memberId, options = {}) => {
   }, options);
 };
 
-export const addBookmarkService = async (dto, options = {}) => {
+export const addApplicantBookmarkService = async (dto, options = {}) => {
   return withErrorHandling(async () => {
     const response = await api.post(ApplicantAPI.ADD_BOOKMARK, dto);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
@@ -83,7 +82,7 @@ export const addBookmarkService = async (dto, options = {}) => {
   }, options);
 };
 
-export const removeBookmarkService = async (memberId, applicantId, options = {}) => {
+export const removeApplicantBookmarkService = async (memberId, applicantId, options = {}) => {
   return withErrorHandling(async () => {
     const response = await api.delete(ApplicantAPI.REMOVE_BOOKMARK(memberId, applicantId));
     const apiResponse = ApiResponseDTO.fromJSON(response.data);

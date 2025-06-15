@@ -2,13 +2,14 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 import {
-    createApplicantService,
     getAllApplicantsService,
     getApplicantByIdService,
-    searchApplicantByNameService,
+    searchApplicantsByNameService,
+    createApplicantService,
+    getBookmarksByMemberIdService,
     addApplicantBookmarkService,
     removeApplicantBookmarkService
-} from '@/services/employment/applicantService';
+} from '@/services/applicantService';
 
 export const useApplicantStore = defineStore('applicant', () => {
     // 상태
@@ -28,6 +29,7 @@ export const useApplicantStore = defineStore('applicant', () => {
             bookmarkedApplicants.value = new Set(
                 result.filter(applicant => applicant.bookmarked).map(a => a.id)
             );
+            return result;
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -43,6 +45,7 @@ export const useApplicantStore = defineStore('applicant', () => {
         try {
             const result = await getApplicantByIdService(id);
             selectedApplicant.value = result;
+            return result;
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -56,8 +59,9 @@ export const useApplicantStore = defineStore('applicant', () => {
         loading.value = true;
         error.value = null;
         try {
-            const result = await searchApplicantByNameService(name);
+            const result = await searchApplicantsByNameService(name);
             applicantList.value = result;
+            return result;
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -72,6 +76,11 @@ export const useApplicantStore = defineStore('applicant', () => {
         await fetchAllApplicants();
         return result;
     };
+
+    const fetchBookmarksByMemberId = async(id) => {
+        const result = await getBookmarksByMemberIdService(id);
+        return result;
+    }
 
     // ⭐ 즐겨찾기 추가
     const addBookmark = async (memberId, applicantId) => {
@@ -102,6 +111,7 @@ export const useApplicantStore = defineStore('applicant', () => {
         fetchApplicantById,
         searchApplicantsByName,
         createApplicant,
+        fetchBookmarksByMemberId,
         addBookmark,
         removeBookmark,
         isBookmarked

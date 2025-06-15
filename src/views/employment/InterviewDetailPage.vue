@@ -73,17 +73,20 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import axios from 'axios';
 
 import { useInterviewStore } from '@/stores/interviewStore';
-const interviewStore = useInterviewStore();
-const interview = computed(() => interviewStore.selectedInterview);
-
 import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore';
-const criteriaStore = useInterviewCriteriaStore();
-const selectedCriteria = computed(() => criteriaStore.selectedCriteria);
-
+import { useApplicantStore } from '@/stores/applicantStore';
+import { useApplicationStore } from '@/stores/applicationStore';
 import { useRouter, useRoute } from 'vue-router'; // useRoute 추가
+
+const interviewStore = useInterviewStore();
+const criteriaStore = useInterviewCriteriaStore();
+const applicantStore = useApplicantStore();
+const applicationStore = useApplicationStore();
+
+const interview = computed(() => interviewStore.selectedInterview);
+const selectedCriteria = computed(() => criteriaStore.selectedCriteria);
 
 const router = useRouter(); // 페이지 이동용
 const route = useRoute();   // 현재 라우트 정보용
@@ -98,24 +101,25 @@ const error = computed(() => interviewStore.error || criteriaStore.error);
 const fetchApplicant = async () => {
     try {
         await interviewStore.fetchInterviewByApplicationId(applicationId);
-        const interviewResult = interview.value; // ✅ store에 저장된 값
+        const interviewResult = interview.value;
         console.log('💬 interviewResult:', interviewResult);
 
-        const applicationRes = await axios.get(`http://localhost:5001/api/v1/employment/application/${interviewResult.applicationId}`);
-        console.log('📄 applicationRes:', applicationRes.data);
-        const applicationData = applicationRes.data.data;
-        const applicantId = Array.isArray(applicationData) && applicationData.length > 0 ? applicationData[0].id : null;
-        console.log('🆔 applicantId:', applicantId);
+        // ✅ applicationStore 통해 application 조회
+        await applicationStore.fetchApplicationById(interviewResult.applicationId);
+        const application = applicationStore.selectedApplication;
+        const applicantId = application?.applicantId;
 
-        const applicantRes = await axios.get('http://localhost:5001/api/v1/employment/applicant');
-        console.log('📦 allApplicants:', applicantRes.data);
-        const allApplicants = applicantRes.data.data;
+        console.log('🆔 applicantId from store:', applicantId);
 
-        const found = allApplicants.find(a => a.id === applicantId);
-        console.log('🎯 찾은 지원자:', found);
+        // ✅ applicantStore 통해 applicant 조회
+        if (applicantId) {
+            await applicantStore.fetchApplicantById(applicantId);
+            applicant.value = applicantStore.selectedApplicant;
+        } else {
+            applicant.value = null;
+        }
 
-        applicant.value = found;
-        console.log('selectedInterview:', interviewStore.selectedInterview);
+        console.log('🎯 최종 applicant:', applicant.value);
     } catch (err) {
         console.warn('지원자 정보 없음 or 에러 발생', err);
         applicant.value = null;
