@@ -159,6 +159,7 @@ export const employmentRoutes = [
             }
         },
         
+        // <---------- 지원서 / 지원자 ---------->
         {
             path: '/employment/application',
             name: 'ApplicationPage',
