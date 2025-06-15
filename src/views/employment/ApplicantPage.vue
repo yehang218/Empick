@@ -1,49 +1,54 @@
 <template>
-  <v-container fluid>
+  <v-container fluid style="margin-top: 70px;">
     <v-card>
+      <!-- 상단 타이틀 + 검색/버튼 영역 -->
       <v-card-title class="d-flex justify-between align-center flex-wrap">
         <span class="text-h6 font-weight-bold">지원자 목록</span>
 
         <v-spacer />
 
         <div class="d-flex align-center flex-wrap" style="gap: 8px;">
-          <!-- 검색창 (공통 컴포넌트) -->
+          <!-- 🔍 검색창 (공통 컴포넌트) -->
           <Search v-model="search" />
 
-          <!-- 사원 등록 버튼 -->
+          <!-- 👤 사원 등록 버튼 -->
           <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px">
             사원 등록
           </v-btn>
 
-          <!-- 문제 할당 버튼 -->
+          <!-- 📝 문제 할당 버튼 -->
           <v-btn color="secondary" variant="tonal" size="small" style="min-width: 90px">
             문제 할당
           </v-btn>
 
-          <!-- 이메일 전송 버튼 -->
+          <!-- 📧 이메일 전송 버튼 -->
           <v-btn color="success" variant="outlined" size="small" prepend-icon="mdi-email" style="min-width: 110px">
             이메일 전송
           </v-btn>
         </div>
       </v-card-title>
 
+      <!-- 📋 지원자 테이블 -->
       <v-data-table
-        :headers="headers"
+        :headers="tableHeaders"
         :items="filteredApplicants"
         :items-per-page="8"
+        item-value="id"
+        show-select
         class="elevation-1"
+        show-headers
       >
-        <!-- 상태 컬럼 -->
+        <!-- 처리 상태 칩 -->
         <template #item.status="{ item }">
           <v-chip :color="getStatusColor(item.status)" variant="tonal" size="small">
             {{ item.status }}
           </v-chip>
         </template>
 
-        <!-- 지원서 보기 버튼 -->
+        <!-- 지원서 확인 텍스트 버튼 -->
         <template #item.actions="{ item }">
-          <v-btn icon size="small" @click="viewDetail(item)">
-            <v-icon>mdi-arrow-right</v-icon>
+          <v-btn color="primary" variant="text" size="small" @click="viewDetail(item)">
+            지원서 확인
           </v-btn>
         </template>
       </v-data-table>
@@ -66,10 +71,10 @@ const dummyApplicants = ref([
   { id: 6, name: '한예린', email: 'yerin@example.com', birth: '1995-08-08', phone: '010-3333-4444', status: '서류합격', recruitment: '데이터 분석가' },
   { id: 7, name: '김진우', email: 'jinu@example.com', birth: '1996-06-17', phone: '010-5555-6666', status: '2차합격', recruitment: 'AI 연구원' },
   { id: 8, name: '윤서희', email: 'seohee@example.com', birth: '1994-09-21', phone: '010-7777-8888', status: '1차합격', recruitment: '프론트 개발자' },
-  { id: 9, name: '이도윤', email: 'doyoon@example.com', birth: '1999-12-12', phone: '010-9999-0000', status: '서류합격', recruitment: '백엔드 개발자' },
+  { id: 9, name: '이도윤', email: 'doyoon@example.com', birth: '1999-12-12', phone: '010-9999-0000', status: '서류합격', recruitment: '백엔드 개발자' }
 ])
 
-const headers = [
+const tableHeaders = [
   { text: '이름', value: 'name', sortable: true },
   { text: '이메일', value: 'email', sortable: true },
   { text: '생년월일', value: 'birth', sortable: true },
