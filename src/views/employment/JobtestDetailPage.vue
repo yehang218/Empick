@@ -36,15 +36,14 @@
 
 <script setup>
 import { computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useJobtestDetailStore } from '@/stores/jobtestDetailStore'
 
 import JobtestSummaryCard from '@/components/employment/JobtestSummaryCard.vue'
 import JobtestQuestionList from '@/components/employment/JobtestQuestionList.vue'
-import JobtestEvaluationCriteria from '@/components/common/EvaluationCriteriaList.vue'
+// import JobtestEvaluationCriteria from '@/components/common/EvaluationCriteriaList.vue'
 import JobtestApplicantTable from '@/components/employment/JobtestApplicantTable.vue'
 
-const route = useRoute()
 const router = useRouter()
 const props = defineProps(['jobtestId'])
 

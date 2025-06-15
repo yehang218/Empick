@@ -52,3 +52,18 @@ export const createJobtestService = async (
         return apiResponse.message;
     }, options);
 }
+
+
+// 실무테스트 입장
+export const verifyJobtestEntryService = async (jobtestId, dto, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.post(JobtestAPI.JOBTEST_ENTER(jobtestId), dto.toJSON());
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.message;
+    }, options);
+};
