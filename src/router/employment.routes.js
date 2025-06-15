@@ -28,7 +28,7 @@ export const employmentRoutes = [
     },
     // 실무테스트 상세 조회 페이지
     {
-        path: '/employment/jobtests/:id',
+        path: '/employment/jobtests/:jobtestId',
         name: 'JobtestDetail',
         component: () => import('@/views/employment/JobtestDetailPage.vue'),
         props: true,
@@ -151,5 +151,16 @@ export const employmentRoutes = [
                 requiresAuth: true
             }
         },
+        
+        {
+            path: '/employment/application',
+            name: 'ApplicationPage',
+            component : () => import('@/views/employment/ApplicationPage.vue'),
+            meta: {
+            hideHeader: false,
+            hideSidebar: false,
+            requiresAuth: true
+            }
+        }
     
 ]; 

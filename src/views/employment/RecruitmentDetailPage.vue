@@ -25,6 +25,7 @@ onMounted(async () => {
     const id = route.params.id
     try {
         await store.loadRecruitmentDetail(id)
+        
         // 연관된 요청서 정보 불러오기
         if (detail.value.recruitment.recruitmentRequestId) {
             requestDetail.value = await fetchRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
@@ -151,6 +152,7 @@ function formatDate(date) {
                     </span>
                 </div>
             </v-card>
+
         </v-card>
 
         <!-- 데이터 없음 -->

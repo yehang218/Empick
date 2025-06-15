@@ -13,4 +13,5 @@ export const RecruitmentAPI = {
 
     // 채용 프로세스
     PROCESS_LIST: (recruitmentId) => `/api/v1/employment/recruitments/processes/${recruitmentId}`,
+
 };
