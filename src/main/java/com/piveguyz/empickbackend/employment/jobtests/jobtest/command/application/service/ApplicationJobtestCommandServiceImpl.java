@@ -20,14 +20,14 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
     private final MemberRepository memberRepository;
     private final JobtestRepository jobtestRepository;
     private final ApplicationJobtestRepository applicationJobtestRepository;
-//    private final ApplicationRepository applicationRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public CreateApplicationJobtestCommandDTO createApplicaionJobtest(CreateApplicationJobtestCommandDTO createApplicationJobtestCommandDTO) {
-        // 🚩 없는 지원서인 경우
-//        if(!applicationRepository.existsById(createApplicationJobtestCommandDTO.getApplicationId())) {
-//            throw new BusinessException(ResponseCode.);
-//        }
+//         🚩 없는 지원서인 경우
+        if(!applicationRepository.existsById(createApplicationJobtestCommandDTO.getApplicationId())) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_NOT_FOUND);
+        }
 
         // 없는 실무테스트일 경우
         if(!jobtestRepository.existsById(createApplicationJobtestCommandDTO.getJobtestId())) {
