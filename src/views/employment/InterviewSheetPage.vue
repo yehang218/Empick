@@ -7,8 +7,8 @@
             </v-col>
             <v-col cols="6" class="d-flex justify-end">
                 <div>
-                    <v-btn color="primary" class="mr-2" size="small">+ 평가표 추가</v-btn>
-                    <v-btn color="secondary" class="mr-2" size="small">✏️ 평가표 수정</v-btn>
+                    <v-btn color="primary" class="mr-2" size="small" @click="goToCreatePage">+ 평가표 추가</v-btn>
+                    <!-- <v-btn color="secondary" class="mr-2" size="small" @click="goToEditPage">✏️ 평가표 수정</v-btn> -->
                     <v-btn color="error" size="small" @click="openDeleteModal">🗑 평가표 삭제</v-btn>
                 </div>
             </v-col>
@@ -24,8 +24,9 @@
             </v-col>
             <v-col cols="6" class="d-flex">
                 <div class="pa-4 flex-grow-1 w-100" style="height: 70%;">
-                    <OneColumnList title="평가 기준" :items="criteriaList.map(item => item.content)"
-                        @update:selectedItem="onSelectItem" />
+                    <OneColumnList title="평가 기준"
+                        :items="criteriaList.map(item => `${item.title} (${Math.round(item.weight * 100)}%)`)"
+                        @update:selectedItem="onSelectItemByTitle" />
                 </div>
             </v-col>
         </v-row>
@@ -36,7 +37,7 @@
             <v-col cols="12" class="d-flex">
                 <v-card outlined class="pa-4 flex-grow-1 w-100" style="height: 90%; overflow-y: auto;">
                     <div class="text-subtitle-1 font-weight-bold mb-2">상세 내용</div>
-                    <div>{{ selectedCriteria.detailContent || '선택된 항목이 없습니다.' }}</div>
+                    <div>{{ selectedCriteria?.content || '선택된 항목이 없습니다.' }}</div>
                 </v-card>
             </v-col>
         </v-row>
@@ -47,85 +48,69 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import OneColumnList from '@/components/OneColumnList.vue'
-import { getAllSheetsService } from '@/services/interviewSheetService'
-import { findSheetItemsBySheetIdService } from '@/services/interviewSheetItemService'
-import { getCriteriaByIdService } from '@/services/interviewCriteriaService'
-import { deleteSheetService } from '@/services/interviewSheetService'
 import Modal from '@/components/common/Modal.vue'
 
-const sheets = ref([])
+import { useInterviewSheetStore } from '@/stores/interviewSheetStore'
+import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
+
+const sheetStore = useInterviewSheetStore()
+const criteriaStore = useInterviewCriteriaStore()
+
+const sheets = computed(() => sheetStore.sheetList)
 const selectedSheet = ref(null)
-const criteriaList = ref([])              // 평가 기준 리스트
-const selectedCriteria = ref({})          // 선택된 평가 기준
 
-// 평가표 전체 조회
-const fetchSheets = async () => {
-    sheets.value = await getAllSheetsService()
+const criteriaList = computed(() => criteriaStore.criteriaList)
+const selectedCriteria = computed(() => criteriaStore.selectedCriteria)
+
+const router = useRouter()
+
+// ✅ 평가표 등록 페이지 이동
+const goToCreatePage = () => {
+    router.push('/employment/interview-criteria/create')
 }
 
-// 평가표 선택
-const onSelectSheet = async (selectedSheetName) => {
-    const sheet = sheets.value.find(sheet => sheet.name === selectedSheetName)
-    if (!sheet) {
-        console.warn('선택된 이름에 해당하는 평가표를 찾을 수 없습니다:', selectedSheetName)
-        return
-    }
+// ✅ 초기 로딩
+onMounted(async () => {
+    await sheetStore.fetchAllSheets()
+})
 
-    selectedSheet.value = sheet // ✅ 여기에 저장
 
-    const items = await findSheetItemsBySheetIdService(selectedSheet.value.id)
-    console.log('items:', items)
+// ✅ 평가표 선택 시 평가 기준 가져오기
+const onSelectSheet = async (sheetName) => {
+    const targetSheet = sheets.value.find(s => s.name === sheetName)
+    if (!targetSheet) return
 
-    const loadedCriteria = await Promise.all(
-        items.map(async item => {
-            const res = await getCriteriaByIdService(item.criteriaId)
-            console.log('criteria for item', item.id, ':', res)
-            return res
-        })
-    )
-
-    criteriaList.value = loadedCriteria.map(dto => ({
-        id: dto.id,
-        content: dto.content,
-        detailContent: dto.detailContent
-    }))
-
-    selectedCriteria.value = {} // 초기화
+    selectedSheet.value = targetSheet
+    await criteriaStore.fetchCriteriaBySheetId(targetSheet.id)
 }
 
-// 평가 기준 선택
-const onSelectItem = (content) => {
-    const selected = criteriaList.value.find(c => c.content === content)
-    selectedCriteria.value = selected || {}
+// ✅ 평가 기준 선택
+const onSelectItemByTitle = (label) => {
+    const title = label.replace(/\s*\(\d+%?\)\s*$/, '')
+    const found = criteriaList.value.find(c => c.title === title)
+    if (found) criteriaStore.selectedCriteria = found
 }
-
-
-
-// 초기 평가표 로딩
-onMounted(fetchSheets)
 
 const showDeleteModal = ref(false)
 
-const openDeleteModal = () => {
-    console.log('[열기] showDeleteModal = true')
-    showDeleteModal.value = true
-}
-const closeDeleteModal = () => {
-    console.log('[닫기] showDeleteModal = false')
-    showDeleteModal.value = false
-}
+// ✅ 삭제
+const openDeleteModal = () => showDeleteModal.value = true
+const closeDeleteModal = () => showDeleteModal.value = false
 
 const confirmDelete = async () => {
     try {
-        await deleteSheetService(selectedSheet.value.id)
+        await sheetStore.deleteSheet(selectedSheet.value.id)
+        selectedSheet.value = null
+        criteriaStore.criteriaList = []
         closeDeleteModal()
-        // ✅ 삭제 후 처리: 리스트 새로고침 or 리디렉션
-        fetchSheets()
     } catch (err) {
-        console.error(err)
+        console.error('삭제 오류:', err)
         alert('삭제 중 오류가 발생했습니다.')
     }
 }
+
+
 </script>
