@@ -58,9 +58,11 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
 
 const search = ref('')
+const router = useRouter()
 
 const dummyApplicants = ref([
   { id: 1, name: '김철수', email: 'kim@example.com', birth: '1995-01-01', phone: '010-1234-5678', status: '최종합격', recruitment: '백엔드 개발자' },
@@ -106,6 +108,7 @@ const filteredApplicants = computed(() => {
 
 const viewDetail = (item) => {
   console.log('지원자 상세:', item)
+  router.push(`/employment/application/${item.id}`)
 }
 </script>
 

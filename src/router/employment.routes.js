@@ -173,9 +173,10 @@ export const employmentRoutes = [
         
         // <---------- 지원서 / 지원자 ---------->
         {
-            path: '/employment/application',
+            path: '/employment/application/:id',
             name: 'ApplicationPage',
             component : () => import('@/views/employment/ApplicationPage.vue'),
+            props: true,
             meta: {
             hideHeader: false,
             hideSidebar: false,

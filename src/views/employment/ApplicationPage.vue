@@ -97,7 +97,7 @@
 
       <!-- 우측: 평가 컴포넌트 -->
       <v-col cols="12" md="6">
-        <component :is="evaluationComponent" />
+        <component :is="evaluationComponent" :evaluationData="introduceEvaluationData" />
       </v-col>
     </v-row>
   </v-container>
@@ -108,9 +108,12 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 import { useApplicationStore } from '@/stores/applicationStore'
+import { useToast } from 'vue-toastification'
+import apiClient from '@/apis/apiClient' // 직접 axios 호출을 위해 임포트
 
 const route = useRoute()
 const applicationStore = useApplicationStore()
+const toast = useToast()
 const applicationId = Number(route.params.id)
 
 const evaluationComponent = ref(IntroduceResult)
@@ -118,6 +121,15 @@ const selectedStatus = ref('')
 const statusOptions = [
   '서류합격', '실무테스트합격', '면접합격', '최종합격', '불합격'
 ]
+
+// 상태 문자열과 정수 코드 매핑
+const statusMap = {
+  '서류합격': 1,
+  '실무테스트합격': 2,
+  '면접합격': 3,
+  '최종합격': 4,
+  '불합격': 5
+}
 
 const applicant = ref({
   name: '',
@@ -129,26 +141,64 @@ const applicant = ref({
   motivation: '',
   experience: '',
   skills: '',
-  evaluationStats: []
+  evaluationStats: [],
+  status: '' // 현재 상태 문자열을 위한 필드
 })
 
+const introduceEvaluationData = ref(null) // IntroduceEvaluationInput.vue에 전달할 데이터
+
 onMounted(async () => {
-  const data = await applicationStore.fetchApplication(applicationId)
-  if (data) {
-    applicant.value = data
-    selectedStatus.value = data.status
+  try {
+    const data = await applicationStore.fetchApplicationById(applicationId)
+    if (data) {
+      applicant.value = data
+      selectedStatus.value = data.status
+
+      // 자기소개서 평가 결과 ID가 있다면 상세 정보 로드
+      if (data.introduceRatingResultId && data.introduceRatingResultId !== 0) {
+        try {
+          const response = await apiClient.get(`/api/v1/employment/introduce-rating-results/${data.introduceRatingResultId}`)
+          if (response.data.success) {
+            introduceEvaluationData.value = response.data.data
+            console.log('자기소개서 평가 결과 데이터:', introduceEvaluationData.value)
+          } else {
+            toast.error('자기소개서 평가 결과 로드 실패: ' + response.data.message)
+          }
+        } catch (evalError) {
+          console.error('자기소개서 평가 결과 API 호출 실패:', evalError)
+          toast.error('자기소개서 평가 결과를 불러오는 데 실패했습니다.')
+        }
+      } else {
+        console.log('연결된 자기소개서 평가 결과가 없습니다.')
+        toast.info('연결된 자기소개서 평가 결과가 없습니다.')
+      }
+    }
+  } catch (error) {
+    console.error('지원서 상세 정보 로드 실패:', error)
+    toast.error('지원서 정보를 불러오는 데 실패했습니다.')
   }
 })
 
 const updateStatus = async () => {
   try {
-    await applicationStore.updateApplicationStatus(applicationId, { status: selectedStatus.value });
-    const data = await applicationStore.fetchApplication(applicationId);
+    const statusCode = statusMap[selectedStatus.value]
+    if (statusCode === undefined) {
+      toast.error('유효하지 않은 상태 값입니다.')
+      return
+    }
+
+    await applicationStore.updateApplicationStatus(applicationId, { status: statusCode });
+    toast.success(`지원서 상태가 '${selectedStatus.value}' (으)로 변경되었습니다.`) // 성공 토스트 메시지
+    
+    // 상태 변경 후 최신 정보 다시 불러오기
+    const data = await applicationStore.fetchApplicationById(applicationId);
     if (data) {
       applicant.value = data;
+      selectedStatus.value = data.status; // 최신 상태로 업데이트
     }
   } catch (error) {
-    console.error('Failed to update application status:', error);
+    console.error('지원서 상태 변경 실패:', error);
+    toast.error('지원서 상태 변경에 실패했습니다.');
   }
 }
 
