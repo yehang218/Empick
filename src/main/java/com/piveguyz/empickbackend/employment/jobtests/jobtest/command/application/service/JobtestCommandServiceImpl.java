@@ -11,7 +11,10 @@ import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 public class JobtestCommandServiceImpl implements JobtestCommandService {
@@ -79,5 +82,15 @@ public class JobtestCommandServiceImpl implements JobtestCommandService {
     @Override
     public Optional<JobtestEntity> findById(int jobtestId) {
         return jobtestRepository.findById(jobtestId);
+    }
+
+    @Override
+    public void checkJobtestTime(int jobtestId) {
+        LocalDateTime now = LocalDateTime.now();
+        JobtestEntity jobtest = jobtestRepository.findById(jobtestId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_JOBTEST));
+        if(now.isBefore(jobtest.getStartedAt()) || now.isAfter(jobtest.getEndedAt())) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_TIME);
+        }
     }
 }

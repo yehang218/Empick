@@ -21,5 +21,6 @@ public class CreateApplicationJobtestCommandDTO {
 
     private int applicationId;
     private int jobtestId;
-    private Integer memberId;
+    private Integer gradingMemberId;
+    private Integer evaluationMemberId;
 }
