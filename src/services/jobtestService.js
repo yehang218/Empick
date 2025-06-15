@@ -52,3 +52,18 @@ export const createJobtestService = async (
         return apiResponse.message;
     }, options);
 }
+
+// 지원서에 실무테스트 할당
+export const createApplicationJobtestService = async (
+    dto,
+    options = {}
+) => {
+    return withErrorHandling(async () => {
+        const response = await api.post(JobtestAPI.APPLICATION_JOBTESTS, dto);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return apiResponse.data;
+    }, options);
+}
