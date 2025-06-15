@@ -37,8 +37,11 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
         // 유효하지 않은 입장 코드인경우
         validateEntryCode(createApplicationJobtestCommandDTO.getEntryCode());
 
-        // 평가자가 값이 들어왔는데 평가자가 member에 없는 경우
-        validateMemberExists(createApplicationJobtestCommandDTO.getMemberId());
+        // 이미 할당된 지원서인경우
+        if(applicationJobtestRepository.existsByApplicationId(createApplicationJobtestCommandDTO.getApplicationId())) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS);
+        }
+
 
         ApplicationJobtestEntity applicationJobtestEntity = ApplicationJobtestMapper.toEntity(createApplicationJobtestCommandDTO);
         ApplicationJobtestEntity saved = applicationJobtestRepository.save(applicationJobtestEntity);
@@ -55,8 +58,11 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
         // 유효하지 않은 입장 코드인 경우
         validateEntryCode(updateApplicationJobtestCommandDTO.getEntryCode());
 
+        // 채점자를 수정할건데 member에 없는 경우
+        validateMemberExists(updateApplicationJobtestCommandDTO.getGradingMemberId());
+
         // 평가자를 수정할건데 member에 없는 경우
-        validateMemberExists(updateApplicationJobtestCommandDTO.getMemberId());
+        validateMemberExists(updateApplicationJobtestCommandDTO.getEvaluationMemberId());
 
         applicationJobtest.updateApplicationJobtestEntity(updateApplicationJobtestCommandDTO);
         ApplicationJobtestEntity updatedEntity = applicationJobtestRepository.save(applicationJobtest);
@@ -91,10 +97,10 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
 
     private void validateEntryCode(String entryCode) {
         if (entryCode != null) {
-            // 5자리 숫자가 아닌 경우
-            if (!entryCode.matches("^\\d{5}$")) {
-                throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_ENTRY_CODE);
-            }
+//            // 5자리 숫자가 아닌 경우
+//            if (!entryCode.matches("^\\d{5}$")) {
+//                throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_ENTRY_CODE);
+//            }
 
             // 중복된 경우
             if (applicationJobtestRepository.existsByEntryCode(entryCode)) {

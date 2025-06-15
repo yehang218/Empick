@@ -3,21 +3,20 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicati
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateApplicationJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateApplicationJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.ApplicationJobtestEntity;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.enums.JobtestStatus;
 
 public class ApplicationJobtestMapper {
 
     public static ApplicationJobtestEntity toEntity(CreateApplicationJobtestCommandDTO dto) {
         return ApplicationJobtestEntity.builder()
                 .evaluatorComment(dto.getEvaluatorComment())
-                .submittedAt(dto.getSubmittedAt())
-                .gradingTotalScore(dto.getGradingTotalScore())
-                .evaluationScore(dto.getEvaluationScore())
-                .evaluationStatus(dto.getEvaluationStatus())
-                .gradingStatus(dto.getGradingStatus())
+                .gradingTotalScore(0.0)
+                .evaluationScore(0.0)
+                .evaluationStatus(JobtestStatus.WAITING)
+                .gradingStatus(JobtestStatus.WAITING)
                 .entryCode(dto.getEntryCode())
                 .applicationId(dto.getApplicationId())
                 .jobTestId(dto.getJobtestId())
-                .memberId(dto.getMemberId())
                 .build();
     }
 
@@ -33,7 +32,6 @@ public class ApplicationJobtestMapper {
                 .entryCode(entity.getEntryCode())
                 .applicationId(entity.getApplicationId())
                 .jobtestId(entity.getJobTestId())
-                .memberId(entity.getMemberId())
                 .build();
     }
 
@@ -46,7 +44,8 @@ public class ApplicationJobtestMapper {
                 .gradingStatus(entity.getGradingStatus())
                 .evaluationStatus(entity.getEvaluationStatus())
                 .entryCode(entity.getEntryCode())
-                .memberId(entity.getMemberId())
+                .gradingMemberId(entity.getGradingMemberId())
+                .evaluationMemberId(entity.getEvaluationMemberId())
                 .build();
     }
 }
