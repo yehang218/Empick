@@ -71,7 +71,7 @@ import { reactive, ref, defineProps } from 'vue'
 const props = defineProps({
   totalTitle: {
     type: String,
-    default: '테스트 / 면접 총 평가'
+    default: '자기소개서 총 평가'
   }
 })
 

@@ -10,7 +10,7 @@ import {
   getAllSheetsService,
   getSheetByIdService,
   searchSheetByNameService,
-} from '@/services/interview/interviewSheetService';
+} from '@/services/interviewSheetService';
 
 export const useInterviewSheetStore = defineStore('interviewSheet', () => {
   const sheetList = ref([]);
