@@ -26,7 +26,7 @@
           </v-row>
 
           <!-- 채용 카드 목록 -->
-          <v-card v-for="(item, index) in paginatedData" :key="index" class="mb-4">
+          <v-card v-for="(item, index) in paginatedData" :key="index" class="mb-4" @click="goToDetail(index)" hover style="cursor: pointer">>
             <v-card-text>
               <div class="font-weight-medium mb-2 text-md">
                 {{ item.department }}에서 가족같이 지낼 인재를 찾습니다.
@@ -59,9 +59,16 @@
 <script setup>
 import { ref, computed } from 'vue'
 import CareerHeader from '@/components/career/CareerHeader.vue'
+import { useRouter } from 'vue-router'
 
 const page = ref(1)
 const perPage = 5
+const router = useRouter()
+
+const goToDetail = (index) => {
+  const globalIndex = (page.value - 1) * perPage + index
+  router.push({ name: 'RecruitmentDetail', params: { id: globalIndex + 1 } })  // id는 1부터 시작한다고 가정
+}
 
 const recruitmentList = ref([
   { department: '인사팀', career: '경력 7년 이상', employmentType: '정규직', job: '퍼포먼스 마케터', status: '채용 중' },
