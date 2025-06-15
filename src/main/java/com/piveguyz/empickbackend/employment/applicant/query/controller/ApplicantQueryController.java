@@ -12,9 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,5 +36,21 @@ public class ApplicantQueryController {
     public ResponseEntity<CustomApiResponse<List<ApplicantQueryDTO>>> getAllApplicant() {
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, applicantQueryService.findAllApplicant()));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<ApplicantQueryDTO>> getApplicantById(@PathVariable Integer id) {
+        ApplicantQueryDTO dto = applicantQueryService.findApplicantById(id);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dto));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<CustomApiResponse<List<ApplicantQueryDTO>>> searchApplicantsByName(@RequestParam("name") String name) {
+        List<ApplicantQueryDTO> dtoList = applicantQueryService.searchApplicantsByName(name);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dtoList));
     }
 }

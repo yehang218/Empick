@@ -9,4 +9,7 @@ import java.util.List;
 public interface ApplicantMapper {
     List<ApplicantQueryDTO> findAllApplicant();
 
+    ApplicantQueryDTO findApplicantById(Integer id);
+
+    List<ApplicantQueryDTO> searchApplicantsByName(String name);
 }
