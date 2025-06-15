@@ -1,10 +1,11 @@
-// 📁 src/stores/recruitmentRequestStore.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import {
     fetchRecruitmentRequestList,
     fetchRecruitmentRequestDetail,
-    createRecruitmentRequest
+    createRecruitmentRequest,
+    fetchJobList,
+    fetchDepartmentList
 } from '@/services/recruitmentRequestService';
 
 export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () => {
@@ -21,6 +22,28 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
     // 요청서 등록 로딩 상태 및 에러 메시지
     const submitting = ref(false);
     const submitError = ref(null);
+
+    // 직무, 부서
+    const jobList = ref([])
+    const departmentList = ref([])
+
+    const loadJobList = async () => {
+        try {
+            const result = await fetchJobList()
+            jobList.value = result
+        } catch (err) {
+            console.error('직무 목록 조회 실패:', err)
+        }
+    }
+
+    const loadDepartmentList = async () => {
+        try {
+            const result = await fetchDepartmentList()
+            departmentList.value = result
+        } catch (err) {
+            console.error('부서 목록 조회 실패:', err)
+        }
+    }
 
     // 목록 불러오기
     const loadRecruitmentRequestList = async () => {
@@ -82,6 +105,12 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
         // 등록 관련
         submitting,
         submitError,
-        submitRecruitmentRequest
+        submitRecruitmentRequest,
+
+        // 직무, 부서
+        jobList,
+        departmentList,
+        loadJobList,
+        loadDepartmentList,
     };
 });
