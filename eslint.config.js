@@ -68,7 +68,7 @@ export default [
                     ],
                     patterns: [
                         { group: ['@/apis/**', '@/api/**', '**/apis/**', '**/api/**', '*api.js', '*Api.js'], message: 'Vue 파일에서 API 모듈 직접 import 금지. Store 레이어를 사용하세요.' },
-                        { group: ['**/services/**', '@/services/**', '*Service.js'], message: 'Vue 파일에서 Service 파일 직접 import 금지. Store 레이어를 사용하세요.' }
+                        { group: ['**/services/**', '@/services/**', '*Service.js'], message: 'Vue 컴포넌트에서는 Service 파일을 직접 import하지 마세요. 반드시 Store 레이어를 통해 접근하세요.' }
                     ]
                 }
             ]
@@ -86,7 +86,8 @@ export default [
                         { name: 'axios', message: 'Store 파일에서 axios 직접 사용 금지. Service 레이어를 사용하세요.' }
                     ],
                     patterns: [
-                        { group: ['@/apis/**', '@/api/**', '**/apis/**', '**/api/**', '*api.js', '*Api.js'], message: 'Store 파일에서 API 모듈 직접 import 금지. Service 레이어를 사용하세요.' }
+                        { group: ['@/apis/**', '@/api/**', '**/apis/**', '**/api/**', '*api.js', '*Api.js'], message: 'Store 파일에서 API 모듈 직접 import 금지. Service 레이어를 사용하세요.' },
+                        // Service는 store에서 허용
                     ]
                 }
             ]
@@ -104,7 +105,7 @@ export default [
                         { name: 'axios', message: 'Service 파일에서 axios 직접 사용 금지. 반드시 apiClient를 import 하세요.' }
                     ],
                     patterns: [
-                        { group: ['**/apis/**', '**/api/**', '*api.js', '*Api.js'], message: 'Service 파일에서 API 모듈 import는 서비스용 api만 허용됩니다.' }
+                        { group: ['**/apis/routes/**', '**/api/routes/**', '@/apis/routes/**', '@/api/routes/**'], message: 'Service 파일에서 API 모듈 import는 서비스용 apiClient만 허용됩니다.' }
                     ]
                 }
             ]
