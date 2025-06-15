@@ -17,4 +17,5 @@ export const RecruitmentAPI = {
     // 지원서 항목 카테고리
     APPLICATION_ITEM_CATEGORIES: '/api/v1/employment/applications/item-categories',
     APPLICATION_ITEMS_BY_RECRUITMENT: (id) => `/api/v1/employment/applications/items/${id}`,
+
 };
