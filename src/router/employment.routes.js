@@ -158,6 +158,18 @@ export const employmentRoutes = [
                 requiresAuth: true
             }
         },
+
+
+
+          {
+        path: '/employment/applicant',
+        name: 'ApplicantPage',
+        component: () => import('@/views/employment/ApplicantPage.vue'),
+        meta: { requiresAuth: true }
+},
+    
+
+
         
         // <---------- 지원서 / 지원자 ---------->
         {
