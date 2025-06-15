@@ -28,6 +28,14 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
         Map<Integer, Integer> approverMap = dto.getApprovers().stream()
                 .collect(Collectors.toMap(CreateApprovalCommandDTO.ApproverDTO::getOrder, CreateApprovalCommandDTO.ApproverDTO::getMemberId));
 
+        for (CreateApprovalCommandDTO.ApprovalContentDTO contentDTO : dto.getContents()) {
+            boolean valid = approvalCategoryItemRepository
+                    .existsByIdAndCategoryId(contentDTO.getItemId(), dto.getCategoryId());
+            if (!valid) {
+                throw new IllegalArgumentException("항목 ID " + contentDTO.getItemId() + "은 해당 결재 유형에 속하지 않습니다.");
+            }
+        }
+
         ApprovalEntity approval = ApprovalEntity.builder()
                 .categoryId(dto.getCategoryId())
                 .writerId(dto.getWriterId())
