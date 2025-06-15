@@ -141,10 +141,16 @@ onMounted(async () => {
 })
 
 const updateStatus = async () => {
-  await fetchAllApplications();
+  try {
+    await applicationStore.updateApplicationStatus(applicationId, { status: selectedStatus.value });
+    const data = await applicationStore.fetchApplication(applicationId);
+    if (data) {
+      applicant.value = data;
+    }
+  } catch (error) {
+    console.error('Failed to update application status:', error);
+  }
 }
-
-
 
 const selectEvaluation = (type) => {
   switch (type) {

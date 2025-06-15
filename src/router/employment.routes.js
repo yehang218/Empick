@@ -181,5 +181,16 @@ export const employmentRoutes = [
             hideSidebar: false,
             requiresAuth: true
             }
+        },
+        {
+            path: '/employment/introduce-standard-items/:templateId',
+            name: 'IntroduceStandardItemPage',
+            component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
+            props: true
+        },
+        {
+            path: '/employment/recruitments/resumes',
+            name: 'ResumeTemplateCreatePage',
+            component: () => import('@/views/employment/ResumeTemplateCreatePage.vue'),
         }
 ]; 
