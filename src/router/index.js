@@ -3,12 +3,14 @@ import { authRoutes } from './auth.routes';
 import { employmentRoutes } from './employment.routes';
 import { orgstructureRoutes } from './orgstructure.routes';
 import { testRoutes } from './test.routes';
+import { approvalRoutes } from './approval.routes';
 import { authGuard } from './middleware/auth.guard';
 
 const allRouteModules = [
     ...authRoutes,
     ...employmentRoutes,
     ...orgstructureRoutes,
+    ...approvalRoutes,
     ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
 ];
 
@@ -36,6 +38,7 @@ const routes = [
     ...authRoutes,
     ...employmentRoutes,
     ...orgstructureRoutes,
+    ...approvalRoutes,
     ...allRouteModules,
     ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
 ];
