@@ -86,15 +86,14 @@ export default [
                         { name: 'axios', message: 'Store 파일에서 axios 직접 사용 금지. Service 레이어를 사용하세요.' }
                     ],
                     patterns: [
-                        { group: ['@/apis/**', '@/api/**', '**/apis/**', '**/api/**', '*api.js', '*Api.js'], message: 'Store 파일에서 API 모듈 직접 import 금지. Service 레이어를 사용하세요.' },
-                        // Service는 store에서 허용
+                        { group: ['@/apis/**', '@/api/**', '**/apis/**', '**/api/**', '*api.js', '*Api.js'], message: 'Store 파일에서 API 모듈 직접 import 금지. Service 레이어를 사용하세요.' }
                     ]
                 }
             ]
         }
     },
 
-    // 6. Service 파일 설정 (api만 허용)
+    // 6. Service 파일 설정 (apiClient와 routes는 허용)
     {
         files: ['**/services/**/*.js', '**/services/**/*.ts'],
         rules: {
@@ -104,9 +103,7 @@ export default [
                     paths: [
                         { name: 'axios', message: 'Service 파일에서 axios 직접 사용 금지. 반드시 apiClient를 import 하세요.' }
                     ],
-                    patterns: [
-                        { group: ['**/apis/routes/**', '**/api/routes/**', '@/apis/routes/**', '@/api/routes/**'], message: 'Service 파일에서 API 모듈 import는 서비스용 apiClient만 허용됩니다.' }
-                    ]
+                    patterns: []
                 }
             ]
         }
@@ -115,7 +112,7 @@ export default [
     // 7. 일반 JS 파일 설정 (axios 제한)
     {
         files: ['**/*.js'],
-        ignores: ['**/apiClient.js', '**/apis/apiClient.js', '**/test/**/*', '**/tests/**/*', '**/*.test.js', '**/*.spec.js'],
+        ignores: ['**/apiClient.js', '**/apis/apiClient.js', '**/services/**/*', '**/test/**/*', '**/tests/**/*', '**/*.test.js', '**/*.spec.js'],
         rules: {
             'no-restricted-imports': [
                 'error',
@@ -131,3 +128,4 @@ export default [
         }
     }
 ]
+
