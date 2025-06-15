@@ -44,4 +44,7 @@ export const JobtestAPI = {
     ANSWER_DETAIL: (id) => `/api/v1/employment/answers/${id}`,
     GRADE_ANSWER: (applicationJobtestId) =>
         `/api/v1/employment/answers/${applicationJobtestId}/grade`,
+
+    // 실무테스트 응시
+    JOBTEST_ENTER: (jobtestId) => `/api/v1/employment/enter/${jobtestId}`,
 };

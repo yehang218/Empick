@@ -81,6 +81,14 @@ export const employmentRoutes = [
         props: true,
         meta: { requiresAuth: true }
     },
+    // 실무테스트 입장 페이지
+    {
+        path: '/employment/jobtest/enter/:jobtestId',
+        name: 'JobtestEnter',
+        component: () => import('@/views/employment/JobtestEnterPage.vue'),
+        props: true,
+        meta: { requiresAuth: false }
+    },
 
     //    <------------------- 채용공고 -------------------->
     // 채용 요청서 목록 페이지
