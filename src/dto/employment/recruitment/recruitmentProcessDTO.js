@@ -1,10 +1,15 @@
-export default class recruitmentProcessDTO {
-    constructor() {
-        // 필요한 필드는 나중에 채움
+export default class RecruitmentProcessDTO {
+    constructor(id, stepType, displayOrder) {
+        this.id = id;
+        this.stepType = stepType; // 'DOCUMENT', 'PRACTICAL', 'INTERVIEW'
+        this.displayOrder = displayOrder;
     }
 
     static fromJSON(json) {
-        if (!json) return null
-        return new recruitmentProcessDTO()
+        return new RecruitmentProcessDTO(
+            json.id,
+            json.stepType,
+            json.displayOrder
+        );
     }
 }
