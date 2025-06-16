@@ -9,7 +9,7 @@
 
         <div class="d-flex align-center flex-wrap" style="gap: 8px;">
           <!-- 🔍 검색창 (공통 컴포넌트) -->
-          <Search v-model="search" />
+          <Search v-model="search" placeholder="이름, 이메일, 전화번호, 직무로 검색" @clear="clearSearch" @search="handleSearch" />
 
           <!-- 👤 사원 등록 버튼 -->
           <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px">
@@ -28,6 +28,11 @@
           </v-btn>
         </div>
       </v-card-title>
+
+      <!-- 검색 결과 요약 -->
+      <v-card-text v-if="search" class="text-caption text-grey">
+        검색어 "{{ search }}"에 대한 검색 결과: {{ filteredApplicants.length }}건
+      </v-card-text>
 
       <!-- 📋 지원자 테이블 -->
       <v-data-table :headers="tableHeaders" :items="filteredApplicants" :items-per-page="8" item-value="applicantId"
@@ -98,6 +103,7 @@ import { ref, computed, onMounted } from 'vue'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
 import { useApplicantStore } from '@/stores/applicantStore';
+import { debounce } from 'lodash'
 
 // 실무테스트 할당
 import { useJobtestListStore } from '@/stores/jobtestListStore';
@@ -194,12 +200,22 @@ const getStatusText = (status) => {
 
 const filteredApplicants = computed(() => {
   if (!search.value) return applicantStore.applicantList
-  return applicantStore.applicantList.filter(applicant =>
-    Object.values(applicant).some(val =>
-      val && String(val).toLowerCase().includes(search.value.toLowerCase())
+
+  const searchTerm = search.value.toLowerCase()
+  return applicantStore.applicantList.filter(applicant => {
+    return (
+      (applicant.name && applicant.name.toLowerCase().includes(searchTerm)) ||
+      (applicant.email && applicant.email.toLowerCase().includes(searchTerm)) ||
+      (applicant.phone && applicant.phone.toLowerCase().includes(searchTerm)) ||
+      (applicant.jobName && applicant.jobName.toLowerCase().includes(searchTerm))
     )
-  )
+  })
 })
+
+// 검색어 초기화 함수
+const clearSearch = () => {
+  search.value = ''
+}
 
 const viewDetail = (item) => {
   console.log('지원자 상세:', item)
@@ -230,6 +246,10 @@ const handleJobtestSelected = async (jobtest) => {
     toast.error(applicationJobtestStore.errorMessage);
   }
 };
+
+const handleSearch = debounce((query) => {
+  applicantStore.setSearchQuery(query)
+}, 300)
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
