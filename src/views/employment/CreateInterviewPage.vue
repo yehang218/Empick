@@ -41,7 +41,7 @@
             <!-- 등록 버튼 -->
             <v-row>
                 <v-col cols="12">
-                    <v-btn type="submit" color="success" :disabled="!isDatetimeAvailable">면접 등록</v-btn>
+                    <v-btn type="submit" color="success" :disabled="isDatetimeAvailable !== true">면접 등록</v-btn>
                 </v-col>
             </v-row>
         </v-form>
@@ -112,7 +112,7 @@ const checkAvailability = async () => {
     }
     if (!selectedDate) {
         console.log('⛔ 날짜 문자열이 없음')
-        return      
+        return
     }
 
     const datetime = `${selectedDate}T${timeString}`
@@ -121,8 +121,11 @@ const checkAvailability = async () => {
     try {
         await interviewStore.checkDatetimeAvailability(datetime)
         console.log('✅ 응답 받음:', interviewStore.isDatetimeAvailable)
-        isDatetimeAvailable.value = interviewStore.isDatetimeAvailable.value
+        isDatetimeAvailable.value = interviewStore.isDatetimeAvailable
+        console.log('isDatetimeAvailable : ', isDatetimeAvailable);
+        console.log('interviewStore.isDatetimeAvailable : ', interviewStore.isDatetimeAvailable);
     } catch (e) {
+        isDatetimeAvailable.value = null;
         console.error('❌ 시간 확인 실패:', e)
     }
 }
