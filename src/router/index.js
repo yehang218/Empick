@@ -5,12 +5,14 @@ import { orgstructureRoutes } from './orgstructure.routes';
 import { approvalRoutes } from './approval.routes';
 import { testRoutes } from './test.routes';
 import { authGuard } from './middleware/auth.guard';
+import { careerRoutes } from './career.routes';
 
 const allRouteModules = [
     ...authRoutes,
     ...employmentRoutes,
     ...orgstructureRoutes,
     ...approvalRoutes,
+    ...careerRoutes,
     ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
 ];
 

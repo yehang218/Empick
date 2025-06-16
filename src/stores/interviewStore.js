@@ -45,6 +45,7 @@ export const useInterviewStore = defineStore('interview', () => {
     try {
       const data = await getInterviewByIdService(id);
       selectedInterview.value = data;
+      return data;
     } catch (err) {
       error.value = err.message;
       throw err;
