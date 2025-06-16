@@ -65,13 +65,13 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { fullMenu } from '@/constants/common/fullMenu.js'
 import { useAuthStore } from '@/stores/authStore'
+import { filterMenuByRoles } from '@/utils/menuAccess'
 
 const route = useRoute()
 const darkMode = ref(true)
 const authStore = useAuthStore()
 
-// 우선 인사팀으로 설정
-const userRole = ref('인사팀')
+const userRoles = computed(() => authStore.userInfo?.roles || [])
 
 // 현재 경로에 따라 헤더 메뉴 결정
 const headerTitle = computed(() => {
@@ -91,15 +91,7 @@ function isGroupOpen(section) {
     )
 }
 
-const menu = computed(() => {
-    const filtered = {}
-    for (const [category, sections] of Object.entries(fullMenu)) {
-        filtered[category] = sections.filter(section =>
-            !section.role || section.role.includes(userRole.value)
-        )
-    }
-    return filtered
-})
+const menu = computed(() => filterMenuByRoles(fullMenu, userRoles.value))
 
 </script>
 
