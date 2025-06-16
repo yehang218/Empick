@@ -1,7 +1,6 @@
 package com.piveguyz.empickbackend.approvals.approvalCategory.query.service;
 
 import com.piveguyz.empickbackend.approvals.approvalCategory.query.dto.ApprovalCategoryQueryDTO;
-import com.piveguyz.empickbackend.approvals.approvalCategory.query.mapper.ApplicationItemCategoryQueryMapper;
 import com.piveguyz.empickbackend.approvals.approvalCategory.query.mapper.ApprovalCategoryQueryMapper;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;

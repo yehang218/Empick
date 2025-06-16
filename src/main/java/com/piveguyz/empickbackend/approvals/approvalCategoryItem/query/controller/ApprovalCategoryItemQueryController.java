@@ -40,7 +40,7 @@ public class ApprovalCategoryItemQueryController {
 				.body(CustomApiResponse.of(result, dto));
 	}
 
-	@GetMapping("/category/{categoryId")
+	@GetMapping("/category/{categoryId}")
 	public ResponseEntity<CustomApiResponse<List<ApprovalCategoryItemQueryDTO>>> findByCategoryId(@PathVariable("categoryId") Integer categoryId) {
 		List<ApprovalCategoryItemQueryDTO> dtoList = service.findByCategoryId(categoryId);
 		ResponseCode result = ResponseCode.SUCCESS;
