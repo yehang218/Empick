@@ -160,13 +160,14 @@ import { QuillEditor } from '@vueup/vue-quill'
 import { stepTypeOptions, getStepTypeLabel } from '@/constants/employment/stepType'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import ConfirmModal from '@/components/common/Modal.vue'
-import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestService'
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
 
 const router = useRouter()
 const route = useRoute()
 const requestId = route.query.requestId;
 
 const store = useRecruitmentStore()
+const recruitmentRequestStore = useRecruitmentRequestStore()
 const isValid = ref(true)
 const formRef = ref()
 const showCancelConfirm = ref(false)
@@ -198,8 +199,8 @@ onMounted(async () => {
     const requestId = route.query.id
 
     if (requestId) {
-        requestDetail.value = await fetchRecruitmentRequestDetail(requestId)
-
+        await recruitmentRequestStore.loadRecruitmentRequestDetail(requestId)
+        requestDetail.value = recruitmentRequestStore.recruitmentRequestDetail
         if (requestDetail.value?.startedAt) {
             form.value.startedAt = requestDetail.value.startedAt.slice(0, 16)
         }
