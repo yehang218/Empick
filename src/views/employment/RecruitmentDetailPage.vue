@@ -3,8 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
-import { fetchRecruitmentProcesses } from '@/services/recruitmentProcessService'
-import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestService'
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
+import { useRecruitmentProcessStore } from '@/stores/recruitmentProcessStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 import { getStepTypeLabel } from '@/constants/employment/stepType'
@@ -15,13 +15,15 @@ const route = useRoute()
 const router = useRouter()
 const store = useRecruitmentStore()
 const applicationItemStore = useApplicationItemStore()
-const processList = ref([])
+const recruitmentRequestStore = useRecruitmentRequestStore()
+const recruitmentProcessStore = useRecruitmentProcessStore()
+const processList = computed(() => recruitmentProcessStore.processList)
 const toast = useToast()
 
 const loading = computed(() => store.loadingDetail)
 const error = computed(() => store.detailError)
 const detail = computed(() => store.detail)
-const requestDetail = ref(null)
+const requestDetail = computed(() => recruitmentRequestStore.recruitmentRequestDetail)
 const applicationItemDialog = ref(false)
 const deleteDialog = ref(false)
 
@@ -44,12 +46,14 @@ onMounted(async () => {
     try {
         await store.loadRecruitmentDetail(id)
 
-        // 연관된 요청서 정보 불러오기
         if (detail.value.recruitment.recruitmentRequestId) {
-            requestDetail.value = await fetchRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
+            await recruitmentRequestStore.loadRecruitmentRequestDetail(
+                detail.value.recruitment.recruitmentRequestId
+            )
         }
 
-        processList.value = await fetchRecruitmentProcesses(id)
+        await recruitmentProcessStore.loadProcesses(id)
+        processList.value = recruitmentProcessStore.processList
 
         await applicationItemStore.loadApplicationItems(id)
     } catch (err) {
@@ -59,7 +63,13 @@ onMounted(async () => {
 
 function formatDate(date) {
     if (!date) return ''
-    return new Date(date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+    return new Date(date).toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
 }
 
 const handleDelete = async () => {
@@ -77,10 +87,8 @@ const getStatusColor = (status) => {
         case 'PUBLISHED': return 'green'
         case 'CLOSED': return 'red'
         default: return 'grey'
-
     }
 }
-
 </script>
 
 <template>

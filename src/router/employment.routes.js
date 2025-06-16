@@ -98,7 +98,7 @@ export const employmentRoutes = [
     {
         path: '/employment/recruitment-requests/create',
         name: 'RecruitmentRequestCreate',
-        component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
+        component: () => import('@/views/employment/RecruitmentRequestCreatePage.vue'),
         meta: {
             requiresAuth: true
         }
