@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 import {
     getAllApplicantsService,
@@ -11,7 +11,6 @@ import {
     removeApplicantBookmarkService,
     getApplicantFullInfoListService
 } from '@/services/applicantService';
-import ApplicantFullInfoListDTO from '@/dto/employment/applicant/applicantFullInfoListDTO';
 
 export const useApplicantStore = defineStore('applicant', () => {
     // 상태
@@ -20,6 +19,9 @@ export const useApplicantStore = defineStore('applicant', () => {
     const loading = ref(false);
     const error = ref(null);
     const bookmarkedApplicants = ref(new Set());
+    const searchQuery = ref('');
+    const sortKey = ref('');
+    const sortOrder = ref('asc');
 
     // 🔍 전체 지원자 조회
     const fetchAllApplicants = async () => {
@@ -52,6 +54,58 @@ export const useApplicantStore = defineStore('applicant', () => {
             throw err;
         } finally {
             loading.value = false;
+        }
+    };
+
+    // 필터링 및 정렬된 지원자 목록
+    const filteredAndSortedApplicants = computed(() => {
+        let result = [...applicantList.value];
+
+        // 검색 필터링
+        if (searchQuery.value) {
+            const query = searchQuery.value.toLowerCase();
+            result = result.filter(applicant =>
+                applicant.name?.toLowerCase().includes(query) ||
+                applicant.email?.toLowerCase().includes(query) ||
+                applicant.phone?.toLowerCase().includes(query) ||
+                applicant.jobName?.toLowerCase().includes(query)
+            );
+        }
+
+        // 정렬
+        if (sortKey.value) {
+            result.sort((a, b) => {
+                const aValue = a[sortKey.value];
+                const bValue = b[sortKey.value];
+
+                if (!aValue || !bValue) return 0;
+
+                if (typeof aValue === 'string') {
+                    return sortOrder.value === 'asc'
+                        ? aValue.localeCompare(bValue)
+                        : bValue.localeCompare(aValue);
+                }
+
+                return sortOrder.value === 'asc'
+                    ? aValue - bValue
+                    : bValue - aValue;
+            });
+        }
+
+        return result;
+    });
+
+    const setSearchQuery = (query) => {
+        searchQuery.value = query;
+    };
+
+    const setSort = (options) => {
+        if (options.sortBy && options.sortBy.length > 0) {
+            sortKey.value = options.sortBy[0];
+            sortOrder.value = options.sortDesc[0] ? 'desc' : 'asc';
+        } else {
+            sortKey.value = '';
+            sortOrder.value = 'asc';
         }
     };
 
@@ -97,7 +151,7 @@ export const useApplicantStore = defineStore('applicant', () => {
     const fetchBookmarksByMemberId = async (id) => {
         const result = await getBookmarksByMemberIdService(id);
         return result;
-    }
+    };
 
     // ⭐ 즐겨찾기 추가
     const addBookmark = async (memberId, applicantId) => {
@@ -122,6 +176,10 @@ export const useApplicantStore = defineStore('applicant', () => {
         loading,
         error,
         bookmarkedApplicants,
+        searchQuery,
+        sortKey,
+        sortOrder,
+        filteredAndSortedApplicants,
 
         // 액션
         fetchAllApplicants,
@@ -132,6 +190,8 @@ export const useApplicantStore = defineStore('applicant', () => {
         fetchBookmarksByMemberId,
         addBookmark,
         removeBookmark,
-        isBookmarked
+        isBookmarked,
+        setSearchQuery,
+        setSort
     };
 });

@@ -10,6 +10,9 @@
         <div class="d-flex align-center flex-wrap" style="gap: 8px;">
           <!-- 🔍 검색창 (공통 컴포넌트) -->
           <Search v-model="search" placeholder="이름, 이메일, 전화번호, 직무로 검색" @clear="clearSearch" @search="handleSearch" />
+          <v-btn icon @click="refreshList" :loading="applicantStore.isLoading">
+            <v-icon>mdi-refresh</v-icon>
+          </v-btn>
 
           <!-- 👤 사원 등록 버튼 -->
           <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px">
@@ -31,12 +34,12 @@
 
       <!-- 검색 결과 요약 -->
       <v-card-text v-if="search" class="text-caption text-grey">
-        검색어 "{{ search }}"에 대한 검색 결과: {{ filteredApplicants.length }}건
+        검색어 "{{ search }}"에 대한 검색 결과: {{ applicantStore.filteredAndSortedApplicants.length }}건
       </v-card-text>
 
       <!-- 📋 지원자 테이블 -->
-      <v-data-table :headers="tableHeaders" :items="filteredApplicants" :items-per-page="8" item-value="applicantId"
-        class="elevation-1" v-model:selected="selectedIds">
+      <v-data-table :headers="tableHeaders" :items="applicantStore.filteredAndSortedApplicants" :items-per-page="8"
+        item-value="applicantId" class="elevation-1" v-model:selected="selectedIds" @update:options="handleSort">
         <!-- 이름 -->
         <template #item.name="{ item }">
           {{ item.name || '-' }}
@@ -198,23 +201,12 @@ const getStatusText = (status) => {
   }
 }
 
-const filteredApplicants = computed(() => {
-  if (!search.value) return applicantStore.applicantList
+const handleSearch = debounce((value) => {
+  applicantStore.setSearchQuery(value)
+}, 300)
 
-  const searchTerm = search.value.toLowerCase()
-  return applicantStore.applicantList.filter(applicant => {
-    return (
-      (applicant.name && applicant.name.toLowerCase().includes(searchTerm)) ||
-      (applicant.email && applicant.email.toLowerCase().includes(searchTerm)) ||
-      (applicant.phone && applicant.phone.toLowerCase().includes(searchTerm)) ||
-      (applicant.jobName && applicant.jobName.toLowerCase().includes(searchTerm))
-    )
-  })
-})
-
-// 검색어 초기화 함수
-const clearSearch = () => {
-  search.value = ''
+const handleSort = (key) => {
+  applicantStore.setSort(key)
 }
 
 const viewDetail = (item) => {
@@ -247,19 +239,26 @@ const handleJobtestSelected = async (jobtest) => {
   }
 };
 
-const handleSearch = debounce((query) => {
-  applicantStore.setSearchQuery(query)
-}, 300)
+// 검색어 초기화 함수
+const clearSearch = () => {
+  search.value = ''
+}
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
+  await refreshList()
+})
+
+// 새로고침 함수
+const refreshList = async () => {
   try {
-    await applicantStore.fetchApplicantFullInfoList();
+    await applicantStore.fetchApplicantFullInfoList()
+    search.value = ''
+    applicantStore.setSearchQuery('')
   } catch (error) {
-    console.error('지원자 목록 로드 실패:', error);
-    toast.error('지원자 목록을 불러오는 데 실패했습니다.');
+    toast.error('지원자 목록을 불러오는데 실패했습니다.')
   }
-});
+}
 
 </script>
 
