@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.approvals.approval.query.mapper.ApprovalQueryMapper">
+    <resultMap id="ApprovalResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO">
+        <id column="id" property="id"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="writer_id" property="writerId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="status" property="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+        <result column="first_approver_id" property="firstApproverId"/>
+        <result column="second_approver_id" property="secondApproverId"/>
+        <result column="third_approver_id" property="thirdApproverId"/>
+        <result column="fourth_approver_id" property="fourthApproverId"/>
+        <result column="first_approved_at" property="firstApprovedAt"/>
+        <result column="second_approved_at" property="secondApprovedAt"/>
+        <result column="third_approved_at" property="thirdApprovedAt"/>
+        <result column="fourth_approved_at" property="fourthApprovedAt"/>
+
+    </resultMap>
+
+    <select id="findAll" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval;
+    </select>
+
+    <select id="findById" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval
+        WHERE id = #{id};
+    </select>
+
+    <select id="findByCategoryId" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval
+        WHERE category_id = #{categoryId};
+    </select>
+
+    <select id="findByWriterId" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval
+        WHERE writer_id = #{writerId};
+    </select>
+
+
+</mapper>

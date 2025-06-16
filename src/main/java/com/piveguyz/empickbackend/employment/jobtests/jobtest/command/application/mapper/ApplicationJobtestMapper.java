@@ -17,6 +17,8 @@ public class ApplicationJobtestMapper {
                 .entryCode(dto.getEntryCode())
                 .applicationId(dto.getApplicationId())
                 .jobTestId(dto.getJobtestId())
+                .gradingMemberId(dto.getGradingMemberId())
+                .evaluationMemberId(dto.getEvaluationMemberId())
                 .build();
     }
 
@@ -32,6 +34,8 @@ public class ApplicationJobtestMapper {
                 .entryCode(entity.getEntryCode())
                 .applicationId(entity.getApplicationId())
                 .jobtestId(entity.getJobTestId())
+                .gradingMemberId(entity.getGradingMemberId())
+                .evaluationMemberId(entity.getEvaluationMemberId())
                 .build();
     }
 

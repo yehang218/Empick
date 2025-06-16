@@ -4,14 +4,20 @@ import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.applicant.command.domain.repository.ApplicationRepository;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateApplicationJobtestCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.JobtestEntryRequestDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateApplicationJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.mapper.ApplicationJobtestMapper;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.ApplicationJobtestEntity;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.JobtestEntity;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.ApplicationJobtestRepository;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.JobtestRepository;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +47,6 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
         if(applicationJobtestRepository.existsByApplicationId(createApplicationJobtestCommandDTO.getApplicationId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS);
         }
-
 
         ApplicationJobtestEntity applicationJobtestEntity = ApplicationJobtestMapper.toEntity(createApplicationJobtestCommandDTO);
         ApplicationJobtestEntity saved = applicationJobtestRepository.save(applicationJobtestEntity);
@@ -86,6 +91,23 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
 
         applicationJobtest.completeGrading(totalScore);
         applicationJobtestRepository.save(applicationJobtest);
+    }
+
+    @Override
+    public void verifyEntryCode(int jobtestId, JobtestEntryRequestDTO requestDTO) {
+        List<ApplicationJobtestEntity> applicationJobtest = applicationJobtestRepository.findByJobTestId(jobtestId);
+
+        boolean flag = false;
+        for(ApplicationJobtestEntity applicationJobtestEntity : applicationJobtest) {
+            if(applicationJobtestEntity.getEntryCode().equals(requestDTO.getEntryCode())) {
+                flag = true;
+                break;
+            }
+        }
+        if(!flag) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_JOBTEST_INVALID_ENTRY_CODE);
+        }
+
     }
 
 

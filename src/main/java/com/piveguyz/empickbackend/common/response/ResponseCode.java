@@ -180,8 +180,10 @@ public enum ResponseCode {
     //   3) 지원서별 실무테스트
     EMPLOYMENT_INVALID_ENTRY_CODE(false, HttpStatus.BAD_REQUEST, 2300, "입장 코드는 5자리 숫자여야 합니다."),
     EMPLOYMENT_ENTRY_CODE_DUPLICATE(false, HttpStatus.CONFLICT, 2301, "중복된 입장 코드입니다."),
-    EMPLOYMENT_INVALID_APPLICATION_JOBTEST(false, HttpStatus.NOT_FOUND, 2302, "존재하지 않는 지원서별 실무테스트입니다."),
-    EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2303, "해당 지원서에 이미 실무테스트가 할당되어 있습니다."),
+    EMPLOYMENT_JOBTEST_INVALID_ENTRY_CODE(false, HttpStatus.NOT_FOUND, 2302, "입장 코드가 올바르지 않습니다."),
+    EMPLOYMENT_INVALID_APPLICATION_JOBTEST(false, HttpStatus.NOT_FOUND, 2303, "존재하지 않는 지원서별 실무테스트입니다."),
+    EMPLOYMENT_INVALID_TIME(false, HttpStatus.BAD_REQUEST, 2304, "시험 시간이 아닙니다."),
+    EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2305, "해당 지원서에 이미 실무테스트가 할당되어 있습니다."),
 
     //   4) 실무테스트 답안
     EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2440, "요청한 답안을 찾을 수 없습니다."),

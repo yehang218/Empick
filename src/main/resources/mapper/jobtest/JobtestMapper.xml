@@ -59,7 +59,6 @@
         <result property="evaluationMemberName" column="e_member_name"/>
 
         <result property="applicationJobtestId" column="ajt_id"/>
-        <result property="entryCode" column="entry_code"/>
     </resultMap>
 
     <resultMap id="JobTestApplicationsMap"
@@ -139,7 +138,6 @@
                ajt.id                  AS ajt_id,
                ajt.grading_status      AS g_status,
                ajt.grading_total_score AS g_score,
-               ajt.entry_code,
                gm.name                 AS g_member_name,
 
                ajt.evaluation_status   AS e_status,
