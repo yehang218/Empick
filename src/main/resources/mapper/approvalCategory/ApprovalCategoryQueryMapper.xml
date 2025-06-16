@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.approvals.approvalCategory.query.mapper.ApprovalCategoryQueryMapper">
+    <resultMap id="ApprovalCategoryResultMap" type="com.piveguyz.empickbackend.approvals.approvalCategory.query.dto.ApprovalCategoryQueryDTO">
+        <id column="id" property="id"/>
+        <result column="approval_category_id" property="approvalCategoryId"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="ApprovalCategoryResultMap">
+        SELECT
+            id,
+            approval_category_id,
+            name
+        FROM approval_category;
+    </select>
+
+    <select id="findById" resultMap="ApprovalCategoryResultMap">
+        SELECT
+            id,
+            approval_category_id,
+            name
+        FROM approval_category
+        WHERE id = #{id};
+    </select>
+
+    <select id="findByCategoryId" resultMap="ApprovalCategoryResultMap">
+        SELECT
+            id,
+            approval_category_id,
+            name
+        FROM approval_category
+        WHERE approval_category_id = #{categoryId};
+    </select>
+
+    <select id="searchByName" resultMap="ApprovalCategoryResultMap">
+        SELECT
+            id,
+            approval_category_id,
+            name
+        FROM approval_category
+        WHERE name LIKE CONCAT('%', #{name}, '%');
+    </select>
+
+</mapper>
