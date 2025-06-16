@@ -3,8 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
-import { fetchRecruitmentProcesses } from '@/services/recruitmentProcessService'
-import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestService'
+import { useRecruitmentProcessStore } from '@/stores/recruitmentProcessStore'
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 import { getStepTypeLabel } from '@/constants/employment/stepType'
@@ -13,16 +13,20 @@ import { useToast } from 'vue-toastification'
 
 const route = useRoute()
 const router = useRouter()
+
 const store = useRecruitmentStore()
 const applicationItemStore = useApplicationItemStore()
-const processList = ref([])
+const processStore = useRecruitmentProcessStore()
+const requestStore = useRecruitmentRequestStore()
+
+const processList = computed(() => processStore.processList)
 const toast = useToast()
 
+const detail = computed(() => store.detail)
+const requestDetail = computed(() => requestStore.recruitmentRequestDetail);
+const applicationItemDialog = ref(false)
 const loading = computed(() => store.loadingDetail)
 const error = computed(() => store.detailError)
-const detail = computed(() => store.detail)
-const requestDetail = ref(null)
-const applicationItemDialog = ref(false)
 const deleteDialog = ref(false)
 
 const getInputComponent = (type) => {
@@ -40,21 +44,15 @@ const getInputComponent = (type) => {
 }
 
 onMounted(async () => {
-    const id = route.params.id
-    try {
-        await store.loadRecruitmentDetail(id)
+    const id = Number(route.params.id)
+    await store.loadRecruitmentDetail(id)
 
-        // 연관된 요청서 정보 불러오기
-        if (detail.value.recruitment.recruitmentRequestId) {
-            requestDetail.value = await fetchRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
-        }
-
-        processList.value = await fetchRecruitmentProcesses(id)
-
-        await applicationItemStore.loadApplicationItems(id)
-    } catch (err) {
-        console.error('채용 공고 상세 로딩 실패:', err)
+    if (detail.value?.recruitment?.recruitmentRequestId) {
+        await requestStore.loadRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
     }
+
+    await processStore.loadProcesses(id)
+    await applicationItemStore.loadApplicationItems(id)
 })
 
 function formatDate(date) {
