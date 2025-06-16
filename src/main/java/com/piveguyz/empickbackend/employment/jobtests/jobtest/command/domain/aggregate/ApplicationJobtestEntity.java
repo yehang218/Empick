@@ -49,8 +49,11 @@ public class ApplicationJobtestEntity {
     @Column(name = "job_test_id", nullable = false)
     private int jobTestId;
 
-    @Column(name = "member_id", nullable = true)
-    private Integer memberId;
+    @Column(name = "evaluation_member_id", nullable = true)
+    private Integer evaluationMemberId;
+
+    @Column(name = "grading_member_id", nullable = true)
+    private Integer gradingMemberId;
 
 
     public void updateApplicationJobtestEntity(UpdateApplicationJobtestCommandDTO updateApplicationJobtestCommandDTO) {
@@ -75,8 +78,11 @@ public class ApplicationJobtestEntity {
         if(updateApplicationJobtestCommandDTO.getEntryCode() != null) {
             this.entryCode = updateApplicationJobtestCommandDTO.getEntryCode();
         }
-        if(updateApplicationJobtestCommandDTO.getMemberId() != null) {
-            this.memberId = updateApplicationJobtestCommandDTO.getMemberId();
+        if(updateApplicationJobtestCommandDTO.getEvaluationMemberId() != null) {
+            this.evaluationMemberId = updateApplicationJobtestCommandDTO.getEvaluationMemberId();
+        }
+        if(updateApplicationJobtestCommandDTO.getGradingMemberId() != null) {
+            this.gradingMemberId = updateApplicationJobtestCommandDTO.getGradingMemberId();
         }
 
     }
