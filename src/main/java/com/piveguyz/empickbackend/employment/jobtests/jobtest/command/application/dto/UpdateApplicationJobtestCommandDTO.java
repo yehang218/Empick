@@ -17,8 +17,7 @@ public class UpdateApplicationJobtestCommandDTO {
     private Double evaluationScore;
     private JobtestStatus gradingStatus;
     private JobtestStatus evaluationStatus;
-    private String entryCode;
 
-    private Integer evaluationMemberId;
     private Integer gradingMemberId;
+    private Integer evaluationMemberId;
 }

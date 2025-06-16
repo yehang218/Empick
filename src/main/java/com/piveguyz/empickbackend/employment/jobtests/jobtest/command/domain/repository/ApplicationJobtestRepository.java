@@ -11,5 +11,8 @@ import java.util.Optional;
 public interface ApplicationJobtestRepository extends JpaRepository<ApplicationJobtestEntity, Integer> {
     boolean existsByEntryCode(String entryCode);
 
+    boolean existsByApplicationId(int applicationId);
     List<ApplicationJobtestEntity> findByJobTestId(int jobtestId);
+
+    boolean existsByJobTestIdAndEntryCode(int jobTestId, String entryCode);
 }
