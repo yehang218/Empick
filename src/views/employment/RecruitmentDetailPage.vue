@@ -44,16 +44,20 @@ const getInputComponent = (type) => {
 }
 
 onMounted(async () => {
-    const id = Number(route.params.id)
-    await store.loadRecruitmentDetail(id)
+    const id = Number(route.params.id);
+    await store.loadRecruitmentDetail(id);
 
-    if (detail.value?.recruitment?.recruitmentRequestId) {
-        await requestStore.loadRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
+    // ✅ 이전 요청서 정보 초기화
+    requestStore.recruitmentRequestDetail = null;
+
+    const requestId = detail.value?.recruitment?.recruitmentRequestId;
+    if (requestId !== null && requestId !== undefined) {
+        await requestStore.loadRecruitmentRequestDetail(requestId);
     }
 
-    await processStore.loadProcesses(id)
-    await applicationItemStore.loadApplicationItems(id)
-})
+    await processStore.loadProcesses(id);
+    await applicationItemStore.loadApplicationItems(id);
+});
 
 function formatDate(date) {
     if (!date) return ''
