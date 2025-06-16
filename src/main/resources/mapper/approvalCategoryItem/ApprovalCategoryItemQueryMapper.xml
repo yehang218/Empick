@@ -14,7 +14,7 @@
         SELECT
             id,
             category_id,
-            name,
+            name
         FROM approval_category_item;
     </select>
 
@@ -22,7 +22,7 @@
         SELECT
             id,
             category_id,
-            name,
+            name
         FROM approval_category_item
         WHERE id = #{id};
     </select>
@@ -31,7 +31,7 @@
         SELECT
             id,
             category_id,
-            name,
+            name
         FROM approval_category_item
         WHERE category_id = #{categoryId};
     </select>

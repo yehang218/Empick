@@ -14,7 +14,7 @@
         SELECT
             id,
             approval_category_id,
-            name,
+            name
         FROM approval_category;
     </select>
 
@@ -22,7 +22,7 @@
         SELECT
             id,
             approval_category_id,
-            name,
+            name
         FROM approval_category
         WHERE id = #{id};
     </select>
@@ -31,7 +31,7 @@
         SELECT
             id,
             approval_category_id,
-            name,
+            name
         FROM approval_category
         WHERE approval_category_id = #{categoryId};
     </select>
@@ -40,7 +40,7 @@
         SELECT
             id,
             approval_category_id,
-            name,
+            name
         FROM approval_category
         WHERE name LIKE CONCAT('%', #{name}, '%');
     </select>

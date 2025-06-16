@@ -9,15 +9,15 @@
         <result column="category_id" property="categoryId"/>
         <result column="writer_id" property="writerId"/>
         <result column="created_at" property="createdAt"/>
-        <result column="status" property="status"/>
-        <result column="approver1_id" property="approver1Id"/>
-        <result column="approver2_id" property="approver2Id"/>
-        <result column="approver3_id" property="approver3Id"/>
-        <result column="approver4_id" property="approver4Id"/>
-        <result column="approved_at1" property="approvedAt1"/>
-        <result column="approved_at2" property="approvedAt2"/>
-        <result column="approved_at3" property="approvedAt3"/>
-        <result column="approved_at4" property="approvedAt4"/>
+        <result column="status" property="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+        <result column="first_approver_id" property="firstApproverId"/>
+        <result column="second_approver_id" property="secondApproverId"/>
+        <result column="third_approver_id" property="thirdApproverId"/>
+        <result column="fourth_approver_id" property="fourthApproverId"/>
+        <result column="first_approved_at" property="firstApprovedAt"/>
+        <result column="second_approved_at" property="secondApprovedAt"/>
+        <result column="third_approved_at" property="thirdApprovedAt"/>
+        <result column="fourth_approved_at" property="fourthApprovedAt"/>
 
     </resultMap>
 
@@ -28,14 +28,14 @@
             writer_id,
             created_at,
             status,
-            approver1_id,
-            approver2_id,
-            approver3_id,
-            approver4_id,
-            approved_at1,
-            approved_at2,
-            approved_at3,
-            approved_at4
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
         FROM approval;
     </select>
 
@@ -46,14 +46,14 @@
             writer_id,
             created_at,
             status,
-            approver1_id,
-            approver2_id,
-            approver3_id,
-            approver4_id,
-            approved_at1,
-            approved_at2,
-            approved_at3,
-            approved_at4
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
         FROM approval
         WHERE id = #{id};
     </select>
@@ -65,14 +65,14 @@
             writer_id,
             created_at,
             status,
-            approver1_id,
-            approver2_id,
-            approver3_id,
-            approver4_id,
-            approved_at1,
-            approved_at2,
-            approved_at3,
-            approved_at4
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
         FROM approval
         WHERE category_id = #{categoryId};
     </select>
@@ -84,14 +84,14 @@
             writer_id,
             created_at,
             status,
-            approver1_id,
-            approver2_id,
-            approver3_id,
-            approver4_id,
-            approved_at1,
-            approved_at2,
-            approved_at3,
-            approved_at4
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
         FROM approval
         WHERE writer_id = #{writerId};
     </select>

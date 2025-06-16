@@ -38,7 +38,7 @@ public class ApprovalCategoryQueryController {
 			.body(CustomApiResponse.of(result, dtoList));
 	}
 
-	@GetMapping("{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<CustomApiResponse<ApprovalCategoryQueryDTO>> findById(@PathVariable("id") Integer id) {
 		ApprovalCategoryQueryDTO dto = service.findById(id);
 		ResponseCode result = ResponseCode.SUCCESS;
