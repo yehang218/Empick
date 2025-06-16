@@ -192,8 +192,8 @@ const form = ref({
 })
 
 onMounted(async () => {
-    if (store.draftRecruitment) {
-        Object.assign(form.value, store.draftRecruitment)
+    if (store.draftRecruitment?.value) {
+        Object.assign(form.value, store.draftRecruitment.value);
     }
 
     const requestId = route.query.id

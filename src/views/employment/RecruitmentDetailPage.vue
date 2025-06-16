@@ -3,8 +3,8 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
-import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
 import { useRecruitmentProcessStore } from '@/stores/recruitmentProcessStore'
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 import { getStepTypeLabel } from '@/constants/employment/stepType'
@@ -13,18 +13,21 @@ import { useToast } from 'vue-toastification'
 
 const route = useRoute()
 const router = useRouter()
+
 const store = useRecruitmentStore()
 const applicationItemStore = useApplicationItemStore()
-const recruitmentRequestStore = useRecruitmentRequestStore()
-const recruitmentProcessStore = useRecruitmentProcessStore()
-const processList = computed(() => recruitmentProcessStore.processList)
+
+const processStore = useRecruitmentProcessStore()
+const requestStore = useRecruitmentRequestStore()
+
+const processList = computed(() => processStore.processList)
 const toast = useToast()
 
+const detail = computed(() => store.detail)
+const requestDetail = computed(() => requestStore.recruitmentRequestDetail);
+const applicationItemDialog = ref(false)
 const loading = computed(() => store.loadingDetail)
 const error = computed(() => store.detailError)
-const detail = computed(() => store.detail)
-const requestDetail = computed(() => recruitmentRequestStore.recruitmentRequestDetail)
-const applicationItemDialog = ref(false)
 const deleteDialog = ref(false)
 
 const getInputComponent = (type) => {
@@ -42,24 +45,23 @@ const getInputComponent = (type) => {
 }
 
 onMounted(async () => {
-    const id = route.params.id
-    try {
-        await store.loadRecruitmentDetail(id)
+    const id = Number(route.params.id);
+    await store.loadRecruitmentDetail(id);
+    console.log('Loaded ID:', id);
 
-        if (detail.value.recruitment.recruitmentRequestId) {
-            await recruitmentRequestStore.loadRecruitmentRequestDetail(
-                detail.value.recruitment.recruitmentRequestId
-            )
-        }
 
-        await recruitmentProcessStore.loadProcesses(id)
-        processList.value = recruitmentProcessStore.processList
+    // ✅ 이전 요청서 정보 초기화
+    requestStore.recruitmentRequestDetail = null;
 
-        await applicationItemStore.loadApplicationItems(id)
-    } catch (err) {
-        console.error('채용 공고 상세 로딩 실패:', err)
+    const requestId = detail.value?.recruitment?.recruitmentRequestId;
+    if (requestId !== null && requestId !== undefined) {
+        await requestStore.loadRecruitmentRequestDetail(requestId);
+
     }
-})
+
+    await processStore.loadProcesses(id);
+    await applicationItemStore.loadApplicationItems(id);
+});
 
 function formatDate(date) {
     if (!date) return ''
