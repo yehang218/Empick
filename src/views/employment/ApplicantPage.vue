@@ -31,17 +31,7 @@
 
       <!-- 📋 지원자 테이블 -->
       <v-data-table :headers="tableHeaders" :items="filteredApplicants" :items-per-page="8" item-value="applicantId"
-        class="elevation-1" show-headers>
-        <!-- 체크 박스 -->
-        <template #item.select="{ item }">
-          <v-btn size="small" icon :color="selectedIds.includes(item.applicantId) ? 'primary' : 'grey-lighten-1'"
-            variant="tonal" @click="toggleSelection(item.applicantId)">
-            <v-icon>
-              {{ selectedIds.includes(item.applicantId) ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
-            </v-icon>
-          </v-btn>
-        </template>
-
+        class="elevation-1" v-model:selected="selectedIds">
         <!-- 이름 -->
         <template #item.name="{ item }">
           {{ item.name || '-' }}
@@ -125,14 +115,55 @@ const applicantStore = useApplicantStore();
 const search = ref('')
 
 const tableHeaders = [
-  { text: '', value: 'select', sortable: false, width: 48 },   // 체크박스
-  { text: '이름', value: 'name', sortable: true },
-  { text: '이메일', value: 'email', sortable: true },
-  { text: '생년월일', value: 'birth', sortable: true },
-  { text: '전화번호', value: 'phone', sortable: true },
-  { text: '지원서', value: 'actions', sortable: false },
-  { text: '처리 상태', value: 'status', sortable: true },
-  { text: '직무', value: 'jobName', sortable: true }
+  {
+    title: '',
+    key: 'data-table-select',
+    sortable: false,
+    width: '48px',
+    align: 'center'
+  },
+  {
+    title: '이름',
+    key: 'name',
+    sortable: true,
+    align: 'start'
+  },
+  {
+    title: '이메일',
+    key: 'email',
+    sortable: true,
+    align: 'start'
+  },
+  {
+    title: '생년월일',
+    key: 'birth',
+    sortable: true,
+    align: 'start'
+  },
+  {
+    title: '전화번호',
+    key: 'phone',
+    sortable: true,
+    align: 'start'
+  },
+  {
+    title: '지원서',
+    key: 'actions',
+    sortable: false,
+    align: 'center'
+  },
+  {
+    title: '처리 상태',
+    key: 'status',
+    sortable: true,
+    align: 'center'
+  },
+  {
+    title: '직무',
+    key: 'jobName',
+    sortable: true,
+    align: 'start'
+  }
 ]
 
 const getStatusColor = (status) => {
@@ -173,15 +204,6 @@ const filteredApplicants = computed(() => {
 const viewDetail = (item) => {
   console.log('지원자 상세:', item)
 }
-
-const toggleSelection = (id) => {
-  const idx = selectedIds.value.indexOf(id);
-  if (idx > -1) {
-    selectedIds.value.splice(idx, 1);
-  } else {
-    selectedIds.value.push(id);
-  }
-};
 
 const handleAssignClick = async () => {
   try {
