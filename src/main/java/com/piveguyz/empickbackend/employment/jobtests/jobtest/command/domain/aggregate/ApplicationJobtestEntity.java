@@ -75,9 +75,6 @@ public class ApplicationJobtestEntity {
         if(updateApplicationJobtestCommandDTO.getEvaluationStatus() != null) {
             this.evaluationStatus = updateApplicationJobtestCommandDTO.getEvaluationStatus();
         }
-        if(updateApplicationJobtestCommandDTO.getEntryCode() != null) {
-            this.entryCode = updateApplicationJobtestCommandDTO.getEntryCode();
-        }
         if(updateApplicationJobtestCommandDTO.getGradingMemberId() != null) {
             this.gradingMemberId = updateApplicationJobtestCommandDTO.getGradingMemberId();
         }

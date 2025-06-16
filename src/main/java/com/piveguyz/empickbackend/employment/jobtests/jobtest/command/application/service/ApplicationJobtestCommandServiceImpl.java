@@ -2,6 +2,7 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicati
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.common.util.RandomCodeUtil;
 import com.piveguyz.empickbackend.employment.applicant.command.domain.repository.ApplicationRepository;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateApplicationJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.JobtestEntryRequestDTO;
@@ -30,7 +31,7 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
 
     @Override
     public CreateApplicationJobtestCommandDTO createApplicaionJobtest(CreateApplicationJobtestCommandDTO createApplicationJobtestCommandDTO) {
-//         🚩 없는 지원서인 경우
+//      // 없는 지원서인 경우
         if(!applicationRepository.existsById(createApplicationJobtestCommandDTO.getApplicationId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_NOT_FOUND);
         }
@@ -40,15 +41,15 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_JOBTEST);
         }
 
-        // 유효하지 않은 입장 코드인경우
-        validateEntryCode(createApplicationJobtestCommandDTO.getEntryCode());
-
         // 이미 할당된 지원서인경우
         if(applicationJobtestRepository.existsByApplicationId(createApplicationJobtestCommandDTO.getApplicationId())) {
             throw new BusinessException(ResponseCode.EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS);
         }
 
-        ApplicationJobtestEntity applicationJobtestEntity = ApplicationJobtestMapper.toEntity(createApplicationJobtestCommandDTO);
+        // 중복되지 않은 입장 코드 생성(jobtest마다)
+        String entryCode = generateUniqueEntryCode(createApplicationJobtestCommandDTO.getJobtestId());
+
+        ApplicationJobtestEntity applicationJobtestEntity = ApplicationJobtestMapper.toEntity(createApplicationJobtestCommandDTO, entryCode);
         ApplicationJobtestEntity saved = applicationJobtestRepository.save(applicationJobtestEntity);
 
         return ApplicationJobtestMapper.toCreateDto(saved);
@@ -59,9 +60,6 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
         // 존재하는 데이터인지 확인
         ApplicationJobtestEntity applicationJobtest = applicationJobtestRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_APPLICATION_JOBTEST));
-
-        // 유효하지 않은 입장 코드인 경우
-        validateEntryCode(updateApplicationJobtestCommandDTO.getEntryCode());
 
         // 채점자를 수정할건데 member에 없는 경우
         validateMemberExists(updateApplicationJobtestCommandDTO.getGradingMemberId());
@@ -117,18 +115,19 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
         }
     }
 
-    private void validateEntryCode(String entryCode) {
-        if (entryCode != null) {
-//            // 5자리 숫자가 아닌 경우
-//            if (!entryCode.matches("^\\d{5}$")) {
-//                throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_ENTRY_CODE);
-//            }
-
-            // 중복된 경우
-            if (applicationJobtestRepository.existsByEntryCode(entryCode)) {
-                throw new BusinessException(ResponseCode.EMPLOYMENT_ENTRY_CODE_DUPLICATE);
+    // 랜덤 입장 코드 생성
+    private String generateUniqueEntryCode(int jobtestId) {
+        String entryCode;
+        int retry = 0;
+        do {
+            entryCode = RandomCodeUtil.generateCode(6); // 6자리의 알파벳/숫자 조합
+            retry++;
+            if (retry > 10) {
+                throw new BusinessException(ResponseCode.EMPLOYMENT_ENTRY_CODE_GENERATION_FAILED);
             }
-        }
+        } while (applicationJobtestRepository.existsByJobTestIdAndEntryCode(jobtestId, entryCode));
+
+        return entryCode;
     }
 
 }
