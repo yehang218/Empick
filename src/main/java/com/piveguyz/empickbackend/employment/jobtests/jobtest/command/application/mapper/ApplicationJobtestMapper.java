@@ -17,7 +17,8 @@ public class ApplicationJobtestMapper {
                 .entryCode(dto.getEntryCode())
                 .applicationId(dto.getApplicationId())
                 .jobTestId(dto.getJobtestId())
-                .memberId(dto.getMemberId())
+                .gradingMemberId(dto.getGradingMemberId())
+                .evaluationMemberId(dto.getEvaluationMemberId())
                 .build();
     }
 
@@ -33,7 +34,8 @@ public class ApplicationJobtestMapper {
                 .entryCode(entity.getEntryCode())
                 .applicationId(entity.getApplicationId())
                 .jobtestId(entity.getJobTestId())
-                .memberId(entity.getMemberId())
+                .gradingMemberId(entity.getGradingMemberId())
+                .evaluationMemberId(entity.getEvaluationMemberId())
                 .build();
     }
 
@@ -46,7 +48,8 @@ public class ApplicationJobtestMapper {
                 .gradingStatus(entity.getGradingStatus())
                 .evaluationStatus(entity.getEvaluationStatus())
                 .entryCode(entity.getEntryCode())
-                .memberId(entity.getMemberId())
+                .gradingMemberId(entity.getGradingMemberId())
+                .evaluationMemberId(entity.getEvaluationMemberId())
                 .build();
     }
 }

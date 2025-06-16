@@ -21,5 +21,5 @@ public class ApplicationInfoDTO {
     private String evaluationMemberName;
 
     private int applicationJobtestId;
-    private int entryCode;
+    private String entryCode;
 }
