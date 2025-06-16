@@ -51,5 +51,13 @@ export const testRoutes = [
         path: '/WSPage',
         name: 'WSPage',
         component: () => import('@/views/test/WSPage.vue')
+    },
+    {
+        path: '/employment/applications/test-assign',
+        name: 'ApplicationAssignTest',
+        component: () => import('@/views/test/ApplicationAssignTestPage.vue'),
+        meta: { requiresAuth: true }
     }
+
+
 ]; 

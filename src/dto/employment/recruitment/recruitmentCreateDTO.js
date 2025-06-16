@@ -15,8 +15,7 @@ export default class recruitmentCreateDTO {
     ) {
         this.title = title;
         this.content = content;
-
-        // recruitType을 숫자로 안전하게 변환
+        
         this.recruitType = recruitType;
 
         // 빈 문자열이면 null로 처리

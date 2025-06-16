@@ -62,3 +62,15 @@ export const updateRecruitment = async (id, dto) => {
         return apiResponse.data
     })
 }
+
+// 채용 공고 삭제
+export const deleteRecruitment = async (id) => {
+    return withErrorHandling(async () => {
+        const response = await api.delete(API.RECRUITMENT.RECRUITMENT_DELETE(id));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message);
+        }
+        return apiResponse.data;
+    });
+};
