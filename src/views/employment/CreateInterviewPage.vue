@@ -10,7 +10,7 @@
 
                 <!-- 평가표 선택 버튼 -->
                 <v-col cols="6">
-                    <v-btn @click="showSheetModal = true" color="primary">평가표 선택</v-btn>
+                    <v-btn @click="openSheetModal" color="primary">평가표 선택</v-btn>
                     <div v-if="selectedSheet">
                         선택한 평가표: {{ selectedSheet.name }}
                     </div>
@@ -19,9 +19,11 @@
 
             <!-- 시간 선택 -->
             <v-row>
-                <v-col cols="6">
-                    <v-text-field v-model="time" label="면접 시간 (예: 14:30)" placeholder="HH:mm"
-                        @blur="checkAvailability" />
+                <v-col cols="3">
+                    <v-select v-model="selectedHour" :items="hours" label="시 선택" />
+                </v-col>
+                <v-col cols="3">
+                    <v-select v-model="selectedMinute" :items="minutes" label="분 선택" />
                 </v-col>
                 <v-col cols="6">
                     <div v-if="isDatetimeAvailable === true" class="text-success">예약 가능</div>
@@ -45,17 +47,18 @@
         </v-form>
 
         <!-- 평가표 모달 -->
-        <InterviewSheetModal v-if="showSheetModal" @close="showSheetModal = false" @select-sheet="onSheetSelected" />
+        <InterviewSheetModal v-model="showSheetModal" @select-sheet="onSheetSelected" @close="closeSheetModal" />
     </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useInterviewStore } from '@/stores/interviewStore'
 
 import InterviewSheetModal from '@/components/employment/InterviewSheetModal.vue'
+
 
 const route = useRoute()
 const selectedDate = route.query.date  // 'YYYY-MM-DD' 형식
@@ -64,21 +67,61 @@ const interviewStore = useInterviewStore()
 
 const selectedApplicationId = ref(null)
 const selectedSheet = ref(null)
-const showSheetModal = ref(false)
 
-const time = ref('')
+const showSheetModal = ref(false)
+const openSheetModal = () => {
+    console.log('✅ 모달 열기 시도됨')
+    showSheetModal.value = true;
+}
+const closeSheetModal = () => showSheetModal.value = false;
+
+const selectedHour = ref('')
+const selectedMinute = ref('')
+
+const hours = Array.from({ length: 10 }, (_, i) => String(i + 9).padStart(2, '0')) // ['09', '10', ..., '18']
+const minutes = ['00', '10', '20', '30', '40', '50']
+
+// 시(hour) 변경 시 체크
+watch(selectedHour, (val) => {
+    console.log('⏰ Hour changed:', val)
+    checkAvailability()
+})
+
+// 분(minute) 변경 시 체크
+watch(selectedMinute, (val) => {
+    console.log('🕐 Minute changed:', val)
+    checkAvailability()
+})
+
+const getTimeString = () => {
+    if (!selectedHour.value || !selectedMinute.value) return ''
+    return `${selectedHour.value}:${selectedMinute.value}`
+}
+
 const address = ref('')
 const isDatetimeAvailable = ref(null)
 const applicationOptions = ref([])
 
 const checkAvailability = async () => {
-    if (!time.value || !selectedDate) return
+    const timeString = getTimeString()
+    if (!timeString) {
+        console.log('⛔ 시간 문자열이 없음')
+        return
+    }
+    if (!selectedDate) {
+        console.log('⛔ 날짜 문자열이 없음')
+        return
+    }
 
-    const datetime = `${selectedDate}T${time.value}`
+    const datetime = `${selectedDate}T${timeString}`
+    console.log('🧪 체크할 datetime:', datetime)
+
     try {
-        isDatetimeAvailable.value = await interviewStore.checkDatetimeAvailability(datetime)
+        await interviewStore.checkDatetimeAvailability(datetime)
+        console.log('✅ 응답 받음:', interviewStore.isDatetimeAvailable.value)
+        isDatetimeAvailable.value = interviewStore.isDatetimeAvailable.value
     } catch (e) {
-        console.error('시간 확인 실패', e)
+        console.error('❌ 시간 확인 실패:', e)
     }
 }
 
@@ -88,12 +131,13 @@ const onSheetSelected = (sheet) => {
 }
 
 const submitInterview = async () => {
-    const datetime = `${selectedDate}T${time.value}`
+    const timeString = getTimeString()
+    const datetime = `${selectedDate}T${timeString}`
     const dto = {
         applicationId: selectedApplicationId.value,
-        sheetId: selectedSheet.value.id,
+        sheetId: selectedSheet.value?.id,
         datetime,
-        address,
+        address: address.value,
     }
 
     try {
