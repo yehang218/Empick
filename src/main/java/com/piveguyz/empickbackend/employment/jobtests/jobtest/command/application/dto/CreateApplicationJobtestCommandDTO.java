@@ -11,16 +11,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class CreateApplicationJobtestCommandDTO {
-    private String evaluatorComment;
-    private LocalDateTime submittedAt;
-    private Double gradingTotalScore;
-    private Double evaluationScore;
-    private JobtestStatus gradingStatus;
-    private JobtestStatus evaluationStatus;
-    private String entryCode;
-
     private int applicationId;
     private int jobtestId;
+
     private Integer gradingMemberId;
     private Integer evaluationMemberId;
 }
