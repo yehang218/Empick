@@ -152,8 +152,7 @@ const handleJobtestSelected = async (jobtest) => {
   jobtestModal.value = false;
 
   const dtoList = selectedIds.value.map(appId => {
-    const entryCode = crypto.randomUUID().slice(0, 8).toUpperCase();
-    return new ApplicationJobtestDTO(appId, jobtest.id, entryCode);
+    return new ApplicationJobtestDTO(appId, jobtest.id);
   });
 
   try {

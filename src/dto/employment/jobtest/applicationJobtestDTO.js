@@ -1,8 +1,7 @@
 export default class CreateApplicationJobtestCommandDTO {
-    constructor(applicationId, jobtestId, entryCode) {
+    constructor(applicationId, jobtestId) {
         this.applicationId = applicationId;
         this.jobtestId = jobtestId;
-        this.entryCode = entryCode;
     }
 
     toJSON() {
@@ -24,7 +23,6 @@ export default class CreateApplicationJobtestCommandDTO {
         return new CreateApplicationJobtestCommandDTO(
             json.applicationId,
             json.jobtestId,
-            json.entryCode
         );
     }
 }
