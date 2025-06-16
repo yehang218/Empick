@@ -4,7 +4,7 @@
         <v-table class="mt-5">
             <thead>
                 <tr>
-                    <th v-if="showCheckbox" style="width: 48px;"></th>
+                    <th v-if="showCheckbox" style="width: 80px;">선택</th>
                     <th v-for="header in headers" :key="header.key">
                         {{ header.label }}
                     </th>
@@ -12,9 +12,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in data" :key="index" @click="$emit('item-click', item)" style="cursor: pointer;">
-                    <td v-if="showCheckbox">
-                        <v-checkbox v-model="item.selected" :ripple="false" hide-details density="compact" />
+                <tr v-for="(item, index) in data" :key="index" @click="$emit('item-click', item)"
+                    style="cursor: pointer;">
+                    <td v-if="showCheckbox" @click.stop>
+                        <v-btn size="small" icon :color="item.selected ? 'primary' : 'grey-lighten-1'" variant="tonal"
+                            @click.stop="$emit('toggle-select', item.id)">
+                            <v-icon>
+                                {{ item.selected ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
+                            </v-icon>
+                        </v-btn>
                     </td>
                     <td v-for="header in headers" :key="header.key">
                         <template v-if="header.key === 'avatarName' && item.avatar && item.name">

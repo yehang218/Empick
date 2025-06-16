@@ -32,7 +32,7 @@
                 <!-- 문제 리스트 -->
 
                 <ListView :headers="headers" :data="jobtestStore.questions" :showCheckbox="true"
-                    @item-click="handleItemClick" />
+                    @item-click="handleItemClick" @toggle-select="jobtestStore.toggleQuestionSelection" />
 
                 <QuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail" />
             </v-container>
@@ -50,6 +50,10 @@ import { useJobtestStore } from '@/stores/jobtestQuestionStore'
 
 import { getQuestionDetailService } from '@/services/jobtestQuestionService'
 import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
+import { useToast } from 'vue-toastification';
+
+
+const toast = useToast();
 
 const router = useRouter()
 const jobtestStore = useJobtestStore()
@@ -64,6 +68,7 @@ const headers = [
     { label: '수정자', key: 'updatedMemberName' },
 ]
 
+
 const handleItemClick = async (item) => {
     try {
         const detail = await getQuestionDetailService(item.id)
@@ -74,10 +79,15 @@ const handleItemClick = async (item) => {
     }
 }
 // 삭제 처리
-const handleDelete = () => {
-    const selectedIds = jobtestStore.getSelectedQuestionIds()
-    console.log('Selected questions:', selectedIds)
-    // TODO: 선택된 문제 삭제 로직 구현
+const handleDelete = async () => {
+    if (!confirm('선택된 문제를 삭제하시겠습니까?')) return;
+
+    try {
+        await jobtestStore.deleteSelectedQuestions();
+        toast.success('선택된 문제가 삭제되었습니다.');
+    } catch (err) {
+        toast.error('문제 삭제 중 오류가 발생했습니다.');
+    }
 }
 
 // 문제 등록
