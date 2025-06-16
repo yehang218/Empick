@@ -8,8 +8,10 @@ import {
     createApplicantService,
     getBookmarksByMemberIdService,
     addApplicantBookmarkService,
-    removeApplicantBookmarkService
+    removeApplicantBookmarkService,
+    getApplicantFullInfoListService
 } from '@/services/applicantService';
+import ApplicantFullInfoListDTO from '@/dto/employment/applicant/applicantFullInfoListDTO';
 
 export const useApplicantStore = defineStore('applicant', () => {
     // 상태
@@ -36,6 +38,12 @@ export const useApplicantStore = defineStore('applicant', () => {
         } finally {
             loading.value = false;
         }
+    };
+
+    const fetchApplicantFullInfoList = async () => {
+        const result = await getApplicantFullInfoListService();
+        applicantList.value = result.map(item => new ApplicantFullInfoListDTO(item));
+        return result;
     };
 
     // 🔍 지원자 ID로 단일 조회
@@ -77,7 +85,7 @@ export const useApplicantStore = defineStore('applicant', () => {
         return result;
     };
 
-    const fetchBookmarksByMemberId = async(id) => {
+    const fetchBookmarksByMemberId = async (id) => {
         const result = await getBookmarksByMemberIdService(id);
         return result;
     }
@@ -109,6 +117,7 @@ export const useApplicantStore = defineStore('applicant', () => {
         // 액션
         fetchAllApplicants,
         fetchApplicantById,
+        fetchApplicantFullInfoList,
         searchApplicantsByName,
         createApplicant,
         fetchBookmarksByMemberId,

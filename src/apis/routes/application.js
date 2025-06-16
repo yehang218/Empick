@@ -8,6 +8,7 @@ export const ApplicantAPI = {
 
     // 🔸 생성
     CREATE_APPLICANT: '/api/v1/employment/applicant/create',
+    APPLICANT_LIST: '/api/v1/employment/applicant/applicant-list',
 }
 
 export const ApplicantBookmarkAPI = {

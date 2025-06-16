@@ -64,9 +64,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
+import { useApplicantStore } from '@/stores/applicantStore';
 
 // 실무테스트 할당
 import { useJobtestListStore } from '@/stores/jobtestListStore';
@@ -79,20 +80,9 @@ const jobtestModal = ref(false);
 const toast = useToast();
 const jobtestListStore = useJobtestListStore();
 const applicationJobtestStore = useApplicationJobtestStore();
+const applicantStore = useApplicantStore();
 
 const search = ref('')
-
-const dummyApplicants = ref([
-  { id: 1, name: '김철수', email: 'kim@example.com', birth: '1995-01-01', phone: '010-1234-5678', status: '최종합격', recruitment: '백엔드 개발자' },
-  { id: 2, name: '이영희', email: 'lee@example.com', birth: '1996-03-10', phone: '010-9876-5432', status: '불합격', recruitment: '프론트 개발자' },
-  { id: 3, name: '박지민', email: 'jimin@example.com', birth: '1994-11-23', phone: '010-5678-1234', status: '서류합격', recruitment: 'AI 연구원' },
-  { id: 4, name: '최유리', email: 'yuri@example.com', birth: '1998-02-05', phone: '010-4567-9876', status: '1차합격', recruitment: '마케터' },
-  { id: 5, name: '장하늘', email: 'sky@example.com', birth: '1997-05-16', phone: '010-1111-2222', status: '불합격', recruitment: '백엔드 개발자' },
-  { id: 6, name: '한예린', email: 'yerin@example.com', birth: '1995-08-08', phone: '010-3333-4444', status: '서류합격', recruitment: '데이터 분석가' },
-  { id: 7, name: '김진우', email: 'jinu@example.com', birth: '1996-06-17', phone: '010-5555-6666', status: '2차합격', recruitment: 'AI 연구원' },
-  { id: 8, name: '윤서희', email: 'seohee@example.com', birth: '1994-09-21', phone: '010-7777-8888', status: '1차합격', recruitment: '프론트 개발자' },
-  { id: 9, name: '이도윤', email: 'doyoon@example.com', birth: '1999-12-12', phone: '010-9999-0000', status: '서류합격', recruitment: '백엔드 개발자' }
-])
 
 const tableHeaders = [
   { text: '', value: 'select', sortable: false, width: 48 },   // 체크박스
@@ -102,7 +92,7 @@ const tableHeaders = [
   { text: '전화번호', value: 'phone', sortable: true },
   { text: '지원서', value: 'actions', sortable: false },
   { text: '처리 상태', value: 'status', sortable: true },
-  { text: '채용 공고 제목', value: 'recruitment', sortable: true }
+  { text: '채용 공고 제목', value: 'recruitmentTitle', sortable: true }
 ]
 
 const getStatusColor = (status) => {
@@ -117,8 +107,8 @@ const getStatusColor = (status) => {
 }
 
 const filteredApplicants = computed(() => {
-  if (!search.value) return dummyApplicants.value
-  return dummyApplicants.value.filter(applicant =>
+  if (!search.value) return applicantStore.applicantList
+  return applicantStore.applicantList.filter(applicant =>
     Object.values(applicant).some(val =>
       String(val).toLowerCase().includes(search.value.toLowerCase())
     )
@@ -130,7 +120,6 @@ const viewDetail = (item) => {
 }
 
 const toggleSelection = (id) => {
-  // 🚩 지원서 id로 수정해야 함(현재 지원자 id로 하는 중)
   const idx = selectedIds.value.indexOf(id);
   if (idx > -1) {
     selectedIds.value.splice(idx, 1);
@@ -143,7 +132,8 @@ const handleAssignClick = async () => {
   try {
     await jobtestListStore.fetchJobtests();
     jobtestModal.value = true;
-  } catch (e) {
+  } catch (error) {
+    console.error('실무 테스트 목록 로드 실패:', error);
     toast.error('실무 테스트 목록을 불러오는 데 실패했습니다.');
   }
 };
@@ -158,10 +148,21 @@ const handleJobtestSelected = async (jobtest) => {
   try {
     await applicationJobtestStore.assignJobtest(dtoList);
     toast.success('선택한 지원서에 실무테스트를 성공적으로 할당했습니다.');
-  } catch (e) {
+  } catch (error) {
+    console.error('실무테스트 할당 실패:', error);
     toast.error(applicationJobtestStore.errorMessage);
   }
 };
+
+// 컴포넌트 마운트 시 데이터 로드
+onMounted(async () => {
+  try {
+    await applicantStore.fetchApplicantFullInfoList();
+  } catch (error) {
+    console.error('지원자 목록 로드 실패:', error);
+    toast.error('지원자 목록을 불러오는 데 실패했습니다.');
+  }
+});
 
 </script>
 
