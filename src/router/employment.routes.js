@@ -73,6 +73,14 @@ export const employmentRoutes = [
         props: true,
         meta: { requiresAuth: true }
     },
+    // 실무테스트 입장 페이지
+    {
+        path: '/employment/jobtest/enter/:jobtestId',
+        name: 'JobtestEnter',
+        component: () => import('@/views/employment/JobtestEnterPage.vue'),
+        props: true,
+        meta: { requiresAuth: false }
+    },
 
     //    <------------------- 채용공고 -------------------->
     // 채용 요청서 목록 페이지
@@ -140,46 +148,54 @@ export const employmentRoutes = [
         meta: { requiresAuth: true }
     },
 
-        // <---------- 면         접 ---------->
-    
-        {
-            path: '/employment/interview-criteria',
-            name: 'InterviewSheetPage',
-            component: () => import('@/views/employment/InterviewSheetPage.vue'),
-            meta: {
-                requiresAuth: true
-            }
-        },
-        {
-            path: '/employment/interview-criteria/create',
-            name: 'CreateInterviewSheetPage',
-            component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
-            meta: {
-                requiresAuth: true
-            }
-        },
+    // <---------- 면         접 ---------->
+
+    {
+        path: '/employment/interview-criteria',
+        name: 'InterviewSheetPage',
+        component: () => import('@/views/employment/InterviewSheetPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interview-criteria/create',
+        name: 'CreateInterviewSheetPage',
+        component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interview-score',
+        name: 'InputInterviewScorePage',
+        component: () => import('@/views/employment/InputInterviewScorePage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
 
 
 
-          {
+    {
         path: '/employment/applicant',
         name: 'ApplicantPage',
         component: () => import('@/views/employment/ApplicantPage.vue'),
         meta: { requiresAuth: true }
-},
-    
+    },
 
 
-        
-        // <---------- 지원서 / 지원자 ---------->
-        {
-            path: '/employment/application',
-            name: 'ApplicationPage',
-            component : () => import('@/views/employment/ApplicationPage.vue'),
-            meta: {
+
+
+    // <---------- 지원서 / 지원자 ---------->
+    {
+        path: '/employment/application',
+        name: 'ApplicationPage',
+        component: () => import('@/views/employment/ApplicationPage.vue'),
+        meta: {
             hideHeader: false,
             hideSidebar: false,
             requiresAuth: true
-            }
         }
+    }
 ]; 
