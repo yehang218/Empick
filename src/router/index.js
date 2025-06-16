@@ -36,11 +36,6 @@ const routes = [
             requiresAuth: true
         }
     },
-
-    ...authRoutes,
-    ...employmentRoutes,
-    ...orgstructureRoutes,
-    ...approvalRoutes,
     ...allRouteModules,
     ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
 ];
