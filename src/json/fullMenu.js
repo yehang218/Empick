@@ -6,7 +6,7 @@ export const fullMenu = {
         {
             label: "기본 정보",
             role: ["사원", "인사팀"],
-            path: "/myinfo/profile",
+            path: "/orgstructure/profile",
             children: []
         },
         {
@@ -27,19 +27,19 @@ export const fullMenu = {
             label: "조직 관리",
             role: ["인사팀"],
             children: [
-                { label: "부서 관리", path: "/hr/department" },
-                { label: "직무 관리", path: "/hr/position" },
-                { label: "직급 관리", path: "/hr/level" },
-                { label: "직책 관리", path: "/hr/title" }
+                { label: "부서 관리", path: "/orgstructure/dept-manage" },
+                { label: "직무 관리", path: "/orgstructure/job-manage" },
+                { label: "직급 관리", path: "/orgstructure/rank-manage" },
+                { label: "직책 관리", path: "/orgstructure/position-manage" }
             ]
         },
         {
             label: "사원 관리",
             role: ["인사팀"],
             children: [
-                { label: "신규 사원 등록", path: "/hr/employees/new" },
-                { label: "사원 목록", path: "/hr/employees/list" },
-                { label: "사원정보변경 요청", path: "/hr/employees/edit-request" }
+                { label: "신규 사원 등록", path: "/orgstructure/members/new" },
+                { label: "사원 목록", path: "/orgstructure/members/list" },
+                { label: "사원정보변경 요청", path: "/orgstructure/members/edit-request" }
             ]
         }
     ],
