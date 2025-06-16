@@ -30,23 +30,48 @@
       </v-card-title>
 
       <!-- 📋 지원자 테이블 -->
-      <v-data-table :headers="tableHeaders" :items="filteredApplicants" :items-per-page="8" item-value="id"
+      <v-data-table :headers="tableHeaders" :items="filteredApplicants" :items-per-page="8" item-value="applicantId"
         class="elevation-1" show-headers>
         <!-- 체크 박스 -->
         <template #item.select="{ item }">
-          <v-btn size="small" icon :color="selectedIds.includes(item.id) ? 'primary' : 'grey-lighten-1'" variant="tonal"
-            @click="toggleSelection(item.id)">
+          <v-btn size="small" icon :color="selectedIds.includes(item.applicantId) ? 'primary' : 'grey-lighten-1'"
+            variant="tonal" @click="toggleSelection(item.applicantId)">
             <v-icon>
-              {{ selectedIds.includes(item.id) ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
+              {{ selectedIds.includes(item.applicantId) ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
             </v-icon>
           </v-btn>
+        </template>
+
+        <!-- 이름 -->
+        <template #item.name="{ item }">
+          {{ item.name || '-' }}
+        </template>
+
+        <!-- 이메일 -->
+        <template #item.email="{ item }">
+          {{ item.email || '-' }}
+        </template>
+
+        <!-- 생년월일 -->
+        <template #item.birth="{ item }">
+          {{ item.birth ? new Date(item.birth).toLocaleDateString() : '-' }}
+        </template>
+
+        <!-- 전화번호 -->
+        <template #item.phone="{ item }">
+          {{ item.phone || '-' }}
         </template>
 
         <!-- 처리 상태 칩 -->
         <template #item.status="{ item }">
           <v-chip :color="getStatusColor(item.status)" variant="tonal" size="small">
-            {{ item.status }}
+            {{ getStatusText(item.status) }}
           </v-chip>
+        </template>
+
+        <!-- 직무 -->
+        <template #item.jobName="{ item }">
+          {{ item.jobName || '미지정' }}
         </template>
 
         <!-- 지원서 확인 텍스트 버튼 -->
@@ -56,6 +81,21 @@
           </v-btn>
         </template>
       </v-data-table>
+
+      <!-- 로딩 상태 표시 -->
+      <v-overlay :model-value="applicantStore.loading" class="align-center justify-center">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+      </v-overlay>
+
+      <!-- 에러 상태 표시 -->
+      <v-snackbar :model-value="!!applicantStore.error" color="error">
+        {{ applicantStore.error }}
+        <template v-slot:actions>
+          <v-btn variant="text" @click="applicantStore.error = null">
+            닫기
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-card>
 
     <!-- 실무 테스트 선택 모달 -->
@@ -92,17 +132,32 @@ const tableHeaders = [
   { text: '전화번호', value: 'phone', sortable: true },
   { text: '지원서', value: 'actions', sortable: false },
   { text: '처리 상태', value: 'status', sortable: true },
-  { text: '채용 공고 제목', value: 'recruitmentTitle', sortable: true }
+  { text: '직무', value: 'jobName', sortable: true }
 ]
 
 const getStatusColor = (status) => {
   switch (status) {
-    case '최종합격': return 'success'
-    case '불합격': return 'error'
-    case '서류합격': return 'info'
-    case '1차합격': return 'teal'
-    case '2차합격': return 'blue'
+    case 'PASSED_FINAL': return 'success'
+    case 'FAILED': return 'error'
+    case 'PASSED_DOCS': return 'info'
+    case 'PASSED_INTERVIEW_1': return 'teal'
+    case 'PASSED_INTERVIEW_2': return 'blue'
+    case 'PASSED_PRACTICAL': return 'purple'
+    case 'WAITING': return 'grey'
     default: return 'grey'
+  }
+}
+
+const getStatusText = (status) => {
+  switch (status) {
+    case 'PASSED_FINAL': return '최종합격'
+    case 'FAILED': return '불합격'
+    case 'PASSED_DOCS': return '서류합격'
+    case 'PASSED_INTERVIEW_1': return '1차합격'
+    case 'PASSED_INTERVIEW_2': return '2차합격'
+    case 'PASSED_PRACTICAL': return '실무합격'
+    case 'WAITING': return '대기중'
+    default: return '알 수 없음'
   }
 }
 
@@ -110,7 +165,7 @@ const filteredApplicants = computed(() => {
   if (!search.value) return applicantStore.applicantList
   return applicantStore.applicantList.filter(applicant =>
     Object.values(applicant).some(val =>
-      String(val).toLowerCase().includes(search.value.toLowerCase())
+      val && String(val).toLowerCase().includes(search.value.toLowerCase())
     )
   )
 })

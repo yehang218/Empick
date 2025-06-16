@@ -41,9 +41,18 @@ export const useApplicantStore = defineStore('applicant', () => {
     };
 
     const fetchApplicantFullInfoList = async () => {
-        const result = await getApplicantFullInfoListService();
-        applicantList.value = result.map(item => new ApplicantFullInfoListDTO(item));
-        return result;
+        loading.value = true;
+        error.value = null;
+        try {
+            const result = await getApplicantFullInfoListService();
+            applicantList.value = result;
+            return result;
+        } catch (err) {
+            error.value = err.message;
+            throw err;
+        } finally {
+            loading.value = false;
+        }
     };
 
     // 🔍 지원자 ID로 단일 조회
