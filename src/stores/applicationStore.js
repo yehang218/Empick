@@ -8,7 +8,7 @@ import {
   updateApplicationStatusService,
   deleteApplicationService,
   createApplicationResponseService
-} from '@/services/employment/applicationService';
+} from '@/services/applicationService';
 
 export const useApplicationStore = defineStore('application', () => {
   // 상태
@@ -24,6 +24,7 @@ export const useApplicationStore = defineStore('application', () => {
     try {
       const result = await getAllApplicationsService();
       applicationList.value = result;
+      return result;
     } catch (err) {
       error.value = err.message;
       throw err;
@@ -39,6 +40,7 @@ export const useApplicationStore = defineStore('application', () => {
     try {
       const result = await getApplicationByIdService(id);
       selectedApplication.value = result?.[0] ?? null;
+      return result;
     } catch (err) {
       error.value = err.message;
       throw err;

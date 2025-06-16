@@ -52,20 +52,21 @@ export const useInterviewCriteriaStore = defineStore('interviewCriteria', () => 
     };
 
     const fetchCriteriaBySheetId = async (sheetId) => {
-    loading.value = true
-    error.value = null
-    try {
-        const result = await getCriteriaBySheetIdService(sheetId)
-        criteriaList.value = result
-        selectedCriteria.value = null
-    } catch (err) {
-        error.value = err.message
-        criteriaList.value = []
-        throw err
-    } finally {
-        loading.value = false
+        loading.value = true
+        error.value = null
+        try {
+            const result = await getCriteriaBySheetIdService(sheetId)
+            criteriaList.value = result
+            selectedCriteria.value = null
+            return result
+        } catch (err) {
+            error.value = err.message
+            criteriaList.value = []
+            throw err
+        } finally {
+            loading.value = false
+        }
     }
-}
 
     const searchCriteriaByTitle = async (title) => {
         loading.value = true;
