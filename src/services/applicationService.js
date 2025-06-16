@@ -1,13 +1,12 @@
 import api from '@/apis/apiClient';
 import { ApplicationAPI } from '@/apis/routes/application';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import ApplicationCommandDTO from '@/dto/employment/application/applicationCommandDTO';
-import ApplicationResponseDTO from '@/dto/employment/application/applicationResponseDTO';
+import ApplicationResponseDTO from '@/dto/employment/application/applicationResponeDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 export const getAllApplicationsService = async (options = {}) => {
   return withErrorHandling(async () => {
-    const response = await api.get(ApplicationAPI.GET_ALL_APPLICATION);
+    const response = await api.get(ApplicationAPI.GET_ALL_APPLICATIONS);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
     if (!apiResponse.success) {
@@ -40,7 +39,7 @@ export const createApplicationService = async (dto, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationCommandDTO.fromJSON(apiResponse.data);
+    return ApplicationResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };
 
@@ -53,7 +52,7 @@ export const updateApplicationStatusService = async (id, dto, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationCommandDTO.fromJSON(apiResponse.data);
+    return ApplicationResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };
 
