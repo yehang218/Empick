@@ -40,4 +40,9 @@ public class ApprovalQueryServiceImpl implements ApprovalQueryService {
 		List<ApprovalQueryDTO> dtoList = mapper.findByWriterId(writerId);
 		return dtoList;
 	}
+
+	@Override
+	public List<ApprovalQueryDTO> findReceivedApprovals(Integer memberId) {
+		return mapper.findReceivedApprovals(memberId);
+	}
 }
