@@ -39,7 +39,15 @@ const goToInterviewDetail = (applicationId) => {
 }
 
 const goToCreateInterview = () => {
-    router.push(`/employment/interviews/create`)
+    if (!selectedDate.value) {
+        alert('날짜를 먼저 선택해주세요!')
+        return
+    }
+
+    router.push({
+        name: 'CreateInterviewPage',
+        query: { date: selectedDate.value }  // 예: '2025-06-16'
+    })
 }
 
 const selectedDate = ref('')

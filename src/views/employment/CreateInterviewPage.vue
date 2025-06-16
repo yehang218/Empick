@@ -4,8 +4,8 @@
             <v-row>
                 <!-- 지원서 선택 -->
                 <v-col cols="6">
-                    <v-select v-model="selectedApplicationId" :items="applicationOptions" label="지원서 선택"
-                        item-title="applicantName" item-value="id" />
+                    <v-select v-model="selectedApplicationId" :items="applicationOptions" item-title="applicantName"
+                        item-value="id" label="지원서 선택" />
                 </v-col>
 
                 <!-- 평가표 선택 버튼 -->
@@ -56,6 +56,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useInterviewStore } from '@/stores/interviewStore'
+import { useApplicantStore } from '@/stores/applicantStore'
 
 import InterviewSheetModal from '@/components/employment/InterviewSheetModal.vue'
 
@@ -63,6 +64,7 @@ import InterviewSheetModal from '@/components/employment/InterviewSheetModal.vue
 const route = useRoute()
 const selectedDate = route.query.date  // 'YYYY-MM-DD' 형식
 const applicationStore = useApplicationStore()
+const applicantStore = useApplicantStore()
 const interviewStore = useInterviewStore()
 
 const selectedApplicationId = ref(null)
@@ -110,7 +112,7 @@ const checkAvailability = async () => {
     }
     if (!selectedDate) {
         console.log('⛔ 날짜 문자열이 없음')
-        return
+        return      
     }
 
     const datetime = `${selectedDate}T${timeString}`
@@ -118,7 +120,7 @@ const checkAvailability = async () => {
 
     try {
         await interviewStore.checkDatetimeAvailability(datetime)
-        console.log('✅ 응답 받음:', interviewStore.isDatetimeAvailable.value)
+        console.log('✅ 응답 받음:', interviewStore.isDatetimeAvailable)
         isDatetimeAvailable.value = interviewStore.isDatetimeAvailable.value
     } catch (e) {
         console.error('❌ 시간 확인 실패:', e)
@@ -149,6 +151,14 @@ const submitInterview = async () => {
 }
 
 onMounted(async () => {
-    applicationOptions.value = await applicationStore.fetchAllApplications()
+    const rawList = await applicationStore.fetchAllApplications()
+    const withNames = await Promise.all(rawList.map(async app => {
+        const applicant = await applicantStore.fetchApplicantById(app.applicantId)
+        return {
+            ...app,
+            applicantName: applicant.name // ✅ 이름 추가
+        }
+    }))
+    applicationOptions.value = withNames
 })
 </script>
