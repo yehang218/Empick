@@ -72,11 +72,11 @@ public class QuestionOptionCommandController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "2417", description = "선택지를 찾을 수 없습니다."),
     })
-    @DeleteMapping("/{id}")
-    public ResponseEntity<CustomApiResponse<Integer>> deleteOption(
-            @PathVariable int id) {
-        int deleteId = questionOptionCommandService.deleteQuestionOption(id);
+    @DeleteMapping("/{questionId}")
+    public ResponseEntity<CustomApiResponse<String>> deleteOption(
+            @PathVariable int questionId) {
+        questionOptionCommandService.deleteQuestionOption(questionId);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
-                .body(CustomApiResponse.of(ResponseCode.SUCCESS, deleteId));
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, ResponseCode.SUCCESS.getMessage()));
     }
 }
