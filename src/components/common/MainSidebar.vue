@@ -63,7 +63,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { fullMenu } from '@/json/fullMenu.js'
+import { fullMenu } from '@/constants/common/fullMenu.js'
 import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
