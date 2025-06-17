@@ -1,4 +1,4 @@
-export default class jobtestMailResponseDTO {
+export default class JobtestMailResponseDTO {
     constructor(
         id, 
         recruitmentId, 
@@ -32,7 +32,7 @@ export default class jobtestMailResponseDTO {
     }
 
     static fromJSON(json) {
-        return new jobtestMailResponseDTO (
+        return new JobtestMailResponseDTO (
             json.id,
             json.recruitmentId,
             json.recruitmentTitle,

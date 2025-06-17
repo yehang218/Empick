@@ -31,7 +31,7 @@ import { ref } from 'vue';
 import { useToast } from 'vue-toastification';
 import { useJobtestListStore } from '@/stores/jobtestListStore';
 import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore';
-import ApplicationJobtestDTO from '@/dto/employment/jobtest/applicationJobtestDTO';
+import ApplicationJobtestDTO from '@/dto/employment/jobtest/createApplicationJobtestDTO';
 import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
 
 const selectedIds = ref([]);

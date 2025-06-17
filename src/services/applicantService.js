@@ -19,7 +19,7 @@ export const getAllApplicantsService = async (options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(ApplicantResponseDTO.fromJSON);
+    return apiResponse.data.map(item => ApplicantResponseDTO.fromJSON(item));
   }, options);
 };
 
@@ -46,7 +46,7 @@ export const getApplicantFullInfoListService = async (options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(ApplicantFullInfoListDTO.fromJSON);
+    return apiResponse.data.map(item => ApplicantResponseDTO.fromJSON(item));
   }, options);
 };
 
@@ -59,7 +59,7 @@ export const searchApplicantsByNameService = async (name, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(ApplicantResponseDTO.fromJSON);
+    return apiResponse.data.map(item => ApplicantResponseDTO.fromJSON(item));
   }, options);
 };
 
