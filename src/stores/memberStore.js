@@ -1,5 +1,14 @@
 import { defineStore } from 'pinia';
-import { registerMemberService, getMyInfoService, updateMyInfoService, profileImageFetchService, profileImageUploadService } from '@/services/memberService';
+import {
+    registerMemberService,
+    getMyInfoService,
+    updateMyInfoService,
+    profileImageFetchService,
+    profileImageUploadService,
+    getMyRoleService,
+    getMemberRoleService
+} from '@/services/memberService';
+import MemberRoleDTO from '@/dto/member/memberRoleDTO';
 
 export const useMemberStore = defineStore('member', {
     state: () => ({
@@ -132,6 +141,16 @@ export const useMemberStore = defineStore('member', {
                 this.error = err.message || '프로필 이미지 업로드에 실패했습니다.';
                 throw err;
             }
+        },
+
+        async getMyRole() {
+            const response = await getMyRoleService();
+            return response.map(role => MemberRoleDTO.fromJSON(role));
+        },
+
+        async getMemberRole(employeeNumber) {
+            const response = await getMemberRoleService(employeeNumber);
+            return response.map(role => MemberRoleDTO.fromJSON(role));
         }
     },
 }); 

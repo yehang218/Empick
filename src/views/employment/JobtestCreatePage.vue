@@ -80,6 +80,13 @@ import { createJobtestService } from '@/services/jobtestService'
 import CreateJobtestRequestDTO from '@/dto/employment/jobtest/createJobtestRequestDTO'
 import QuestionCreateModal from '@/components/employment/QuestionCreateModal.vue'
 import SuccessModal from '@/components/common/AlertModal.vue'
+import { useMemberStore } from '@/stores/memberStore'
+
+const router = useRouter();
+const jobtestStore = useJobtestStore()
+const memberStore = useMemberStore()
+
+const showSuccessModal = ref(false)
 
 const localQuestions = ref([])
 const toast = useToast()
@@ -91,11 +98,6 @@ const selectedIds = ref([])
 const startedAt = ref('');
 const endedAt = ref('');
 
-const showSuccessModal = ref(false)
-
-const router = useRouter();
-
-const jobtestStore = useJobtestStore()
 
 const headers = [
     { title: '', key: 'actions', sortable: false, width: 48 },
@@ -143,6 +145,10 @@ const getDifficultyColor = level => {
 }
 
 const register = async () => {
+    if (!memberStore.form.id) {
+        toast.error('등록자 정보가 없습니다. 다시 로그인해주세요.');
+        return;
+    }
     if (!jobtestTitle.value) {
         toast.error('실무 테스트 이름을 입력해주세요.')
         return
@@ -180,7 +186,7 @@ const register = async () => {
         testTime.value,
         new Date(startedAt.value),
         new Date(endedAt.value),
-        1,
+        memberStore.form.id,
         selected.map(q => ({
             questionId: q.id,
             score: Number(q.score ?? 0)
@@ -211,6 +217,10 @@ const handleNewQuestion = async () => {
     dialog.value = false
     await jobtestStore.fetchQuestions()
 }
+
+onMounted(async () => {
+    await memberStore.getMyInfo();
+})
 </script>
 
 <style scoped></style>
