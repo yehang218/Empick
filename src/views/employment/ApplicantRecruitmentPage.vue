@@ -7,7 +7,7 @@ import { useApplicantStore } from '@/stores/applicantStore';
 import { debounce } from 'lodash'
 import { useJobtestListStore } from '@/stores/jobtestListStore';
 import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore';
-import ApplicationJobtestDTO from '@/dto/employment/jobtest/applicationJobtestDTO';
+import ApplicationJobtestDTO from '@/dto/employment/jobtest/createApplicationJobtestDTO';
 import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
 
 const selectedApplicants = ref([]);
