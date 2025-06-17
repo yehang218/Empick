@@ -72,8 +72,14 @@ public class MemberQueryController {
     public ResponseEntity<CustomApiResponse<List<MemberResponseDTO>>> getMembers(
             @RequestParam(value = "employeeNumber", required = false) Integer employeeNumber
     ) {
-        List<MemberResponseDTO> members = memberQueryService.getMembersByEmployeeNumber(employeeNumber);
-        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, members));
+
+        if (employeeNumber == null) {
+            List<MemberResponseDTO> members = memberQueryService.findAllMembers();
+            return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, members));
+        } else {
+            List<MemberResponseDTO> members = memberQueryServiceImpl.getMembersByEmployeeNumber(employeeNumber);
+            return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, members));
+        }
     }
 
     @Operation(
