@@ -95,12 +95,14 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
 
     // ================== 공통 유틸 ==================
 
-    // 이미 승인 또는 반려된 결재문서면 예외 throw
+    // 이미 승인 또는 반려, 취소된 결재문서면 예외 throw
     private void validateNotProcessed(ApprovalEntity approval) {
         if (approval.getStatus() == 1)
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_APPROVED);
         if (approval.getStatus() == -1)
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_REJECTED);
+        if(approval.getStatus() == -2)
+            throw new BusinessException(ResponseCode.APPROVAL_ALREADY_CANCELED);
     }
 
     // 현재 결재 차례의 ApproverId 리턴 (없으면 예외)
@@ -145,8 +147,8 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
 
     @Override
     @Transactional
-    public void approve(ApproveRequestDTO dto) {
-        ApprovalEntity approval = approvalRepository.findById(dto.getApprovalId())
+    public void approve(int approvalId, ApproveRequestDTO dto) {
+        ApprovalEntity approval = approvalRepository.findById(approvalId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_NOT_FOUND));
 
         validateNotProcessed(approval);
@@ -166,6 +168,10 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
 
         // 마지막 결재자인 경우 상태 완료
         if (isFinalApprover(approval)) {
+
+            // 만약 결재 취소 요청이었다면
+            Integer targetApprovalId = approval.getApprovalId();
+            if(targetApprovalId != null) approveCancel(targetApprovalId);
             approval.setStatus(1);
         } else {
             approval.setStatus(0); // 계속 진행중
@@ -178,8 +184,8 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
 
     @Override
     @Transactional
-    public void reject(RejectRequestDTO dto) {
-        ApprovalEntity approval = approvalRepository.findById(dto.getApprovalId())
+    public void reject(int approvalId, RejectRequestDTO dto) {
+        ApprovalEntity approval = approvalRepository.findById(approvalId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_NOT_FOUND));
 
         validateNotProcessed(approval);
@@ -197,25 +203,15 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
     }
 
     // ================== 취소 결재 승인 ==================
-
-    @Override
-    @Transactional
-    public void approveCancel(ApproveCancelRequestDTO dto) {
-        ApprovalEntity cancelApproval = approvalRepository.findById(dto.getApprovalId())
-                .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_NOT_FOUND));
-
-        validateNotProcessed(cancelApproval);
-
-        ApprovalEntity targetApproval = approvalRepository.findById(dto.getTargetApprovalId())
+    private void approveCancel(Integer targetApprovalId) {
+        ApprovalEntity targetApproval = approvalRepository.findById(targetApprovalId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_CANCEL_TARGET_NOT_FOUND));
         if (targetApproval.getStatus() == -2) {
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_PROCESSED);
         }
 
-        cancelApproval.setStatus(1);   // 취소결재 승인
-        targetApproval.setStatus(-2);  // 대상 문서 '취소됨'
+        targetApproval.setStatus(-2);  // 대상 문서 상태 '취소됨"으로 변경
 
-        approvalRepository.save(cancelApproval);
         approvalRepository.save(targetApproval);
     }
 }

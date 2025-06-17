@@ -7,10 +7,9 @@ import java.util.List;
 public interface ApprovalCommandService {
     Integer createApproval(CreateApprovalCommandDTO dto);
 
-    void approve(ApproveRequestDTO dto);
+    void approve(int approvalId, ApproveRequestDTO dto);
 
-    void reject(RejectRequestDTO dto);
+    void reject(int approvalId, RejectRequestDTO dto);
 
-    void approveCancel(ApproveCancelRequestDTO dto);
 
 }

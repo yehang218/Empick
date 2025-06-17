@@ -261,9 +261,10 @@ public enum ResponseCode {
     APPROVAL_CONTENT_ITEM_MISSING(false, HttpStatus.BAD_REQUEST, 3007, "결재 문서 항목이 누락되었습니다."),
     APPROVAL_ALREADY_APPROVED(false, HttpStatus.BAD_REQUEST, 3008, "이미 승인 완료된 문서입니다."),
     APPROVAL_ALREADY_REJECTED(false, HttpStatus.BAD_REQUEST, 3009, "이미 반려된 문서입니다."),
-    APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3010, "결재 차례가 아닙니다."),
-    APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3011, "반려 사유가 필요합니다."),
-    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3012, "이미 처리된 결재입니다.");
+    APPROVAL_ALREADY_CANCELED(false, HttpStatus.BAD_REQUEST, 3010, "이미 결재 취소된 문서입니다."),
+    APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3011, "결재 차례가 아닙니다."),
+    APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3012, "반려 사유가 필요합니다."),
+    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다.");
 
 
 

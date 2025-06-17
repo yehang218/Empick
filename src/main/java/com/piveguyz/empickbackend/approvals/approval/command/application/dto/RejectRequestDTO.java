@@ -8,7 +8,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class RejectRequestDTO {
-    private Integer approvalId;   // 결재 문서 ID
     private Integer approverId;   // 결재자(본인) ID
     private String rejectReason; // 추가할 수도 있어서 우선 넣음
 }
