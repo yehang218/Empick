@@ -44,6 +44,10 @@
                                 {{ item.status }}
                             </v-chip>
                         </template>
+                        <template v-else-if="header.key === 'isMyTurn'">
+                            <v-chip v-if="item.canApproveChip" color="success" text-color="white" small>결재 가능</v-chip>
+                            <span v-else>{{ item.isMyTurn }}</span>
+                        </template>
                         <template v-else>
                             {{ item[header.key] }}
                         </template>
