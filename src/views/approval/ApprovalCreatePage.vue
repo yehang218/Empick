@@ -30,7 +30,7 @@
                                 {{ approverList.find(a => a.id === approver.memberId)?.positionName }}
                             </div>
                             <v-select v-model="form.approvers[idx].memberId" 
-                                :items="approverList" 
+                                :items="getAvailableApprovers(idx)" 
                                 item-title="displayName" 
                                 item-value="id"
                                 label="결재자" 
@@ -116,7 +116,7 @@ const memberId = ref(null);
 const { form, categoryList, categoryItems, loading } = storeToRefs(approvalStore);
 // const { memberList } = storeToRefs(memberStore);
 
-// 결재자 목록에 표시명 추가
+// 결재자 목록
 // const approverList = computed(() => 
 //     memberList.value.map(member => ({
 //         ...member,
@@ -162,6 +162,16 @@ const removeApprover = (idx) => {
         form.value.approvers.splice(idx, 1);
         form.value.approvers.forEach((a, i) => a.order = i + 1);
     }
+};
+
+const getAvailableApprovers = (currentIndex) => {
+    // 현재 선택된 모든 결재자 ID 목록
+    const selectedApproverIds = form.value.approvers
+        .map((approver, idx) => idx !== currentIndex ? approver.memberId : null)
+        .filter(id => id !== null);
+    
+    // 이미 선택된 결재자를 제외한 목록 반환
+    return approverList.filter(approver => !selectedApproverIds.includes(approver.id));
 };
 
 const handleSubmit = async () => {
