@@ -77,6 +77,7 @@ export const useJobtestQuestionStore = defineStore('question', () => {
                     ...opt,
                     isAnswer: opt.content === data.answer
                 })),
+                usedJobTests:data.usedJobTests || [],
                 gradingCriteria: data.gradingCriteria || []
             };
             isEdit.value = true;
