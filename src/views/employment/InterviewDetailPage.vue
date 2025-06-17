@@ -4,36 +4,36 @@
         <h2>면접 상세 정보</h2>
 
         <v-alert v-if="loading" type="info">로딩 중...</v-alert>
-        <v-alert v-else-if="!interview" type="warning">면접 정보가 없습니다. 면접을 배정해주세요.</v-alert>
-        <v-card v-if="applicant && applicant.name" class="pa-4" elevation="1">
+        <v-alert v-else-if="!selectedInterview" type="warning">면접 정보가 없습니다. 면접을 배정해주세요.</v-alert>
+        <v-card v-if="selectedApplicant && selectedApplicant.name" class="pa-4" elevation="1">
             <h3>지원자 정보</h3>
             <v-row>
                 <v-col cols="12" md="3">
-                    <v-img :src="applicant.profileUrl" aspect-ratio="1" class="rounded" contain />
+                    <!-- <v-img :src="selectedApplicant.profileUrl" aspect-ratio="1" class="rounded" contain /> -->
                 </v-col>
                 <v-col cols="12" md="9">
-                    <p><strong>이름:</strong> {{ applicant.name }}</p>
-                    <p><strong>연락처:</strong> {{ applicant.phone }}</p>
-                    <p><strong>이메일:</strong> {{ applicant.email }}</p>
-                    <p><strong>주소:</strong> {{ applicant.address }}</p>
-                    <p><strong>생년월일:</strong> {{ formatDate(applicant.birth, 'date') }}</p>
+                    <p><strong>이름:</strong> {{ selectedApplicant.name }}</p>
+                    <p><strong>연락처:</strong> {{ selectedApplicant.phone }}</p>
+                    <p><strong>이메일:</strong> {{ selectedApplicant.email }}</p>
+                    <p><strong>주소:</strong> {{ selectedApplicant.address }}</p>
+                    <p><strong>생년월일:</strong> {{ formatDate(selectedApplicant.birth, 'date') }}</p>
                 </v-col>
             </v-row>
         </v-card>
-        <v-card v-if="interview" class="pa-4 mt-4" outlined>
+        <v-card v-if="selectedInterview" class="pa-4 mt-4" outlined>
             <v-card-title>
-                면접 ID: {{ interview.id }}
+                면접 ID: {{ selectedInterview.id }}
                 <v-spacer />
                 <v-btn icon @click="startEditing">
                     <v-icon>mdi-pencil</v-icon>
                 </v-btn>
             </v-card-title>
             <v-card-text>
-                <div><strong>지원서 ID:</strong> {{ interview.applicationId }}</div>
-                <div><strong>평가표 ID:</strong> {{ interview.sheetId }}</div>
-                <div><strong>면접 일시:</strong> {{ formatDate(interview.datetime) }}</div>
-                <div><strong>면접 장소:</strong> {{ interview.address }}</div>
-                <div><strong>점수:</strong> {{ interview.score }}</div>
+                <div><strong>지원서 ID:</strong> {{ selectedInterview.applicationId }}</div>
+                <div><strong>평가표 ID:</strong> {{ selectedInterview.sheetId }}</div>
+                <div><strong>면접 일시:</strong> {{ formatDate(selectedInterview.datetime) }}</div>
+                <div><strong>면접 장소:</strong> {{ selectedInterview.address }}</div>
+                <div><strong>점수:</strong> {{ selectedInterview.score }}</div>
             </v-card-text>
         </v-card>
 
@@ -62,7 +62,7 @@
             </v-card>
         </v-dialog>
 
-        <v-btn v-if="!interview && !loading" color="primary" class="mt-4" @click="assignInterview">
+        <v-btn v-if="!selectedInterview && !loading" color="primary" class="mt-4">
             면접 배정하기
         </v-btn>
         <v-btn color="primary" class="mt-4" @click="goToInterviewPage">
@@ -78,72 +78,60 @@ import { useInterviewStore } from '@/stores/interviewStore';
 import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore';
 import { useApplicantStore } from '@/stores/applicantStore';
 import { useApplicationStore } from '@/stores/applicationStore';
+import { useInterviewSheetStore } from '@/stores/interviewSheetStore';
 import { useRouter, useRoute } from 'vue-router'; // useRoute 추가
 
 const interviewStore = useInterviewStore();
 const criteriaStore = useInterviewCriteriaStore();
 const applicantStore = useApplicantStore();
 const applicationStore = useApplicationStore();
-
-const interview = computed(() => interviewStore.selectedInterview);
-const selectedCriteria = computed(() => criteriaStore.selectedCriteria);
+const interviewSheetStore = useInterviewSheetStore();
 
 const router = useRouter(); // 페이지 이동용
 const route = useRoute();   // 현재 라우트 정보용
 
-const applicationId = route.params.applicationId; // ✅ 이렇게 해야 params 접근 가능
+const applicationId = route.params.applicationId;
+const selectedApplication = ref(null)
+const selectedApplicant = ref(null)
+const selectedInterview = ref(null)
+const selectedInterviewSheet = ref(null)
+const selectedCriteria = ref(null)
 
-const applicant = ref(null);
 const criteriaList = ref([]);
 const loading = computed(() => interviewStore.loading || criteriaStore.loading);
 const error = computed(() => interviewStore.error || criteriaStore.error);
 
-const fetchApplicant = async () => {
+const fetchAll = async () => {
     try {
-        await interviewStore.fetchInterviewByApplicationId(applicationId);
-        const interviewResult = interview.value;
-        console.log('💬 interviewResult:', interviewResult);
+        await applicationStore.fetchApplicationById(applicationId)
+        selectedApplication.value = applicationStore.selectedApplication[0];
+        console.log('selectedApplication : ', selectedApplication)
 
-        // ✅ applicationStore 통해 application 조회
-        await applicationStore.fetchApplicationById(interviewResult.applicationId);
-        const application = applicationStore.selectedApplication;
-        const applicantId = application?.applicantId;
+        const applicantId = selectedApplication.value.applicantId
+        console.log('applicantId : ', applicantId)
 
-        console.log('🆔 applicantId from store:', applicantId);
+        await applicantStore.fetchApplicantById(applicantId)
+        selectedApplicant.value = applicantStore.selectedApplicant[0]
+        console.log('selectedApplicant', selectedApplicant)
 
-        // ✅ applicantStore 통해 applicant 조회
-        if (applicantId) {
-            await applicantStore.fetchApplicantById(applicantId);
-            applicant.value = applicantStore.selectedApplicant;
-        } else {
-            applicant.value = null;
-        }
+        await interviewStore.fetchInterviewByApplicationId(applicationId)
+        selectedInterview.value = interviewStore.selectedInterview[0]
+        console.log('selectedInterview : ', selectedInterview)
 
-        console.log('🎯 최종 applicant:', applicant.value);
+        const interviewSheetId = selectedInterview.value.interviewSheetId
+        console.log('interviewSheetId : ', interviewSheetId)
+
+        await interviewSheetStore.fetchSheetById(interviewSheetId)
+        selectedInterviewSheet.value = interviewSheetStore.selectedSheet[0]
+        console.log('selectedInterviewSheet', selectedInterviewSheet)
+
+        await criteriaStore.fetchCriteriaBySheetId(sheetId);
+        criteriaList.value = criteriaStore.criteriaList[0];
+        console.log('criteriaList : ', criteriaList)
+
     } catch (err) {
         console.warn('지원자 정보 없음 or 에러 발생', err);
-        applicant.value = null;
-    } finally {
-        loading.value = false;
     }
-};
-
-const fetchCriteria = async (sheetId) => {
-    loading.value = true;
-    try {
-        await criteriaStore.fetchCriteriaById(sheetId);
-        criteriaList.value = [selectedCriteria.value]; // 이건 UI에 맞게 조절
-    } catch (err) {
-        console.warn('평가 기준 조회 실패', err);
-        criteriaList.value = [];
-    } finally {
-        loading.value = false;
-    }
-};
-
-const assignInterview = () => {
-    // 나중에 면접 배정 모달 or 페이지 이동 구현
-    alert(`지원서 ${applicationId}에 대해 면접을 배정합니다.`);
 };
 
 const goToInterviewPage = () => {
@@ -159,16 +147,10 @@ const formatDate = (dateStr, type = 'datetime') => {
 };
 
 onMounted(async () => {
-    await fetchApplicant(); // 내부에서 interview와 applicant 모두 처리
-    console.log('📌 applicant:', applicant.value); // 👈 이게 실제 객체로 잘 나오는지
-    if (interview.value?.sheetId) {
-        await fetchCriteria(interview.value.sheetId);
-    }
+    await fetchAll(); // 내부에서 interview와 applicant 모두 처리
 });
 
-const isEditing = ref(false);
 const editDatetime = ref(null);
-const editTime = ref('');
 const editAddress = ref('');
 const dialog = ref(false);
 
@@ -179,15 +161,15 @@ const hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '
 const minuteOptions = ['00', '10', '20', '30', '40', '50'];
 
 const startEditing = () => {
-    if (!interview.value) return;
+    if (!selectedInterview.value) return;
 
-    const original = new Date(interview.value.datetime);
+    const original = new Date(selectedInterview.value.datetime);
     editDatetime.value = original.toISOString().substr(0, 10); // YYYY-MM-DD
 
     selectedHour.value = String(original.getHours()).padStart(2, '0');
     selectedMinute.value = String(Math.floor(original.getMinutes() / 10) * 10).padStart(2, '0');
 
-    editAddress.value = interview.value.address;
+    editAddress.value = selectedInterview.value.address;
 
     dialog.value = true;
 };
