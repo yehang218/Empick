@@ -3,6 +3,7 @@ package com.piveguyz.empickbackend.employment.jobtests.question.command.applicat
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionOptionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionOptionResponse;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.UpdateQuestionOptionCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionEntity;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionOptionEntity;
 
 public class QuestionOptionMapper {

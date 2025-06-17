@@ -2,29 +2,38 @@ package com.piveguyz.empickbackend.employment.jobtests.question.command.applicat
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.jobtests.grading.command.application.mapper.GradingCriteriaMapper;
+import com.piveguyz.empickbackend.employment.jobtests.grading.command.domain.repository.GradingCriteriaRepository;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionOptionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.DeleteQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.UpdateQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.mapper.QuestionMapper;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.application.mapper.QuestionOptionMapper;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionEntity;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionOptionEntity;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.enums.QuestionType;
+import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.repository.QuestionOptionRepository;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.repository.QuestionRepository;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class QuestionCommandServiceImpl implements QuestionCommandService {
 
     private final QuestionRepository questionRepository;
+    private final QuestionOptionRepository questionOptionRepository;
+    private final GradingCriteriaRepository gradingCriteriaRepository;
     private final MemberRepository memberRepository;
 
-    public QuestionCommandServiceImpl(QuestionRepository questionRepository,
-                                      MemberRepository memberRepository) {
-        this.questionRepository = questionRepository;
-        this.memberRepository = memberRepository;
-    }
 
     // 실무 테스트 문제 등록
     @Override
@@ -61,6 +70,27 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         question.updateQuestionEntity(updateQuestionCommandDTO);
 
         QuestionEntity updatedEntity = questionRepository.save(question);
+
+        // 4. 선택형 문제라면 기존 선택지 삭제 후 재등록
+        if (question.getType() == QuestionType.MULTIPLE) {
+            // 기존 선택지 삭제
+            questionOptionRepository.deleteByQuestionId(id);
+
+            // 새 선택지 저장
+            List<QuestionOptionEntity> newOptions = new ArrayList<>();
+            List<CreateQuestionOptionCommandDTO> optionDTOs = updateQuestionCommandDTO.getQuestionOptions();
+
+            for (int i = 0; i < optionDTOs.size(); i++) {
+                CreateQuestionOptionCommandDTO dto = optionDTOs.get(i);
+                QuestionOptionEntity entity = QuestionOptionMapper.toEntity(dto, i + 1, id);
+                newOptions.add(entity);
+            }
+
+            questionOptionRepository.saveAll(newOptions);
+        }
+
+        // 5. 🚩TODO : 서술형 문제라면 기존 채점 기준 삭제 후 재등록
+
 
         return QuestionMapper.toUpdateDto(updatedEntity);
     }
