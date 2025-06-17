@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.applicant.command.domain.repository.ApplicationRepository;
 import com.piveguyz.empickbackend.employment.applicationItem.command.application.dto.ApplicationItemCommandDTO;
 import com.piveguyz.empickbackend.employment.applicationItem.command.domain.aggregate.ApplicationItem;
 import com.piveguyz.empickbackend.employment.applicationItem.command.domain.aggregate.ApplicationItemCategory;
@@ -41,6 +42,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 	private final RecruitmentProcessRepository recruitmentProcessRepository;
 	private final RecruitmentTemplateCopyCommandService recruitmentTemplateCopyCommandService;
 	private final RecruitmentTemplateRepository recruitmentTemplateRepository;
+	private final ApplicationRepository applicationRepository;
 
 	@Override
 	public void createRecruitment(RecruitmentCommandDTO dto) {
@@ -250,6 +252,12 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 
 		if (recruitment.getDeletedAt() != null) {
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_ALREADY_DELETED);
+		}
+
+		// 지원서가 존재하는 채용공고 삭제 불가
+		boolean hasApplications = applicationRepository.existsByRecruitmentId(id);
+		if (hasApplications) {
+			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_HAS_APPLICATIONS);
 		}
 
 		recruitment.setDeletedAt(LocalDateTime.now());
