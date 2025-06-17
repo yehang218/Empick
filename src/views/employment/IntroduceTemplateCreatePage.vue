@@ -47,13 +47,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { createTemplate, fetchItems } from '@/services/introduceTemplateService'
+import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
+import { useIntroduceItemStore } from '@/stores/introduceItemStore'
 
 const router = useRouter()
+const introduceTemplateStore = useIntroduceTemplateStore()
+const introduceItemStore = useIntroduceItemStore()
+
 const title = ref('')
-const items = ref([])
+const items = computed(() => introduceItemStore.items)
 const selectedItemIds = ref([])
 
 function goToManage() {
@@ -66,7 +70,7 @@ function goToTemplateList() {
 
 onMounted(async () => {
   try {
-    items.value = await fetchItems()
+    await introduceItemStore.loadItems()
     // console.log('Fetched items for create page:', items.value) // 디버깅용
   } catch (error) {
     console.error('항목 로드 실패:', error)
@@ -84,7 +88,7 @@ const submit = async () => {
     return
   }
   try {
-    await createTemplate(title.value, 1, selectedItemIds.value) // memberId는 실제 로그인 유저로
+    await introduceTemplateStore.addTemplate(title.value, 1, selectedItemIds.value)
     alert('템플릿이 성공적으로 등록되었습니다.')
     router.push('/employment/recruitments/introduce-templates')
   } catch (error) {

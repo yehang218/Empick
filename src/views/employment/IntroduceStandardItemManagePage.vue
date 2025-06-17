@@ -40,17 +40,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { fetchItems, createItem, deleteItem } from '@/services/introduceTemplateItemService'
+import { useIntroduceItemStore } from '@/stores/introduceItemStore'
 
-const items = ref([])
+const introduceItemStore = useIntroduceItemStore()
+
+const items = computed(() => introduceItemStore.items)
 const newContent = ref('')
 const router = useRouter()
 
 const loadItems = async () => {
   try {
-    items.value = await fetchItems()
+    await introduceItemStore.loadItems()
     console.log('Fetched items:', items.value)
   } catch (error) {
     console.error('항목 로드 실패:', error)
@@ -61,7 +63,7 @@ onMounted(loadItems)
 const addItem = async () => {
   if (!newContent.value.trim()) return
   try {
-    await createItem(newContent.value, 1) // memberId는 실제 로그인 유저로
+    await introduceItemStore.addItem(newContent.value, 1) // memberId는 실제 로그인 유저로
     newContent.value = ''
     await loadItems()
   } catch (error) {
@@ -77,7 +79,7 @@ const goToCreateTemplate = () => {
 const removeItem = async (id) => {
   if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
     try {
-      await deleteItem(id)
+      await introduceItemStore.removeItem(id)
       await loadItems()
     } catch (error) {
       console.error('항목 삭제 실패:', error)
