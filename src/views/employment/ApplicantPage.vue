@@ -142,7 +142,9 @@ import { useJobtestListStore } from '@/stores/jobtestListStore';
 import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore';
 import ApplicationJobtestDTO from '@/dto/employment/jobtest/applicationJobtestDTO';
 import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const selectedIds = ref([]);
 const jobtestModal = ref(false);
 const toast = useToast();
@@ -276,6 +278,7 @@ const handleSort = (options) => {
 }
 
 const viewDetail = (item) => {
+  router.push(`/employment/applicant/${item.applicationId}` + '?jobtestId=' + item.jobtestId)
   console.log('지원자 상세:', item)
 }
 
