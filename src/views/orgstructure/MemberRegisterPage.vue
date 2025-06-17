@@ -347,8 +347,19 @@ const restoreFormData = (applicant) => {
         regStore.form.positionId = savedData.positionId
         regStore.form.jobId = savedData.jobId
         regStore.form.rankId = savedData.rankId
+
+        // 이미지 정보 복원
         regStore.profileImageFile = savedData.profileImageFile
         regStore.profileImageUrl = savedData.profileImageUrl
+
+        // pictureUrl 설정: 이미지 파일이 있으면 임시 경로, 없으면 빈 문자열
+        if (savedData.profileImageFile) {
+            regStore.form.pictureUrl = 'profiles/temp.png'
+            console.log('📷 저장된 이미지 파일 사용:', savedData.profileImageFile.name)
+        } else {
+            regStore.form.pictureUrl = ''
+            console.log('📷 저장된 이미지 없음')
+        }
     } else {
         // 저장된 데이터가 없으면 기본값으로 로드
         console.log('📝 기본 데이터로 폼 로드:', applicant.name)
@@ -536,6 +547,15 @@ const onBulkRegister = async () => {
                 regStore.form.rankId = savedData.rankId
                 regStore.profileImageFile = savedData.profileImageFile
                 regStore.profileImageUrl = savedData.profileImageUrl
+
+                // pictureUrl 설정: 이미지 파일이 있으면 임시 경로, 없으면 빈 문자열
+                if (savedData.profileImageFile) {
+                    regStore.form.pictureUrl = 'profiles/temp.png'
+                    console.log('📷 저장된 이미지 파일 사용:', savedData.profileImageFile.name)
+                } else {
+                    regStore.form.pictureUrl = ''
+                    console.log('📷 저장된 이미지 없음')
+                }
             } else {
                 console.log('📝 기본 데이터로 등록:', applicant.name)
                 // 기본 지원자 데이터로 폼 설정
@@ -611,7 +631,11 @@ watch(currentApplicant, (newApplicant) => {
 })
 
 const triggerFileInput = () => {
-    if (fileInputRef.value) fileInputRef.value.click()
+    if (fileInputRef.value) {
+        // 같은 파일명 선택 시에도 onChange 이벤트가 발생하도록 value 초기화
+        fileInputRef.value.value = ''
+        fileInputRef.value.click()
+    }
 }
 
 const onProfileImageChange = (event) => {
@@ -626,9 +650,22 @@ const onProfileImageChange = (event) => {
             toast.error('파일 크기는 5MB를 초과할 수 없습니다.')
             return
         }
+
+        console.log('📷 프로필 이미지 선택됨:', file.name, 'size:', file.size)
         regStore.setProfileImage(file)
+
+        // 현재 지원자의 이미지 정보를 즉시 저장
+        if (currentApplicant.value) {
+            saveCurrentFormData()
+        }
     } else {
+        console.log('📷 프로필 이미지 선택 취소됨')
         regStore.clearProfileImage()
+
+        // 현재 지원자의 이미지 정보를 즉시 저장
+        if (currentApplicant.value) {
+            saveCurrentFormData()
+        }
     }
 }
 
