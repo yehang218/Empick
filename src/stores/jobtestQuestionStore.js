@@ -1,21 +1,129 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getQuestionsService, deleteQuestionService, deleteQuestionOptionsByQuestionId } from '@/services/jobtestQuestionService';
+import {
+    getQuestionsService,
+    getQuestionDetailService,
+    createQuestionService,
+    updateQuestionService,
+    deleteQuestionService,
+    deleteQuestionOptionsByQuestionId
+} from '@/services/jobtestQuestionService';
 import { getQuestionTypeLabel } from '@/constants/employment/questionTypes';
 import { getDifficultyLabel } from '@/constants/employment/difficulty';
+import { CreateQuestionRequestDTO, UpdateQuestionRequestDTO } from '@/dto/employment/jobtest/questionRequestDTO';
 
-export const useJobtestStore = defineStore('jobtest', () => {
+export const useJobtestQuestionStore = defineStore('question', () => {
     // 상태 정의
     const questions = ref([]);
     const loading = ref(false);
     const error = ref(null);
+    const isEdit = ref(false);
+    const form = ref({
+        id: null,
+        content: '',
+        detailContent: '',
+        type: 'MULTIPLE',
+        difficulty: 'EASY',
+        answer: '',
+        createdMemberId: null,
+        updatedMemberId: null,
+        questionOptions: [],
+        gradingCriteria: []
+    });
 
-    // 게터
     const hasSelectedQuestions = computed(() => {
         return questions.value.some(q => q.selected);
     });
 
-    // 문제 목록 id 큰 순 조회
+    // ✅ 폼 초기화
+    const resetForm = () => {
+        form.value = {
+            id: null,
+            content: '',
+            detailContent: '',
+            type: 'MULTIPLE',
+            difficulty: 'EASY',
+            answer: '',
+            createdMemberId: null,
+            updatedMemberId: null,
+            questionOptions: [],
+            gradingCriteria: []
+        };
+        isEdit.value = false;
+        error.value = null;
+    };
+
+    // ✅ 문제 상세 로드
+    const loadQuestion = async (questionId, memberId) => {
+        loading.value = true;
+        error.value = null;
+
+        try {
+            const data = await getQuestionDetailService(questionId);
+            form.value = {
+                id: data.id,
+                content: data.content,
+                detailContent: data.detailContent,
+                type: data.type,
+                difficulty: data.difficulty,
+                answer: data.answer,
+                createdMemberId: data.createdMemberId,
+                createdMemberName: data.createdMemberName,
+                createdAt: data.createdAt,
+                updatedMemberId: memberId,
+                updatedMemberName: data.updatedMemberName,
+                updatedAt: data.updatedAt,
+                questionOptions: (data.options || []).map(opt => ({
+                    ...opt,
+                    isAnswer: opt.content === data.answer
+                })),
+                gradingCriteria: data.gradingCriteria || []
+            };
+            isEdit.value = true;
+        } catch (err) {
+            error.value = err.message || '문제 정보를 불러오는 중 오류 발생';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    // ✅ 등록 / 수정 처리
+    const submitQuestion = async (memberId) => {
+        loading.value = true;
+        error.value = null;
+
+        try {
+            const formCopy = { ...form.value };
+            if (formCopy.type === 'MULTIPLE') {
+                formCopy.answer = formCopy.questionOptions.find(opt => opt.isAnswer)?.content || '';
+            }
+
+            if (isEdit.value) {
+                formCopy.updatedMemberId = memberId;
+                const dto = new UpdateQuestionRequestDTO(
+                    formCopy.content,
+                    formCopy.detailContent,
+                    formCopy.type,
+                    formCopy.difficulty,
+                    formCopy.answer,
+                    formCopy.updatedMemberId
+                );
+                await updateQuestionService(formCopy.id, dto);
+            } else {
+                formCopy.createdMemberId = memberId;
+                const dto = CreateQuestionRequestDTO.fromForm(formCopy);
+                await createQuestionService(dto);
+            }
+        } catch (err) {
+            error.value = err.message || '저장 중 오류 발생';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    // ✅ 문제 목록 조회
     const fetchQuestions = async () => {
         loading.value = true;
         error.value = null;
@@ -26,7 +134,7 @@ export const useJobtestStore = defineStore('jobtest', () => {
                 .sort((a, b) => b.id - a.id)
                 .map(question => ({
                     ...question,
-                    id: Number(question.id), // 숫자로!
+                    id: Number(question.id),
                     selected: false,
                     type: getQuestionTypeLabel(question.type),
                     difficulty: getDifficultyLabel(question.difficulty)
@@ -40,21 +148,16 @@ export const useJobtestStore = defineStore('jobtest', () => {
         }
     };
 
-    // 문제 삭제
+    // ✅ 문제 삭제
     const deleteSelectedQuestions = async () => {
         const selectedIds = getSelectedQuestionIds();
 
         for (const id of selectedIds) {
             try {
-                // 해당 문제 객체 가져오기
                 const question = questions.value.find(q => q.id === id);
-
-                // 문제 유형이 MULTIPLE 이라면 선택지 먼저 삭제
                 if (question?.type === '선택형' || question?.type === 'MULTIPLE') {
                     await deleteQuestionOptionsByQuestionId(id);
                 }
-
-                // 그 후 문제 삭제
                 await deleteQuestionService(id);
             } catch (err) {
                 console.error(`문제 ID ${id} 삭제 실패:`, err);
@@ -66,8 +169,7 @@ export const useJobtestStore = defineStore('jobtest', () => {
         clearSelection();
     };
 
-
-    // 문제 선택 토글
+    // ✅ 선택 관련 유틸
     const toggleQuestionSelection = (questionId) => {
         const question = questions.value.find(q => q.id === questionId);
         if (question) {
@@ -75,19 +177,14 @@ export const useJobtestStore = defineStore('jobtest', () => {
         }
     };
 
-    // 선택된 문제들 가져오기
     const getSelectedQuestions = () => {
         return questions.value.filter(q => q.selected);
     };
 
-    // 선택된 문제들의 ID 가져오기
     const getSelectedQuestionIds = () => {
-        return questions.value
-            .filter(q => q.selected)
-            .map(q => q.id);
+        return questions.value.filter(q => q.selected).map(q => q.id);
     };
 
-    // 모든 선택 해제
     const clearSelection = () => {
         questions.value.forEach(q => q.selected = false);
     };
@@ -95,8 +192,10 @@ export const useJobtestStore = defineStore('jobtest', () => {
     return {
         // 상태
         questions,
+        form,
         loading,
         error,
+        isEdit,
 
         // 게터
         hasSelectedQuestions,
@@ -107,7 +206,11 @@ export const useJobtestStore = defineStore('jobtest', () => {
         getSelectedQuestions,
         getSelectedQuestionIds,
         clearSelection,
-        deleteSelectedQuestions
-    };
+        deleteSelectedQuestions,
 
-}); 
+        // 등록/수정용
+        resetForm,
+        loadQuestion,
+        submitQuestion
+    };
+});

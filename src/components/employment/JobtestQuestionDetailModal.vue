@@ -36,14 +36,15 @@
 
 
       <!-- 선지 -->
-      <v-card v-if="question.options?.length" class="mb-4" variant="tonal">
+      <v-card v-if="question.type === 'MULTIPLE' && question.questionOptions?.length" class="mb-4" variant="tonal">
         <v-card-title>선택지</v-card-title>
         <v-list>
-          <v-list-item v-for="(opt, i) in question.options" :key="i">
+          <v-list-item v-for="(opt, i) in question.questionOptions" :key="i">
             <v-list-item-title>
               {{ opt.optionNumber ? `${opt.optionNumber}. ` : '' }}{{ opt.content }}
-              <span v-if="question.answer === opt.content" class="text-success font-weight-bold">
-                <v-icon v-if="question.answer === opt.content" color="green" size="small" class="ml-1">mdi-check-circle</v-icon>
+              <span v-if="question.answer?.trim() === opt.content?.trim()" class="text-success font-weight-bold">
+                <v-icon v-if="question.answer === opt.content" color="green" size="small"
+                  class="ml-1">mdi-check-circle</v-icon>
               </span>
             </v-list-item-title>
           </v-list-item>
@@ -84,45 +85,50 @@
 
       <v-card-actions class="justify-end">
         <v-btn text @click="closeModal">닫기</v-btn>
+        <v-btn color="primary" variant="tonal" @click="goEditPage" prepend-icon="mdi-pencil">
+          수정하기
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
 import { defineProps, defineEmits } from 'vue'
+
+import { getQuestionTypeLabel } from '@/constants/employment/questionTypes'
+import { getDifficultyLabel } from '@/constants/employment/difficulty'
 
 const props = defineProps({
   modelValue: Boolean,
   question: Object
 })
+const router = useRouter()
 const emit = defineEmits(['update:modelValue'])
 
 function closeModal() {
   emit('update:modelValue', false)
 }
 
-function getQuestionTypeLabel(type) {
-  return {
-    MULTIPLE: '선택형',
-    SUBJECTIVE: '단답형',
-    DESCRIPTIVE: '서술형'
-  }[type] || type
-}
-
-function getDifficultyLabel(difficulty) {
-  return {
-    EASY: '쉬움',
-    MEDIUM: '보통',
-    HARD: '어려움'
-  }[difficulty] || difficulty
+function goEditPage() {
+  if (props.question?.id) {
+    emit('update:modelValue', false);
+    router.push({ name: 'JobtestQuestionEdit', params: { id: props.question.id } })
+  }
 }
 
 function formatDate(dateStr) {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
-  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+  const yyyy = date.getFullYear()
+  const MM = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  const HH = String(date.getHours()).padStart(2, '0')
+  const mm = String(date.getMinutes()).padStart(2, '0')
+  return `${yyyy}-${MM}-${dd} ${HH}:${mm}`
 }
+
 </script>
 
 <style scoped>

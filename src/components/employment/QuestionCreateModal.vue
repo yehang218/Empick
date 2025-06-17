@@ -25,26 +25,18 @@ import { useToast } from 'vue-toastification'
 import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.vue'
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue'
 import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue'
-import { createQuestionService } from '@/services/jobtestQuestionService'
-import CreateQuestionRequestDTO from '@/dto/employment/jobtest/questionRequestDTO'
+
 import { useMemberStore } from '@/stores/memberStore'
+import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 
 const emit = defineEmits(['close', 'saved'])
 const toast = useToast()
 
-const activeTab = ref('MULTIPLE')
 const memberStore = useMemberStore()
+const questionStore = useJobtestQuestionStore()
+const form = computed(() => questionStore.form)
 
-const form = ref({
-    type: 'MULTIPLE',
-    content: '',
-    detailContent: '',
-    difficulty: 'EASY',
-    answer: '',
-    createdMemberId: '',
-    questionOptions: [],
-    gradingCriteria: []
-})
+const activeTab = ref(form.value.type || 'MULTIPLE')
 
 const difficultyOptions = [
     { title: '쉬움', value: 'EASY' },
@@ -72,17 +64,11 @@ const handleSubmit = async () => {
     if (!validateForm()) return
 
     try {
-        if (form.value.type === 'MULTIPLE') {
-            form.value.answer = form.value.questionOptions.find(opt => opt.isAnswer)?.content || ''
-        }
-
-        const dto = CreateQuestionRequestDTO.fromForm(form.value)
-        await createQuestionService(dto)
-
+        await questionStore.submitQuestion(memberStore.form.id)
         toast.success('문제 등록이 완료되었습니다.')
         emit('saved')
-    } catch (e) {
-        toast.error('문제 등록 중 오류가 발생했습니다.')
+    } catch {
+        toast.error(questionStore.error || '문제 등록 중 오류가 발생했습니다.')
     }
 }
 
@@ -128,13 +114,15 @@ function validateForm() {
 }
 
 onMounted(async () => {
-    await memberStore.getMyInfo();
-    if (!memberStore.form.id) {
-        toast.error('등록자 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
-        return;
+    await memberStore.getMyInfo()
+    const memberId = memberStore.form.id
+    if (!memberId) {
+        toast.error('등록자 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+        return
     }
-    form.value.createdMemberId = memberStore.form.id;
+
+    // ✅ form 초기화 및 생성자 ID 설정
+    questionStore.resetForm()
+    form.value.createdMemberId = memberId
 })
 </script>
-
-<style scoped></style>

@@ -2,7 +2,7 @@
     <v-container>
         <h2 class="text-h6 font-weight-bold mb-4">{{ isEdit ? '문제 수정' : '문제 등록' }}</h2>
 
-        <v-tabs v-model="activeTab">
+        <v-tabs v-model="activeTab" :disabled="isEdit">
             <v-tab value="MULTIPLE">선택형</v-tab>
             <v-tab value="SUBJECTIVE">단답형</v-tab>
             <!-- <v-tab value="DESCRIPTIVE">서술형</v-tab> -->
@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 
@@ -39,35 +39,29 @@ import SuccessModal from '@/components/common/AlertModal.vue'
 
 import { DIFFICULTY_MAP } from '@/constants/employment/difficulty'
 
-import { createQuestionService, updateQuestionService, getQuestionDetailService } from '@/services/jobtestQuestionService'
-import { CreateQuestionRequestDTO, UpdateQuestionRequestDTO } from '@/dto/employment/jobtest/questionRequestDTO'
-
 import { useMemberStore } from '@/stores/memberStore'
+import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+
 const memberStore = useMemberStore()
+const jobtestQuestionStore = useJobtestQuestionStore()
 
 const questionId = Number(route.params.id)
-const isEdit = !!questionId // id가 있으면 수정 모드
-
-const activeTab = ref('MULTIPLE')
 const showSuccessModal = ref(false)
 
-const difficultyOptions = Object.entries(DIFFICULTY_MAP).map(([value, label]) => ({ value, label }))
+// ❗ form과 isEdit은 store에서 가져옴
+const form = computed(() => jobtestQuestionStore.form)
+const isEdit = computed(() => jobtestQuestionStore.isEdit)
 
-const form = ref({
-    content: '',
-    detailContent: '',
-    type: 'MULTIPLE',
-    difficulty: 'EASY',
-    answer: '',
-    createdMemberId: null,
-    updatedMemberId: null,
-    questionOptions: [],
-    gradingCriteria: []
-})
+const activeTab = ref(form.value.type || 'MULTIPLE')
+
+const difficultyOptions = Object.entries(DIFFICULTY_MAP).map(([value, label]) => ({
+    value,
+    label
+}))
 
 const currentComponent = computed(() => {
     switch (activeTab.value) {
@@ -94,70 +88,27 @@ async function handleSubmit() {
             return
         }
 
-        if (form.value.type === 'MULTIPLE') {
-            form.value.answer = form.value.questionOptions.find(opt => opt.isAnswer)?.content || ''
-        }
-
-        if (isEdit) {
-            form.value.updatedMemberId = userId
-            const dto = new UpdateQuestionRequestDTO(
-                form.value.content,
-                form.value.detailContent,
-                form.value.type,
-                form.value.difficulty,
-                form.value.answer,
-                form.value.updatedMemberId
-            )
-            await updateQuestionService(questionId, dto)
-        } else {
-            form.value.createdMemberId = userId
-            const dto = CreateQuestionRequestDTO.fromForm(form.value)
-            await createQuestionService(dto)
-        }
-
+        await jobtestQuestionStore.submitQuestion(userId)
         showSuccessModal.value = true
-    } catch (err) {
-        toast.error('저장 중 오류가 발생했습니다.')
+    } catch {
+        toast.error(jobtestQuestionStore.error || '저장 중 오류가 발생했습니다.')
     }
 }
-
-async function loadQuestionIfEditing() {
-    if (!isEdit) return
-    try {
-        const data = await getQuestionDetailService(questionId)
-        Object.assign(form.value, {
-            ...data,
-            updatedMemberId: memberStore.form.id
-        })
-        activeTab.value = data.type
-    } catch (e) {
-        toast.error('문제 정보를 불러오는 중 오류가 발생했습니다.')
-    }
-}
-
 
 onMounted(async () => {
     await memberStore.getMyInfo()
-    if (!memberStore.form.id) {
+    const memberId = memberStore.form.id
+    if (!memberId) {
         toast.error('사용자 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
         return
     }
 
-    await loadQuestionIfEditing()
-})
-
-watch(activeTab, (newType) => {
-    form.value.type = newType;
-
-    // 타입에 따라 관련 필드 초기화
-    if (newType === 'MULTIPLE') {
-        form.value.gradingCriteria = [];
-    } else if (newType === 'SUBJECTIVE') {
-        form.value.questionOptions = [];
-        form.value.gradingCriteria = [];
-    } else if (newType === 'DESCRIPTIVE') {
-        form.value.answer = '';
-        form.value.questionOptions = [];
+    if (questionId) {
+        await jobtestQuestionStore.loadQuestion(questionId, memberId)
+    } else {
+        jobtestQuestionStore.resetForm()
     }
-});
+
+    activeTab.value = form.value.type || 'MULTIPLE'
+})
 </script>

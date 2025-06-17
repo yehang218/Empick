@@ -58,14 +58,14 @@ export const createQuestionService = async (
 // 실무테스트 문제 수정 서비스
 export const updateQuestionService = async ( id, dto, options = {} ) => {
     return withErrorHandling(async () => {
-        const response = await api.patch(JobtestAPI.QUESTION_DETAIL(id),dto);
+        const response = await api.patch(JobtestAPI.QUESTION_DETAIL(id), dto);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if(!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return UpdateQuestionRequestDTO.fromJSON(apiResponse.data);
+        return apiResponse.data;
 
     }, options);
 }
