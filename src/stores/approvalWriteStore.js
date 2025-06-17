@@ -7,6 +7,7 @@ import {
     getApprovalCategoryItems,
     createApprovalService
 } from '@/services/approvalService';
+import { InputTypeEnum } from '@/constants/common/inputType';
 
 export const useApprovalWriteStore = defineStore('approvalWrite', () => {
     // 상태
@@ -26,7 +27,7 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
         form.value = CreateApprovalDTO.fromJSON(json);
     };
 
-    // 액션: 카테고리 불러오기
+    // 카테고리 불러오기
     const fetchCategories = async () => {
         loading.value = true;
         try {
@@ -36,11 +37,18 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
         }
     };
 
-    // 액션: 카테고리별 항목 불러오기
+    // 카테고리별 항목 불러오기
     const fetchCategoryItems = async (categoryId) => {
         loading.value = true;
         try {
             categoryItems.value = await getApprovalCategoryItems(categoryId);
+
+            // inputType이 문자열이면 숫자로 변환
+            categoryItems.value = categoryItems.value.map(item => ({
+                ...item,
+                inputType: typeof item.inputType === 'string' ? InputTypeEnum[item.inputType] : item.inputType
+            }));
+
             form.value.contents = categoryItems.value.map(
                 item => new ApprovalContentDTO({ itemId: item.id, content: '' })
             );
@@ -50,12 +58,11 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
         }
     };
 
-    // 액션: 결재 요청 생성
+    // 결재 요청
     const submitApproval = async () => {
         loading.value = true;
         try {
-            // 예: writerId를 로그인 사용자로 지정 (여기선 1로 예시)
-            form.value.writerId = 1;
+            form.value.writerId = memberStore.form.id;
             await createApprovalService(form.value); // 서비스 함수로 POST 요청
             resetForm();
         } finally {
