@@ -106,7 +106,7 @@ export const employmentRoutes = [
     {
         path: '/employment/recruitment-requests/create',
         name: 'RecruitmentRequestCreate',
-        component: () => import('@/views/employment/RecruitmentRequestCreateView.vue'),
+        component: () => import('@/views/employment/RecruitmentRequestCreatePage.vue'),
         meta: {
             requiresAuth: true
         }
@@ -168,7 +168,7 @@ export const employmentRoutes = [
     // 채용 공고 상세 조회 페이지
     {
         path: '/employment/recruitments/:id',
-        name: 'RecruitmentDetail',
+        name: 'RecruitmentDetails',
         component: () => import('@/views/employment/RecruitmentDetailPage.vue'),
         props: true,
         meta: {

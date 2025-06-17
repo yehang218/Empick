@@ -8,6 +8,7 @@ import {
     updateRecruitment,
     deleteRecruitment
 } from '@/services/recruitmentService';
+import { fetchApplicationItemCategories } from '@/services/applicationItemService';
 
 export const useRecruitmentStore = defineStore('recruitment', () => {
     const list = ref([]);
@@ -122,6 +123,15 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         }
     };
 
+    const loadApplicationItemCategories = async () => {
+        try {
+            const result = await fetchApplicationItemCategories();
+            applicationItemCategoryList.value = result;
+        } catch (err) {
+            console.error('지원서 항목 카테고리 불러오기 실패:', err);
+        }
+    };
+
     return {
         list,
         loadingList,
@@ -145,6 +155,7 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         applicationItemCategoryList,
         setApplicationItemCategoryList,
         clearApplicationItemCategoryList,
+        loadApplicationItemCategories,
 
         submitting,
         submitError,
