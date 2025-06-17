@@ -81,15 +81,3 @@ export const createApplicationResponseService = async (dto, options = {}) => {
     return apiResponse.data;
   }, options);
 };
-
-export const getApplicationsByRecruitmentIdService = async (recruitmentId, options = {}) => {
-  return withErrorHandling(async () => {
-    const response = await api.get(ApplicationAPI.GET_APPLICATION_BY_RECRUITMENT_ID(recruitmentId));
-    const apiResponse = ApiResponseDTO.fromJSON(response.data);
-
-    if (!apiResponse.success) {
-      throwCustomApiError(apiResponse.code, apiResponse.message);
-    }
-    return apiResponse.data.map(ApplicationResponseDTO.fromJSON);
-  }, options);
-};

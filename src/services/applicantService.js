@@ -109,3 +109,15 @@ export const removeApplicantBookmarkService = async (memberId, applicantId, opti
     return apiResponse.data;
   }, options);
 };
+
+export const getApplicantsByRecruitmentIdService = async (recruitmentId, options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.get(ApplicantAPI.GET_APPLICANTS_BY_RECRUITMENT_ID(recruitmentId));
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+    return apiResponse.data.map(ApplicantFullInfoListDTO.fromJSON);
+  }, options);
+};

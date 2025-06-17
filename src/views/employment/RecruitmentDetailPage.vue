@@ -116,7 +116,7 @@ const getStatusColor = (status) => {
 
                 <v-col cols="auto" class="d-flex gap-2">
                     <v-btn class="mr-2" variant="outlined" color="success"
-                        :to="`/employment/applications/recruitments/${detail.recruitment.id}`">
+                        :to="`/employment/applicant/recruitments/${detail.recruitment.id}`">
                         지원자 현황 보기
                     </v-btn>
                     <v-btn class="mr-2" variant="outlined" color="success" @click="applicationItemDialog = true">

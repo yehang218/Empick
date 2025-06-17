@@ -9,7 +9,8 @@ import {
     getBookmarksByMemberIdService,
     addApplicantBookmarkService,
     removeApplicantBookmarkService,
-    getApplicantFullInfoListService
+    getApplicantFullInfoListService,
+    getApplicantsByRecruitmentIdService
 } from '@/services/applicantService';
 
 export const useApplicantStore = defineStore('applicant', () => {
@@ -283,6 +284,22 @@ export const useApplicantStore = defineStore('applicant', () => {
         selectedApplicants.value = [];
     };
 
+    // 채용공고별 지원자 조회
+    const loadApplicantsByRecruitmentId = async (recruitmentId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const result = await getApplicantsByRecruitmentIdService(recruitmentId);
+            applicantList.value = result;
+            return result;
+        } catch (err) {
+            error.value = err.message || '지원자 조회 중 오류 발생';
+            console.error('❌ 지원자 조회 오류:', err);
+        } finally {
+            loading.value = false;
+        }
+    };
+
     return {
         // 상태
         applicantList,
@@ -313,6 +330,7 @@ export const useApplicantStore = defineStore('applicant', () => {
         setSelectedApplicants,
         addSelectedApplicant,
         removeSelectedApplicant,
-        clearSelectedApplicants
+        clearSelectedApplicants,
+        loadApplicantsByRecruitmentId
     };
 });

@@ -6,19 +6,23 @@
         <!-- 공고 현황 요약 -->
         <v-row class="mb-4" align="center">
             <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'ALL'" style="cursor:pointer">
-                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'ALL' }">{{ summary.total }}</div>
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'ALL' }">{{
+                    summary.total }}</div>
                 <div class="text-caption">전체 공고</div>
             </v-col>
             <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'WAITING'" style="cursor:pointer">
-                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'WAITING' }">{{ summary.waiting }}</div>
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'WAITING' }">{{
+                    summary.waiting }}</div>
                 <div class="text-caption">대기 중 공고</div>
             </v-col>
             <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'PUBLISHED'" style="cursor:pointer">
-                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'PUBLISHED' }">{{ summary.ongoing }}</div>
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'PUBLISHED' }">{{
+                    summary.ongoing }}</div>
                 <div class="text-caption">게시 중 공고</div>
             </v-col>
             <v-col cols="12" md="2" class="text-center" @click="selectedStatus = 'CLOSED'" style="cursor:pointer">
-                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'CLOSED' }">{{ summary.closed }}</div>
+                <div class="text-h6 font-weight-bold" :class="{ 'text-success': selectedStatus === 'CLOSED' }">{{
+                    summary.closed }}</div>
                 <div class="text-caption">종료 된 공고</div>
             </v-col>
             <v-col cols="12" md="4" class="d-flex justify-end">
@@ -67,15 +71,16 @@ onMounted(() => {
 })
 
 const handleRowClick = (e) => {
-    const tr = e.target.closest('tr')
-    if (!tr || tr.rowIndex === 0) return
+    const tr = e.target.closest('tr');
+    if (!tr || !tr.parentElement || tr.parentElement.tagName !== 'TBODY') return;
 
-    const index = tr.rowIndex - 1
-    const item = recruitmentsForDisplay.value[index]
+    const index = tr.rowIndex - 1;
+
+    const item = pagedRecruitments.value[index];
     if (item?.id) {
-        router.push(`/employment/recruitments/${item.id}`)
+        router.push(`/employment/recruitments/${item.id}`);
     }
-}
+};
 
 const headers = [
     { key: 'title', label: '제목' },
