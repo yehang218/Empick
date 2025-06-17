@@ -86,7 +86,7 @@
                         <div class="d-flex align-center">
                             <v-avatar size="48" color="primary" class="mr-4">
                                 <span class="text-white text-h6">{{ selectedApplicants[0]?.name?.charAt(0) || '?'
-                                    }}</span>
+                                }}</span>
                             </v-avatar>
                             <div>
                                 <div class="text-h6">{{ selectedApplicants[0]?.name || '이름 없음' }}</div>
@@ -224,6 +224,9 @@ const currentApplicantIndex = ref(0)
 const selectAllForRegistration = ref(false)
 const selectedForRegistration = ref([])
 
+// 지원자별 폼 데이터 저장소
+const applicantFormData = ref(new Map())
+
 // 현재 편집중인 지원자
 const currentApplicant = computed(() => {
     return selectedApplicants.value[currentApplicantIndex.value] || null
@@ -241,6 +244,52 @@ watch(selectedForRegistration, (newValue) => {
     const totalCount = selectedApplicants.value.length
     selectAllForRegistration.value = newValue.length === totalCount && totalCount > 0
 }, { deep: true })
+
+// 현재 폼 데이터 저장 함수
+const saveCurrentFormData = () => {
+    if (currentApplicant.value) {
+        const currentFormData = {
+            name: regStore.form.name,
+            email: regStore.form.email,
+            phone: regStore.form.phone,
+            birth: regStore.form.birth,
+            address: regStore.form.address,
+            departmentId: regStore.form.departmentId,
+            positionId: regStore.form.positionId,
+            jobId: regStore.form.jobId,
+            rankId: regStore.form.rankId,
+            profileImageFile: regStore.profileImageFile,
+            profileImageUrl: regStore.profileImageUrl
+        }
+        applicantFormData.value.set(currentApplicant.value.applicantId, currentFormData)
+        console.log('💾 폼 데이터 저장됨:', currentApplicant.value.name, currentFormData)
+    }
+}
+
+// 저장된 폼 데이터 복원 함수
+const restoreFormData = (applicant) => {
+    const savedData = applicantFormData.value.get(applicant.applicantId)
+
+    if (savedData) {
+        // 저장된 데이터가 있으면 복원
+        console.log('📂 저장된 폼 데이터 복원:', applicant.name, savedData)
+        regStore.form.name = savedData.name
+        regStore.form.email = savedData.email
+        regStore.form.phone = savedData.phone
+        regStore.form.birth = savedData.birth
+        regStore.form.address = savedData.address
+        regStore.form.departmentId = savedData.departmentId
+        regStore.form.positionId = savedData.positionId
+        regStore.form.jobId = savedData.jobId
+        regStore.form.rankId = savedData.rankId
+        regStore.profileImageFile = savedData.profileImageFile
+        regStore.profileImageUrl = savedData.profileImageUrl
+    } else {
+        // 저장된 데이터가 없으면 기본값으로 로드
+        console.log('📝 기본 데이터로 폼 로드:', applicant.name)
+        loadApplicantToForm(applicant)
+    }
+}
 
 const departments = [
     { label: '인사', value: 1 },
@@ -313,24 +362,41 @@ const loadApplicantToForm = (applicant) => {
     regStore.form.rankId = regStore.form.rankId || 0
 }
 
-// 다중 선택 시 네비게이션 함수들
+// 다중 선택 시 네비게이션 함수들 (수정됨)
 const selectCurrentApplicant = (index) => {
     console.log('👆 지원자 선택:', index)
+
+    // 현재 폼 데이터 저장
+    saveCurrentFormData()
+
+    // 지원자 변경
     currentApplicantIndex.value = index
-    loadApplicantToForm(selectedApplicants.value[index])
+
+    // 새 지원자의 폼 데이터 복원
+    restoreFormData(selectedApplicants.value[index])
 }
 
 const previousApplicant = () => {
     if (currentApplicantIndex.value > 0) {
+        // 현재 폼 데이터 저장
+        saveCurrentFormData()
+
         currentApplicantIndex.value--
-        loadApplicantToForm(currentApplicant.value)
+
+        // 이전 지원자의 폼 데이터 복원
+        restoreFormData(currentApplicant.value)
     }
 }
 
 const nextApplicant = () => {
     if (currentApplicantIndex.value < selectedApplicants.value.length - 1) {
+        // 현재 폼 데이터 저장
+        saveCurrentFormData()
+
         currentApplicantIndex.value++
-        loadApplicantToForm(currentApplicant.value)
+
+        // 다음 지원자의 폼 데이터 복원
+        restoreFormData(currentApplicant.value)
     }
 }
 
@@ -369,6 +435,9 @@ const onBulkRegister = async () => {
         return
     }
 
+    // 현재 폼 데이터 저장
+    saveCurrentFormData()
+
     let successCount = 0
     let failCount = 0
     const failedApplicants = []
@@ -377,8 +446,27 @@ const onBulkRegister = async () => {
         try {
             console.log('📝 등록 중:', applicant.name)
 
-            // 해당 지원자 데이터로 폼 설정
-            loadApplicantToForm(applicant)
+            // 저장된 폼 데이터가 있으면 사용, 없으면 기본 데이터 사용
+            const savedData = applicantFormData.value.get(applicant.applicantId)
+            if (savedData) {
+                console.log('📂 저장된 데이터로 등록:', applicant.name)
+                // 저장된 데이터를 폼에 적용
+                regStore.form.name = savedData.name
+                regStore.form.email = savedData.email
+                regStore.form.phone = savedData.phone
+                regStore.form.birth = savedData.birth
+                regStore.form.address = savedData.address
+                regStore.form.departmentId = savedData.departmentId
+                regStore.form.positionId = savedData.positionId
+                regStore.form.jobId = savedData.jobId
+                regStore.form.rankId = savedData.rankId
+                regStore.profileImageFile = savedData.profileImageFile
+                regStore.profileImageUrl = savedData.profileImageUrl
+            } else {
+                console.log('📝 기본 데이터로 등록:', applicant.name)
+                // 기본 지원자 데이터로 폼 설정
+                loadApplicantToForm(applicant)
+            }
 
             // 사원 등록 실행
             const result = await regStore.registerMemberWithImage()
@@ -386,6 +474,8 @@ const onBulkRegister = async () => {
             if (result) {
                 successCount++
                 console.log('✅ 등록 성공:', applicant.name)
+                // 등록 성공한 지원자의 저장된 데이터 삭제
+                applicantFormData.value.delete(applicant.applicantId)
             } else {
                 failCount++
                 failedApplicants.push(applicant.name)
@@ -448,22 +538,30 @@ const onProfileImageChange = (event) => {
 
 const onRegister = async () => {
     try {
+        // 현재 폼 데이터 저장
+        saveCurrentFormData()
+
         const result = await regStore.registerMemberWithImage()
         if (result) {
             const currentName = currentApplicant.value?.name || '지원자'
             toast.success(`${currentName}의 사원 등록이 완료되었습니다!`)
 
+            // 등록 완료된 지원자의 저장된 데이터 삭제
+            if (currentApplicant.value) {
+                applicantFormData.value.delete(currentApplicant.value.applicantId)
+            }
+
             // 다중 선택 시 다음 지원자로 이동
             if (selectedApplicants.value.length > 1 && currentApplicantIndex.value < selectedApplicants.value.length - 1) {
                 nextApplicant()
                 regStore.resetForm() // 폼 초기화 후 다음 지원자 데이터 로드
-                loadApplicantToForm(currentApplicant.value)
+                restoreFormData(currentApplicant.value)
             } else {
                 // 모든 지원자 등록 완료 또는 단일 선택 시
                 regStore.resetForm()
                 if (selectedApplicants.value.length > 1) {
                     toast.success('모든 지원자의 사원 등록이 완료되었습니다!')
-                    router.push('/employment/applicants') // 지원자 목록으로 돌아가기
+                    router.push('/employment/applicants')
                 }
             }
         }
