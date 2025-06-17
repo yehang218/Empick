@@ -36,6 +36,9 @@ public class ApplicantFullInfoDTO {
     // 해당 지원자가 지원한 채용 공고의 ID (recruitment 테이블 참조)
     private int recruitmentId;
 
+    // 채용 공고 제목 (recruitment 테이블의 title 컬럼)
+    private String recruitmentTitle;
+
     // 자기소개 평가 결과 ID (introduce_rating_result 테이블의 FK, nullable)
     private Integer introduceRatingResultId;
 

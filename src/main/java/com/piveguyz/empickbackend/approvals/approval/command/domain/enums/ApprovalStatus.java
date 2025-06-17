@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.approvals.approval.command.domain.enums;
 
 public enum ApprovalStatus {
+    CANCELED(-2, "결재 취소"),
     REJECTED(-1, "반려"),
     IN_PROGRESS(0, "결재 진행중"),
     APPROVED(1, "결재 완료");
