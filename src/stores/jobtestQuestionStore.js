@@ -154,7 +154,7 @@ export const useJobtestQuestionStore = defineStore('question', () => {
     };
 
 
-    // ✅ 문제 삭제
+    // ✅ 문제 일괄 삭제
     const deleteSelectedQuestions = async () => {
         const selectedIds = getSelectedQuestionIds();
 
@@ -174,6 +174,20 @@ export const useJobtestQuestionStore = defineStore('question', () => {
         await fetchQuestions();
         clearSelection();
     };
+
+    // ✅ 단일 문제 삭제
+const deleteQuestion = async (questionId, type) => {
+    try {
+        if (type === '선택형' || type === 'MULTIPLE') {
+            await deleteQuestionOptionsByQuestionId(questionId)
+        }
+        await deleteQuestionService(questionId)
+        await fetchQuestions()
+    } catch (err) {
+        error.value = err.message || '문제 삭제 중 오류 발생'
+        throw err
+    }
+}
 
     // ✅ 선택 관련 유틸
     const toggleQuestionSelection = (questionId) => {
@@ -213,6 +227,7 @@ export const useJobtestQuestionStore = defineStore('question', () => {
         getSelectedQuestionIds,
         clearSelection,
         deleteSelectedQuestions,
+        deleteQuestion,
 
         // 등록/수정용
         resetForm,

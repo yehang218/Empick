@@ -35,7 +35,11 @@
                     @item-click="handleItemClick" @toggle-select="questionStore.toggleQuestionSelection" />
 
                 <!-- 문제 상세 보기 -->
-                <QuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail" />
+                <QuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail"
+                    @update:modelValue="(val) => {
+                        detailDialogVisible = val;
+                        if (!val) questionStore.fetchQuestions();
+                    }" />
             </v-container>
         </v-main>
     </v-app>
