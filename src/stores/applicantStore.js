@@ -23,13 +23,25 @@ export const useApplicantStore = defineStore('applicant', () => {
     const sortKey = ref('');
     const sortOrder = ref('asc');
 
+    // 각 지원서에 고유 키 추가 함수
+    const addUniqueKeys = (applicants) => {
+        return applicants.map((applicant, index) => ({
+            ...applicant,
+            // 고유 키 생성: 여러 조합으로 안전하게 생성
+            uniqueKey: applicant.introduceRatingResultId ||
+                `${applicant.recruitmentId || 'unknown'}_${applicant.applicantId}_${applicant.createdAt || index}`,
+            // 지원서 ID (실무테스트 할당에 사용)
+            applicationId: applicant.introduceRatingResultId ||
+                `${applicant.recruitmentId}_${applicant.applicantId}`
+        }));
+    };
+
     // 🔍 전체 지원자 조회
     const fetchAllApplicants = async () => {
         loading.value = true;
         error.value = null;
         try {
             const result = await getAllApplicantsService();
-            // 고유 키 추가
             applicantList.value = addUniqueKeys(result);
             bookmarkedApplicants.value = new Set(
                 result.filter(applicant => applicant.bookmarked).map(a => a.id)
@@ -48,7 +60,6 @@ export const useApplicantStore = defineStore('applicant', () => {
         error.value = null;
         try {
             const result = await getApplicantFullInfoListService();
-            // 고유 키 추가
             applicantList.value = addUniqueKeys(result);
             return applicantList.value;
         } catch (err) {
@@ -57,19 +68,6 @@ export const useApplicantStore = defineStore('applicant', () => {
         } finally {
             loading.value = false;
         }
-    };
-
-    // 각 지원서에 고유 키 추가 함수
-    const addUniqueKeys = (applicants) => {
-        return applicants.map((applicant, index) => ({
-            ...applicant,
-            // 고유 키 생성: 여러 조합으로 안전하게 생성
-            uniqueKey: applicant.introduceRatingResultId ||
-                `${applicant.recruitmentId || 'unknown'}_${applicant.applicantId}_${applicant.createdAt || index}`,
-            // 지원서 ID (실무테스트 할당에 사용)
-            applicationId: applicant.introduceRatingResultId ||
-                `${applicant.recruitmentId}_${applicant.applicantId}`
-        }));
     };
 
     // 필터링 및 정렬된 지원자 목록
@@ -135,7 +133,7 @@ export const useApplicantStore = defineStore('applicant', () => {
     };
 
     const setSort = (options) => {
-        console.log('setSort 호출됨:', options); // 디버깅용 로그
+        console.log('setSort 호출됨:', options);
         if (options.sortBy && options.sortBy.length > 0) {
             sortKey.value = options.sortBy[0];
             sortOrder.value = options.sortDesc && options.sortDesc[0] ? 'desc' : 'asc';
@@ -143,7 +141,7 @@ export const useApplicantStore = defineStore('applicant', () => {
             sortKey.value = '';
             sortOrder.value = 'asc';
         }
-        console.log('정렬 설정:', { sortKey: sortKey.value, sortOrder: sortOrder.value }); // 디버깅용 로그
+        console.log('정렬 설정:', { sortKey: sortKey.value, sortOrder: sortOrder.value });
     };
 
     // 🔍 지원자 ID로 단일 조회

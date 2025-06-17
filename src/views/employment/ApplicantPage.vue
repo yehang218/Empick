@@ -1,4 +1,4 @@
-<template>
+// 선택된 지원자들의 이름 목<template>
   <v-container fluid style="margin-top: 70px;">
     <v-card>
       <!-- 상단 타이틀 + 검색/버튼 영역 -->
@@ -34,7 +34,17 @@
 
       <!-- 검색 결과 요약 -->
       <v-card-text v-if="search" class="text-caption text-grey">
-        검색어 "{{ search }}"에 대한 검색 결과: {{ applicantStore.filteredAndSortedApplicants.length }}건
+        <span v-if="getUniqueApplicantCount() === 1">
+          검색어 "{{ search }}"에 대한 검색 결과:
+          지원자 {{ getUniqueApplicantCount() }}명
+          <span v-if="applicantStore.filteredAndSortedApplicants.length > 1">
+            (지원서 {{ applicantStore.filteredAndSortedApplicants.length }}건)
+          </span>
+        </span>
+        <span v-else>
+          검색어 "{{ search }}"에 대한 검색 결과:
+          지원자 {{ getUniqueApplicantCount() }}명, 지원서 {{ applicantStore.filteredAndSortedApplicants.length }}건
+        </span>
       </v-card-text>
 
       <!-- 📋 지원자 테이블 -->
@@ -209,6 +219,14 @@ const getApplicantApplicationNumber = (currentItem) => {
 const getSelectedApplicantNames = () => {
   const selectedNames = selectedIds.value.map(selectedItem => selectedItem.name);
   return [...new Set(selectedNames)]; // 중복 제거
+};
+
+// 검색 결과에서 고유한 지원자 수 계산
+const getUniqueApplicantCount = () => {
+  const uniqueApplicantIds = new Set(
+    applicantStore.filteredAndSortedApplicants.map(item => item.applicantId)
+  );
+  return uniqueApplicantIds.size;
 };
 
 const getStatusColor = (status) => {
