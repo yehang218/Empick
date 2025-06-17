@@ -25,8 +25,21 @@
                     <div class="d-flex mb-6 flex-wrap">
                         <div v-for="(approver, idx) in form.approvers" :key="idx" class="approver-box mr-4 mb-2" style="position:relative;">
                             <div class="approver-name">{{ approverList.find(a => a.id === approver.memberId)?.name || '결재자 선택' }}</div>
-                            <v-select v-model="form.approvers[idx].memberId" :items="approverList" item-title="name" item-value="id"
-                                label="결재자" variant="solo" density="comfortable" class="approval-input mt-1" hide-details clearable required />
+                            <div v-if="approver.memberId" class="approver-info">
+                                {{ approverList.find(a => a.id === approver.memberId)?.departmentName }} · 
+                                {{ approverList.find(a => a.id === approver.memberId)?.positionName }}
+                            </div>
+                            <v-select v-model="form.approvers[idx].memberId" 
+                                :items="approverList" 
+                                item-title="displayName" 
+                                item-value="id"
+                                label="결재자" 
+                                variant="solo" 
+                                density="comfortable" 
+                                class="approval-input mt-1" 
+                                hide-details 
+                                clearable 
+                                required />
                             <v-btn v-if="form.approvers.length > 1" icon size="x-small" class="remove-approver-btn" @click="removeApprover(idx)" style="position:absolute; top:6px; right:6px; z-index:2;">
                                 <v-icon size="16">mdi-close</v-icon>
                             </v-btn>
@@ -86,17 +99,37 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useApprovalWriteStore } from '@/stores/approvalWriteStore';
 import { ApproverDTO } from '@/dto/approval/approval/createApprovalDTO';
 import { InputTypeEnum } from '@/constants/common/inputType.js';
 import { useMemberStore } from '@/stores/memberStore'
+import { useRouter } from 'vue-router';
 
 const approvalStore = useApprovalWriteStore();
 const memberStore = useMemberStore();
+const router = useRouter();
 
-const { form, categoryList, categoryItems, approverList, loading } = storeToRefs(approvalStore);
+const memberId = ref(null);
+
+const { form, categoryList, categoryItems, loading } = storeToRefs(approvalStore);
+// const { memberList } = storeToRefs(memberStore);
+
+// 결재자 목록에 표시명 추가
+// const approverList = computed(() => 
+//     memberList.value.map(member => ({
+//         ...member,
+//         displayName: `${member.name} (${member.departmentName} · ${member.positionName})`
+//     }))
+// );
+
+const approverList = [
+    { id: 1, name: '이철수', departmentName: '개발팀', positionName: '과장', displayName: '이철수 (개발팀 · 과장)' },
+    { id: 10, name: '박우석', departmentName: '기획팀', positionName: '대리', displayName: '박우석 (기획팀 · 대리)' },
+    { id: 57, name: '홍길동', departmentName: '인사팀', positionName: '사원', displayName: '홍길동 (인사팀 · 사원)' },
+    { id: 62, name: '김민지', departmentName: '디자인팀', positionName: '팀장', displayName: '김민지 (디자인팀 · 팀장)' },
+];
 
 onMounted(async () => {
     approvalStore.fetchCategories();
@@ -104,13 +137,10 @@ onMounted(async () => {
         form.value.approvers = [new ApproverDTO({ order: 1, memberId: null })];
     }
 
-    approverList.value = [
-        { id: 11, name: '이철수' },
-        { id: 12, name: '박우석' },
-        { id: 13, name: '홍길동' }
-    ];
-
+    // await memberStore.getMemberList();
     await memberStore.getMyInfo();
+    memberId.value = memberStore.form.id;
+
     // 작성일 자동으로
     if (!form.value.createdAt) {
         form.value.createdAt = new Date().toISOString().slice(0, 10);
@@ -135,9 +165,33 @@ const removeApprover = (idx) => {
 };
 
 const handleSubmit = async () => {
-    await approvalStore.submitApproval();
-    alert('결재 요청이 등록되었습니다.');
-    // 라우터 이동 등 후처리
+    try {
+        // 기본 유효성 검사
+        if (!form.value.categoryId) {
+            alert('결재 유형을 선택해주세요.');
+            return;
+        }
+        if (!form.value.approvers.length) {
+            alert('최소 한 명의 결재자를 지정해주세요.');
+            return;
+        }
+        if (!form.value.approvers.every(a => a.memberId)) {
+            alert('모든 결재자를 선택해주세요.');
+            return;
+        }
+        if (!form.value.contents.every(c => c.content)) {
+            alert('모든 결재 항목을 입력해주세요.');
+            return;
+        }
+
+        await approvalStore.submitApproval(memberId.value);
+        alert('결재 요청이 등록되었습니다.');
+        // 목록 페이지로 이동
+        router.push('/approval/sent');
+    } catch (error) {
+        console.error('결재 요청 실패:', error);
+        alert(error.message || '결재 요청 중 오류가 발생했습니다.');
+    }
 };
 </script>
 
@@ -176,6 +230,11 @@ const handleSubmit = async () => {
     color: #4B6B3A;
     margin-bottom: 2px;
     font-size: 1.02rem;
+}
+.approver-info {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 4px;
 }
 .add-approver-btn {
     border: 1.5px solid #7BAE6C !important;
