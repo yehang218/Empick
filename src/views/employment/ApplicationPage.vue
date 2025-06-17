@@ -35,11 +35,11 @@
           <v-card-text>
             <div class="d-flex align-start mb-4">
               <v-avatar size="80" class="mr-4">
-                <v-img :src="applicant.pictureUrl" alt="프로필 사진" />
+                <v-img :src="applicant.profileUrl" alt="프로필 사진" />
               </v-avatar>
               <div class="flex-grow-1">
                 <h2 class="text-h5 font-weight-bold mb-1">{{ applicant.name }}</h2>
-                <p class="text-body-2 text-grey mb-2">{{ applicant.jobTitle || '백엔드 개발자' }}</p>
+                <p class="text-body-2 text-grey mb-2">{{ applicant.jobName || '백엔드 개발자' }}</p>
                 <v-chip size="small" color="blue" variant="tonal">
                   {{ getExperiencePreview() }}
                 </v-chip>
@@ -96,6 +96,28 @@
                   <span class="ml-2 font-weight-medium">{{ formatDate(applicant.createdAt) }}</span>
                 </v-list-item-title>
               </v-list-item>
+
+              <v-list-item class="px-0 py-1" v-if="applicant.education">
+                <template #prepend>
+                  <v-icon class="mr-3" size="small">mdi-school</v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                  <span class="text-grey">학력</span>
+                  <span class="ml-2 font-weight-medium">{{ applicant.education }}</span>
+                </v-list-item-title>
+              </v-list-item>
+
+              <v-list-item class="px-0 py-1" v-if="applicant.portfolioUrl">
+                <template #prepend>
+                  <v-icon class="mr-3" size="small">mdi-briefcase</v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                  <span class="text-grey">포트폴리오</span>
+                  <a :href="applicant.portfolioUrl" target="_blank" class="ml-2 font-weight-medium text-primary">
+                    포트폴리오 보기
+                  </a>
+                </v-list-item-title>
+              </v-list-item>
             </v-list>
           </v-card-text>
         </v-card>
@@ -118,13 +140,18 @@
               <p class="text-body-2 line-height-1-6">{{ applicant.experience }}</p>
             </div>
 
-            <div class="resume-section">
+            <div class="resume-section mb-4">
               <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">기술 스택</h4>
               <div class="d-flex flex-wrap gap-2">
                 <v-chip v-for="skill in getSkillsArray()" :key="skill" size="small" variant="tonal" color="blue">
                   {{ skill }}
                 </v-chip>
               </div>
+            </div>
+
+            <div class="resume-section" v-if="applicant.coverLetter">
+              <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">자기소개서</h4>
+              <p class="text-body-2 line-height-1-6">{{ applicant.coverLetter }}</p>
             </div>
           </v-card-text>
         </v-card>
@@ -185,7 +212,7 @@
           <v-divider class="mb-4" />
           <v-card-text>
             <div v-if="viewMode === 'detail'">
-              <component :is="evaluationComponent" />
+              <component :is="evaluationComponent" :applicant="applicant" />
             </div>
             <div v-else class="score-analysis">
               <h4 class="text-h6 mb-4">점수 분석</h4>
@@ -253,7 +280,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 // import InterviewResult from '@/components/employment/InterviewResult.vue'
@@ -268,22 +295,46 @@ const viewMode = ref('detail')
 
 // query parameter에서 받은 기본 정보로 applicant 객체 구성
 const applicant = ref({
+  // 기본 ID 필드들
+  applicantId: '',
+  applicationId: '',
+
+  // 기본 정보
   name: '',
-  birth: '',
   phone: '',
   email: '',
+  profileUrl: '',
+  birth: '',
   address: '',
-  pictureUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
+
+  // 채용 관련 정보
+  recruitmentId: '',
+  introduceRatingResultId: '',
+  jobId: '',
+  jobName: '',
+  createdAt: '',
   status: '',
-  jobTitle: '',
-  motivation: '안정적이고 성장 가능성이 높은 기업에서 제 경험을 활용하여 더 나은 서비스를 만들어가고 싶습니다. 특히 귀사의 기술 스택과 개발 문화에 큰 매력을 느꼈습니다.',
-  experience: '백엔드 개발 3년 경력, Spring Boot를 활용한 REST API 개발 및 마이크로서비스 아키텍처 구축 경험',
-  skills: 'Java, Spring Boot, JPA, MySQL, Vue.js, Docker, AWS',
-  evaluationStats: [
-    { type: '자기소개서', score: 85, average: 76, result: '합격' },
-    { type: '실무 테스트', score: 90, average: 65, result: '합격' },
-    { type: '면접', score: 71, average: 78, result: '불합격' }
-  ]
+  updatedAt: '',
+  updatedBy: '',
+
+  // 추가된 필드들
+  introduceEvaluationContent: '',
+  introduceScore: null,
+  introduceStatus: '',
+  motivation: '',
+  experience: '',
+  skills: '',
+  education: '',
+  portfolioUrl: '',
+  coverLetter: '',
+  jobtestTotalScore: null,
+  jobtestEvaluationScore: null,
+  jobtestStatus: '',
+  interviewScore: null,
+  interviewAddress: '',
+  interviewDatetime: '',
+
+  evaluationStats: []
 })
 
 // 컴포넌트 마운트 시 query parameter에서 데이터 로드
@@ -298,8 +349,8 @@ onMounted(() => {
     evaluationStats.push({
       type: '자기소개서',
       score: parseInt(query.introduceScore),
-      average: 76, // 평균은 별도 계산 필요
-      result: query.introduceStatus === '합격' ? '합격' : '불합격'
+      average: null,
+      result: query.introduceStatus === 'PASSED' ? '합격' : '불합격'
     })
   }
 
@@ -308,8 +359,8 @@ onMounted(() => {
     evaluationStats.push({
       type: '실무 테스트',
       score: parseFloat(query.jobtestEvaluationScore),
-      average: 65, // 평균은 별도 계산 필요
-      result: parseFloat(query.jobtestEvaluationScore) >= 70 ? '합격' : '불합격'
+      average: null,
+      result: query.jobtestStatus === 'PASSED' ? '합격' : '불합격'
     })
   }
 
@@ -318,38 +369,51 @@ onMounted(() => {
     evaluationStats.push({
       type: '면접',
       score: parseFloat(query.interviewScore),
-      average: 78, // 평균은 별도 계산 필요
+      average: null,
       result: parseFloat(query.interviewScore) >= 70 ? '합격' : '불합격'
     })
   }
 
-  // 기본 평가 통계가 없으면 mock 데이터 사용
-  if (evaluationStats.length === 0) {
-    evaluationStats.push(
-      { type: '자기소개서', score: 85, average: 76, result: '합격' },
-      { type: '실무 테스트', score: 90, average: 65, result: '합격' },
-      { type: '면접', score: 71, average: 78, result: '불합격' }
-    )
-  }
-
   applicant.value = {
-    ...applicant.value,
+    // 기본 ID 필드들
+    applicantId: query.applicantId || '',
+    applicationId: query.applicationId || '',
+
+    // 기본 정보
     name: query.name || '정보 없음',
-    birth: query.birth || '',
-    phone: query.phone || '',
-    email: query.email || '',
-    address: query.address || '',
-    status: query.status || 'WAITING',
-    jobTitle: query.jobName || '백엔드 개발자',
-    pictureUrl: query.profileUrl || 'https://randomuser.me/api/portraits/women/1.jpg',
+    phone: query.phone || '정보 없음',
+    email: query.email || '정보 없음',
+    profileUrl: query.profileUrl || '',
+    birth: query.birth || '정보 없음',
+    address: query.address || '정보 없음',
+
+    // 채용 관련 정보
     recruitmentId: query.recruitmentId || '',
-    createdAt: query.createdAt || '',
+    introduceRatingResultId: query.introduceRatingResultId || '',
+    jobId: query.jobId || '',
+    jobName: query.jobName || '정보 없음',
+    createdAt: query.createdAt || '정보 없음',
+    status: query.status || 'WAITING',
     updatedAt: query.updatedAt || '',
-    introduceRatingResultId: query.introduceRatingResultId || null,
-    // 실제 데이터로 교체
-    motivation: query.motivation || '안정적이고 성장 가능성이 높은 기업에서 제 경험을 활용하여 더 나은 서비스를 만들어가고 싶습니다.',
-    experience: query.experience || '백엔드 개발 3년 경력, Spring Boot를 활용한 REST API 개발 및 마이크로서비스 아키텍처 구축 경험',
-    skills: query.skills || 'Java, Spring Boot, JPA, MySQL, Vue.js, Docker, AWS',
+    updatedBy: query.updatedBy || '',
+
+    // 추가된 필드들
+    introduceEvaluationContent: query.introduceEvaluationContent || '',
+    introduceScore: query.introduceScore ? parseInt(query.introduceScore) : null,
+    introduceStatus: query.introduceStatus || '',
+    motivation: query.motivation || '정보 없음',
+    experience: query.experience || '정보 없음',
+    skills: query.skills || '정보 없음',
+    education: query.education || '정보 없음',
+    portfolioUrl: query.portfolioUrl || '',
+    coverLetter: query.coverLetter || '정보 없음',
+    jobtestTotalScore: query.jobtestTotalScore ? parseFloat(query.jobtestTotalScore) : null,
+    jobtestEvaluationScore: query.jobtestEvaluationScore ? parseFloat(query.jobtestEvaluationScore) : null,
+    jobtestStatus: query.jobtestStatus || '',
+    interviewScore: query.interviewScore ? parseFloat(query.interviewScore) : null,
+    interviewAddress: query.interviewAddress || '정보 없음',
+    interviewDatetime: query.interviewDatetime || '정보 없음',
+
     evaluationStats: evaluationStats
   }
 })
