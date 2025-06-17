@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class IntroduceRatingResultCommandServiceImp implements IntroduceRatingResultCommandService {
 
     private final IntroduceRatingResultRepository introduceRatingResultRepository;
+    private final IntroduceRatingResultCommandMapper introduceRatingResultCommandMapper;
 
     @Override
     public IntroduceRatingResultCommandDTO create(IntroduceRatingResultCommandDTO dto) {

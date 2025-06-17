@@ -1,26 +1,29 @@
 package com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate;
 
 
+import lombok.Getter;
+
+@Getter
 public enum IntroduceRatingResultStatus {
-    BEFORE_CONFIRM(0, "확인 전"),
-    CONFIRMED(1, "확인만"),
-    PASS(2, "합격"),
-    FAIL(3, "불합격");
+    PENDING(0, "확인전"),
+    REVIEWING(1, "확인중"),
+    PASSED(2, "합격"),
+    FAILED(3, "불합격");
 
     private final int code;
-    private final String description;
+    private final String label;
 
-    IntroduceRatingResultStatus(int code, String description) {
+    IntroduceRatingResultStatus(int code, String label) {
         this.code = code;
-        this.description = description;
+        this.label = label;
     }
 
     public int getCode() {
         return code;
     }
 
-    public String getDescription() {
-        return description;
+    public String getLabel() {
+        return label;
     }
 
     public static IntroduceRatingResultStatus fromCode(int code) {
@@ -29,7 +32,6 @@ public enum IntroduceRatingResultStatus {
                 return status;
             }
         }
-        throw new IllegalArgumentException("Invalid IntroduceResultStatus code: " + code);
+        throw new IllegalArgumentException("Invalid IntroduceRatingResultStatus code: " + code);
     }
 }
-
