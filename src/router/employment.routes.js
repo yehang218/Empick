@@ -183,6 +183,15 @@ export const employmentRoutes = [
             requiresAuth: true
             }
         },
+        // 지원자 인적사항 등록 페이지
+        {
+            path: '/employment/applicants/register',
+            name: 'ApplicantRegistrationPage',
+            component: () => import('@/views/employment/ApplicantRegistrationPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
         {
             path: '/employment/introduce-standard-items/:templateId',
             name: 'IntroduceStandardItemPage',

@@ -1,9 +1,11 @@
 import { ApplicantAPI } from '@/apis/routes/applicant';
 import api from '@/apis/apiClient';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import ApplicantCommandDTO from '@/dto/employment/applicant/applicantCommandDTO';
-import ApplicantResponseDTO from '@/dto/employment/applicant/applicantResponseDTO';
+// import ApplicantCommandDTO from '@/dto/employment/employment/applicant/applicantCommandDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
+import axios from '@/apis/axios';
+
+const APPLICANT_API_BASE_URL = '/api/v1/employment/applicant';
 
 export const getAllApplicantsService = async (options = {}) => {
   return withErrorHandling(async () => {
@@ -95,3 +97,36 @@ export const removeBookmarkService = async (memberId, applicantId, options = {})
     return apiResponse.data;
   }, options);
 };
+
+const applicantService = {
+  /**
+   * 새로운 지원자를 등록합니다.
+   * @param {Object} applicantData - 등록할 지원자 데이터 (이름, 전화번호 등)
+   * @returns {Promise<Object>} API 응답 데이터 (CustomApiResponse 구조)
+   */
+  async registerApplicant(applicantData) {
+    try {
+      const response = await axios.post(`${APPLICANT_API_BASE_URL}/create`, applicantData);
+      return response.data; // CustomApiResponse 구조를 따른 응답
+    } catch (error) {
+      console.error('지원자 등록 실패:', error);
+      throw error; // 에러를 호출자에게 다시 던집니다.
+    }
+  },
+
+  /**
+   * 모든 지원자 목록을 조회합니다.
+   * @returns {Promise<Object>} API 응답 데이터 (CustomApiResponse 구조, 지원자 목록 포함)
+   */
+  async fetchAllApplicants() {
+    try {
+      const response = await axios.get(APPLICANT_API_BASE_URL);
+      return response.data; // CustomApiResponse 구조를 따른 응답
+    } catch (error) {
+      console.error('지원자 목록 조회 실패:', error);
+      throw error; // 에러를 호출자에게 다시 던집니다.
+    }
+  }
+};
+
+export default applicantService;

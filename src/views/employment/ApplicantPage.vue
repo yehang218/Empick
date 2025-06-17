@@ -11,9 +11,14 @@
           <!-- 🔍 검색창 (공통 컴포넌트) -->
           <Search v-model="search" />
 
-          <!-- 👤 사원 등록 버튼 -->
+          <!-- 👤 사원 등록 버튼 (유지) -->
           <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px">
             사원 등록
+          </v-btn>
+
+          <!-- ➕ 지원자 추가 버튼 (새로 추가) -->
+          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="goToApplicantRegistration">
+            지원자 추가
           </v-btn>
 
           <!-- 📝 문제 할당 버튼 -->
@@ -38,13 +43,6 @@
         class="elevation-1"
         show-headers
       >
-        <!-- 처리 상태 칩 -->
-        <template #item.status="{ item }">
-          <v-chip :color="getStatusColor(item.status)" variant="tonal" size="small">
-            {{ item.status }}
-          </v-chip>
-        </template>
-
         <!-- 지원서 확인 텍스트 버튼 -->
         <template #item.actions="{ item }">
           <v-btn color="primary" variant="text" size="small" @click="viewDetail(item)">
@@ -57,49 +55,28 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
+import applicantService from '@/services/applicantService'
 
 const search = ref('')
 const router = useRouter()
 
-const dummyApplicants = ref([
-  { id: 1, name: '김철수', email: 'kim@example.com', birth: '1995-01-01', phone: '010-1234-5678', status: '최종합격', recruitment: '백엔드 개발자' },
-  { id: 2, name: '이영희', email: 'lee@example.com', birth: '1996-03-10', phone: '010-9876-5432', status: '불합격', recruitment: '프론트 개발자' },
-  { id: 3, name: '박지민', email: 'jimin@example.com', birth: '1994-11-23', phone: '010-5678-1234', status: '서류합격', recruitment: 'AI 연구원' },
-  { id: 4, name: '최유리', email: 'yuri@example.com', birth: '1998-02-05', phone: '010-4567-9876', status: '1차합격', recruitment: '마케터' },
-  { id: 5, name: '장하늘', email: 'sky@example.com', birth: '1997-05-16', phone: '010-1111-2222', status: '불합격', recruitment: '백엔드 개발자' },
-  { id: 6, name: '한예린', email: 'yerin@example.com', birth: '1995-08-08', phone: '010-3333-4444', status: '서류합격', recruitment: '데이터 분석가' },
-  { id: 7, name: '김진우', email: 'jinu@example.com', birth: '1996-06-17', phone: '010-5555-6666', status: '2차합격', recruitment: 'AI 연구원' },
-  { id: 8, name: '윤서희', email: 'seohee@example.com', birth: '1994-09-21', phone: '010-7777-8888', status: '1차합격', recruitment: '프론트 개발자' },
-  { id: 9, name: '이도윤', email: 'doyoon@example.com', birth: '1999-12-12', phone: '010-9999-0000', status: '서류합격', recruitment: '백엔드 개발자' }
-])
+const applicants = ref([])
 
 const tableHeaders = [
   { text: '이름', value: 'name', sortable: true },
   { text: '이메일', value: 'email', sortable: true },
   { text: '생년월일', value: 'birth', sortable: true },
   { text: '전화번호', value: 'phone', sortable: true },
+  { text: '주소', value: 'address', sortable: true },
   { text: '지원서', value: 'actions', sortable: false },
-  { text: '처리 상태', value: 'status', sortable: true },
-  { text: '채용 공고 제목', value: 'recruitment', sortable: true }
 ]
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case '최종합격': return 'success'
-    case '불합격': return 'error'
-    case '서류합격': return 'info'
-    case '1차합격': return 'teal'
-    case '2차합격': return 'blue'
-    default: return 'grey'
-  }
-}
-
 const filteredApplicants = computed(() => {
-  if (!search.value) return dummyApplicants.value
-  return dummyApplicants.value.filter(applicant =>
+  if (!search.value) return applicants.value
+  return applicants.value.filter(applicant =>
     Object.values(applicant).some(val =>
       String(val).toLowerCase().includes(search.value.toLowerCase())
     )
@@ -110,6 +87,34 @@ const viewDetail = (item) => {
   console.log('지원자 상세:', item)
   router.push(`/employment/application/${item.id}`)
 }
+
+const goToApplicantRegistration = () => {
+  router.push('/employment/applicants/register')
+}
+
+const loadApplicants = async () => {
+  try {
+    const response = await applicantService.fetchAllApplicants();
+    if (response.isSuccess) {
+      applicants.value = response.data.data;
+      applicants.value.forEach(applicant => {
+        if (applicant.birth) {
+          applicant.birth = applicant.birth;
+        }
+      });
+    } else {
+      console.error(`지원자 목록 로드 실패: ${response.message}`);
+      alert(`지원자 목록 로드 실패: ${response.message}`);
+    }
+  } catch (error) {
+    console.error('지원자 목록 로드 중 오류 발생:', error);
+    alert('지원자 목록 로드 중 오류가 발생했습니다. 다시 시도해주세요.');
+  }
+}
+
+onMounted(() => {
+  loadApplicants();
+});
 </script>
 
 <style scoped>
