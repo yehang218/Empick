@@ -2,8 +2,11 @@ package com.piveguyz.empickbackend.employment.jobtests.question.command.applicat
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.jobtests.answer.command.domain.repository.AnswerRepository;
 import com.piveguyz.empickbackend.employment.jobtests.grading.command.application.mapper.GradingCriteriaMapper;
 import com.piveguyz.empickbackend.employment.jobtests.grading.command.domain.repository.GradingCriteriaRepository;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.JobtestQuestionRepository;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.repository.JobtestRepository;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.CreateQuestionOptionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto.DeleteQuestionCommandDTO;
@@ -33,6 +36,9 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
     private final QuestionOptionRepository questionOptionRepository;
     private final GradingCriteriaRepository gradingCriteriaRepository;
     private final MemberRepository memberRepository;
+    private final AnswerRepository answerRepository;
+    private final JobtestRepository jobtestRepository;
+    private final JobtestQuestionRepository jobtestQuestionRepository;
 
 
     // 실무 테스트 문제 등록
@@ -101,6 +107,16 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
         // 문제 있는지 확인
         QuestionEntity question = questionRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_QUESTION));
+
+        // 답안에서 참조중이라면
+        if(answerRepository.existsByQuestionId(id)) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_USED_IN_ANSWER);
+        }
+
+        // 실무테스트에서 참조중이라면
+        if(jobtestQuestionRepository.existsByQuestionId(id)) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_USED_IN_JOBTEST);
+        }
 
         try {
             questionRepository.delete(question);

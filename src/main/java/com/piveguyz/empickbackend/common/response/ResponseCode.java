@@ -167,10 +167,11 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_QUESTION_TYPE(false, HttpStatus.BAD_REQUEST, 2412, "유효하지 않은 실무테스트 문제 유형입니다."),
     EMPLOYMENT_INVALID_QUESTION(false, HttpStatus.NOT_FOUND, 2413, "요청한 문제를 찾을 수 없습니다."),
     EMPLOYMENT_QUESTION_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2414, "이 문제는 다른 곳에서 사용 중이므로 삭제할 수 없습니다."),
-
+    EMPLOYMENT_QUESTION_USED_IN_ANSWER(false, HttpStatus.BAD_REQUEST,2415, "해당 문제는 제출된 답변이 있어 삭제할 수 없습니다."),
     EMPLOYMENT_OPTION_COUNT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2416, "선택지는 최대 5개까지만 등록할 수 있습니다."),
     EMPLOYMENT_QUESTION_OPTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2417, "선택지를 찾을 수 없습니다."),
     EMPLOYMENT_QUESTION_OPTION_MAX_NUMBER(false, HttpStatus.BAD_REQUEST, 2418, "선택지는 5번을 초과할 수 없습니다."),
+    EMPLOYMENT_QUESTION_USED_IN_JOBTEST(false, HttpStatus.BAD_REQUEST, 2419, "해당 문제는 실무 테스트에서 사용 중입니다."),
 
     //   2) 실무테스트
     EMPLOYMENT_JOBTEST_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2420, "이 실무테스트는 다른 곳에서 사용중이므로 수정하거나 삭제할 수 없습니다."),

@@ -14,4 +14,6 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, Integer> {
     Optional<AnswerEntity> findByApplicationJobTestIdAndQuestionId(int applicationJobTestId, int questionId);
 
     List<AnswerEntity> findByApplicationJobTestId(int applicationJobTestId);
+
+    boolean existsByQuestionId(int id);
 }
