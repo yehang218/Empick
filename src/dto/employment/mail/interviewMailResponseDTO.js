@@ -1,4 +1,4 @@
-export default class interviewMailResponseDTO {
+export default class InterviewMailResponseDTO {
     constructor(id, recruitmentId, recruitmentTitle, applicantId, applicantName, email, interviewId, interviewDatetime, interviewAddress) {
         this.id = id;
         this.recruitmentId = recruitmentId;
@@ -12,7 +12,7 @@ export default class interviewMailResponseDTO {
     }
 
     static fromJSON(json) {
-        return new interviewMailResponseDTO(
+        return new InterviewMailResponseDTO(
             json.id,
             json.recruitmentId,
             json.recruitmentTitle,

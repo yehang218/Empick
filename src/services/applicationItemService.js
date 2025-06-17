@@ -14,7 +14,7 @@ export const fetchApplicationItemCategories = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data.map(applicationItemCategoryDTO.fromJSON);
+        return apiResponse.data.map(item => applicationItemCategoryDTO.fromJSON(item));
     }, options);
 };
 
@@ -28,6 +28,6 @@ export const fetchApplicationItemsByRecruitment = async (recruitmentId, options 
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return apiResponse.data.map(item => applicationItemCategoryDTO.fromJSON(item));
     }, options);
 };

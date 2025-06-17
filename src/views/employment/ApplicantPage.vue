@@ -152,7 +152,7 @@ import { debounce } from 'lodash'
 // 실무테스트 할당
 import { useJobtestListStore } from '@/stores/jobtestListStore';
 import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore';
-import ApplicationJobtestDTO from '@/dto/employment/jobtest/applicationJobtestDTO';
+import ApplicationJobtestDTO from '@/dto/employment/jobtest/createApplicationJobtestDTO';
 import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
 
 // 로컬 상태로 selectedApplicants 관리

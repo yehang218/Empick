@@ -23,4 +23,4 @@ export default class ApiResponseDTO {
             data: this.data
         };
     }
-} 
+}

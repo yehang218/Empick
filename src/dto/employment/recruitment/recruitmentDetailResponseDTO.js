@@ -2,7 +2,7 @@ import recruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResp
 import applicationItemDTO from '@/dto/employment/recruitment/applicationItemDTO'
 import recruitmentProcessDTO from '@/dto/employment/recruitment/recruitmentProcessDTO'
 
-export default class recruitmentDetailResponseDTO {
+export default class RecruitmentDetailResponseDTO {
     constructor(recruitment, request, template, applicationItems, processes) {
         this.recruitment = recruitment
         this.request = request
@@ -16,7 +16,7 @@ export default class recruitmentDetailResponseDTO {
 
         if (!json || !json.id) {
             console.warn('❌ 잘못된 JSON 구조:', json)
-            return new recruitmentDetailResponseDTO(null, null, null, [], [])
+            return new RecruitmentDetailResponseDTO(null, null, null, [], [])
         }
 
         // 🔥 여기가 핵심! json.recruitment ❌ → json ✅
