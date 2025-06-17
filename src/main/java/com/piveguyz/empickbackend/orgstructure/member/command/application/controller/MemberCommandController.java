@@ -34,7 +34,7 @@ public class MemberCommandController {
     private final MemberCommandService memberCommandService;
     private final MemberProfileFacade memberProfileFacade;
 
-    @PostMapping
+    @PostMapping("/registrations")
     @Operation(summary = "사원 등록", description = "새로운 사원을 등록합니다.", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공",
