@@ -1,4 +1,4 @@
-// 선택된 지원자들의 이름 목<template>
+<template>
   <v-container fluid style="margin-top: 70px;">
     <v-card>
       <!-- 상단 타이틀 + 검색/버튼 영역 -->
@@ -131,7 +131,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
 import { useApplicantStore } from '@/stores/applicantStore';
@@ -142,15 +143,14 @@ import { useJobtestListStore } from '@/stores/jobtestListStore';
 import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore';
 import ApplicationJobtestDTO from '@/dto/employment/jobtest/applicationJobtestDTO';
 import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 const selectedIds = ref([]);
 const jobtestModal = ref(false);
 const toast = useToast();
 const jobtestListStore = useJobtestListStore();
 const applicationJobtestStore = useApplicationJobtestStore();
 const applicantStore = useApplicantStore();
+const router = useRouter()
 
 const search = ref('')
 
@@ -231,6 +231,7 @@ const getUniqueApplicantCount = () => {
   return uniqueApplicantIds.size;
 };
 
+
 const getStatusColor = (status) => {
   switch (status) {
     case 'PASSED_FINAL': return 'success'
@@ -278,8 +279,7 @@ const handleSort = (options) => {
 }
 
 const viewDetail = (item) => {
-  router.push(`/employment/applicant/${item.applicationId}` + '?jobtestId=' + item.jobtestId)
-  console.log('지원자 상세:', item)
+  router.push(`/employment/applications/${item.applicationId}`)
 }
 
 const handleAssignClick = async () => {
