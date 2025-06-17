@@ -216,5 +216,13 @@ export const employmentRoutes = [
             hideSidebar: false,
             requiresAuth: true
         }
+    },
+    {
+        path: '/employment/applicant/recruitments/:recruitmentId',
+        name: 'ApplicantRecruitmentPage',
+        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
     }
 ]; 

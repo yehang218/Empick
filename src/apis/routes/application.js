@@ -5,6 +5,8 @@ export const ApplicantAPI = {
         `/api/v1/employment/applicant/${id}`,
     SEARCH_APPLICANTS_BY_NAME: (name) =>
         `/api/v1/employment/applicant/search?name=${encodeURIComponent(name)}`,
+    GET_APPLICANT_BY_RECRUITMENT_ID: (recruitmentId) =>
+        `/api/v1/employment/applicant/recruitment/${recruitmentId}`,
 
     // 🔸 생성
     CREATE_APPLICANT: '/api/v1/employment/applicant/create',
