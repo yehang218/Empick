@@ -83,7 +83,10 @@ const handleRowClick = (e) => {
 
     const item = pagedRecruitments.value[index];
     if (item?.id) {
-        router.push(`/employment/recruitments/${item.id}`);
+        router.push({
+            path: `/employment/recruitments/${item.id}`,
+            query: { page: page.value }
+        });
     }
 };
 

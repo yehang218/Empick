@@ -108,7 +108,9 @@ const viewDetail = (item) => {
     router.push({
         path: `/employment/applications/${item.applicationId}`,
         query: {
-            ...applicantData
+            ...applicantData,
+            from: `/employment/applicant/recruitments/${recruitmentId.value}`,
+            page: route.query.page
         }
     })
 }
@@ -201,7 +203,11 @@ const toggleSelectAll = (selectAll) => {
     }
 }
 const goBack = () => {
-    router.push(`/employment/recruitments/${recruitmentId.value}`);
+    const page = route.query.page;
+    router.push({
+        path: `/employment/recruitments/${recruitmentId.value}`,
+        query: page ? { page } : {}
+    });
 }
 </script>
 
