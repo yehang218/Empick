@@ -11,9 +11,7 @@
             id,
             content,
             member_id AS memberId,
-            introduce_id AS introduceId,
-            updated_by AS updatedBy,
-            updated_at AS updatedAt
+            introduce_id AS introduceId
         FROM
             introduce_standard
     </select>

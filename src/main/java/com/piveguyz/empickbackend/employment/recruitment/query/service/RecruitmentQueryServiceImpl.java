@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO;
+import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQueryDTO;
 import com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryConditionDTO;
 import com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryDTO;
 import com.piveguyz.empickbackend.employment.recruitment.query.mapper.RecruitmentQueryMapper;
@@ -29,5 +31,10 @@ public class RecruitmentQueryServiceImpl implements RecruitmentQueryService {
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NOT_FOUND);
 		}
 		return result;
+	}
+
+	@Override
+	public List<ApplicationQueryDTO> findApplicationsByRecruitmentId(int recruitmentId) {
+		return recruitmentQueryMapper.selectApplicationsByRecruitmentId(recruitmentId);
 	}
 }

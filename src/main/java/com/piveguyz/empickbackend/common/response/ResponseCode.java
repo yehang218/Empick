@@ -22,6 +22,7 @@ public enum ResponseCode {
     FORBIDDEN(false, HttpStatus.FORBIDDEN, 403, "접근 권한이 없습니다."),
     NOT_FOUND(false, HttpStatus.NOT_FOUND, 404, "요청한 리소스를 찾을 수 없습니다."),
     VALIDATION_FAIL(false, HttpStatus.BAD_REQUEST, 405, "유효성 검증에 실패했습니다."),
+    INVALID_PARAMETER(false, HttpStatus.BAD_REQUEST, 400, "잘못된 매개변수입니다."),
 
     // 서버 오류 (5xx)
     INTERNAL_SERVER_ERROR(false, HttpStatus.INTERNAL_SERVER_ERROR, 500, "서버 내부 오류입니다."),
@@ -55,6 +56,16 @@ public enum ResponseCode {
     POSITION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1201, "요청한 직책을 찾을 수 없습니다."),
     JOB_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1202, "요청한 직무를 찾을 수 없습니다."),
     RANK_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1203, "요청한 직급을 찾을 수 없습니다."),
+
+    RANK_CODE_DUPLICATE(false, HttpStatus.CONFLICT, 1204, "이미 존재하는 직급 코드입니다."),
+    RANK_CODE_INVALID_FORMAT(false, HttpStatus.BAD_REQUEST, 1205, "직급 코드 형식이 올바르지 않습니다."),
+    RANK_NAME_DUPLICATE(false, HttpStatus.CONFLICT, 1206, "이미 존재하는 직급명입니다."),
+    RANK_IN_USE(false, HttpStatus.CONFLICT, 1207, "해당 직급을 사용하는 사원이 있어 삭제할 수 없습니다."),
+
+    POSITION_NAME_DUPLICATE(false, HttpStatus.CONFLICT, 1208, "이미 존재하는 직책명입니다."),
+    POSITION_NAME_INVALID_FORMAT(false, HttpStatus.BAD_REQUEST, 1209, "직책명 형식이 올바르지 않습니다."),
+    POSITION_IN_USE(false, HttpStatus.CONFLICT, 1210, "해당 직책을 사용하는 사원이 있어 삭제할 수 없습니다."),
+    POSITION_DESCRIPTION_TOO_LONG(false, HttpStatus.BAD_REQUEST, 1211, "직책 설명이 너무 깁니다."),
 
     // 채용 오류 - 2000 ~ 2999
     // 채용 공고 - 2000 ~ 2099
@@ -126,8 +137,12 @@ public enum ResponseCode {
     DUPLICATE_TEMPLATE_TITLE(false, HttpStatus.CONFLICT, 2106, "이미 존재하는 템플릿 제목입니다."),
     INTRODUCE_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2107, "요청한 자기소개서 템플릿 ID가 존재하지 않습니다."),
     INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
-    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2109, "이미 존재하는 템플릿 항목명입니다."),
-    INTRODUCE_RATING_RESULT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2110, "요청한 자기소개서 평가 결과 ID가 존재하지 않습니다."),
+    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2112, "이미 존재하는 템플릿 항목명입니다."),
+    INTRODUCE_STANDARD_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2113, "해당 자기소개서 기준표 항목을 찾을 수 없습니다."),
+    DUPLICATE_STANDARD_ITEM_CONTENT(false, HttpStatus.CONFLICT, 2114, "이미 존재하는 자기소개서 기준표 항목입니다."),
+    DUPLICATE_STANDARD_ITEM_CONTENT_TITLE(false, HttpStatus.CONFLICT, 2115, "이미 존재하는 자기소개서 기준표 항목명입니다."),
+    INTRODUCE_STANDARD_NOT_FOUND(false, HttpStatus.NOT_FOUND , 2116 ,"자기소개서 기준표 id를 찾을 수 없습니다" ),
+    DUPLICATE_STANDARD_CONTENT(false,HttpStatus.CONFLICT ,2117 ,"중복된 내용입니다" ),
 
 
 
@@ -166,8 +181,11 @@ public enum ResponseCode {
     //   3) 지원서별 실무테스트
     EMPLOYMENT_INVALID_ENTRY_CODE(false, HttpStatus.BAD_REQUEST, 2300, "입장 코드는 5자리 숫자여야 합니다."),
     EMPLOYMENT_ENTRY_CODE_DUPLICATE(false, HttpStatus.CONFLICT, 2301, "중복된 입장 코드입니다."),
-    EMPLOYMENT_INVALID_APPLICATION_JOBTEST(false, HttpStatus.NOT_FOUND, 2302, "존재하지 않는 지원서별 실무테스트입니다."),
-
+    EMPLOYMENT_JOBTEST_INVALID_ENTRY_CODE(false, HttpStatus.NOT_FOUND, 2302, "입장 코드가 올바르지 않습니다."),
+    EMPLOYMENT_ENTRY_CODE_GENERATION_FAILED(false, HttpStatus.BAD_REQUEST, 2303, "입장 코드를 생성할 수 없습니다."),
+    EMPLOYMENT_INVALID_APPLICATION_JOBTEST(false, HttpStatus.NOT_FOUND, 2304, "존재하지 않는 지원서별 실무테스트입니다."),
+    EMPLOYMENT_INVALID_TIME(false, HttpStatus.BAD_REQUEST, 2305, "시험 시간이 아닙니다."),
+    EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2306, "해당 지원서에 이미 실무테스트가 할당되어 있습니다."),
 
     //   4) 실무테스트 답안
     EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2440, "요청한 답안을 찾을 수 없습니다."),

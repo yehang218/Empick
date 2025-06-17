@@ -143,6 +143,7 @@ public class MailCommandServiceImpl implements MailCommandService {
             context.setVariable("recruitmentTitle", recruitmentTitle);
             context.setVariable("applicantName", applicantName);
             context.setVariable("entryCode", entryCode);
+            context.setVariable("jobtestId", jobTestId);
             context.setVariable("jobTestTitle", jobTestTitle);
             context.setVariable("testTime", testTime);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일 (E) a h시 mm분")

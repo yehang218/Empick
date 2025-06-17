@@ -1,5 +1,7 @@
 package com.piveguyz.empickbackend.employment.applicant.query.service;
 
+import com.piveguyz.empickbackend.common.exception.BusinessException;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQueryDTO;
 import com.piveguyz.empickbackend.employment.applicant.query.mapper.ApplicationMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,4 +20,19 @@ public class ApplicationQueryServiceImp implements ApplicationQueryService {
 
         return applicationMapper.findAllApplication();
     }
+
+    @Override
+    public List<ApplicationQueryDTO> findApplicationById(int id) {
+        return applicationMapper.findApplicationById(id);
+    }
+
+    @Override
+    public ApplicationQueryDTO findApplicationByApplicantId(Integer applicantId) {
+        ApplicationQueryDTO dto = applicationMapper.findApplicationByApplicantId(applicantId);
+        if(dto == null){
+            throw new BusinessException(ResponseCode.APPLICATION_RESPONSE_EMPTY_CONTENT);
+        }
+        return dto;
+    }
+
 }

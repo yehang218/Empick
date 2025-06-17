@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.approvals.approvalContent.query.mapper.ApprovalContentQueryMapper">
+    <resultMap id="ApprovalContentItemResultMap" type="com.piveguyz.empickbackend.approvals.approvalContent.query.dto.ApprovalContentQueryDTO">
+        <id column="id" property="id"/>
+        <result column="approval_id" property="approvalId"/>
+        <result column="item_id" property="itemId"/>
+        <result column="content" property="content"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="ApprovalContentItemResultMap">
+        SELECT
+            id,
+            approval_id,
+            item_id,
+            content
+        FROM approval_content;
+    </select>
+
+    <select id="findById" resultMap="ApprovalContentItemResultMap">
+        SELECT
+            id,
+            approval_id,
+            item_id,
+            content
+        FROM approval_content
+        WHERE id = #{id};
+    </select>
+
+    <select id="findByApprovalId" resultMap="ApprovalContentItemResultMap">
+        SELECT
+            id,
+            approval_id,
+            item_id,
+            content
+        FROM approval_content
+        WHERE approval_id = #{approvalId};
+    </select>
+
+
+</mapper>

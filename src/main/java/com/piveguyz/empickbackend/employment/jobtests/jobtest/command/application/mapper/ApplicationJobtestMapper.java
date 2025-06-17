@@ -3,37 +3,30 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicati
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateApplicationJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateApplicationJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.ApplicationJobtestEntity;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.enums.JobtestStatus;
 
 public class ApplicationJobtestMapper {
 
-    public static ApplicationJobtestEntity toEntity(CreateApplicationJobtestCommandDTO dto) {
+    public static ApplicationJobtestEntity toEntity(CreateApplicationJobtestCommandDTO dto, String entryCode) {
         return ApplicationJobtestEntity.builder()
-                .evaluatorComment(dto.getEvaluatorComment())
-                .submittedAt(dto.getSubmittedAt())
-                .gradingTotalScore(dto.getGradingTotalScore())
-                .evaluationScore(dto.getEvaluationScore())
-                .evaluationStatus(dto.getEvaluationStatus())
-                .gradingStatus(dto.getGradingStatus())
-                .entryCode(dto.getEntryCode())
+                .gradingTotalScore(0.0)
+                .evaluationScore(0.0)
+                .evaluationStatus(JobtestStatus.WAITING)
+                .gradingStatus(JobtestStatus.WAITING)
+                .entryCode(entryCode)
                 .applicationId(dto.getApplicationId())
                 .jobTestId(dto.getJobtestId())
-                .memberId(dto.getMemberId())
+                .gradingMemberId(dto.getGradingMemberId())
+                .evaluationMemberId(dto.getEvaluationMemberId())
                 .build();
     }
 
     public static CreateApplicationJobtestCommandDTO toCreateDto(ApplicationJobtestEntity entity) {
         return CreateApplicationJobtestCommandDTO.builder()
-                .evaluatorComment(entity.getEvaluatorComment())
-                .evaluationScore(entity.getEvaluationScore())
-                .submittedAt(entity.getSubmittedAt())
-                .gradingTotalScore(entity.getGradingTotalScore())
-                .evaluationScore(entity.getEvaluationScore())
-                .gradingStatus(entity.getGradingStatus())
-                .evaluationStatus(entity.getEvaluationStatus())
-                .entryCode(entity.getEntryCode())
                 .applicationId(entity.getApplicationId())
                 .jobtestId(entity.getJobTestId())
-                .memberId(entity.getMemberId())
+                .gradingMemberId(entity.getGradingMemberId())
+                .evaluationMemberId(entity.getEvaluationMemberId())
                 .build();
     }
 
@@ -45,8 +38,8 @@ public class ApplicationJobtestMapper {
                 .evaluationScore(entity.getEvaluationScore())
                 .gradingStatus(entity.getGradingStatus())
                 .evaluationStatus(entity.getEvaluationStatus())
-                .entryCode(entity.getEntryCode())
-                .memberId(entity.getMemberId())
+                .gradingMemberId(entity.getGradingMemberId())
+                .evaluationMemberId(entity.getEvaluationMemberId())
                 .build();
     }
 }

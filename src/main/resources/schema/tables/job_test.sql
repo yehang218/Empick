@@ -35,22 +35,24 @@ CREATE TABLE job_test
 # ========================== 지원서별 실무 테스트
 CREATE TABLE application_job_test
 (
-    id                  INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    evaluator_comment   LONGTEXT     NULL COMMENT '평가자 코멘트',
-    submitted_at        DATETIME     NOT NULL COMMENT '제출 일시',
-    grading_total_score DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '채점 총 점수',
-    evaluation_score    DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '평가 점수',
-    grading_status      TINYINT      NOT NULL DEFAULT 0 COMMENT '채점 상태',
-    evaluation_status   TINYINT      NOT NULL DEFAULT 0 COMMENT '평가 상태',
-    entry_code          VARCHAR(255) NULL COMMENT '입장 코드',
+    id                   INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    evaluator_comment    LONGTEXT     NULL COMMENT '평가자 코멘트',
+    submitted_at         DATETIME     NULL COMMENT '제출 일시',
+    grading_total_score  DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '채점 총 점수',
+    evaluation_score     DOUBLE       NOT NULL DEFAULT 0.0 COMMENT '평가 점수',
+    grading_status       TINYINT      NOT NULL DEFAULT 0 COMMENT '채점 상태',
+    evaluation_status    TINYINT      NOT NULL DEFAULT 0 COMMENT '평가 상태',
+    entry_code           VARCHAR(255) NULL COMMENT '입장 코드',
 
-    application_id      INT          NOT NULL COMMENT '지원서 id',
-    job_test_id         INT          NOT NULL COMMENT '실무테스트 id',
-    member_id           INT          NULL COMMENT '평가자 id',
+    application_id       INT          NOT NULL COMMENT '지원서 id',
+    job_test_id          INT          NOT NULL COMMENT '실무테스트 id',
+    grading_member_id    INT          NULL COMMENT '채점자 id',
+    evaluation_member_id INT          NULL COMMENT '평가자 id',
 
     FOREIGN KEY (`application_id`) REFERENCES `application` (`id`),
     FOREIGN KEY (`job_test_id`) REFERENCES `job_test` (`id`),
-    FOREIGN KEY (`member_id`) REFERENCES `member` (`id`)
+    FOREIGN KEY (`grading_member_id`) REFERENCES `member` (`id`),
+    FOREIGN KEY (`evaluation_member_id`) REFERENCES `member` (`id`)
 );
 
 

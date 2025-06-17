@@ -4,7 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.piveguyz.empickbackend.employment.applicant.query.mapper.ApplicantMapper">
-    <resultMap id="ApplicantResultMap" type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO">
+    <resultMap id="ApplicantResultMap"
+               type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO">
         <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="phone" column="phone"/>
@@ -14,8 +15,63 @@
         <result property="address" column="address"/>
     </resultMap>
 
+    <resultMap id="ApplicantFullInfoResultMap"
+               type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantFullInfoDTO">
+        <result property="applicantId" column="applicant_id"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="profileUrl" column="profile_url"/>
+        <result property="birth" column="birth"/>
+        <result property="address" column="address"/>
+        <result property="recruitmentId" column="recruitment_id"/>
+        <result property="introduceRatingResultId" column="introduce_rating_result_id"/>
+        <result property="jobId" column="job_id"/>
+        <result property="jobName" column="job_name"/>
+        <result property="createdAt" column="created_at" javaType="java.time.LocalDateTime"/>
+        <result property="status" column="status"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="updatedBy" column="updated_by"/>
+    </resultMap>
+
+    <select id="findAllApplicantFullInfo" resultMap="ApplicantFullInfoResultMap">
+        SELECT DISTINCT
+            a.id AS applicant_id,
+            a.name,
+            a.phone,
+            a.email,
+            a.profile_url,
+            a.birth,
+            a.address,
+            ap.recruitment_id,
+            ap.introduce_rating_result_id,
+            ap.created_at,
+            ap.status,
+            j.id as job_id,
+            j.name as job_name,
+            ap.updated_at,
+            ap.updated_by
+        FROM applicant AS a
+                 LEFT JOIN application ap ON a.id = ap.applicant_id
+                 LEFT JOIN recruitment r ON ap.recruitment_id = r.id
+                 LEFT JOIN recruitment_request rq ON rq.id = r.recruitment_request_id
+                 LEFT JOIN job j ON j.id = rq.job_id
+    </select>
+
     <select id="findAllApplicant" resultMap="ApplicantResultMap">
         SELECT id, name, phone, email, profile_url, birth, address
         FROM applicant
+    </select>
+
+    <select id="findApplicantById" resultMap="ApplicantResultMap">
+        SELECT id, name, phone, email, profile_url, birth, address
+        FROM applicant
+        WHERE id = #{id}
+    </select>
+
+    <select id="searchApplicantsByName" resultMap="ApplicantResultMap">
+        SELECT id, name, phone, email, profile_url, birth, address
+        FROM applicant
+        WHERE name LIKE CONCAT('%',#{name},'%')
     </select>
 </mapper>
