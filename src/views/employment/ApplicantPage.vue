@@ -15,8 +15,9 @@
           </v-btn>
 
           <!-- 👤 사원 등록 버튼 -->
-          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="handleRegisterClick">
-            사원 등록
+          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="handleRegisterClick"
+            :disabled="!selectedApplicants.length">
+            사원 등록 ({{ selectedApplicants.length }}개 선택)
           </v-btn>
 
           <!-- 📝 문제 할당 버튼 -->
@@ -50,6 +51,12 @@
       <!-- 📋 지원자 테이블 -->
       <v-data-table :headers="tableHeaders" :items="applicantStore.filteredAndSortedApplicants" :items-per-page="8"
         item-key="uniqueKey" class="elevation-1" @update:options="handleSort" return-object>
+
+        <!-- 전체 선택 체크박스 헤더 -->
+        <template #header.select>
+          <v-checkbox :model-value="isAllSelected" :indeterminate="isIndeterminate"
+            @update:model-value="toggleSelectAll" hide-details density="compact" />
+        </template>
 
         <!-- 커스텀 체크박스 컬럼 -->
         <template #item.select="{ item }">
@@ -113,19 +120,6 @@
         </span>
       </v-card-text>
 
-      <!-- 디버깅용 정보 표시 -->
-      <v-card-text class="text-caption text-info">
-        <div>총 데이터 수: {{ applicantStore.filteredAndSortedApplicants.length }}</div>
-        <div>선택된 항목 수: {{ selectedApplicants.length }}</div>
-        <div v-if="selectedApplicants.length > 0">
-          첫 번째 선택된 항목: {{ selectedApplicants[0]?.name }} ({{ selectedApplicants[0]?.uniqueKey }})
-        </div>
-        <div>
-          <v-btn size="small" color="info" @click="testSelectFirst" class="mr-2">첫 번째 항목 선택 테스트</v-btn>
-          <v-btn size="small" color="warning" @click="clearSelection">선택 초기화</v-btn>
-        </div>
-      </v-card-text>
-
       <!-- 로딩 상태 표시 -->
       <v-overlay :model-value="applicantStore.loading" class="align-center justify-center">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -148,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
@@ -470,21 +464,6 @@ const handleRegisterClick = () => {
   })
 }
 
-const testSelectFirst = () => {
-  console.log('🧪 첫 번째 항목 선택 테스트');
-  if (applicantStore.filteredAndSortedApplicants.length > 0) {
-    const firstItem = applicantStore.filteredAndSortedApplicants[0];
-    console.log('🧪 선택할 항목:', firstItem);
-    selectedApplicants.value = [firstItem];
-    console.log('🧪 선택 후 상태:', selectedApplicants.value);
-  }
-}
-
-const clearSelection = () => {
-  console.log('🧹 선택 초기화');
-  selectedApplicants.value = [];
-}
-
 // 커스텀 체크박스 관련 함수들
 const isSelected = (item) => {
   return selectedApplicants.value.some(selected => selected.uniqueKey === item.uniqueKey);
@@ -507,6 +486,32 @@ const toggleSelection = (item) => {
   }
 
   console.log('📊 현재 선택된 항목 수:', selectedApplicants.value.length);
+}
+
+// 전체 선택 관련 computed 속성들
+const isAllSelected = computed(() => {
+  const totalItems = applicantStore.filteredAndSortedApplicants.length;
+  return totalItems > 0 && selectedApplicants.value.length === totalItems;
+});
+
+const isIndeterminate = computed(() => {
+  const selectedCount = selectedApplicants.value.length;
+  const totalItems = applicantStore.filteredAndSortedApplicants.length;
+  return selectedCount > 0 && selectedCount < totalItems;
+});
+
+const toggleSelectAll = (selectAll) => {
+  console.log('🔄 전체 선택 토글:', selectAll);
+
+  if (selectAll) {
+    // 전체 선택
+    selectedApplicants.value = [...applicantStore.filteredAndSortedApplicants];
+    console.log('✅ 전체 선택됨:', selectedApplicants.value.length);
+  } else {
+    // 전체 해제
+    selectedApplicants.value = [];
+    console.log('❌ 전체 해제됨');
+  }
 }
 
 </script>
