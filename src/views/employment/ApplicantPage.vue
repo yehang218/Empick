@@ -10,7 +10,7 @@
         <div class="d-flex align-center flex-wrap" style="gap: 8px;">
           <!-- 🔍 검색창 (공통 컴포넌트) -->
           <Search v-model="search" placeholder="이름, 이메일, 전화번호, 직무로 검색" @clear="clearSearch" @search="handleSearch" />
-          <v-btn icon @click="refreshList" :loading="applicantStore.isLoading">
+          <v-btn icon @click="refreshList" :loading="applicantStore.isLoading" aria-label="새로고침">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
 
@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
 import { useApplicantStore } from '@/stores/applicantStore';
@@ -242,6 +242,7 @@ const handleJobtestSelected = async (jobtest) => {
 // 검색어 초기화 함수
 const clearSearch = () => {
   search.value = ''
+  applicantStore.setSearchQuery('')
 }
 
 // 컴포넌트 마운트 시 데이터 로드
@@ -259,6 +260,13 @@ const refreshList = async () => {
     toast.error('지원자 목록을 불러오는데 실패했습니다.')
   }
 }
+
+onUnmounted(() => {
+  // 상태 초기화
+  applicantStore.resetState()
+  // debounce 취소
+  handleSearch.cancel()
+})
 
 </script>
 
