@@ -107,7 +107,9 @@ export const useJobtestQuestionStore = defineStore('question', () => {
                     formCopy.type,
                     formCopy.difficulty,
                     formCopy.answer,
-                    formCopy.updatedMemberId
+                    formCopy.updatedMemberId,
+                    formCopy.questionOptions,
+                    formCopy.gradingCriteria
                 );
                 await updateQuestionService(formCopy.id, dto);
             } else {
@@ -130,7 +132,9 @@ export const useJobtestQuestionStore = defineStore('question', () => {
 
         try {
             const response = await getQuestionsService();
+
             const mapped = response
+                .filter(q => q.type !== 'DESCRIPTIVE') // 서술형 우선 제외
                 .sort((a, b) => b.id - a.id)
                 .map(question => ({
                     ...question,
@@ -139,6 +143,7 @@ export const useJobtestQuestionStore = defineStore('question', () => {
                     type: getQuestionTypeLabel(question.type),
                     difficulty: getDifficultyLabel(question.difficulty)
                 }));
+
             questions.value.splice(0, questions.value.length, ...mapped);
         } catch (err) {
             error.value = err.message;
@@ -147,6 +152,7 @@ export const useJobtestQuestionStore = defineStore('question', () => {
             loading.value = false;
         }
     };
+
 
     // ✅ 문제 삭제
     const deleteSelectedQuestions = async () => {
