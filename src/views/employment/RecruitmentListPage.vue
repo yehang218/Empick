@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import ListView from '@/components/common/ListView.vue'
@@ -53,7 +53,7 @@ const router = useRouter()
 const route = useRoute()
 const toast = useToast()
 const itemsPerPage = ref(10)
-const page = ref(1)
+const page = ref(Number(route.query.page) || 1)
 const store = useRecruitmentStore()
 
 const selectedStatus = ref('ALL')
@@ -62,7 +62,12 @@ function goToCreate() {
     router.push('/employment/recruitments/create')
 }
 
+watch(page, (newPage) => {
+    router.replace({ query: { ...route.query, page: newPage } });
+});
+
 onMounted(() => {
+    page.value = Number(route.query.page) || 1;
     store.loadRecruitmentList()
     if (route.query.toast === 'deleted') {
         toast.success('채용공고가 삭제되었습니다.')
