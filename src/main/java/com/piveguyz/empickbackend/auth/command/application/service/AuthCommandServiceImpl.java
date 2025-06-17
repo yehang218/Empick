@@ -7,6 +7,7 @@ import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEntity;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
+import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberRoleQueryDTO;
 import com.piveguyz.empickbackend.orgstructure.member.query.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,9 +49,12 @@ public class AuthCommandServiceImpl implements AuthCommandService {
             throw new BusinessException(ResponseCode.MEMBER_STATUS_SUSPENDED);
         }
 
-        List<String> roles = memberMapper.findRolesByEmployeeNumber(member.getEmployeeNumber());
+        List<MemberRoleQueryDTO> roles = memberMapper.findRolesByEmployeeNumber(member.getEmployeeNumber());
+        List<String> roleCodes = roles.stream()
+                .map(MemberRoleQueryDTO::getCode)
+                .collect(Collectors.toList());
 
-        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber(), roles);
+        String accessToken = jwtProvider.createAccessToken(member.getId(), member.getEmployeeNumber(), roleCodes);
         String refreshToken = jwtProvider.createRefreshToken(member.getId(), member.getEmployeeNumber());
 
         refreshTokenService.saveRefreshToken(

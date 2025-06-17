@@ -3,6 +3,7 @@ package com.piveguyz.empickbackend.orgstructure.member.query.service;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberResponseDTO;
+import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberRoleQueryDTO;
 import com.piveguyz.empickbackend.orgstructure.member.query.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,15 @@ public class MemberQueryServiceImpl implements MemberQueryService {
             throw new BusinessException(ResponseCode.MEMBER_NOT_FOUND);
         }
         return members;
+    }
+
+    @Override
+    public List<MemberRoleQueryDTO> getMemberRoles(int employeeNumber) {
+        List<MemberRoleQueryDTO> memberRoles = memberMapper.findRolesByEmployeeNumber(employeeNumber);
+        if (memberRoles.isEmpty()) {
+            throw new BusinessException(ResponseCode.NOT_FOUND);
+        }
+        return memberRoles;
     }
 
     @Override
