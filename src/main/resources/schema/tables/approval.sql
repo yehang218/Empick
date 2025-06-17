@@ -29,7 +29,7 @@ CREATE TABLE `approval` (
     `category_id`        INT      NOT NULL,
     `writer_id`          INT      NOT NULL COMMENT '기안자 id',
     `created_at`         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `status`             TINYINT  NOT NULL DEFAULT 0 COMMENT '결재 상태 (-1: 반려, 0: 진행중, 1: 완료)',
+    `status`             TINYINT  NOT NULL DEFAULT 0 COMMENT '결재 상태 (-1: 반려, 0: 진행중, 1: 완료, 2: 취소)',
     `first_approver_id`  INT      NULL,
     `second_approver_id` INT      NULL,
     `third_approver_id`  INT      NULL,
