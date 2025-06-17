@@ -112,6 +112,50 @@ export const employmentRoutes = [
         }
     },
 
+    // <---------- 면         접 ---------->
+
+    {
+        path: '/employment/interview-criteria',
+        name: 'InterviewSheetPage',
+        component: () => import('@/views/employment/InterviewSheetPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interview-criteria/create',
+        name: 'CreateInterviewSheetPage',
+        component: () => import('@/views/employment/CreateInterviewSheetPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interviews',
+        name: 'InterviewPage',
+        component: () => import('@/views/employment/InterviewPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interviews/detail/:applicationId',
+        name: 'InterviewDetailPage',
+        component: () => import('@/views/employment/InterviewDetailPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/employment/interviews/create',
+        name: 'CreateInterviewPage',
+        component: () => import('@/views/employment/CreateInterviewPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+
+    
     // 채용 공고 목록 페이지
     {
         path: '/employment/recruitments',

@@ -97,13 +97,13 @@ const memberStore = useMemberStore()
 
 const categoryList = computed(() => store.applicationItemCategoryList)
 const selectedIds = computed({
-  get: () => store.selectedApplicationItemIds,
-  set: (val) => store.selectedApplicationItemIds = val
+    get: () => store.selectedApplicationItemIds,
+    set: (val) => store.selectedApplicationItemIds = val
 })
 
 const requiredIds = computed({
-  get: () => store.requiredApplicationItemIds,
-  set: (val) => store.requiredApplicationItemIds = val
+    get: () => store.requiredApplicationItemIds,
+    set: (val) => store.requiredApplicationItemIds = val
 })
 const dateValues = ref({})
 const menuStates = ref({})
@@ -182,11 +182,14 @@ const submit = async () => {
 
     const dto = recruitmentCreateDTO.fromForm({
         ...draft,
+        recruitmentRequestId: draft.recruitmentRequestId,
         recruitType: draft.recruitType,
         applicationItems,
         introduceTemplateId: draft.introduceTemplateId || 1,
         memberId: memberStore.form.id
     })
+
+    console.log('📦 전송 DTO:', JSON.stringify(dto, null, 2));
 
     await store.submitRecruitment(dto)
     store.clearDraftRecruitment()

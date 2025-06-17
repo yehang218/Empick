@@ -5,7 +5,8 @@ import {
     fetchRecruitmentList,
     fetchRecruitmentDetail,
     createRecruitment,
-    updateRecruitment
+    updateRecruitment,
+    deleteRecruitment
 } from '@/services/recruitmentService';
 
 export const useRecruitmentStore = defineStore('recruitment', () => {
@@ -107,6 +108,20 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         }
     };
 
+    // 삭제
+    const deleteExistingRecruitment = async (id) => {
+        submitting.value = true;
+        submitError.value = null;
+        try {
+            await deleteRecruitment(id);
+        } catch (err) {
+            submitError.value = err.message;
+            throw err;
+        } finally {
+            submitting.value = false;
+        }
+    };
+
     return {
         list,
         loadingList,
@@ -135,6 +150,7 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         submitError,
         submitRecruitment,
         updateExistingRecruitment,
+        deleteExistingRecruitment,
 
         requestDetail
     };

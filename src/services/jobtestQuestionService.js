@@ -53,3 +53,32 @@ export const createQuestionService = async (
         return apiResponse.message;
     }, options);
 };
+
+// 실무테스트 문제 삭제
+export const deleteQuestionService = async (
+    questionId,
+    options = {}
+) => {
+    return withErrorHandling(async () => {
+        const response = await api.delete(JobtestAPI.QUESTION_DETAIL(questionId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.message;
+    }, options);
+};
+
+// 선택지 전체 삭제 (문제 ID 기준)
+export const deleteQuestionOptionsByQuestionId = async (questionId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.delete(JobtestAPI.QUESTION_OPTION_DETAIL(questionId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return apiResponse.message;
+    }, options);
+};

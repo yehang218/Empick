@@ -3,6 +3,9 @@ export const RecruitmentAPI = {
     REQUEST_LIST: '/api/v1/employment/recruitments/requests',
     REQUEST_DETAIL: (id) => `/api/v1/employment/recruitments/requests/${id}`,
     REQUEST_CREATE: '/api/v1/employment/recruitments/requests',
+    // 직무, 부서 목록
+    JOB_LIST: '/api/v1/jobs',
+    DEPARTMENT_LIST: '/api/v1/departments',
 
     // 채용 공고
     RECRUITMENT_LIST: '/api/v1/employment/recruitments',
