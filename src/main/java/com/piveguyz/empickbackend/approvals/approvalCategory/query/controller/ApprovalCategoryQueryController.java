@@ -16,7 +16,7 @@ import java.util.List;
 @Tag(name = "결재 문서 유형 API", description = "결재 문서 유형 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/approval-category")
+@RequestMapping("/api/v1/approval/categories")
 public class ApprovalCategoryQueryController {
 	private final ApprovalCategoryQueryService service;
 
@@ -46,9 +46,10 @@ public class ApprovalCategoryQueryController {
 				.body(CustomApiResponse.of(result, dto));
 	}
 
-	@GetMapping("/category/{categoryId}")
-	public ResponseEntity<CustomApiResponse<List<ApprovalCategoryQueryDTO>>> findByCategoryId(@PathVariable("categoryId") Integer categoryId) {
-		List<ApprovalCategoryQueryDTO> dtoList = service.findByCategoryId(categoryId);
+	// 상위 카테고리로 하위 카테고리 찾기
+	@GetMapping("/{parentId}/children")
+	public ResponseEntity<CustomApiResponse<List<ApprovalCategoryQueryDTO>>> findChildren(@PathVariable("parentId") Integer parentId) {
+		List<ApprovalCategoryQueryDTO> dtoList = service.findByCategoryId(parentId);
 		ResponseCode result = ResponseCode.SUCCESS;
 		return ResponseEntity.status(result.getHttpStatus())
 				.body(CustomApiResponse.of(result, dtoList));
