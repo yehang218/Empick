@@ -3,7 +3,14 @@
         <h2 class="text-h5 font-weight-bold mb-6">받은 결재 목록</h2>
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
-        <ListView v-else :headers="headers" :data="pagedList" @item-click="goToDetail" />
+        <ListView v-else :headers="headers" :data="pagedList" @item-click="goToDetail">
+            <template #item.isMyTurn="{ item }">
+                <v-chip v-if="item.canApproveChip" color="success" text-color="white" small>
+                    결재 가능
+                </v-chip>
+                <span v-else>-</span>
+            </template>
+        </ListView>
         <Pagination v-model="page" :length="totalPages" />
     </v-container>
 </template>
@@ -13,12 +20,14 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useMemberStore } from '@/stores/memberStore';
+import { useAuthStore } from '@/stores/authStore';
 import ListView from '@/components/common/ListView.vue';
 import Pagination from '@/components/common/Pagination.vue';
 import dayjs from 'dayjs';
 
 const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
+const authStore = useAuthStore();
 const router = useRouter();
 
 const receivedList = computed(() => approvalStore.receivedList);
@@ -41,11 +50,15 @@ const page = ref(1);
 const pagedList = computed(() => {
     const start = (page.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
-    return receivedList.value.slice(start, end).map(item => ({
-        ...item,
-        isMyTurn: item.isMyTurn === 1 ? '내 차례' : '-',
-        createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD HH:mm') : '',
-    }));
+    return receivedList.value.slice(start, end).map(item => {
+        console.log('isMyTurn API값:', item.isMyTurn, typeof item.isMyTurn);
+        const isMyTurn = item.isMyTurn == 1 || item.isMyTurn === true;
+        return Object.assign({}, item, {
+            isMyTurn: isMyTurn ? '결재 가능' : '-',
+            canApproveChip: isMyTurn,
+            createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD HH:mm') : '',
+        });
+    });
 });
 
 const totalPages = computed(() => Math.ceil(receivedList.value.length / itemsPerPage.value));
@@ -63,6 +76,7 @@ onMounted(async () => {
     }
     if (memberStore.form.id) {
         approvalStore.loadReceivedApprovals(memberStore.form.id);
+        console.log('받은 결재 데이터:', approvalStore.receivedList);
     }
 });
 </script>
