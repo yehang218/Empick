@@ -10,19 +10,19 @@
         <div class="d-flex align-center flex-wrap" style="gap: 8px;">
           <!-- 🔍 검색창 (공통 컴포넌트) -->
           <Search v-model="search" placeholder="이름, 이메일, 전화번호, 직무로 검색" @clear="clearSearch" @search="handleSearch" />
-          <v-btn icon @click="refreshList" :loading="applicantStore.isLoading" aria-label="새로고침">
+          <v-btn icon @click="refreshList" :loading="applicantStore.loading" aria-label="새로고침">
             <v-icon>mdi-refresh</v-icon>
           </v-btn>
 
           <!-- 👤 사원 등록 버튼 -->
-          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px">
+          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="handleRegisterClick">
             사원 등록
           </v-btn>
 
           <!-- 📝 문제 할당 버튼 -->
           <v-btn color="secondary" variant="tonal" size="small" style="min-width: 90px" @click="handleAssignClick"
-            :disabled="!selectedIds.length">
-            실무테스트 할당 ({{ selectedIds.length }}개 선택)
+            :disabled="!selectedApplicants.length">
+            실무테스트 할당 ({{ selectedApplicants.length }}개 선택)
           </v-btn>
 
           <!-- 📧 이메일 전송 버튼 -->
@@ -49,8 +49,13 @@
 
       <!-- 📋 지원자 테이블 -->
       <v-data-table :headers="tableHeaders" :items="applicantStore.filteredAndSortedApplicants" :items-per-page="8"
-        item-value="uniqueKey" class="elevation-1" v-model:selected="selectedIds" @update:options="handleSort"
-        show-select return-object>
+        item-key="uniqueKey" class="elevation-1" @update:options="handleSort" return-object>
+
+        <!-- 커스텀 체크박스 컬럼 -->
+        <template #item.select="{ item }">
+          <v-checkbox :model-value="isSelected(item)" @update:model-value="toggleSelection(item)" hide-details
+            density="compact" />
+        </template>
 
         <!-- 이름 + 지원 횟수 표시 -->
         <template #item.name="{ item }">
@@ -96,17 +101,29 @@
           </v-btn>
         </template>
 
-
       </v-data-table>
 
       <!-- 선택된 지원서 정보 표시 -->
-      <v-card-text v-if="selectedIds.length > 0" class="text-caption">
+      <v-card-text v-if="selectedApplicants.length > 0" class="text-caption">
         <v-chip color="primary" variant="tonal" size="small">
-          {{ selectedIds.length }}개 지원서 선택됨
+          {{ selectedApplicants.length }}개 지원서 선택됨
         </v-chip>
         <span class="ml-2 text-grey">
           선택된 지원자: {{ getSelectedApplicantNames().join(', ') }}
         </span>
+      </v-card-text>
+
+      <!-- 디버깅용 정보 표시 -->
+      <v-card-text class="text-caption text-info">
+        <div>총 데이터 수: {{ applicantStore.filteredAndSortedApplicants.length }}</div>
+        <div>선택된 항목 수: {{ selectedApplicants.length }}</div>
+        <div v-if="selectedApplicants.length > 0">
+          첫 번째 선택된 항목: {{ selectedApplicants[0]?.name }} ({{ selectedApplicants[0]?.uniqueKey }})
+        </div>
+        <div>
+          <v-btn size="small" color="info" @click="testSelectFirst" class="mr-2">첫 번째 항목 선택 테스트</v-btn>
+          <v-btn size="small" color="warning" @click="clearSelection">선택 초기화</v-btn>
+        </div>
       </v-card-text>
 
       <!-- 로딩 상태 표시 -->
@@ -131,7 +148,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
@@ -144,7 +161,8 @@ import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore';
 import ApplicationJobtestDTO from '@/dto/employment/jobtest/applicationJobtestDTO';
 import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
 
-const selectedIds = ref([]);
+// 로컬 상태로 selectedApplicants 관리
+const selectedApplicants = ref([]);
 const jobtestModal = ref(false);
 const toast = useToast();
 const jobtestListStore = useJobtestListStore();
@@ -155,6 +173,13 @@ const router = useRouter()
 const search = ref('')
 
 const tableHeaders = [
+  {
+    title: '',
+    key: 'select',
+    sortable: false,
+    align: 'center',
+    width: '50px'
+  },
   {
     title: '이름',
     key: 'name',
@@ -217,9 +242,20 @@ const getApplicantApplicationNumber = (currentItem) => {
   ) + 1;
 };
 
+// selectedApplicants 변경 감시
+watch(selectedApplicants, (newValue) => {
+  console.log('🔍 로컬 selectedApplicants 변경:', newValue);
+  console.log('🔍 선택된 항목 수:', newValue.length);
+  if (newValue.length > 0) {
+    console.log('🔍 첫 번째 선택된 항목:', newValue[0]);
+    console.log('🔍 선택된 항목들의 이름:', newValue.map(item => item.name));
+  }
+}, { deep: true });
+
 // 선택된 지원자들의 이름 목록
 const getSelectedApplicantNames = () => {
-  const selectedNames = selectedIds.value.map(selectedItem => selectedItem.name);
+  if (!selectedApplicants.value || selectedApplicants.value.length === 0) return [];
+  const selectedNames = selectedApplicants.value.map(selectedItem => selectedItem.name);
   return [...new Set(selectedNames)]; // 중복 제거
 };
 
@@ -230,7 +266,6 @@ const getUniqueApplicantCount = () => {
   );
   return uniqueApplicantIds.size;
 };
-
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -263,6 +298,7 @@ const handleSearch = debounce((value) => {
 }, 300)
 
 const handleSort = (options) => {
+  console.log('🔧 정렬 옵션:', options);
   // Vuetify v-data-table의 options 객체에서 정렬 정보 추출
   if (options.sortBy && options.sortBy.length > 0) {
     applicantStore.setSort({
@@ -279,28 +315,57 @@ const handleSort = (options) => {
 }
 
 const viewDetail = (item) => {
-  // 지원자 기본 정보를 query parameter로 전달
+  console.log('🔍 상세보기 클릭:', item);
+  // DTO의 모든 필드를 query parameter로 전달
   router.push({
     path: `/employment/applications/${item.applicationId}`,
     query: {
+      // 기본 지원자 정보
+      applicantId: item.applicantId,
+      applicationId: item.applicationId,
       name: item.name,
-      email: item.email,
       phone: item.phone,
+      email: item.email,
+      profileUrl: item.profileUrl,
       birth: item.birth,
       address: item.address,
-      status: item.status,
-      jobName: item.jobName,
-      applicantId: item.applicantId,
-      profileUrl: item.profileUrl,
-      createdAt: item.createdAt,
       recruitmentId: item.recruitmentId,
+      introduceRatingResultId: item.introduceRatingResultId,
+      jobId: item.jobId,
+      jobName: item.jobName,
+      createdAt: item.createdAt,
+      status: item.status,
       updatedAt: item.updatedAt,
-      introduceRatingResultId: item.introduceRatingResultId
+      updatedBy: item.updatedBy,
+
+      // 추가된 필드들
+      introduceEvaluationContent: item.introduceEvaluationContent,
+      introduceScore: item.introduceScore,
+      introduceStatus: item.introduceStatus,
+      motivation: item.motivation,
+      experience: item.experience,
+      skills: item.skills,
+      education: item.education,
+      portfolioUrl: item.portfolioUrl,
+      coverLetter: item.coverLetter,
+      jobtestTotalScore: item.jobtestTotalScore,
+      jobtestEvaluationScore: item.jobtestEvaluationScore,
+      jobtestStatus: item.jobtestStatus,
+      interviewScore: item.interviewScore,
+      interviewAddress: item.interviewAddress,
+      interviewDatetime: item.interviewDatetime
     }
   })
 }
 
 const handleAssignClick = async () => {
+  console.log('📝 실무테스트 할당 클릭, 선택된 항목:', selectedApplicants.value);
+
+  if (!selectedApplicants.value || selectedApplicants.value.length === 0) {
+    toast.warning('선택된 지원자가 없습니다.');
+    return;
+  }
+
   try {
     await jobtestListStore.fetchJobtests();
     jobtestModal.value = true;
@@ -311,18 +376,21 @@ const handleAssignClick = async () => {
 };
 
 const handleJobtestSelected = async (jobtest) => {
+  console.log('🎯 실무테스트 선택:', jobtest);
+  console.log('🎯 할당할 지원자들:', selectedApplicants.value);
+
   jobtestModal.value = false;
 
-  // selectedIds는 이제 전체 객체를 포함하므로 applicationId를 추출
-  const dtoList = selectedIds.value.map(selectedItem => {
-    // 추가된 applicationId 필드 사용
+  // selectedApplicants에서 applicationId를 추출
+  const dtoList = selectedApplicants.value.map(selectedItem => {
+    console.log('🎯 DTO 생성 대상:', selectedItem.applicationId, jobtest.id);
     return new ApplicationJobtestDTO(selectedItem.applicationId, jobtest.id);
   });
 
   try {
     await applicationJobtestStore.assignJobtest(dtoList);
-    toast.success(`선택한 ${selectedIds.value.length}개 지원서에 실무테스트를 성공적으로 할당했습니다.`);
-    selectedIds.value = []; // 할당 후 선택 초기화
+    toast.success(`선택한 ${selectedApplicants.value.length}개 지원서에 실무테스트를 성공적으로 할당했습니다.`);
+    selectedApplicants.value = []; // 할당 후 선택 초기화
   } catch (error) {
     console.error('실무테스트 할당 실패:', error);
     toast.error(applicationJobtestStore.errorMessage);
@@ -337,17 +405,27 @@ const clearSearch = () => {
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
+  console.log('🚀 컴포넌트 마운트됨');
   await refreshList()
+  console.log('✅ 데이터 로드 완료');
+  console.log('📊 로드된 데이터 수:', applicantStore.filteredAndSortedApplicants.length);
+  if (applicantStore.filteredAndSortedApplicants.length > 0) {
+    console.log('📋 첫 번째 항목:', applicantStore.filteredAndSortedApplicants[0]);
+    console.log('🔑 첫 번째 항목 uniqueKey:', applicantStore.filteredAndSortedApplicants[0]?.uniqueKey);
+  }
 })
 
 // 새로고침 함수
 const refreshList = async () => {
   try {
+    console.log('🔄 데이터 새로고침 시작');
     await applicantStore.fetchApplicantFullInfoList()
     search.value = ''
     applicantStore.setSearchQuery('')
-    selectedIds.value = [] // 새로고침 시 선택 초기화
+    selectedApplicants.value = []; // 새로고침 시 선택 초기화
+    console.log('✅ 데이터 새로고침 완료');
   } catch (error) {
+    console.error('❌ 데이터 로드 에러:', error);
     toast.error('지원자 목록을 불러오는데 실패했습니다.')
   }
 }
@@ -358,6 +436,78 @@ onUnmounted(() => {
   // debounce 취소
   handleSearch.cancel()
 })
+
+const handleRegisterClick = () => {
+  console.log('👤 사원 등록 버튼 클릭');
+  console.log('👤 현재 선택된 항목:', selectedApplicants.value);
+  console.log('👤 선택된 항목 수:', selectedApplicants.value.length);
+
+  if (!selectedApplicants.value || selectedApplicants.value.length === 0) {
+    toast.warning('선택된 지원자가 없습니다.')
+    return
+  }
+
+  // 선택된 지원자 데이터 가공
+  const selectedApplicantsData = selectedApplicants.value.map(applicant => ({
+    applicantId: applicant.applicantId,
+    applicationId: applicant.applicationId,
+    name: applicant.name,
+    email: applicant.email,
+    phone: applicant.phone,
+    birth: applicant.birth,
+    address: applicant.address,
+    // 필요한 다른 필드들 추가
+  }));
+
+  console.log('👤 가공된 지원자 데이터:', selectedApplicantsData);
+
+  // 라우터를 통해 MemberRegisterPage로 데이터 전달
+  router.push({
+    path: '/orgstructure/member/register',
+    query: {
+      applicants: JSON.stringify(selectedApplicantsData)
+    }
+  })
+}
+
+const testSelectFirst = () => {
+  console.log('🧪 첫 번째 항목 선택 테스트');
+  if (applicantStore.filteredAndSortedApplicants.length > 0) {
+    const firstItem = applicantStore.filteredAndSortedApplicants[0];
+    console.log('🧪 선택할 항목:', firstItem);
+    selectedApplicants.value = [firstItem];
+    console.log('🧪 선택 후 상태:', selectedApplicants.value);
+  }
+}
+
+const clearSelection = () => {
+  console.log('🧹 선택 초기화');
+  selectedApplicants.value = [];
+}
+
+// 커스텀 체크박스 관련 함수들
+const isSelected = (item) => {
+  return selectedApplicants.value.some(selected => selected.uniqueKey === item.uniqueKey);
+}
+
+const toggleSelection = (item) => {
+  console.log('✅ 체크박스 클릭:', item.name);
+  const isCurrentlySelected = isSelected(item);
+
+  if (isCurrentlySelected) {
+    // 선택 해제
+    selectedApplicants.value = selectedApplicants.value.filter(
+      selected => selected.uniqueKey !== item.uniqueKey
+    );
+    console.log('❌ 선택 해제됨');
+  } else {
+    // 선택 추가
+    selectedApplicants.value.push(item);
+    console.log('✅ 선택 추가됨');
+  }
+
+  console.log('📊 현재 선택된 항목 수:', selectedApplicants.value.length);
+}
 
 </script>
 

@@ -22,15 +22,19 @@ export const useApplicantStore = defineStore('applicant', () => {
     const searchQuery = ref('');
     const sortKey = ref('');
     const sortOrder = ref('asc');
+    const selectedApplicants = ref([]);
 
 
     // 각 지원서에 고유 키 추가 함수
     const addUniqueKeys = (applicants) => {
         return applicants.map((applicant, index) => ({
             ...applicant,
-            // 완전히 고유한 키: 시간 + 랜덤 + index
-            uniqueKey: `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${index}`,
-            // applicationId는 백엔드에서 온 값 그대로 사용
+            // applicantId 또는 applicationId를 기반으로 한 고유 키 생성
+            uniqueKey: applicant.applicationId
+                ? `app_${applicant.applicationId}`
+                : applicant.applicantId
+                    ? `applicant_${applicant.applicantId}_${index}`
+                    : `temp_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
         }));
     };
 
@@ -212,6 +216,73 @@ export const useApplicantStore = defineStore('applicant', () => {
         sortOrder.value = 'asc';
     };
 
+    // 선택된 지원자 데이터 가공
+    const getSelectedApplicantsData = (selectedItems) => {
+        if (!selectedItems || selectedItems.length === 0) {
+            return [];
+        }
+
+        return selectedItems.map(selectedItem => {
+            const applicant = applicantList.value.find(
+                item => item.uniqueKey === selectedItem.uniqueKey
+            );
+            if (!applicant) return null;
+
+            return {
+                applicantId: applicant.applicantId,
+                applicationId: applicant.applicationId,
+                name: applicant.name,
+                birth: applicant.birth,
+                phone: applicant.phone,
+                email: applicant.email,
+                address: applicant.address,
+                profileUrl: applicant.profileUrl,
+                jobName: applicant.jobName,
+                createdAt: applicant.createdAt,
+                status: applicant.status,
+                recruitmentId: applicant.recruitmentId,
+                introduceRatingResultId: applicant.introduceRatingResultId,
+                education: applicant.education,
+                experience: applicant.experience,
+                skills: applicant.skills,
+                motivation: applicant.motivation,
+                coverLetter: applicant.coverLetter,
+                portfolioUrl: applicant.portfolioUrl,
+                introduceScore: applicant.introduceScore,
+                introduceStatus: applicant.introduceStatus,
+                jobtestTotalScore: applicant.jobtestTotalScore,
+                jobtestEvaluationScore: applicant.jobtestEvaluationScore,
+                jobtestStatus: applicant.jobtestStatus,
+                interviewScore: applicant.interviewScore,
+                interviewAddress: applicant.interviewAddress,
+                interviewDatetime: applicant.interviewDatetime
+            };
+        }).filter(Boolean); // null 값 제거
+    };
+
+    // 선택된 지원자 관리
+    const setSelectedApplicants = (selected) => {
+        console.log('Store에서 선택된 지원자 설정:', selected);
+        selectedApplicants.value = selected;
+    };
+
+    const addSelectedApplicant = (applicant) => {
+        console.log('Store에 지원자 추가:', applicant);
+        if (!selectedApplicants.value.find(item => item.uniqueKey === applicant.uniqueKey)) {
+            selectedApplicants.value.push(applicant);
+        }
+    };
+
+    const removeSelectedApplicant = (uniqueKey) => {
+        console.log('Store에서 지원자 제거:', uniqueKey);
+        selectedApplicants.value = selectedApplicants.value.filter(item => item.uniqueKey !== uniqueKey);
+    };
+
+    const clearSelectedApplicants = () => {
+        console.log('Store에서 선택된 지원자 모두 제거');
+        selectedApplicants.value = [];
+    };
+
     return {
         // 상태
         applicantList,
@@ -223,6 +294,7 @@ export const useApplicantStore = defineStore('applicant', () => {
         sortKey,
         sortOrder,
         filteredAndSortedApplicants,
+        selectedApplicants,
 
         // 액션
         fetchAllApplicants,
@@ -236,6 +308,11 @@ export const useApplicantStore = defineStore('applicant', () => {
         isBookmarked,
         setSearchQuery,
         setSort,
-        resetState
+        resetState,
+        getSelectedApplicantsData,
+        setSelectedApplicants,
+        addSelectedApplicant,
+        removeSelectedApplicant,
+        clearSelectedApplicants
     };
 });
