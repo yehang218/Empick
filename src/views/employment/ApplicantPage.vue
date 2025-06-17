@@ -131,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
@@ -279,7 +279,20 @@ const handleSort = (options) => {
 }
 
 const viewDetail = (item) => {
-  router.push(`/employment/applications/${item.applicationId}`)
+  // 지원자 기본 정보를 query parameter로 전달
+  router.push({
+    path: `/employment/applications/${item.applicationId}`,
+    query: {
+      name: item.name,
+      email: item.email,
+      phone: item.phone,
+      birth: item.birth,
+      address: item.address,
+      status: item.status,
+      jobName: item.jobName,
+      applicantId: item.applicantId
+    }
+  })
 }
 
 const handleAssignClick = async () => {

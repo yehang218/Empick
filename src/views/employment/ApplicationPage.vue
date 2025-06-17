@@ -244,24 +244,29 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 // import InterviewResult from '@/components/employment/InterviewResult.vue'
 // import TestResult from '@/components/employment/TestResult.vue'
+
+const route = useRoute()
+const router = useRouter()
 
 const evaluationComponent = ref(IntroduceResult)
 const selectedEvaluation = ref('자기소개서')
 const viewMode = ref('detail')
 
-const applicant = {
-  name: '박지민',
-  birth: '1994-11-23',
-  phone: '010-5678-1234',
-  email: 'jimin@example.com',
-  address: '서울시 강남구 역삼동',
+// query parameter에서 받은 기본 정보로 applicant 객체 구성
+const applicant = ref({
+  name: '',
+  birth: '',
+  phone: '',
+  email: '',
+  address: '',
   pictureUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
-  status: 'PASSED_DOCS', // 서류합격 상태
-  jobTitle: '백엔드 개발자',
+  status: '',
+  jobTitle: '',
   motivation: '안정적이고 성장 가능성이 높은 기업에서 제 경험을 활용하여 더 나은 서비스를 만들어가고 싶습니다. 특히 귀사의 기술 스택과 개발 문화에 큰 매력을 느꼈습니다.',
   experience: '백엔드 개발 3년 경력, Spring Boot를 활용한 REST API 개발 및 마이크로서비스 아키텍처 구축 경험',
   skills: 'Java, Spring Boot, JPA, MySQL, Vue.js, Docker, AWS',
@@ -270,7 +275,23 @@ const applicant = {
     { type: '실무 테스트', score: 90, average: 65, result: '합격' },
     { type: '면접', score: 71, average: 78, result: '불합격' }
   ]
-}
+})
+
+// 컴포넌트 마운트 시 query parameter에서 데이터 로드
+onMounted(() => {
+  const query = route.query
+
+  applicant.value = {
+    ...applicant.value,
+    name: query.name || '정보 없음',
+    birth: query.birth || '',
+    phone: query.phone || '',
+    email: query.email || '',
+    address: query.address || '',
+    status: query.status || 'WAITING',
+    jobTitle: query.jobName || '백엔드 개발자'
+  }
+})
 
 const selectEvaluation = (type) => {
   selectedEvaluation.value = type
@@ -291,10 +312,11 @@ const selectEvaluation = (type) => {
 }
 
 const getCurrentEvaluation = () => {
-  return applicant.evaluationStats.find(evaluation => evaluation.type === selectedEvaluation.value)
+  return applicant.value.evaluationStats.find(evaluation => evaluation.type === selectedEvaluation.value)
 }
 
 const formatDate = (dateString) => {
+  if (!dateString) return '정보 없음'
   return new Date(dateString).toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
@@ -335,96 +357,6 @@ const updateStatus = () => {
 
 const goBack = () => {
   // 뒤로가기 또는 목록으로 이동
-  console.log('뒤로가기')
+  router.push('/employment/applicant')
 }
 </script>
-
-<style scoped>
-.modern-card {
-  border-radius: 16px !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid rgba(var(--v-theme-primary), 0.12);
-  transition: all 0.3s ease;
-}
-
-.modern-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
-}
-
-.page-header {
-  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.05), rgba(var(--v-theme-secondary), 0.05));
-  border-radius: 16px;
-  padding: 24px;
-  margin: -24px -24px 24px -24px;
-}
-
-.line-height-1-6 {
-  line-height: 1.6;
-}
-
-.evaluation-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.evaluation-card {
-  padding: 16px;
-  border: 2px solid rgba(var(--v-theme-primary), 0.12);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(var(--v-theme-surface), 1);
-}
-
-.evaluation-card:hover {
-  border-color: rgba(var(--v-theme-primary), 0.3);
-  background: rgba(var(--v-theme-primary), 0.02);
-  transform: translateY(-2px);
-}
-
-.evaluation-detail-card {
-  min-height: 600px;
-}
-
-.score-analysis {
-  padding: 16px 0;
-}
-
-.stat-card {
-  text-align: center;
-  padding: 20px;
-  background: rgba(var(--v-theme-primary), 0.05);
-  border-radius: 12px;
-}
-
-.stat-number {
-  font-size: 2.5rem;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: rgba(var(--v-theme-on-surface), 0.6);
-  margin-top: 4px;
-}
-
-.action-section {
-  position: sticky;
-  bottom: 24px;
-  z-index: 10;
-}
-
-.gap-3 {
-  gap: 12px;
-}
-
-.v-list-item {
-  min-height: 32px !important;
-}
-
-.v-card-title {
-  font-size: 1.125rem !important;
-  font-weight: 600 !important;
-}
-</style>
