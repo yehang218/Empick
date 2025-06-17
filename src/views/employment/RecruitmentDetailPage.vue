@@ -48,6 +48,7 @@ onMounted(async () => {
     const id = Number(route.params.id);
     await store.loadRecruitmentDetail(id);
     console.log('Loaded ID:', id);
+    console.log('Detail:', store.value);
 
 
     // ✅ 이전 요청서 정보 초기화
