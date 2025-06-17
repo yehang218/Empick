@@ -88,20 +88,8 @@ const applicantStore = useApplicantStore()
 const interviewStore = useInterviewStore()
 const recruitmentStore = useRecruitmentStore()
 
-const selectedApplication = computed(() => {
-    return applicationOptions.value.find(app => app.id === selectedApplicationId.value)
-})
-const selectedApplicationId = ref(null)
-
+const selectedApplication = ref(null)
 const selectedSheet = ref(null)
-
-const showSheetModal = ref(false)
-const openSheetModal = () => {
-    console.log('✅ 모달 열기 시도됨')
-    showSheetModal.value = true;
-}
-const closeSheetModal = () => showSheetModal.value = false;
-
 const selectedHour = ref('')
 const selectedMinute = ref('')
 
@@ -216,4 +204,12 @@ onMounted(async () => {
 
     applicationOptions.value = withDetails.filter(Boolean)  // null 제거
 })
+
+const showSheetModal = ref(false)
+const openSheetModal = () => {
+    console.log('✅ 모달 열기 시도됨')
+    showSheetModal.value = true;
+}
+const closeSheetModal = () => showSheetModal.value = false;
+
 </script>

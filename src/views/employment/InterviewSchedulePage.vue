@@ -8,7 +8,7 @@
             <h3 class="text-h6 font-weight-bold mb-4">{{ selectedDate }} 면접 일정</h3>
             <v-btn color="primary" @click="goToCreateInterview">면접 등록하기</v-btn>
 
-            <v-alert v-if="interviews.length === 0" type="info" border="left" colored-border>
+            <v-alert v-if="interviews.length === 0" type="info" border="start" colored-border>
                 등록된 면접 일정이 없습니다.
             </v-alert>
 
@@ -50,12 +50,16 @@ const goToCreateInterview = () => {
     })
 }
 
-const selectedDate = ref('')
-const interviews = ref([])
 
 const interviewStore = useInterviewStore()
 const applicationStore = useApplicationStore()
 const applicantStore = useApplicantStore()
+
+const selectedInterview = ref(null)
+const selectedApplication = ref(null)
+const selectedApplicant = ref(null)
+const selectedDate = ref('')
+const interviews = ref([])
 
 const onDateSelected = async (date) => {
     selectedDate.value = date
@@ -68,15 +72,27 @@ const onDateSelected = async (date) => {
     // 각 인터뷰에 대해 applicantName 추가
     for (const interview of rawInterviews) {
         try {
-            const appRes = await applicationStore.fetchApplicationById(interview.applicationId)
-            const applicantId = appRes?.[0]?.applicantId
+            selectedInterview.value = interview 
+            const applicationId = selectedInterview.value.applicationId
+            const interviewTime = selectedInterview.value.datetime
+            console.log('applicationId : ', applicationId)
+            console.log('interviewTime : ', interviewTime)
+            await applicationStore.fetchApplicationById(applicationId)
+            
+            selectedApplication.value = await applicationStore.selectedApplication
+            console.log('selectedApplication : ', selectedApplication)
+            const applicantId = selectedApplication.value.applicantId
+            console.log('applicantId : ', applicantId)
+
+            selectedApplicant.value = await applicantStore.fetchApplicantById(applicantId)
+            console.log('selectedApplicant : ', selectedApplicant)
 
             let applicantName = '이름 없음'
-            if (applicantId) {
-                const applicantRes = await applicantStore.fetchApplicantById(applicantId)
-                applicantName = applicantRes?.name ?? '이름 없음'
+            if(selectedApplicant.value){
+                applicantName = selectedApplicant.value.name
             }
-
+            console.log('applicantName : ', applicantName)
+            
             interviews.value.push({
                 ...interview,
                 applicantName,

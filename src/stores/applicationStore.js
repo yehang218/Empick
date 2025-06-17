@@ -39,7 +39,7 @@ export const useApplicationStore = defineStore('application', () => {
     error.value = null;
     try {
       const result = await getApplicationByIdService(id);
-      selectedApplication.value = result?.[0] ?? null;
+      selectedApplication.value = result;
       return result;
     } catch (err) {
       error.value = err.message;

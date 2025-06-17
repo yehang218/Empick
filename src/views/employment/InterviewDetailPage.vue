@@ -36,6 +36,24 @@
                 <div><strong>점수:</strong> {{ selectedInterview.score }}</div>
             </v-card-text>
         </v-card>
+        <v-card class="pa-4 mt-4" outlined>
+            <v-card-title>
+                평가 기준 목록
+            </v-card-title>
+            <v-divider />
+            <v-list>
+                <v-list-item v-for="(criteria, index) in criteriaList" :key="criteria.id" class="mb-2">
+                    <v-list-item-content>
+                        <v-list-item-title class="font-weight-bold">
+                            {{ index + 1 }}. {{ criteria.title }} (가중치 : {{ criteria.weight }}%)
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                            {{ criteria.content }}
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+        </v-card>
 
         <v-dialog v-model="dialog" max-width="500px">
             <v-card>
@@ -104,29 +122,30 @@ const error = computed(() => interviewStore.error || criteriaStore.error);
 const fetchAll = async () => {
     try {
         await applicationStore.fetchApplicationById(applicationId)
-        selectedApplication.value = applicationStore.selectedApplication[0];
+        selectedApplication.value = applicationStore.selectedApplication;
         console.log('selectedApplication : ', selectedApplication)
 
         const applicantId = selectedApplication.value.applicantId
         console.log('applicantId : ', applicantId)
 
         await applicantStore.fetchApplicantById(applicantId)
-        selectedApplicant.value = applicantStore.selectedApplicant[0]
+        selectedApplicant.value = applicantStore.selectedApplicant
         console.log('selectedApplicant', selectedApplicant)
 
         await interviewStore.fetchInterviewByApplicationId(applicationId)
-        selectedInterview.value = interviewStore.selectedInterview[0]
+        selectedInterview.value = interviewStore.selectedInterview
         console.log('selectedInterview : ', selectedInterview)
 
-        const interviewSheetId = selectedInterview.value.interviewSheetId
+        const interviewSheetId = selectedInterview.value.sheetId
         console.log('interviewSheetId : ', interviewSheetId)
 
         await interviewSheetStore.fetchSheetById(interviewSheetId)
-        selectedInterviewSheet.value = interviewSheetStore.selectedSheet[0]
+        selectedInterviewSheet.value = interviewSheetStore.selectedSheet
         console.log('selectedInterviewSheet', selectedInterviewSheet)
 
-        await criteriaStore.fetchCriteriaBySheetId(sheetId);
-        criteriaList.value = criteriaStore.criteriaList[0];
+        const sheetId = selectedInterviewSheet.value.id
+        await criteriaStore.fetchCriteriaBySheetId(sheetId)
+        criteriaList.value = criteriaStore.criteriaList
         console.log('criteriaList : ', criteriaList)
 
     } catch (err) {

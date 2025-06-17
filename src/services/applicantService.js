@@ -3,7 +3,7 @@ import api from '@/apis/apiClient';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import ApplicantResponseDTO from '@/dto/employment/application/applicantResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
-import ApplicantFullInfoListDTO from '@/dto/employment/applicant/applicantFullInfoListDTO';
+// import ApplicantFullInfoListDTO from '@/dto/employment/applicant/applicantFullInfoListDTO';
 
 export const getAllApplicantsService = async (options = {}) => {
   return withErrorHandling(async () => {
@@ -19,7 +19,6 @@ export const getAllApplicantsService = async (options = {}) => {
 };
 
 export const getApplicantByIdService = async (id, options = {}) => {
-  console.log('getApplicantByIdService called with id:', id);
   return withErrorHandling(async () => {
     const response = await api.get(ApplicantAPI.GET_APPLICANT_BY_ID(id));
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
