@@ -35,6 +35,28 @@ export const useMemberStore = defineStore('member', {
         defaultProfileImageUrl: '/images/default-profile.png'
     }),
     actions: {
+        reset() {
+            this.form = {
+                id: null,
+                employeeNumber: null,
+                name: '',
+                email: '',
+                phone: '',
+                departmentName: '',
+                positionName: '',
+                jobName: '',
+                rankName: '',
+                pictureUrl: '',
+                status: 0,
+                hireAt: null,
+                resignAt: null
+            };
+            this.registerResult = null;
+            this.registerError = null;
+            this.loading = false;
+            this.error = '';
+            this.profileImageUrl = '';
+        },
         async registerMember(memberData) {
             this.loading = true;
             this.registerError = null;

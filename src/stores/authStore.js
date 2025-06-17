@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { loginService, logoutService } from '@/services/authService';
 import { useRouter } from 'vue-router';
+import { useMemberStore } from '@/stores/memberStore'
 
 import { jwtDecode } from 'jwt-decode';
 
@@ -85,6 +86,8 @@ console.log('userInfo.value (최종)', userInfo.value);
             accessToken.value = '';
             refreshToken.value = '';
             userInfo.value = null;
+
+            useMemberStore().reset();
 
             // 로그아웃 후 로그인 페이지로 이동
             router.push('/login');

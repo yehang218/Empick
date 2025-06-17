@@ -4,9 +4,11 @@ import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import ApplicantResponseDTO from '@/dto/employment/application/applicantResponseDTO';
 // import ApplicantCommandDTO from '@/dto/employment/employment/applicant/applicantCommandDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
-import axios from '@/apis/axios';
+// import axios from '@/apis/axios';
 
-const APPLICANT_API_BASE_URL = '/api/v1/employment/applicant';
+// const APPLICANT_API_BASE_URL = '/api/v1/employment/applicant';
+
+import ApplicantFullInfoListDTO from '@/dto/employment/applicant/applicantFullInfoListDTO';
 
 export const getAllApplicantsService = async (options = {}) => {
   return withErrorHandling(async () => {
@@ -32,6 +34,19 @@ export const getApplicantByIdService = async (id, options = {}) => {
     }
 
     return ApplicantResponseDTO.fromJSON(apiResponse.data);
+  }, options);
+};
+
+export const getApplicantFullInfoListService = async (options = {}) => {
+  return withErrorHandling(async () => {
+    const response = await api.get(ApplicantAPI.APPLICANT_LIST);
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    return apiResponse.data.map(ApplicantFullInfoListDTO.fromJSON);
   }, options);
 };
 
