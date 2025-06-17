@@ -43,7 +43,7 @@ public class ApplicantQueryController {
             @ApiResponse(responseCode = "404", description = "지원자를 찾을 수 없습니다."),
             @ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
     })
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<CustomApiResponse<ApplicantQueryDTO>> getApplicantById(@PathVariable Integer id) {
         ApplicantQueryDTO dto = applicantQueryService.findApplicantById(id);
         ResponseCode result = ResponseCode.SUCCESS;
