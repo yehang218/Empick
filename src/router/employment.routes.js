@@ -252,7 +252,5 @@ export const employmentRoutes = [
             name: 'IntroduceStandardItemManagePage',
             component: () => import('@/views/employment/IntroduceStandardItemManagePage.vue')
         },
-        }
-    },
 ]; 
 
