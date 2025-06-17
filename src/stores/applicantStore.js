@@ -29,11 +29,12 @@ export const useApplicantStore = defineStore('applicant', () => {
         error.value = null;
         try {
             const result = await getAllApplicantsService();
-            applicantList.value = result;
+            // 고유 키 추가
+            applicantList.value = addUniqueKeys(result);
             bookmarkedApplicants.value = new Set(
                 result.filter(applicant => applicant.bookmarked).map(a => a.id)
             );
-            return result;
+            return applicantList.value;
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -47,14 +48,28 @@ export const useApplicantStore = defineStore('applicant', () => {
         error.value = null;
         try {
             const result = await getApplicantFullInfoListService();
-            applicantList.value = result;
-            return result;
+            // 고유 키 추가
+            applicantList.value = addUniqueKeys(result);
+            return applicantList.value;
         } catch (err) {
             error.value = err.message;
             throw err;
         } finally {
             loading.value = false;
         }
+    };
+
+    // 각 지원서에 고유 키 추가 함수
+    const addUniqueKeys = (applicants) => {
+        return applicants.map((applicant, index) => ({
+            ...applicant,
+            // 고유 키 생성: 여러 조합으로 안전하게 생성
+            uniqueKey: applicant.introduceRatingResultId ||
+                `${applicant.recruitmentId || 'unknown'}_${applicant.applicantId}_${applicant.createdAt || index}`,
+            // 지원서 ID (실무테스트 할당에 사용)
+            applicationId: applicant.introduceRatingResultId ||
+                `${applicant.recruitmentId}_${applicant.applicantId}`
+        }));
     };
 
     // 필터링 및 정렬된 지원자 목록
@@ -131,8 +146,8 @@ export const useApplicantStore = defineStore('applicant', () => {
         error.value = null;
         try {
             const result = await searchApplicantsByNameService(name);
-            applicantList.value = result;
-            return result;
+            applicantList.value = addUniqueKeys(result);
+            return applicantList.value;
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -169,6 +184,16 @@ export const useApplicantStore = defineStore('applicant', () => {
         return bookmarkedApplicants.value.has(applicantId);
     };
 
+    // 상태 초기화
+    const resetState = () => {
+        applicantList.value = [];
+        selectedApplicant.value = null;
+        error.value = null;
+        searchQuery.value = '';
+        sortKey.value = '';
+        sortOrder.value = 'asc';
+    };
+
     return {
         // 상태
         applicantList,
@@ -192,6 +217,7 @@ export const useApplicantStore = defineStore('applicant', () => {
         removeBookmark,
         isBookmarked,
         setSearchQuery,
-        setSort
+        setSort,
+        resetState
     };
 });

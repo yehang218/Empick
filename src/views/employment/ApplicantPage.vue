@@ -22,7 +22,7 @@
           <!-- 📝 문제 할당 버튼 -->
           <v-btn color="secondary" variant="tonal" size="small" style="min-width: 90px" @click="handleAssignClick"
             :disabled="!selectedIds.length">
-            실무테스트 할당
+            실무테스트 할당 ({{ selectedIds.length }}개 선택)
           </v-btn>
 
           <!-- 📧 이메일 전송 버튼 -->
@@ -39,10 +39,17 @@
 
       <!-- 📋 지원자 테이블 -->
       <v-data-table :headers="tableHeaders" :items="applicantStore.filteredAndSortedApplicants" :items-per-page="8"
-        item-value="applicantId" class="elevation-1" v-model:selected="selectedIds" @update:options="handleSort">
-        <!-- 이름 -->
+        item-value="uniqueKey" class="elevation-1" v-model:selected="selectedIds" @update:options="handleSort"
+        show-select return-object>
+
+        <!-- 이름 + 지원 횟수 표시 -->
         <template #item.name="{ item }">
-          {{ item.name || '-' }}
+          <div>
+            <div class="font-weight-medium">{{ item.name || '-' }}</div>
+            <div class="text-caption text-grey" v-if="getApplicantCount(item.applicantId) > 1">
+              {{ getApplicantApplicationNumber(item) }}번째 지원
+            </div>
+          </div>
         </template>
 
         <!-- 이메일 -->
@@ -78,7 +85,19 @@
             지원서 확인
           </v-btn>
         </template>
+
+
       </v-data-table>
+
+      <!-- 선택된 지원서 정보 표시 -->
+      <v-card-text v-if="selectedIds.length > 0" class="text-caption">
+        <v-chip color="primary" variant="tonal" size="small">
+          {{ selectedIds.length }}개 지원서 선택됨
+        </v-chip>
+        <span class="ml-2 text-grey">
+          선택된 지원자: {{ getSelectedApplicantNames().join(', ') }}
+        </span>
+      </v-card-text>
 
       <!-- 로딩 상태 표시 -->
       <v-overlay :model-value="applicantStore.loading" class="align-center justify-center">
@@ -102,7 +121,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
 import { useApplicantStore } from '@/stores/applicantStore';
@@ -124,13 +143,6 @@ const applicantStore = useApplicantStore();
 const search = ref('')
 
 const tableHeaders = [
-  {
-    title: '',
-    key: 'data-table-select',
-    sortable: false,
-    width: '48px',
-    align: 'center'
-  },
   {
     title: '이름',
     key: 'name',
@@ -174,6 +186,30 @@ const tableHeaders = [
     align: 'start'
   }
 ]
+
+// 동일한 지원자의 지원 횟수 계산
+const getApplicantCount = (applicantId) => {
+  return applicantStore.filteredAndSortedApplicants.filter(
+    item => item.applicantId === applicantId
+  ).length;
+};
+
+// 동일한 지원자의 몇 번째 지원인지 계산
+const getApplicantApplicationNumber = (currentItem) => {
+  const sameApplicantApplications = applicantStore.filteredAndSortedApplicants
+    .filter(item => item.applicantId === currentItem.applicantId)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+  return sameApplicantApplications.findIndex(item =>
+    item.uniqueKey === currentItem.uniqueKey
+  ) + 1;
+};
+
+// 선택된 지원자들의 이름 목록
+const getSelectedApplicantNames = () => {
+  const selectedNames = selectedIds.value.map(selectedItem => selectedItem.name);
+  return [...new Set(selectedNames)]; // 중복 제거
+};
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -226,13 +262,16 @@ const handleAssignClick = async () => {
 const handleJobtestSelected = async (jobtest) => {
   jobtestModal.value = false;
 
-  const dtoList = selectedIds.value.map(appId => {
-    return new ApplicationJobtestDTO(appId, jobtest.id);
+  // selectedIds는 이제 전체 객체를 포함하므로 applicationId를 추출
+  const dtoList = selectedIds.value.map(selectedItem => {
+    // 추가된 applicationId 필드 사용
+    return new ApplicationJobtestDTO(selectedItem.applicationId, jobtest.id);
   });
 
   try {
     await applicationJobtestStore.assignJobtest(dtoList);
-    toast.success('선택한 지원서에 실무테스트를 성공적으로 할당했습니다.');
+    toast.success(`선택한 ${selectedIds.value.length}개 지원서에 실무테스트를 성공적으로 할당했습니다.`);
+    selectedIds.value = []; // 할당 후 선택 초기화
   } catch (error) {
     console.error('실무테스트 할당 실패:', error);
     toast.error(applicationJobtestStore.errorMessage);
@@ -256,6 +295,7 @@ const refreshList = async () => {
     await applicantStore.fetchApplicantFullInfoList()
     search.value = ''
     applicantStore.setSearchQuery('')
+    selectedIds.value = [] // 새로고침 시 선택 초기화
   } catch (error) {
     toast.error('지원자 목록을 불러오는데 실패했습니다.')
   }
