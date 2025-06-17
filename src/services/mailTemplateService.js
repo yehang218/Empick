@@ -1,7 +1,7 @@
 import api from '@/apis/apiClient';
 import { MailTemplateAPI } from '@/apis/routes/mail';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import MailTemplateDTO from '@/dto/employment/mail/mailTemplateDTO';
+import MailTemplateResponseDTO from '@/dto/employment/mail/mailTemplateResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 // Command
@@ -10,8 +10,12 @@ export const createTemplateService = async (dto, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.post(MailTemplateAPI.CREATE, dto);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailTemplateDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailTemplateResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -20,8 +24,12 @@ export const updateTemplateService = async (id, dto, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.patch(MailTemplateAPI.UPDATE(id), dto);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailTemplateDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailTemplateResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -30,8 +38,12 @@ export const deleteTemplateService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.delete(MailTemplateAPI.DELETE(id));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailTemplateDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailTemplateResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -40,8 +52,12 @@ export const findAllTemplatesService = async (options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(MailTemplateAPI.GET_ALL);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailTemplateDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return apiResponse.data.map(item => MailTemplateResponseDTO.fromJSON(item));
     }, options);
 };
 
@@ -50,8 +66,12 @@ export const findTemplateByIdService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(MailTemplateAPI.GET_BY_ID(id));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailTemplateDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailTemplateResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -60,7 +80,11 @@ export const searchTemplateByTitleService = async (title, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(MailTemplateAPI.SEARCH_BY_TITLE(title));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailTemplateDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return apiResponse.data.map(item => MailTemplateResponseDTO.fromJSON(item));
     }, options);
 };

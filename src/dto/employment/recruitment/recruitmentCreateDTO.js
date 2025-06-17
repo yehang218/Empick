@@ -1,4 +1,4 @@
-export default class recruitmentCreateDTO {
+export default class RecruitmentCreateDTO {
     constructor(
         title,
         content,
@@ -35,7 +35,7 @@ export default class recruitmentCreateDTO {
     }
 
     static fromForm(form) {
-        return new recruitmentCreateDTO(
+        return new RecruitmentCreateDTO(
             form.title,
             form.content,
             form.recruitType,

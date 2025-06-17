@@ -1,7 +1,7 @@
 import api from '@/apis/apiClient';
 import { MailAPI } from '@/apis/routes/mail';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import MailDTO from '@/dto/employment/mail/mailResponseDTO';
+import MailResponseDTO from '@/dto/employment/mail/mailResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 // Command
@@ -10,8 +10,12 @@ export const createMailService = async (dto, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.post(MailAPI.CREATE, dto);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -30,8 +34,12 @@ export const sendJobtestMailService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.post(MailAPI.SEND_JOBTEST(id));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -40,8 +48,12 @@ export const sendInterviewMailService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.post(MailAPI.SEND_INTERVIEW(id));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -51,8 +63,12 @@ export const findAllMailsService = async (options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(MailAPI.GET_ALL);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return apiResponse.data.map(item => MailResponseDTO.fromJSON(item));
     }, options);
 };
 
@@ -61,8 +77,12 @@ export const findMailByIdService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(MailAPI.GET_BY_ID(id));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return MailResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -71,7 +91,10 @@ export const findMailsByEmailService = async (email, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(MailAPI.GET_BY_EMAIL(email));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
-        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data.map(item => MailDTO.fromJSON(item));
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400)
+        };
+
+        return apiResponse.data.map(item => MailResponseDTO.fromJSON(item));
     }, options);
 };
