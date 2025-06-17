@@ -41,7 +41,7 @@
                 <h2 class="text-h5 font-weight-bold mb-1">{{ applicant.name }}</h2>
                 <p class="text-body-2 text-grey mb-2">{{ applicant.jobTitle || '백엔드 개발자' }}</p>
                 <v-chip size="small" color="blue" variant="tonal">
-                  {{ applicant.experience.split(',')[0] }}
+                  {{ getExperiencePreview() }}
                 </v-chip>
               </div>
             </div>
@@ -121,8 +121,7 @@
             <div class="resume-section">
               <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">기술 스택</h4>
               <div class="d-flex flex-wrap gap-2">
-                <v-chip v-for="skill in applicant.skills.split(', ')" :key="skill" size="small" variant="tonal"
-                  color="blue">
+                <v-chip v-for="skill in getSkillsArray()" :key="skill" size="small" variant="tonal" color="blue">
                   {{ skill }}
                 </v-chip>
               </div>
@@ -291,6 +290,48 @@ const applicant = ref({
 onMounted(() => {
   const query = route.query
 
+  // 받은 데이터로 실제 평가 통계 구성
+  const evaluationStats = []
+
+  // 자기소개서 평가
+  if (query.introduceScore) {
+    evaluationStats.push({
+      type: '자기소개서',
+      score: parseInt(query.introduceScore),
+      average: 76, // 평균은 별도 계산 필요
+      result: query.introduceStatus === '합격' ? '합격' : '불합격'
+    })
+  }
+
+  // 실무테스트 평가
+  if (query.jobtestEvaluationScore) {
+    evaluationStats.push({
+      type: '실무 테스트',
+      score: parseFloat(query.jobtestEvaluationScore),
+      average: 65, // 평균은 별도 계산 필요
+      result: parseFloat(query.jobtestEvaluationScore) >= 70 ? '합격' : '불합격'
+    })
+  }
+
+  // 면접 평가
+  if (query.interviewScore) {
+    evaluationStats.push({
+      type: '면접',
+      score: parseFloat(query.interviewScore),
+      average: 78, // 평균은 별도 계산 필요
+      result: parseFloat(query.interviewScore) >= 70 ? '합격' : '불합격'
+    })
+  }
+
+  // 기본 평가 통계가 없으면 mock 데이터 사용
+  if (evaluationStats.length === 0) {
+    evaluationStats.push(
+      { type: '자기소개서', score: 85, average: 76, result: '합격' },
+      { type: '실무 테스트', score: 90, average: 65, result: '합격' },
+      { type: '면접', score: 71, average: 78, result: '불합격' }
+    )
+  }
+
   applicant.value = {
     ...applicant.value,
     name: query.name || '정보 없음',
@@ -304,7 +345,12 @@ onMounted(() => {
     recruitmentId: query.recruitmentId || '',
     createdAt: query.createdAt || '',
     updatedAt: query.updatedAt || '',
-    introduceRatingResultId: query.introduceRatingResultId || null
+    introduceRatingResultId: query.introduceRatingResultId || null,
+    // 실제 데이터로 교체
+    motivation: query.motivation || '안정적이고 성장 가능성이 높은 기업에서 제 경험을 활용하여 더 나은 서비스를 만들어가고 싶습니다.',
+    experience: query.experience || '백엔드 개발 3년 경력, Spring Boot를 활용한 REST API 개발 및 마이크로서비스 아키텍처 구축 경험',
+    skills: query.skills || 'Java, Spring Boot, JPA, MySQL, Vue.js, Docker, AWS',
+    evaluationStats: evaluationStats
   }
 })
 
@@ -328,6 +374,17 @@ const selectEvaluation = (type) => {
 
 const getCurrentEvaluation = () => {
   return applicant.value.evaluationStats.find(evaluation => evaluation.type === selectedEvaluation.value)
+}
+
+const getSkillsArray = () => {
+  if (!applicant.value.skills) return ['정보 없음']
+  return applicant.value.skills.split(/[,،、]\s*/).filter(skill => skill.trim())
+}
+
+const getExperiencePreview = () => {
+  if (!applicant.value.experience) return '경력 정보 없음'
+  const preview = applicant.value.experience.split(/[,،、]/)[0]
+  return preview ? preview.trim() : '경력 정보 없음'
 }
 
 const formatDate = (dateString) => {

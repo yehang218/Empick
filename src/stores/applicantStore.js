@@ -23,16 +23,14 @@ export const useApplicantStore = defineStore('applicant', () => {
     const sortKey = ref('');
     const sortOrder = ref('asc');
 
+
     // 각 지원서에 고유 키 추가 함수
     const addUniqueKeys = (applicants) => {
         return applicants.map((applicant, index) => ({
             ...applicant,
-            // 고유 키 생성: 여러 조합으로 안전하게 생성
-            uniqueKey: applicant.introduceRatingResultId ||
-                `${applicant.recruitmentId || 'unknown'}_${applicant.applicantId}_${applicant.createdAt || index}`,
-            // 지원서 ID (실무테스트 할당에 사용)
-            applicationId: applicant.introduceRatingResultId ||
-                `${applicant.recruitmentId}_${applicant.applicantId}`
+            // 완전히 고유한 키: 시간 + 랜덤 + index
+            uniqueKey: `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${index}`,
+            // applicationId는 백엔드에서 온 값 그대로 사용
         }));
     };
 

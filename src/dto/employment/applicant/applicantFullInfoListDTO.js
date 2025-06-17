@@ -1,6 +1,7 @@
 class ApplicantFullInfoListDTO {
     constructor(
         applicantId,
+        applicationId,
         name,
         phone,
         email,
@@ -14,9 +15,27 @@ class ApplicantFullInfoListDTO {
         createdAt,
         status,
         updatedAt,
-        updatedBy
+        updatedBy,
+        // 추가된 필드들
+        introduceEvaluationContent,
+        introduceScore,
+        introduceStatus,
+        motivation,
+        experience,
+        skills,
+        education,
+        portfolioUrl,
+        coverLetter,
+        jobtestTotalScore,
+        jobtestEvaluationScore,
+        jobtestStatus,
+        interviewScore,
+        interviewAddress,
+        interviewDatetime
     ) {
+        // 기존 필드들
         this.applicantId = applicantId;
+        this.applicationId = applicationId;
         this.name = name;
         this.phone = phone;
         this.email = email;
@@ -31,11 +50,29 @@ class ApplicantFullInfoListDTO {
         this.status = status;
         this.updatedAt = updatedAt;
         this.updatedBy = updatedBy;
+
+        // 추가된 필드들
+        this.introduceEvaluationContent = introduceEvaluationContent;
+        this.introduceScore = introduceScore;
+        this.introduceStatus = introduceStatus;
+        this.motivation = motivation;
+        this.experience = experience;
+        this.skills = skills;
+        this.education = education;
+        this.portfolioUrl = portfolioUrl;
+        this.coverLetter = coverLetter;
+        this.jobtestTotalScore = jobtestTotalScore;
+        this.jobtestEvaluationScore = jobtestEvaluationScore;
+        this.jobtestStatus = jobtestStatus;
+        this.interviewScore = interviewScore;
+        this.interviewAddress = interviewAddress;
+        this.interviewDatetime = interviewDatetime;
     }
 
     static fromJSON(json) {
         return new ApplicantFullInfoListDTO(
             json.applicantId,
+            json.applicationId,
             json.name,
             json.phone,
             json.email,
@@ -49,7 +86,23 @@ class ApplicantFullInfoListDTO {
             json.createdAt,
             json.status,
             json.updatedAt,
-            json.updatedBy
+            json.updatedBy,
+            // 추가된 필드들
+            json.introduceEvaluationContent,
+            json.introduceScore,
+            json.introduceStatus,
+            json.motivation,
+            json.experience,
+            json.skills,
+            json.education,
+            json.portfolioUrl,
+            json.coverLetter,
+            json.jobtestTotalScore,
+            json.jobtestEvaluationScore,
+            json.jobtestStatus,
+            json.interviewScore,
+            json.interviewAddress,
+            json.interviewDatetime
         );
     }
 }
