@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { authRoutes } from './auth.routes';
 import { employmentRoutes } from './employment.routes';
 import { orgstructureRoutes } from './orgstructure.routes';
-import { approvalRoutes } from './approval.routes';
 import { testRoutes } from './test.routes';
 import { approvalRoutes } from './approval.routes';
 import { authGuard } from './middleware/auth.guard';

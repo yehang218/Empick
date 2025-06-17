@@ -13,8 +13,6 @@ export const approvalRoutes = [
             }
         }
     },
-]; 
-
     // 받은 결재 목록 페이지
     {
         path: '/approval/inbox',
