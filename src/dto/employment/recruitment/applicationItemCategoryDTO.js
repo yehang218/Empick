@@ -1,4 +1,4 @@
-export default class applicationItemCategoryDTO {
+export default class ApplicationItemCategoryDTO {
     constructor(id, name, inputType, displayOrder, applicationItemCategoryId) {
         this.id = id
         this.name = name
@@ -8,7 +8,7 @@ export default class applicationItemCategoryDTO {
     }
 
     static fromJSON(json) {
-        return new applicationItemCategoryDTO(
+        return new ApplicationItemCategoryDTO(
             json.id,
             json.name,
             json.inputType,

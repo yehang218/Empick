@@ -13,7 +13,7 @@ export const getAllApplicationsService = async (options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(ApplicationResponseDTO.fromJSON);
+    return apiResponse.data.map(item => ApplicationResponseDTO.fromJSON(item));
   }, options);
 };
 
@@ -26,7 +26,7 @@ export const getApplicationByIdService = async (id, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(ApplicationResponseDTO.fromJSON);
+    return ApplicationResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };
 
@@ -65,7 +65,7 @@ export const deleteApplicationService = async (id, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data;
+    return ApplicationResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };
 
@@ -78,6 +78,6 @@ export const createApplicationResponseService = async (dto, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data;
+    return ApplicationResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };

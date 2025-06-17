@@ -1,4 +1,4 @@
-export default class recruitmentResponseDTO {
+export default class RecruitmentResponseDTO {
     constructor(id, title, recruitType, startedAt, endedAt, departmentName, status, memberName) {
         this.id = id
         this.title = title
@@ -11,7 +11,7 @@ export default class recruitmentResponseDTO {
     }
 
     static fromJSON(json) {
-        return new recruitmentResponseDTO(
+        return new RecruitmentResponseDTO(
             json.id,
             json.title,
             json.recruitType,

@@ -1,4 +1,4 @@
-export default class mailTemplateResponseDTO {
+export default class MailTemplateResponseDTO {
     constructor(id, title, content, isDeleted, memberId, updatedAt) {
         this.id = id;
         this.title = title;
@@ -9,7 +9,7 @@ export default class mailTemplateResponseDTO {
     }
 
     static fromJSON(json) {
-        return new mailTemplateResponseDTO(
+        return new MailTemplateResponseDTO(
             json.id,
             json.title,
             json.content,
