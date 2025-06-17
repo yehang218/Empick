@@ -1,21 +1,10 @@
 <template>
   <div class="search-bar">
-    <input
-      v-model="keyword"
-      type="text"
-      placeholder="검색"
-      @keyup.enter="onSearch"
-    />
-    <button @click="onSearch">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        fill="none"
-        stroke="black"
-        stroke-width="2"
-        viewBox="0 0 24 24"
-      >
+    <input :value="modelValue" type="text" placeholder="검색" @input="$emit('update:modelValue', $event.target.value)"
+      @keyup.enter="$emit('search', $event.target.value)" />
+    <button @click="$emit('search', modelValue)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="black" stroke-width="2"
+        viewBox="0 0 24 24">
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
@@ -24,13 +13,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+defineProps({
+  modelValue: {
+    type: String,
+    required: true
+  }
+})
 
-const keyword = ref('')
-
-const onSearch = () => {
-  console.log('검색어:', keyword.value)
-}
+defineEmits(['update:modelValue', 'search'])
 </script>
 
 <style scoped>

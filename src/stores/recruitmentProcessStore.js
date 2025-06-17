@@ -1,30 +1,23 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { fetchRecruitmentProcesses } from '@/services/recruitmentProcessService';
+// stores/recruitmentProcessStore.js
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { fetchRecruitmentProcesses } from '@/services/recruitmentProcessService'
 
 export const useRecruitmentProcessStore = defineStore('recruitmentProcess', () => {
-    const processList = ref([]);
-    const loading = ref(false);
-    const error = ref(null);
+    const processList = ref([])
 
     const loadProcesses = async (recruitmentId) => {
-        loading.value = true;
-        error.value = null;
-
         try {
-            const result = await fetchRecruitmentProcesses(recruitmentId);
-            processList.value = result;
+            const result = await fetchRecruitmentProcesses(recruitmentId)
+            processList.value = Array.isArray(result) ? result : []  // ✅ 안전하게 할당
         } catch (err) {
-            error.value = err.message;
-        } finally {
-            loading.value = false;
+            console.error('채용 프로세스 조회 실패:', err)
+            processList.value = [] // ✅ 실패 시도 안전하게 초기화
         }
-    };
+    }
 
     return {
         processList,
-        loading,
-        error,
-        loadProcesses
-    };
-});
+        loadProcesses  // ✅ 반드시 반환
+    }
+})

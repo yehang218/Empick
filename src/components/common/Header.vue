@@ -45,7 +45,8 @@
             <teleport to="body">
                 <v-container v-if="selectedMenu" class="menu-panel" fluid @mouseleave="selectedMenu = ''">
                     <div class="menu-columns">
-                        <div v-for="section in filteredMenuObject[selectedMenu]" :key="section.label" class="menu-section">
+                        <div v-for="section in filteredMenuObject[selectedMenu]" :key="section.label"
+                            class="menu-section">
                             <h3 class="menu-title">{{ section.label }}</h3>
                             <ul v-if="section.children.length" class="submenu-list">
                                 <li v-for="child in section.children" :key="child.label" class="submenu-item"
@@ -72,6 +73,7 @@ import { filterMenuByRoles } from '@/utils/menuAccess'
 const router = useRouter()
 const selectedMenu = ref('')
 const searchInput = ref('')
+const selectedPath = ref('')
 
 const authStore = useAuthStore()
 const userRoles = computed(() => authStore.userInfo?.roles || [])

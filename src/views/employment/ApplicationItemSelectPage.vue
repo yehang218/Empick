@@ -84,27 +84,40 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import recruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
-import { fetchApplicationItemCategories } from '@/services/applicationItemService'
 import { getInputTypeLabel } from '@/constants/employment/inputTypes'
 import { useMemberStore } from '@/stores/memberStore'
 
 const router = useRouter()
+const route = useRoute()
 const store = useRecruitmentStore()
 const memberStore = useMemberStore()
+const requestId = route.query.requestId
 
-const categoryList = computed(() => store.applicationItemCategoryList)
+// 선택된 항목 ID와 필수 여부
 const selectedIds = computed({
     get: () => store.selectedApplicationItemIds,
     set: (val) => store.selectedApplicationItemIds = val
 })
-
 const requiredIds = computed({
     get: () => store.requiredApplicationItemIds,
     set: (val) => store.requiredApplicationItemIds = val
 })
+
+// 지원서 항목 카테고리
+const categoryList = computed(() => store.applicationItemCategoryList || [])
+
+// 그룹핑된 카테고리 (부모-자식 구조)
+const groupedCategories = computed(() => {
+    const parents = categoryList.value.filter(c => c.applicationItemCategoryId === null)
+    return parents.map(parent => ({
+        parent,
+        children: categoryList.value.filter(c => c.applicationItemCategoryId === parent.id)
+    }))
+})
+
 const dateValues = ref({})
 const menuStates = ref({})
 const openGroup = ref(null)
@@ -124,23 +137,16 @@ const selectedItemsByGroup = (children) => {
     return children.filter(item => selectedIds.value.includes(item.id))
 }
 
-const groupedCategories = computed(() => {
-    const parents = categoryList.value.filter(c => c.applicationItemCategoryId === null)
-    return parents.map(parent => ({
-        parent,
-        children: categoryList.value.filter(c => c.applicationItemCategoryId === parent.id)
-    }))
-})
-
+// 📦 지원서 항목 카테고리 목록 불러오기 (스토어 함수 사용)
 onMounted(async () => {
     await memberStore.getMyInfo()
 
-    // store에 없을 때만 fetch
     if (!store.applicationItemCategoryList.length) {
-        const result = await fetchApplicationItemCategories()
-        store.setApplicationItemCategoryList(result)
+        await store.loadApplicationItemCategories()
+        console.log('불러온 카테고리:', store.applicationItemCategoryList)
+    } else {
+        console.log('이미 있는 카테고리:', store.applicationItemCategoryList)
     }
-
 })
 
 const getInputComponent = (inputType) => {
@@ -189,7 +195,7 @@ const submit = async () => {
         memberId: memberStore.form.id
     })
 
-    console.log('📦 전송 DTO:', JSON.stringify(dto, null, 2));
+    console.log('📦 전송 DTO:', JSON.stringify(dto, null, 2))
 
     await store.submitRecruitment(dto)
     store.clearDraftRecruitment()

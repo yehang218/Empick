@@ -16,6 +16,7 @@ const router = useRouter()
 
 const store = useRecruitmentStore()
 const applicationItemStore = useApplicationItemStore()
+
 const processStore = useRecruitmentProcessStore()
 const requestStore = useRecruitmentRequestStore()
 
@@ -46,6 +47,9 @@ const getInputComponent = (type) => {
 onMounted(async () => {
     const id = Number(route.params.id);
     await store.loadRecruitmentDetail(id);
+    console.log('Loaded ID:', id);
+    console.log('Detail:', store.value);
+
 
     // ✅ 이전 요청서 정보 초기화
     requestStore.recruitmentRequestDetail = null;
@@ -53,6 +57,7 @@ onMounted(async () => {
     const requestId = detail.value?.recruitment?.recruitmentRequestId;
     if (requestId !== null && requestId !== undefined) {
         await requestStore.loadRecruitmentRequestDetail(requestId);
+
     }
 
     await processStore.loadProcesses(id);
@@ -61,7 +66,13 @@ onMounted(async () => {
 
 function formatDate(date) {
     if (!date) return ''
-    return new Date(date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+    return new Date(date).toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
 }
 
 const handleDelete = async () => {
@@ -79,10 +90,8 @@ const getStatusColor = (status) => {
         case 'PUBLISHED': return 'green'
         case 'CLOSED': return 'red'
         default: return 'grey'
-
     }
 }
-
 </script>
 
 <template>
