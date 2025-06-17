@@ -69,7 +69,7 @@
   </template>
   
   <script>
-  import applicantService from '@/services/applicantService'; // 서비스 임포트
+  import { createApplicantService } from '@/services/applicantService'; // createApplicantService 임포트
   import router from '@/router'; // 라우터 임포트
 
   export default {
@@ -116,13 +116,18 @@
                 profileImageUrl: this.applicant.profileImage ? this.applicant.profileImage.name : null, // 파일 이름만 예시로 저장
             };
 
-            const response = await applicantService.registerApplicant(payload);
-            if (response.isSuccess) {
+            const response = await createApplicantService(payload);
+            // createApplicantService는 ApiResponseDTO 구조의 data를 반환합니다.
+            // 여기서 isSuccess 대신 success 속성을 확인합니다.
+            if (response) { // 성공적으로 응답을 받았다면 (withErrorHandling 내부에서 에러가 던져지지 않았다면)
               alert('지원자 정보가 성공적으로 등록되었습니다!');
               this.resetForm();
               router.push('/employment/applicant'); // 등록 후 지원자 목록 페이지로 이동
             } else {
-              alert(`지원자 등록 실패: ${response.message}`);
+              // createApplicantService 내부에서 에러 처리 및 throwCustomApiError가 호출되므로,
+              // 여기서는 추가적인 에러 메시지 처리가 필요 없을 수 있습니다.
+              // 하지만 만약을 위해 일반적인 실패 메시지를 남겨둡니다.
+              alert('지원자 등록에 실패했습니다. 상세 오류는 콘솔을 확인해주세요.');
             }
           } catch (error) {
             console.error('지원자 등록 중 오류 발생:', error);
