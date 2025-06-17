@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification';
 
@@ -37,7 +37,11 @@ import { createQuestionService } from '@/services/jobtestQuestionService';
 import { withErrorHandling } from '@/utils/errorHandler';
 import CreateQuestionRequestDTO from '@/dto/employment/jobtest/createQuestionRequestDTO';
 
+import { useMemberStore } from '@/stores/memberStore'
+
 const activeTab = ref('MULTIPLE');
+const memberStore = useMemberStore()
+
 const difficultyOptions = [
     { title: '쉬움', value: 'EASY' },
     { title: '보통', value: 'MEDIUM' },
@@ -50,7 +54,7 @@ const form = ref({
     detailContent: '',
     difficulty: 'EASY',
     answer: '',
-    createdMemberId: 1,
+    createdMemberId: '',
     questionOptions: [],
     gradingCriteria: []
 });
@@ -170,6 +174,15 @@ async function handleSubmit() {
         // 이미 withErrorHandling에서 처리하는 중
     }
 }
+
+onMounted(async () => {
+    await memberStore.getMyInfo();
+    if (!memberStore.form.id) {
+        toast.error('등록자 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+    form.value.createdMemberId = memberStore.form.id;
+})
 
 </script>
 

@@ -1,12 +1,12 @@
 import api from '@/apis/apiClient';
 import { ApplicationAPI } from '@/apis/routes/application';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import ApplicationResponseDTO from '@/dto/employment/applicant/applicationResponseDTO'; // ✅ 이거 하나로 통일
+import ApplicationResponseDTO from '@/dto/employment/application/applicationResponeDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
 export const getAllApplicationsService = async (options = {}) => {
   return withErrorHandling(async () => {
-    const response = await api.get(ApplicationAPI.GET_ALL_APPLICATION);
+    const response = await api.get(ApplicationAPI.GET_ALL_APPLICATIONS);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
     if (!apiResponse.success) {
@@ -52,7 +52,7 @@ export const updateApplicationStatusService = async (id, dto, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationResponseDTO.fromJSON(apiResponse.data); // ✅ 여기
+    return ApplicationResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };
 

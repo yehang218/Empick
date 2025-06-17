@@ -6,15 +6,13 @@
             <v-row dense>
                 <!-- 포지션 -->
                 <v-col cols="12">
-                    <v-select v-model="form.jobId" :items="jobOptions" label="포지션" item-title="name" item-value="id"
-                        :rules="[required]" />
+                    <v-select v-model="form.jobId" :items="store.jobList" item-title="name" item-value="id"
+                        label="포지션" />
                 </v-col>
 
                 <!-- 부서 -->
-                <v-col cols="12">
-                    <v-select v-model="form.departmentId" :items="departmentOptions" label="부서" item-title="name"
-                        item-value="id" :rules="[required]" />
-                </v-col>
+                <v-select v-model="form.departmentId" :items="store.departmentList" item-title="name" item-value="id"
+                    label="부서" />
 
                 <!-- 모집 인원 -->
                 <v-col cols="12">
@@ -68,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
@@ -101,17 +99,12 @@ const form = ref({
     workLocation: ''
 });
 
+onMounted(() => {
+    store.loadJobList();
+    store.loadDepartmentList();
+});
+
 // 더미 옵션
-const jobOptions = [
-    { id: 1, name: '프론트엔드 개발자' },
-    { id: 2, name: '백엔드 개발자' }
-];
-
-const departmentOptions = [
-    { id: 1, name: '개발팀' },
-    { id: 2, name: '디자인팀' }
-];
-
 const employmentTypes = ['정규직', '계약직', '인턴'];
 
 // 유효성 검사

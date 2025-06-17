@@ -1,24 +1,33 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
-import { fetchRecruitmentProcesses } from '@/services/recruitmentProcessService'
-import { fetchRecruitmentRequestDetail } from '@/services/recruitmentRequestService'
+import { useRecruitmentProcessStore } from '@/stores/recruitmentProcessStore'
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 import { getStepTypeLabel } from '@/constants/employment/stepType'
+import ConfirmModal from '@/components/common/Modal.vue'
+import { useToast } from 'vue-toastification'
 
 const route = useRoute()
+const router = useRouter()
+
 const store = useRecruitmentStore()
 const applicationItemStore = useApplicationItemStore()
-const processList = ref([])
+const processStore = useRecruitmentProcessStore()
+const requestStore = useRecruitmentRequestStore()
 
+const processList = computed(() => processStore.processList)
+const toast = useToast()
+
+const detail = computed(() => store.detail)
+const requestDetail = computed(() => requestStore.recruitmentRequestDetail);
+const applicationItemDialog = ref(false)
 const loading = computed(() => store.loadingDetail)
 const error = computed(() => store.detailError)
-const detail = computed(() => store.detail)
-const requestDetail = ref(null)
-const applicationItemDialog = ref(false)
+const deleteDialog = ref(false)
 
 const getInputComponent = (type) => {
     switch (type) {
@@ -35,27 +44,45 @@ const getInputComponent = (type) => {
 }
 
 onMounted(async () => {
-    const id = route.params.id
-    try {
-        await store.loadRecruitmentDetail(id)
-        
-        // 연관된 요청서 정보 불러오기
-        if (detail.value.recruitment.recruitmentRequestId) {
-            requestDetail.value = await fetchRecruitmentRequestDetail(detail.value.recruitment.recruitmentRequestId)
-        }
+    const id = Number(route.params.id);
+    await store.loadRecruitmentDetail(id);
 
-        processList.value = await fetchRecruitmentProcesses(id)
+    // ✅ 이전 요청서 정보 초기화
+    requestStore.recruitmentRequestDetail = null;
 
-        await applicationItemStore.loadApplicationItems(id)
-    } catch (err) {
-        console.error('채용 공고 상세 로딩 실패:', err)
+    const requestId = detail.value?.recruitment?.recruitmentRequestId;
+    if (requestId !== null && requestId !== undefined) {
+        await requestStore.loadRecruitmentRequestDetail(requestId);
     }
-})
+
+    await processStore.loadProcesses(id);
+    await applicationItemStore.loadApplicationItems(id);
+});
 
 function formatDate(date) {
     if (!date) return ''
     return new Date(date).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
+
+const handleDelete = async () => {
+    try {
+        await store.deleteExistingRecruitment(detail.value.recruitment.id)
+        router.push({ path: '/employment/recruitments', query: { toast: 'deleted' } })
+    } catch (e) {
+        toast.error('삭제 실패: ' + e)
+    }
+}
+
+const getStatusColor = (status) => {
+    switch (status) {
+        case 'WAITING': return 'grey'
+        case 'PUBLISHED': return 'green'
+        case 'CLOSED': return 'red'
+        default: return 'grey'
+
+    }
+}
+
 </script>
 
 <template>
@@ -66,9 +93,16 @@ function formatDate(date) {
         <v-card v-else-if="detail" class="pa-6" flat>
             <v-row align="center" justify="space-between" class="mb-6">
                 <v-col cols="auto" class="d-flex align-center">
-                    <v-icon @click="$router.back()" class="me-2 cursor-pointer" size="28"
-                        color="black">mdi-arrow-left</v-icon>
-                    <h2 class="text-h5 font-weight-bold">채용 공고 상세</h2>
+                    <v-icon @click="$router.back()" class="me-2 cursor-pointer" size="28" color="black">
+                        mdi-arrow-left
+                    </v-icon>
+                    <h2 class="text-h5 font-weight-bold me-3">
+                        채용 공고 상세
+                    </h2>
+                    <v-chip v-if="detail?.recruitment?.status !== undefined"
+                        :color="getStatusColor(detail.recruitment.status)" text-color="white" class="ml-2" size="small">
+                        {{ getRecruitStatusLabel(detail.recruitment.status) }}
+                    </v-chip>
                 </v-col>
 
                 <v-col cols="auto" class="d-flex gap-2">
@@ -76,8 +110,11 @@ function formatDate(date) {
                         :to="`/employment/applicants?recruitmentId=${detail.recruitment.id}`">
                         지원자 현황 보기
                     </v-btn>
-                    <v-btn variant="outlined" color="success" @click="applicationItemDialog = true">
+                    <v-btn class="mr-2" variant="outlined" color="success" @click="applicationItemDialog = true">
                         지원서 항목 보기
+                    </v-btn>
+                    <v-btn variant="outlined" color="error" @click="deleteDialog = true">
+                        삭제
                     </v-btn>
                 </v-col>
             </v-row>
@@ -87,16 +124,12 @@ function formatDate(date) {
                 <div>{{ detail.recruitment.title }}</div>
             </v-card>
             <v-card class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">내용</div>
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">상세 내용</div>
                 <div v-html="detail.recruitment.content"></div>
             </v-card>
             <v-card class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">유형</div>
                 <div>{{ getRecruitTypeLabel(detail.recruitment.recruitType) }}</div>
-            </v-card>
-            <v-card class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">상태</div>
-                <div>{{ getRecruitStatusLabel(detail.recruitment.status) }}</div>
             </v-card>
             <v-card class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">모집 기간</div>
@@ -108,20 +141,24 @@ function formatDate(date) {
                 <div class="white-space-pre-line">{{ requestDetail.jobName }}</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">고용 형태</div>
-                <div class="white-space-pre-line">{{ requestDetail.employmentType }}</div>
-            </v-card>
-            <v-card v-if="requestDetail" class="mb-4 pa-4">
-                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">주요 업무</div>
-                <div class="white-space-pre-line">{{ requestDetail.responsibility }}</div>
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">부서명</div>
+                <div class="white-space-pre-line">{{ requestDetail.departmentName }}</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">모집 인원</div>
                 <div>{{ requestDetail.headcount }}명</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">고용 형태</div>
+                <div class="white-space-pre-line">{{ requestDetail.employmentType }}</div>
+            </v-card>
+            <v-card v-if="requestDetail" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">근무 지역</div>
                 <div>{{ requestDetail.workLocation }}</div>
+            </v-card>
+            <v-card v-if="requestDetail" class="mb-4 pa-4">
+                <div class="font-weight-bold mb-2" style="color: #2f6f3e;">주요 업무</div>
+                <div class="white-space-pre-line">{{ requestDetail.responsibility }}</div>
             </v-card>
             <v-card v-if="requestDetail" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">자격 요건</div>
@@ -142,6 +179,9 @@ function formatDate(date) {
                     </span>
                 </div>
             </v-card>
+
+            <ConfirmModal v-if="deleteDialog" message="정말 삭제하시겠습니까?" @confirm="handleDelete"
+                @cancel="deleteDialog = false" />
 
         </v-card>
 
@@ -168,7 +208,6 @@ function formatDate(date) {
                 </v-card-actions>
             </v-card>
         </v-dialog>
-
 
     </v-container>
 </template>

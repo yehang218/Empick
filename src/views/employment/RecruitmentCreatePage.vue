@@ -4,10 +4,71 @@
         <v-row justify="space-between" align="center" class="mb-6">
             <h2 class="text-h5 font-weight-bold">채용 공고 작성</h2>
             <div>
-                <v-btn variant="tonal" class="mr-2" @click="$router.back()">취소하기</v-btn>
+                <v-btn variant="tonal" class="mr-2" @click="cancel">취소하기</v-btn>
                 <v-btn color="success" variant="elevated" @click="goToApplicationItem">지원서 항목 선택</v-btn>
             </div>
         </v-row>
+
+        <v-card v-if="requestDetail" class="mb-6 pa-6" elevation="1" color="#f8faf9">
+            <h3 class="text-subtitle-1 font-weight-bold d-flex align-center mb-4">
+                <v-icon class="mr-2" color="success">mdi-clipboard-text</v-icon>
+                채용 요청서 정보
+            </h3>
+
+            <v-row dense>
+                <!-- 포지션 / 부서 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">포지션명</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.jobName }}</div>
+                </v-col>
+                <v-col cols="12">
+                    <div class="text-caption text-grey">부서명</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.departmentName }}</div>
+                </v-col>
+
+                <!-- 모집 인원 / 고용 형태 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">모집 인원</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.headcount }}명</div>
+                </v-col>
+                <v-col cols="12">
+                    <div class="text-caption text-grey">고용 형태</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.employmentType }}</div>
+                </v-col>
+
+                <!-- 근무 지역 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">근무 지역</div>
+                    <div class="text-body-1 font-weight-medium">{{ requestDetail.workLocation }}</div>
+                </v-col>
+
+                <!-- 주요 업무 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">주요 업무</div>
+                    <div class="text-body-1 font-weight-medium" style="white-space: pre-line;">
+                        {{ requestDetail.responsibility }}
+                    </div>
+                </v-col>
+
+                <!-- 자격 요건 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">자격 요건</div>
+                    <div class="text-body-1 font-weight-medium" style="white-space: pre-line;">
+                        {{ requestDetail.qualification }}
+                    </div>
+                </v-col>
+
+                <!-- 우대 사항 -->
+                <v-col cols="12">
+                    <div class="text-caption text-grey">우대 사항</div>
+                    <div class="text-body-1 font-weight-medium" style="white-space: pre-line;">
+                        {{ requestDetail.preference }}
+                    </div>
+                </v-col>
+            </v-row>
+        </v-card>
+
+
 
         <!-- 입력 폼 -->
         <v-form ref="formRef" v-model="isValid">
@@ -87,6 +148,8 @@
             </v-row>
         </v-form>
     </v-container>
+    <ConfirmModal v-if="showCancelConfirm" message="작성을 취소하시겠습니까?" @confirm="confirmCancel"
+        @cancel="showCancelConfirm = false" />
 </template>
 
 <script setup>
@@ -96,12 +159,20 @@ import { recruitTypeOptions } from '@/constants/employment/recruitTypes'
 import { QuillEditor } from '@vueup/vue-quill'
 import { stepTypeOptions, getStepTypeLabel } from '@/constants/employment/stepType'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
+import ConfirmModal from '@/components/common/Modal.vue'
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
 
 const router = useRouter()
 const route = useRoute()
+const requestId = route.query.requestId;
+
 const store = useRecruitmentStore()
+const recruitmentRequestStore = useRecruitmentRequestStore()
 const isValid = ref(true)
 const formRef = ref()
+const showCancelConfirm = ref(false)
+
+const requestDetail = ref(null)
 
 const newStep = ref({
     stepType: '',
@@ -116,14 +187,38 @@ const form = ref({
     imageUrl: '',
     startedAt: '',
     endedAt: '',
-    recruitmentProcesses: []
+    recruitmentProcesses: [],
+    recruitmentRequestId: route.query.id || null
 })
 
-onMounted(() => {
-    if (store.draftRecruitment) {
-        Object.assign(form.value, store.draftRecruitment)
+onMounted(async () => {
+    if (store.draftRecruitment?.value) {
+        Object.assign(form.value, store.draftRecruitment.value);
+    }
+
+    const requestId = route.query.id
+
+    if (requestId) {
+        await recruitmentRequestStore.loadRecruitmentRequestDetail(requestId)
+        requestDetail.value = recruitmentRequestStore.recruitmentRequestDetail
+        if (requestDetail.value?.startedAt) {
+            form.value.startedAt = requestDetail.value.startedAt.slice(0, 16)
+        }
+        if (requestDetail.value?.endedAt) {
+            form.value.endedAt = requestDetail.value.endedAt.slice(0, 16)
+        }
     }
 })
+
+const cancel = () => {
+    showCancelConfirm.value = true
+}
+
+const confirmCancel = () => {
+    store.clearDraftRecruitment()
+    store.clearDraftApplicationItems()
+    router.push('/employment/recruitments')
+}
 
 const rules = {
     required: v => !!v || '필수 입력 항목입니다.'

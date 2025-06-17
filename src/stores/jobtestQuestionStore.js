@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getQuestionsService } from '@/services/jobtestQuestionService';
+import { getQuestionsService, deleteQuestionService, deleteQuestionOptionsByQuestionId } from '@/services/jobtestQuestionService';
 import { getQuestionTypeLabel } from '@/constants/employment/questionTypes';
 import { getDifficultyLabel } from '@/constants/employment/difficulty';
 
@@ -38,6 +38,32 @@ export const useJobtestStore = defineStore('jobtest', () => {
         } finally {
             loading.value = false;
         }
+    };
+
+    // 문제 삭제
+    const deleteSelectedQuestions = async () => {
+        const selectedIds = getSelectedQuestionIds();
+
+        for (const id of selectedIds) {
+            try {
+                // 해당 문제 객체 가져오기
+                const question = questions.value.find(q => q.id === id);
+
+                // 문제 유형이 MULTIPLE 이라면 선택지 먼저 삭제
+                if (question?.type === '선택형' || question?.type === 'MULTIPLE') {
+                    await deleteQuestionOptionsByQuestionId(id);
+                }
+
+                // 그 후 문제 삭제
+                await deleteQuestionService(id);
+            } catch (err) {
+                console.error(`문제 ID ${id} 삭제 실패:`, err);
+                throw err;
+            }
+        }
+
+        await fetchQuestions();
+        clearSelection();
     };
 
 
@@ -80,6 +106,8 @@ export const useJobtestStore = defineStore('jobtest', () => {
         toggleQuestionSelection,
         getSelectedQuestions,
         getSelectedQuestionIds,
-        clearSelection
+        clearSelection,
+        deleteSelectedQuestions
     };
+
 }); 

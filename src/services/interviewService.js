@@ -113,6 +113,20 @@ export const getInterviewByIdService = async (id, options = {}) => {
     }, options);
 };
 
+// 면접을 지원서id로 조회하는 서비스
+export const getInterviewByApplicationIdService = async (applicationId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(InterviewAPI.GET_INTERVIEW_BY_APPLICATION_ID(applicationId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return InterviewResponseDTO.fromJSON(apiResponse.data);
+    }, options);
+};
+
 // 면접을 날짜로 조회하는 서비스
 export const getInterviewsByDateService = async (date, options = {}) => {
     return withErrorHandling(async () => {
