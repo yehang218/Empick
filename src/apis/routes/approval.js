@@ -2,6 +2,7 @@ export const ApprovalAPI = {
     // 결재 유형
     CATEGORIES: '/api/v1/approval/categories',
     CATEGORY_DETAIL: (categoryId) => `/api/v1/approval/categories/${categoryId}`,
+    CATEGORY_CHILDREN: (parentId) => `/api/v1/approval/categories/${parentId}/children`,
 
     // 결재 항목 (유형별 항목)
     CATEGORY_ITEMS: (categoryId) => `/api/v1/approval/categories/${categoryId}/items`,
