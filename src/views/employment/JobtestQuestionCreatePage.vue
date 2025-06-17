@@ -35,7 +35,7 @@ import SuccessModal from '@/components/common/AlertModal.vue'
 
 import { createQuestionService } from '@/services/jobtestQuestionService';
 import { withErrorHandling } from '@/utils/errorHandler';
-import CreateQuestionRequestDTO from '@/dto/employment/jobtest/createQuestionRequestDTO';
+import { CreateQuestionRequestDTO } from '@/dto/employment/jobtest/questionRequestDTO';
 
 import { useMemberStore } from '@/stores/memberStore'
 

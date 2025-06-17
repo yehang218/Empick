@@ -1,7 +1,7 @@
 import CreateQuestionOptionRequestDTO from './createQuestionOptionRequestDTO';
 import CreateGradingCriteriaRequestDTO from './createGradingCriteriaRequestDTO';
 
-export default class CreateQuestionRequestDTO {
+export class CreateQuestionRequestDTO {
     constructor(content, detailContent, type, difficulty, answer, createdMemberId, questionOptions, gradingCriteria) {
         this.content = content;
         this.detailContent = detailContent;
@@ -40,6 +40,39 @@ export default class CreateQuestionRequestDTO {
             form.createdMemberId,
             form.questionOptions,
             form.gradingCriteria
+        );
+    }
+}
+
+export class UpdateQuestionRequestDTO {
+    constructor(content, detailContent, type, difficulty, answer, updatedMemberId) {
+        this.content = content;
+        this.detailContent = detailContent;
+        this.type = type;
+        this.difficulty = difficulty;
+        this.answer = answer;
+        this.updatedMemberId = updatedMemberId;
+    }
+
+    toJSON() {
+        return {
+            content: this.content,
+            detailContent: this.detailContent,
+            type: this.type,
+            difficulty: this.difficulty,
+            answer: this.answer,
+            updatedMemberId: this.updatedMemberId
+        };
+    }
+
+    static fromForm(form) {
+        return new UpdateQuestionRequestDTO(
+            form.content,
+            form.detailContent,
+            form.type,
+            form.difficulty,
+            form.answer,
+            form.updatedMemberId
         );
     }
 }

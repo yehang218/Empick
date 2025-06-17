@@ -26,7 +26,7 @@ import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.v
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue'
 import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue'
 import { createQuestionService } from '@/services/jobtestQuestionService'
-import CreateQuestionRequestDTO from '@/dto/employment/jobtest/createQuestionRequestDTO'
+import CreateQuestionRequestDTO from '@/dto/employment/jobtest/questionRequestDTO'
 import { useMemberStore } from '@/stores/memberStore'
 
 const emit = defineEmits(['close', 'saved'])
