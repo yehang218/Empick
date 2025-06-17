@@ -38,6 +38,7 @@ CREATE TABLE `approval` (
     `second_approved_at` DATETIME NULL,
     `third_approved_at`  DATETIME NULL,
     `fourth_approved_at` DATETIME NULL,
+    `approval_id`          INT NULL             COMMENT '취소 대상 결재 id',
 
     FOREIGN KEY (`category_id`) REFERENCES `approval_category` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`writer_id`) REFERENCES `member` (`id`) ON DELETE CASCADE,
