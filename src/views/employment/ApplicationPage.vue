@@ -86,6 +86,16 @@
                   <span class="ml-2 font-weight-medium">{{ applicant.address }}</span>
                 </v-list-item-title>
               </v-list-item>
+
+              <v-list-item class="px-0 py-1">
+                <template #prepend>
+                  <v-icon class="mr-3" size="small">mdi-calendar-plus</v-icon>
+                </template>
+                <v-list-item-title class="text-body-2">
+                  <span class="text-grey">지원일자</span>
+                  <span class="ml-2 font-weight-medium">{{ formatDate(applicant.createdAt) }}</span>
+                </v-list-item-title>
+              </v-list-item>
             </v-list>
           </v-card-text>
         </v-card>
@@ -244,7 +254,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 // import InterviewResult from '@/components/employment/InterviewResult.vue'
@@ -289,7 +299,12 @@ onMounted(() => {
     email: query.email || '',
     address: query.address || '',
     status: query.status || 'WAITING',
-    jobTitle: query.jobName || '백엔드 개발자'
+    jobTitle: query.jobName || '백엔드 개발자',
+    pictureUrl: query.profileUrl || 'https://randomuser.me/api/portraits/women/1.jpg',
+    recruitmentId: query.recruitmentId || '',
+    createdAt: query.createdAt || '',
+    updatedAt: query.updatedAt || '',
+    introduceRatingResultId: query.introduceRatingResultId || null
   }
 })
 

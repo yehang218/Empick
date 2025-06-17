@@ -290,7 +290,12 @@ const viewDetail = (item) => {
       address: item.address,
       status: item.status,
       jobName: item.jobName,
-      applicantId: item.applicantId
+      applicantId: item.applicantId,
+      profileUrl: item.profileUrl,
+      createdAt: item.createdAt,
+      recruitmentId: item.recruitmentId,
+      updatedAt: item.updatedAt,
+      introduceRatingResultId: item.introduceRatingResultId
     }
   })
 }
