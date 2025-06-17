@@ -65,11 +65,10 @@ export const updateQuestionService = async ( id, dto, options = {} ) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return Question
+        return UpdateQuestionRequestDTO.fromJSON(apiResponse.data);
 
     }, options);
 }
-
 
 
 // 실무테스트 문제 삭제
