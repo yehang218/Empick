@@ -108,7 +108,6 @@
                  LEFT JOIN member m ON r.member_id = m.id
                  LEFT JOIN department d ON m.department_id = d.id
         WHERE r.id = #{id}
-          AND r.deleted_at IS NULL
     </select>
 
     <!-- 채용공고별 지원서 조회 -->
