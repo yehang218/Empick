@@ -8,5 +8,5 @@ public interface ApplicationQueryService {
     List<ApplicationQueryDTO> findAllApplication();
 
 
-    List<ApplicationQueryDTO> findApplicationById(int id);
+    ApplicationQueryDTO findApplicationById(int id);
 }

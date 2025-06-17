@@ -26,7 +26,7 @@ public class ApplicantEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(name = "profile_url", nullable = false)
+    @Column(name = "profile_url")
     private String profileUrl;
 
     @Column(nullable = false)

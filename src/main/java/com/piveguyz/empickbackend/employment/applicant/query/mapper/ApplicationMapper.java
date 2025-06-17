@@ -8,5 +8,5 @@ public interface ApplicationMapper {
     
     List<ApplicationQueryDTO> findAllApplication();
 
-    List<ApplicationQueryDTO> findApplicationById(int id);
+    ApplicationQueryDTO findApplicationById(int id);
 }
