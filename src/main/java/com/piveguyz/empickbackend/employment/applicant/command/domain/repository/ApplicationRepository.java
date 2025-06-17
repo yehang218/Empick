@@ -8,4 +8,6 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
 
 
     boolean existsByRecruitmentIdAndApplicantId(int recruitmentId, int applicantId);
+
+	boolean existsByRecruitmentId(int id);
 }

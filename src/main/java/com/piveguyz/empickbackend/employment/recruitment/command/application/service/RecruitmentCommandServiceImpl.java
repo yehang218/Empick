@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.applicant.command.domain.repository.ApplicationRepository;
 import com.piveguyz.empickbackend.employment.applicationItem.command.application.dto.ApplicationItemCommandDTO;
 import com.piveguyz.empickbackend.employment.applicationItem.command.domain.aggregate.ApplicationItem;
 import com.piveguyz.empickbackend.employment.applicationItem.command.domain.aggregate.ApplicationItemCategory;
@@ -41,15 +42,18 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 	private final RecruitmentProcessRepository recruitmentProcessRepository;
 	private final RecruitmentTemplateCopyCommandService recruitmentTemplateCopyCommandService;
 	private final RecruitmentTemplateRepository recruitmentTemplateRepository;
+	private final ApplicationRepository applicationRepository;
 
 	@Override
 	public void createRecruitment(RecruitmentCommandDTO dto) {
 		validateRecruitmentInfo(dto);
 		validateApplicationItems(dto.getApplicationItems());
 
-		RecruitmentTemplate template = recruitmentTemplateRepository
-			.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
-			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
+		if (dto.getRecruitmentTemplateId() != null) {
+			RecruitmentTemplate template = recruitmentTemplateRepository
+				.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
+				.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
+		}
 
 		Recruitment recruitment = Recruitment.builder()
 			.title(dto.getTitle())
@@ -69,10 +73,12 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		Recruitment saved = recruitmentRepository.save(recruitment);
 
 		// 템플릿 복사본 생성
-		recruitmentTemplateCopyCommandService.copyTemplateItemsToRecruitment(
-			saved.getId(),
-			dto.getRecruitmentTemplateId()
-		);
+		if (dto.getRecruitmentTemplateId() != null) {
+			recruitmentTemplateCopyCommandService.copyTemplateItemsToRecruitment(
+				saved.getId(),
+				dto.getRecruitmentTemplateId()
+			);
+		}
 
 		// 지원서 항목 저장
 		for (ApplicationItemCreateDTO itemDTO : dto.getApplicationItems()) {
@@ -229,8 +235,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		RecruitmentStatus nextStatus = RecruitmentStatus.fromCode(statusCode);
 
 		boolean valid =
-			(currentStatus == RecruitmentStatus.WAITING && nextStatus == RecruitmentStatus.APPROVED) ||
-				(currentStatus == RecruitmentStatus.APPROVED && nextStatus == RecruitmentStatus.PUBLISHED) ||
+			(currentStatus == RecruitmentStatus.WAITING && nextStatus == RecruitmentStatus.PUBLISHED) ||
 				(currentStatus == RecruitmentStatus.PUBLISHED && nextStatus == RecruitmentStatus.CLOSED);
 
 		if (!valid) {
@@ -247,6 +252,12 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 
 		if (recruitment.getDeletedAt() != null) {
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_ALREADY_DELETED);
+		}
+
+		// 지원서가 존재하는 채용공고 삭제 불가
+		boolean hasApplications = applicationRepository.existsByRecruitmentId(id);
+		if (hasApplications) {
+			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_HAS_APPLICATIONS);
 		}
 
 		recruitment.setDeletedAt(LocalDateTime.now());

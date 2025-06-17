@@ -3,25 +3,29 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicati
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateApplicationJobtestCommandDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.JobtestEntryRequestDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateApplicationJobtestCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.ApplicationJobtestCommandService;
+import com.piveguyz.empickbackend.facade.JobtestFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/employment/application-jobtests")
 public class ApplicationJobtestCommandController {
 
     private final ApplicationJobtestCommandService applicationJobtestCommandService;
+    private final JobtestFacade jobtestFacade;
 
-    public ApplicationJobtestCommandController(ApplicationJobtestCommandService applicationJobtestCommandService) {
-        this.applicationJobtestCommandService = applicationJobtestCommandService;
-    }
 
     @Operation(
             summary = "지원서별 실무테스트 등록",
@@ -70,5 +74,24 @@ public class ApplicationJobtestCommandController {
         int deleteId = applicationJobtestCommandService.deleteApplicationJobtest(id);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body((CustomApiResponse.of(ResponseCode.SUCCESS, deleteId)));
+    }
+
+
+    @Operation(
+            summary = "실무테스트 입장",
+            description = """
+                    실무테스트 입장 검증
+                    """
+    )
+    @ApiResponses(value = {
+    })
+    @PostMapping("/enter/{jobtestId}")
+    public ResponseEntity<CustomApiResponse<String>> verifyEntry(
+            @PathVariable int jobtestId,
+            @RequestBody JobtestEntryRequestDTO request
+    ) {
+        jobtestFacade.verifyJobtestEnter(jobtestId, request);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body((CustomApiResponse.of(ResponseCode.SUCCESS, ResponseCode.SUCCESS.getMessage())));
     }
 }

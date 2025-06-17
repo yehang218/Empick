@@ -16,4 +16,6 @@ public interface InterviewMapper {
     List<InterviewQueryDTO> findByDate(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     List<InterviewQueryDTO> checkAvailable(LocalDateTime start, LocalDateTime end);
+
+    InterviewQueryDTO findByApplicationId(Integer applicationId);
 }

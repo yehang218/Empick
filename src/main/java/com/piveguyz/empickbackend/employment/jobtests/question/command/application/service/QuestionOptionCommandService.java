@@ -6,9 +6,9 @@ import com.piveguyz.empickbackend.employment.jobtests.question.command.applicati
 import jakarta.validation.Valid;
 
 public interface QuestionOptionCommandService {
-    CreateQuestionOptionResponse createQuestionOption(@Valid CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO);
+    CreateQuestionOptionResponse createQuestionOption(@Valid CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO, int questionId);
 
     UpdateQuestionOptionCommandDTO updateQuestionOption(int id, @Valid UpdateQuestionOptionCommandDTO updateQuestionOptionCommandDTO);
 
-    Integer deleteQuestionOption(int id);
+    void deleteQuestionOption(int questionId);
 }

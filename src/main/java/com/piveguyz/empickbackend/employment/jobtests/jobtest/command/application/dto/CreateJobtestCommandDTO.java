@@ -4,6 +4,7 @@ import com.piveguyz.empickbackend.employment.jobtests.common.enums.JobtestDiffic
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @ToString
 @Getter
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class CreateJobtestCommandDTO {
+    // 제목, 시험 시간, 유형, 난이도
     private String title;
     private JobtestDifficulty difficulty;
     private int testTime;
@@ -18,4 +20,7 @@ public class CreateJobtestCommandDTO {
     private LocalDateTime endedAt;
 
     private int createdMemberId;
+
+    // 문제 목록
+    private List<CreateJobtestQuestionCommandDTO> jobtestQuestions;
 }

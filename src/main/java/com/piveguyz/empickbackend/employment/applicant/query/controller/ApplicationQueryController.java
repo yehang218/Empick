@@ -56,4 +56,22 @@ public class ApplicationQueryController {
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
     }
 
+    @GetMapping("/applicant/{applicantId}")
+    @Operation(
+            summary = "지원자 id로 지원서 조회",
+            description = """
+    - 지원자 id로 해당 지원자가 작성한 지원서를 조회합니다.
+    """
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다.")
+    })
+    public ResponseEntity<CustomApiResponse<ApplicationQueryDTO>> getApplicationByApplicantId(@PathVariable("applicantId") Integer applicantId){
+        ApplicationQueryDTO dto = applicationQueryService.findApplicationByApplicantId(applicantId);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dto));
+    }
+
 }

@@ -18,8 +18,10 @@
         <result column="created_at" property="createdAt"/>
         <result column="member_id" property="memberId"/>
         <result column="department_id" property="departmentId"/>
+        <result column="job_id" property="jobId"/>
         <result column="member_name" property="memberName"/>
         <result column="department_name" property="departmentName"/>
+        <result column="job_name" property="jobName"/>
     </resultMap>
 
     <select id="findAll" resultMap="RecruitmentRequestResultMap">
@@ -36,11 +38,14 @@
                rr.created_at,
                rr.member_id,
                rr.department_id,
+               rr.job_id,
                m.name AS member_name,
-               d.name AS department_name
-          FROM recruitment_request rr
+               d.name AS department_name,
+               j.name AS job_name
+        FROM recruitment_request rr
           LEFT JOIN member m ON rr.member_id = m.id
           LEFT JOIN department d ON rr.department_id = d.id
+          LEFT JOIN job j ON rr.job_id = j.id
          ORDER BY rr.created_at DESC
     </select>
 
@@ -58,11 +63,14 @@
                rr.created_at,
                rr.member_id,
                rr.department_id,
+               rr.job_id,
                m.name AS member_name,
-               d.name AS department_name
+               d.name AS department_name,
+               j.name AS job_name
           FROM recruitment_request rr
           LEFT JOIN member m ON rr.member_id = m.id
           LEFT JOIN department d ON rr.department_id = d.id
+          LEFT JOIN job j ON rr.job_id = j.id
          WHERE rr.id = #{id}
     </select>
 

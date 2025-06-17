@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.applicant.query.service;
 
+import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantFullInfoDTO;
 import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO;
 import com.piveguyz.empickbackend.employment.applicant.query.mapper.ApplicantMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,23 @@ public class ApplicantQueryServiceImp implements ApplicantQueryService {
     @Override
     public List<ApplicantQueryDTO> findAllApplicant() {
         return applicantMapper.findAllApplicant();
+    }
+
+    @Override
+    public ApplicantQueryDTO findApplicantById(Integer id) {
+        ApplicantQueryDTO dto = applicantMapper.findApplicantById(id);
+        return dto;
+    }
+
+    @Override
+    public List<ApplicantQueryDTO> searchApplicantsByName(String name) {
+        List<ApplicantQueryDTO> dtoList = applicantMapper.searchApplicantsByName(name);
+        return dtoList;
+    }
+
+    @Override
+    public List<ApplicantFullInfoDTO> findAllApplicantFullInfo() {
+        List<ApplicantFullInfoDTO> applicantFullInfoList = applicantMapper.findAllApplicantFullInfo();
+        return applicantFullInfoList;
     }
 }

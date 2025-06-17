@@ -7,10 +7,14 @@ import com.piveguyz.empickbackend.common.response.ResponseCode;
 import com.piveguyz.empickbackend.orgstructure.facade.MemberProfileFacade;
 import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberEditProposalQueryDTO;
 import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberResponseDTO;
+import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberRoleQueryDTO;
 import com.piveguyz.empickbackend.orgstructure.member.query.service.MemberEditProposalQueryService;
 import com.piveguyz.empickbackend.orgstructure.member.query.service.MemberQueryService;
+import com.piveguyz.empickbackend.orgstructure.member.query.service.MemberQueryServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,6 +39,7 @@ public class MemberQueryController {
     private final MemberQueryService memberQueryService;
     private final AuthFacade authFacade;
     private final MemberEditProposalQueryService queryService;
+    private final MemberQueryServiceImpl memberQueryServiceImpl;
 
     @Operation(
             summary = "내 정보 조회",
@@ -118,5 +123,71 @@ public class MemberQueryController {
         if (lowerKey.endsWith(".svg")) return "image/svg+xml";
 
         return "application/octet-stream";
+    }
+
+    @Operation(
+            summary = "내 권한 목록 조회",
+            description = """
+        - 사번(employeeNumber)에 해당하는 사원의 권한(Role) 목록을 조회합니다.
+        - 권한에는 code, name, description, roleType 등이 포함됩니다.
+        """
+            ,security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "권한 목록 조회 성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = MemberRoleQueryDTO.class)))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
+                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_400_EXAMPLE))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "데이터를 찾을 수 없음",
+                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE))
+            )
+    })
+    @GetMapping("/my-roles")
+    private ResponseEntity<CustomApiResponse<List<MemberRoleQueryDTO>>> getMyRoles() {
+        authFacade.getCurrentMemberId();
+        int employeeNumber = Integer.parseInt(authFacade.getCurrentEmployeeNumber());
+        List<MemberRoleQueryDTO> memberRoles = memberQueryService.getMemberRoles(employeeNumber);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, memberRoles));
+    }
+
+    @Operation(
+            summary = "사원 권한 목록 조회",
+            description = """
+        - 사번(employeeNumber)에 해당하는 다른 사원의 권한(Role) 목록을 조회합니다.
+        - 권한에는 code, name, description, roleType, createdAt, updatedAt, deletedAt이 포함됩니다.
+        """
+    )
+    @Parameters({
+            @Parameter(name = "employeeNumber", description = "조회할 사원의 사번", required = true, example = "100004")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "권한 목록 조회 성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = MemberRoleQueryDTO.class)))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
+                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_400_EXAMPLE))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "데이터를 찾을 수 없음",
+                    content = @Content(examples = @ExampleObject(value = ApiExamples.ERROR_404_EXAMPLE))
+            )
+    })
+    @GetMapping("/roles")
+    private ResponseEntity<CustomApiResponse<List<MemberRoleQueryDTO>>> getMemberRoles(@RequestParam(value = "employeeNumber", required = true) Integer employeeNumber) {
+        List<MemberRoleQueryDTO> memberRoles = memberQueryService.getMemberRoles(employeeNumber);
+        return ResponseEntity.ok(CustomApiResponse.of(ResponseCode.SUCCESS, memberRoles));
     }
 }

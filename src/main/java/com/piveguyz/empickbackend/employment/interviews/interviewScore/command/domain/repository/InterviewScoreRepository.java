@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface InterviewScoreRepository extends JpaRepository<InterviewScoreEntity, Integer> {
 
-    boolean existsByInterviewerIdAndItemId(Integer interviewerId, Integer itemId);
+    boolean existsByInterviewerIdAndCriteriaId(Integer interviewerId, Integer criteriaId);
 }

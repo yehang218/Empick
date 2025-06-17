@@ -22,7 +22,7 @@ CREATE TABLE `member`
     `deleted_member_id` INT          NULL COMMENT '퇴사처리자',
     `updated_member_id` INT          NULL COMMENT '수정자',
     `last_login_at`     DATETIME     NULL COMMENT '로그인 시작',
-    `status`            TINYINT      NOT NULL COMMENT '계정 상태 (0 = 비활성, 1 = 활성)',
+    `status`            TINYINT      NOT NULL DEFAULT 1 COMMENT '계정 상태 (0 = 비활성, 1 = 활성)',
     `department_id`     INT          NULL COMMENT '부서',
     `position_id`       INT          NULL COMMENT '직책',
     `job_id`            INT          NULL COMMENT '직무',

@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.orgstructure.member.query.service;
 
 import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberResponseDTO;
+import com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberRoleQueryDTO;
 
 import java.util.List;
 
@@ -12,4 +13,6 @@ public interface MemberQueryService {
     List<MemberResponseDTO>  getMembersByName(String name);
 
     List<MemberResponseDTO> getMembersByEmployeeNumber(int employeeNumbers);
+
+    List<MemberRoleQueryDTO> getMemberRoles(int memberId);
 }

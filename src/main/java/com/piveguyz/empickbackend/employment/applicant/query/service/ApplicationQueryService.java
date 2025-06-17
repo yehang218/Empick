@@ -9,4 +9,6 @@ public interface ApplicationQueryService {
 
 
     ApplicationQueryDTO findApplicationById(int id);
+
+    ApplicationQueryDTO findApplicationByApplicantId(Integer applicantId);
 }

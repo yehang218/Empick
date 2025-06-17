@@ -38,7 +38,7 @@
                r.score               AS result_score
 
         FROM application_job_test ajt
-                 JOIN member m ON ajt.member_id = m.id
+                 JOIN member m ON ajt.evaluation_member_id = m.id
                  JOIN job_test jt ON ajt.job_test_id = jt.id
                  JOIN job_test_evaluation_criteria c ON jt.id = c.job_test_id
                  LEFT JOIN job_test_evaluation_result r ON r.application_job_test_id = ajt.id

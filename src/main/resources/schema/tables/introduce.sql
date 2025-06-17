@@ -12,6 +12,8 @@ CREATE TABLE introduce_template_item
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     member_id INT NOT NULL,
+    introduce_template_id INT NOT NULL,
+    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
     FOREIGN KEY (member_id) REFERENCES member(id)
 );
 
@@ -21,38 +23,21 @@ CREATE TABLE introduce_template
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     member_id INT NOT NULL,
-    introduce_template_item_id INT NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (introduce_template_item_id) REFERENCES introduce_template_item(id)
+    FOREIGN KEY (member_id) REFERENCES member(id)
 );
 
 -- introduce_standard_item
-CREATE TABLE introduce_standard_item
-(
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR(255) NOT NULL,
-    member_id INT NOT NULL,
-    updated_by INT NULL,
-    updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (updated_by) REFERENCES member(id)
-);
-
--- introduce
 CREATE TABLE introduce
 (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(255) NOT NULL,
-    member_id INT NOT NULL,
+    applicant_id INT NOT NULL,
     introduce_template_id INT NOT NULL,
-    updated_by INT NULL,
-    updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
-    FOREIGN KEY (updated_by) REFERENCES member(id)
+    FOREIGN KEY (applicant_id) REFERENCES applicant(id),
+    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id)
 );
 
--- introduce_standard
+-- introduce
 CREATE TABLE introduce_standard
 (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -66,6 +51,17 @@ CREATE TABLE introduce_standard
     FOREIGN KEY (introduce_id) REFERENCES introduce(id),
     FOREIGN KEY (introduce_standard_item_id) REFERENCES introduce_standard_item(id),
     FOREIGN KEY (updated_by) REFERENCES member(id)
+);
+
+-- introduce_standard
+CREATE TABLE introduce_standard_item
+(
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    content VARCHAR(255) NOT NULL,
+    member_id INT NOT NULL,
+    introduce_standard_id INT NOT NULL,
+    FOREIGN KEY (member_id) REFERENCES member(id),
+    FOREIGN KEY (introduce_standard_id) REFERENCES introduce_standard(id)
 );
 
 -- introduce_rating_result

@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 @Setter
 public class GradingCriteriaQueryDTO {
+    private int id;
     private String content;
     private String detailContent;
     private double scoreWeight;

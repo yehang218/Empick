@@ -50,7 +50,7 @@ public class InterviewSheetCommandServiceImpl implements InterviewSheetCommandSe
                         .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_SHEET_NOT_FOUND));
         entity.setName(name);
         entity.setIsDeleted("N");
-        entity.setMemberId(dto.getMemberId());
+        entity.setMemberId(1);
         entity.setUpdatedAt(LocalDateTime.now());
         InterviewSheetEntity updatedEntity = repository.save(entity);
         InterviewSheetCommandDTO updatedDTO = mapper.toDTO(updatedEntity);

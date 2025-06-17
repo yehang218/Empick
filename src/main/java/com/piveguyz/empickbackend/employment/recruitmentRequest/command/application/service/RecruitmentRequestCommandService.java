@@ -3,5 +3,5 @@ package com.piveguyz.empickbackend.employment.recruitmentRequest.command.applica
 import com.piveguyz.empickbackend.employment.recruitmentRequest.command.application.dto.RecruitmentRequestCommandDTO;
 
 public interface RecruitmentRequestCommandService {
-	void create(RecruitmentRequestCommandDTO dto);
+	void create(RecruitmentRequestCommandDTO dto, int memberId);
 }

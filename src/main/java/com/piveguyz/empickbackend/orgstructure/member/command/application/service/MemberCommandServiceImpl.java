@@ -42,12 +42,12 @@ public class MemberCommandServiceImpl implements MemberCommandService {
         }
 
         // 🔥 Step 5️⃣: EmployeeNumber 생성
-        int employeeNumber = generateUniqueEmployeeNumber();
+        Integer employeeNumber = generateUniqueEmployeeNumber();
 
         // 🔥 Step 6️⃣: 신규 사원 생성
         MemberEntity member = MemberEntity.builder()
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(passwordEncoder.encode(employeeNumber.toString()))
                 .name(request.getName())
                 .phone(request.getPhone())
                 .address(request.getAddress())

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.introduce.query.mapper.IntroduceTemplateMapper">
+
+<select id="findAllIntroduceTemplateItem"
+        resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateItemQueryDTO">
+    SELECT
+        id,
+        title,
+        member_id AS memberId,
+        introduce_template_id AS introduceTempltaeId
+    FROM
+        introduce_template_item
+</select>
+
+<!--    <select id="findIntroduceTemplateById" parameterType="int" resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateQueryDTO">-->
+<!--        SELECT-->
+<!--            id,-->
+<!--            title,-->
+<!--            member_id AS memberId-->
+<!--        FROM-->
+<!--            introduce_template-->
+<!--        WHERE-->
+<!--            id = #{id}-->
+<!--    </select>-->
+</mapper>
