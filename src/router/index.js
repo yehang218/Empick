@@ -36,6 +36,7 @@ const routes = [
             requiresAuth: true
         }
     },
+    ...allRouteModules
 ];
 
 const router = createRouter({
