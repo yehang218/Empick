@@ -6,7 +6,7 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicatio
 import jakarta.validation.Valid;
 
 public interface JobtestQuestionCommandService {
-    CreateJobtestQuestionResponseDTO createJobtestQuestion(@Valid CreateJobtestQuestionCommandDTO createJobtestQuestionCommandDTO);
+    CreateJobtestQuestionResponseDTO createJobtestQuestion(@Valid CreateJobtestQuestionCommandDTO createJobtestQuestionCommandDTO, int jobtestId);
 
     UpdateJobtestQuestionCommandDTO updateJobtestQuestion(int id, UpdateJobtestQuestionCommandDTO updateJobtestQuestionCommandDTO);
 

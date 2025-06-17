@@ -22,4 +22,11 @@ public List<IntroduceTemplateQueryDTO> findAllIntroduceTemplate() {
     public List<IntroduceTemplateQueryDTO> findAllIntroduceTemplateItem() {
         return introduceTemplateMapper.findAllIntroduceTemplateItem();
     }
+
+    @Override
+    public IntroduceTemplateQueryDTO getIntroduceTemplateById(int id) {
+        return introduceTemplateMapper.findIntroduceTemplateById(id);
+    }
+
+
 }

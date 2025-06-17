@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.orgstructure.position.query.mapper.PositionMapper">
+
+    <!-- 기본 ResultMap -->
+    <resultMap id="PositionQueryDTO" type="com.piveguyz.empickbackend.orgstructure.position.query.dto.PositionQueryDTO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="isActiveValue" column="is_active"/>
+        <result property="description" column="description"/>
+        <result property="roleId" column="role_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="roleCode" column="role_code"/>
+        <result property="roleName" column="role_name"/>
+        <result property="memberCount" column="member_count"/>
+        <result property="activeMemberCount" column="active_member_count"/>
+    </resultMap>
+
+    <!-- 모든 직책 조회 -->
+    <select id="findAll" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        ORDER BY name ASC
+    </select>
+
+    <!-- 활성 여부별 직책 조회 -->
+    <select id="findByIsActive" parameterType="Integer" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE is_active = #{isActive}
+        ORDER BY name ASC
+    </select>
+
+    <!-- ID로 직책 단건 조회 -->
+    <select id="findById" parameterType="Integer" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE id = #{id}
+    </select>
+
+    <!-- 코드로 직책 단건 조회 -->
+    <select id="findByCode" parameterType="String" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE code = #{code}
+    </select>
+
+    <!-- 이름으로 직책 단건 조회 -->
+    <select id="findByName" parameterType="String" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE name = #{name}
+    </select>
+
+    <!-- 코드로 직책 존재 여부 확인 -->
+    <select id="existsByCode" parameterType="String" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM position
+        WHERE code = #{code}
+    </select>
+
+    <!-- 이름으로 직책 존재 여부 확인 -->
+    <select id="existsByName" parameterType="String" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM position
+        WHERE name = #{name}
+    </select>
+
+    <!-- 권한 정보를 포함한 직책 조회 -->
+    <select id="findWithRoleInfo" resultMap="PositionQueryDTO">
+        SELECT
+            p.id,
+            p.name,
+            p.code,
+            p.is_active,
+            p.description,
+            p.role_id,
+            p.created_at,
+            p.updated_at,
+            r.code as role_code,
+            r.name as role_name
+        FROM position p
+                 LEFT JOIN role r ON p.role_id = r.id
+        ORDER BY p.name ASC
+    </select>
+
+    <!-- 사원 수 정보를 포함한 직책 조회 -->
+    <select id="findWithMemberCount" resultMap="PositionQueryDTO">
+        SELECT
+            p.id,
+            p.name,
+            p.code,
+            p.is_active,
+            p.description,
+            p.role_id,
+            p.created_at,
+            p.updated_at,
+            COALESCE(COUNT(m.id), 0) as member_count,
+            COALESCE(SUM(CASE WHEN m.status = 1 AND m.resign_at IS NULL THEN 1 ELSE 0 END), 0) as active_member_count
+        FROM position p
+                 LEFT JOIN member m ON p.id = m.position_id
+        GROUP BY p.id, p.name, p.code, p.is_active, p.description, p.role_id, p.created_at, p.updated_at
+        ORDER BY p.name ASC
+    </select>
+
+    <!-- 권한 정보와 사원 수 정보를 모두 포함한 상세 직책 조회 -->
+    <select id="findWithFullDetails" resultMap="PositionQueryDTO">
+        SELECT
+            p.id,
+            p.name,
+            p.code,
+            p.is_active,
+            p.description,
+            p.role_id,
+            p.created_at,
+            p.updated_at,
+            r.code as role_code,
+            r.name as role_name,
+            COALESCE(COUNT(m.id), 0) as member_count,
+            COALESCE(SUM(CASE WHEN m.status = 1 AND m.resign_at IS NULL THEN 1 ELSE 0 END), 0) as active_member_count
+        FROM position p
+                 LEFT JOIN role r ON p.role_id = r.id
+                 LEFT JOIN member m ON p.id = m.position_id
+        GROUP BY p.id, p.name, p.code, p.is_active, p.description, p.role_id, p.created_at, p.updated_at, r.code, r.name
+        ORDER BY p.name ASC
+    </select>
+
+    <!-- 특정 권한을 가진 직책 조회 -->
+    <select id="findByRoleId" parameterType="Integer" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE role_id = #{roleId}
+        ORDER BY name ASC
+    </select>
+
+    <!-- 이름으로 직책 검색 (부분 일치) -->
+    <select id="findByNameContaining" parameterType="String" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE name LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY name ASC
+    </select>
+
+    <!-- 코드로 직책 검색 (부분 일치) -->
+    <select id="findByCodeContaining" parameterType="String" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE code LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY code ASC
+    </select>
+
+    <!-- 설명이 있는 직책만 조회 -->
+    <select id="findPositionsWithDescription" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE description IS NOT NULL
+          AND description != ''
+        ORDER BY name ASC
+    </select>
+
+    <!-- 설명이 없는 직책만 조회 -->
+    <select id="findPositionsWithoutDescription" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE description IS NULL
+           OR description = ''
+        ORDER BY name ASC
+    </select>
+
+    <!-- 사원이 있는 직책만 조회 -->
+    <select id="findPositionsWithMembers" resultMap="PositionQueryDTO">
+        SELECT
+            p.id,
+            p.name,
+            p.code,
+            p.is_active,
+            p.description,
+            p.role_id,
+            p.created_at,
+            p.updated_at,
+            COUNT(m.id) as member_count,
+            SUM(CASE WHEN m.status = 1 AND m.resign_at IS NULL THEN 1 ELSE 0 END) as active_member_count
+        FROM position p
+                 INNER JOIN member m ON p.id = m.position_id
+        GROUP BY p.id, p.name, p.code, p.is_active, p.description, p.role_id, p.created_at, p.updated_at
+        HAVING COUNT(m.id) > 0
+        ORDER BY p.name ASC
+    </select>
+
+    <!-- 사원이 없는 직책만 조회 -->
+    <select id="findPositionsWithoutMembers" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at,
+            0 as member_count,
+            0 as active_member_count
+        FROM position
+        WHERE NOT EXISTS (
+            SELECT 1 FROM member WHERE position_id = position.id
+        )
+        ORDER BY name ASC
+    </select>
+
+    <!-- 특정 ID를 제외한 이름 중복 검사 (수정 시 사용) -->
+    <select id="existsByNameExcludingId" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM position
+        WHERE name = #{name}
+          AND id != #{excludeId}
+    </select>
+
+    <!-- 특정 ID를 제외한 코드 중복 검사 (수정 시 사용) -->
+    <select id="existsByCodeExcludingId" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM position
+        WHERE code = #{code}
+          AND id != #{excludeId}
+    </select>
+
+    <!-- 권한이 연결된 직책 조회 -->
+    <select id="findPositionsWithRole" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE role_id IS NOT NULL
+        ORDER BY name ASC
+    </select>
+
+    <!-- 권한이 연결되지 않은 직책 조회 -->
+    <select id="findPositionsWithoutRole" resultMap="PositionQueryDTO">
+        SELECT
+            id,
+            name,
+            code,
+            is_active,
+            description,
+            role_id,
+            created_at,
+            updated_at
+        FROM position
+        WHERE role_id IS NULL
+        ORDER BY name ASC
+    </select>
+
+</mapper>

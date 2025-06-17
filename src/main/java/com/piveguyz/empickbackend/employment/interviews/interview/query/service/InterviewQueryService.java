@@ -11,6 +11,8 @@ public interface InterviewQueryService {
 
     InterviewQueryDTO findById(Integer id);
 
+    InterviewQueryDTO findByApplicationId(Integer applicationId);
+
     List<InterviewQueryDTO> findByDate(LocalDate date);
 
     Boolean checkAvailable(LocalDateTime datetime);

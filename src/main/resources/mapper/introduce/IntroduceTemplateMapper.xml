@@ -1,10 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.piveguyz.empickbackend.employment.introduce.query.mapper.IntroduceTemplateMapper">
 
+    <!-- IntroduceTemplateQueryDTO를 위한 ResultMap 정의 -->
+    <resultMap id="introduceTemplateQueryResultMap" type="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateQueryDTO">
+        <id property="id" column="template_id"/>
+        <result property="title" column="template_title"/>
+        <result property="memberId" column="member_id"/>
+        <!-- items 리스트를 위한 collection 매핑 -->
+        <collection property="items" ofType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateItemQueryDTO">
+            <id property="id" column="item_id"/>
+            <result property="title" column="item_title"/>
+        </collection>
+    </resultMap>
+
+    <!-- findAllIntroduceTemplate 쿼리 추가 -->
     <select id="findAllIntroduceTemplate" resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateQueryDTO">
         SELECT
             id,
@@ -12,6 +22,22 @@
             member_id AS memberId
         FROM
             introduce_template
+    </select>
+
+    <!-- findIntroduceTemplateById 쿼리 수정 -->
+    <select id="findIntroduceTemplateById" resultMap="introduceTemplateQueryResultMap">
+        SELECT
+            it.id AS template_id,
+            it.title AS template_title,
+            it.member_id AS member_id,
+            iti.id AS item_id,
+            iti.title AS item_title
+        FROM
+            introduce_template it
+                LEFT JOIN
+            introduce_template_item iti ON it.id = iti.introduce_template_id
+        WHERE
+            it.id = #{id}
     </select>
 
 </mapper>

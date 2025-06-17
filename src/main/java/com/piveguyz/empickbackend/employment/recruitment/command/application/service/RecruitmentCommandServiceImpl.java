@@ -47,9 +47,11 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		validateRecruitmentInfo(dto);
 		validateApplicationItems(dto.getApplicationItems());
 
-		RecruitmentTemplate template = recruitmentTemplateRepository
-			.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
-			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
+		if (dto.getRecruitmentTemplateId() != null) {
+			RecruitmentTemplate template = recruitmentTemplateRepository
+				.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
+				.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
+		}
 
 		Recruitment recruitment = Recruitment.builder()
 			.title(dto.getTitle())
@@ -69,10 +71,12 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		Recruitment saved = recruitmentRepository.save(recruitment);
 
 		// 템플릿 복사본 생성
-		recruitmentTemplateCopyCommandService.copyTemplateItemsToRecruitment(
-			saved.getId(),
-			dto.getRecruitmentTemplateId()
-		);
+		if (dto.getRecruitmentTemplateId() != null) {
+			recruitmentTemplateCopyCommandService.copyTemplateItemsToRecruitment(
+				saved.getId(),
+				dto.getRecruitmentTemplateId()
+			);
+		}
 
 		// 지원서 항목 저장
 		for (ApplicationItemCreateDTO itemDTO : dto.getApplicationItems()) {
@@ -229,8 +233,7 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		RecruitmentStatus nextStatus = RecruitmentStatus.fromCode(statusCode);
 
 		boolean valid =
-			(currentStatus == RecruitmentStatus.WAITING && nextStatus == RecruitmentStatus.APPROVED) ||
-				(currentStatus == RecruitmentStatus.APPROVED && nextStatus == RecruitmentStatus.PUBLISHED) ||
+			(currentStatus == RecruitmentStatus.WAITING && nextStatus == RecruitmentStatus.PUBLISHED) ||
 				(currentStatus == RecruitmentStatus.PUBLISHED && nextStatus == RecruitmentStatus.CLOSED);
 
 		if (!valid) {

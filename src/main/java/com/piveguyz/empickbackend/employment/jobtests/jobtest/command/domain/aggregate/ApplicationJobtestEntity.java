@@ -20,16 +20,16 @@ public class ApplicationJobtestEntity {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "evaluator_comment", nullable = false)
+    @Column(name = "evaluator_comment", nullable = true)
     private String evaluatorComment;
 
     @Column(name = "submitted_at", nullable = true)
     private LocalDateTime submittedAt;
 
-    @Column(name = "grading_total_score", nullable = true)
+    @Column(name = "grading_total_score", nullable = false)
     private Double gradingTotalScore;
 
-    @Column(name = "evaluation_score", nullable = true)
+    @Column(name = "evaluation_score", nullable = false)
     private Double evaluationScore;
 
     @Enumerated(EnumType.ORDINAL)
@@ -49,8 +49,11 @@ public class ApplicationJobtestEntity {
     @Column(name = "job_test_id", nullable = false)
     private int jobTestId;
 
-    @Column(name = "member_id", nullable = true)
-    private Integer memberId;
+    @Column(name = "grading_member_id", nullable = true)
+    private Integer gradingMemberId;
+
+    @Column(name = "evaluation_member_id", nullable = true)
+    private Integer evaluationMemberId;
 
 
     public void updateApplicationJobtestEntity(UpdateApplicationJobtestCommandDTO updateApplicationJobtestCommandDTO) {
@@ -72,11 +75,11 @@ public class ApplicationJobtestEntity {
         if(updateApplicationJobtestCommandDTO.getEvaluationStatus() != null) {
             this.evaluationStatus = updateApplicationJobtestCommandDTO.getEvaluationStatus();
         }
-        if(updateApplicationJobtestCommandDTO.getEntryCode() != null) {
-            this.entryCode = updateApplicationJobtestCommandDTO.getEntryCode();
+        if(updateApplicationJobtestCommandDTO.getGradingMemberId() != null) {
+            this.gradingMemberId = updateApplicationJobtestCommandDTO.getGradingMemberId();
         }
-        if(updateApplicationJobtestCommandDTO.getMemberId() != null) {
-            this.memberId = updateApplicationJobtestCommandDTO.getMemberId();
+        if(updateApplicationJobtestCommandDTO.getEvaluationMemberId() != null) {
+            this.evaluationMemberId = updateApplicationJobtestCommandDTO.getEvaluationMemberId();
         }
 
     }

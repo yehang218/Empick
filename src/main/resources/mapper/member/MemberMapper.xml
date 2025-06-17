@@ -5,8 +5,14 @@
 <mapper namespace="com.piveguyz.empickbackend.orgstructure.member.query.mapper.MemberMapper">
     
     <!-- 사원의 권한 코드 리스트 조회 -->
-    <select id="findRolesByEmployeeNumber" parameterType="int" resultType="string">
+    <select id="findRolesByEmployeeNumber" parameterType="int" resultType="com.piveguyz.empickbackend.orgstructure.member.query.dto.MemberRoleQueryDTO">
         SELECT DISTINCT r.code
+        , r.name
+        , r.description
+        , r.role_type
+        , d.created_at
+        , d.updated_at
+        ,deleted_at
         FROM member m
                  LEFT JOIN department d ON m.department_id = d.id
                  LEFT JOIN position p ON m.position_id = p.id

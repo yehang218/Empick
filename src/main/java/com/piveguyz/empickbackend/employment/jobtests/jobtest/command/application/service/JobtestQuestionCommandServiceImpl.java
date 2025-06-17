@@ -28,8 +28,8 @@ public class JobtestQuestionCommandServiceImpl implements JobtestQuestionCommand
     }
 
     @Override
-    public CreateJobtestQuestionResponseDTO createJobtestQuestion(CreateJobtestQuestionCommandDTO createJobtestQuestionCommandDTO) {
-        int jobtestId = createJobtestQuestionCommandDTO.getJobTestId();
+    public CreateJobtestQuestionResponseDTO createJobtestQuestion(CreateJobtestQuestionCommandDTO createJobtestQuestionCommandDTO,
+                                                                  int jobtestId) {
         int questionId = createJobtestQuestionCommandDTO.getQuestionId();
 
         // 실무테스트가 없는 경우
@@ -51,7 +51,7 @@ public class JobtestQuestionCommandServiceImpl implements JobtestQuestionCommand
         Integer maxOptionNumber = jobtestQuestionRepository.findMaxOptionNumberByJobTestId(jobtestId);
         int nextOptionNumber = maxOptionNumber != null ? maxOptionNumber + 1 : 1;
 
-        JobtestQuestionEntity jobtestQuestionEntity = JobtestQuestionMapper.toEntity(createJobtestQuestionCommandDTO, nextOptionNumber);
+        JobtestQuestionEntity jobtestQuestionEntity = JobtestQuestionMapper.toEntity(createJobtestQuestionCommandDTO, nextOptionNumber, jobtestId);
         JobtestQuestionEntity saved = jobtestQuestionRepository.save(jobtestQuestionEntity);
 
         return JobtestQuestionMapper.toCreateDto(saved);

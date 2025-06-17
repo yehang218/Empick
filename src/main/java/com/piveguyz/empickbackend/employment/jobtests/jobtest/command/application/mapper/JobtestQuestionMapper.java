@@ -7,11 +7,11 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.agg
 
 public class JobtestQuestionMapper {
 
-    public static JobtestQuestionEntity toEntity(CreateJobtestQuestionCommandDTO dto, int optionNumber) {
+    public static JobtestQuestionEntity toEntity(CreateJobtestQuestionCommandDTO dto, int optionNumber, int jobtestId) {
         return JobtestQuestionEntity.builder()
                 .score(dto.getScore())
                 .optionNumber(optionNumber)
-                .jobTestId(dto.getJobTestId())
+                .jobTestId(jobtestId)
                 .questionId(dto.getQuestionId())
                 .build();
     }

@@ -47,8 +47,9 @@ public class JobtestQueryController {
                     """
     )
     @GetMapping("/{id}")
-    public ResponseEntity<JobtestQueryDTO> getJobTestById(@PathVariable int id) {
+    public ResponseEntity<CustomApiResponse<JobtestQueryDTO>> getJobTestById(@PathVariable int id) {
         JobtestQueryDTO result = jobtestQueryService.findJobTestWithApplications(id);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
     }
 }

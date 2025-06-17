@@ -20,11 +20,15 @@
 
 
     <!--    상세조회  -->
+    <!--    포함된 문제 정보-->
     <resultMap id="JobTestQuestionMap"
                type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionQueryDTO">
         <id property="id" column="job_test_question_id"/>
         <result property="score" column="score"/>
+        <result property="content" column="q_content"/>
         <result property="optionNumber" column="option_number"/>
+        <result property="difficulty" column="q_difficulty"
+                typeHandler="com.piveguyz.empickbackend.common.handler.JobtestDifficultyHandler"/>
         <result property="questionId" column="question_id"/>
     </resultMap>
 
@@ -42,6 +46,19 @@
         <id property="applicationId" column="application_id"/>
         <result property="applicantId" column="applicant_id"/>
         <result property="applicantName" column="applicant_name"/>
+        <result property="recruitmentTitle" column="recruitment_title"/>
+
+        <result property="gradingStatus" column="g_status"
+                typeHandler="com.piveguyz.empickbackend.common.handler.JobtestStatusHandler"/>
+        <result property="gradingScore" column="g_score"/>
+        <result property="gradingMemberName" column="g_member_name"/>
+
+        <result property="evaluationStatus" column="e_status"
+                typeHandler="com.piveguyz.empickbackend.common.handler.JobtestStatusHandler"/>
+        <result property="evaluationScore" column="e_score"/>
+        <result property="evaluationMemberName" column="e_member_name"/>
+
+        <result property="applicationJobtestId" column="ajt_id"/>
     </resultMap>
 
     <resultMap id="JobTestApplicationsMap"
@@ -87,39 +104,68 @@
 
     <!--    특정 실무테스트 조회-->
     <select id="findJobTestWithApplications" resultMap="JobTestApplicationsMap" parameterType="int">
-        SELECT jt.id               AS job_test_id,
-               jt.title            AS job_test_title,
+        SELECT jt.id                   AS job_test_id,
+               jt.title                AS job_test_title,
                jt.difficulty,
                jt.test_time,
                jt.started_at,
                jt.ended_at,
-               cm.name             AS created_name,
-               um.name             AS updated_name,
+
+               cm.name                 AS created_name,
+               um.name                 AS updated_name,
                jt.created_at,
                jt.updated_at,
 
-               jtq.id              AS job_test_question_id,
+               jtq.id                  AS job_test_question_id,
                jtq.score,
                jtq.option_number,
                jtq.question_id,
 
-               jtec.id             AS criteria_id,
-               jtec.content        AS criteria_content,
-               jtec.detail_content AS criteria_detail_content,
+               q.difficulty            AS q_difficulty,
+               q.content               AS q_content,
+
+               jtec.id                 AS criteria_id,
+               jtec.content            AS criteria_content,
+               jtec.detail_content     AS criteria_detail_content,
                jtec.score_weight,
 
-               a.id                AS application_id,
+               a.id                    AS application_id,
                a.applicant_id,
-               ap.name             AS applicant_name
+               ap.name                 AS applicant_name,
+
+               r.title                 AS recruitment_title,
+
+               ajt.id                  AS ajt_id,
+               ajt.grading_status      AS g_status,
+               ajt.grading_total_score AS g_score,
+               gm.name                 AS g_member_name,
+
+               ajt.evaluation_status   AS e_status,
+               ajt.evaluation_score    AS e_score,
+               em.name                 AS e_member_name
+
 
         FROM job_test jt
+#             작성자 정보
                  JOIN member cm ON jt.created_member_id = cm.id
                  LEFT JOIN member um ON jt.updated_member_id = um.id
+
+#             실무테스트 문제
                  LEFT JOIN job_test_question jtq ON jtq.job_test_id = jt.id
+                 LEFT JOIN question q ON jtq.question_id = q.id
+
+#             지원서별 실무테스트
+                 LEFT JOIN application_job_test ajt ON jt.id = ajt.job_test_id
+
+#             실무테스트 평가 기준
                  LEFT JOIN job_test_evaluation_criteria jtec ON jtec.job_test_id = jt.id
-                 LEFT JOIN application_job_test ajt ON ajt.job_test_id = jt.id
-                 LEFT JOIN application a ON ajt.application_id = a.id
+                 LEFT JOIN member gm ON ajt.grading_member_id = gm.id
+                 LEFT JOIN member em ON ajt.evaluation_member_id = em.id
+
+#             지원서
+                 LEFT JOIN application a ON a.id = ajt.application_id
                  LEFT JOIN applicant ap ON a.applicant_id = ap.id
+                 LEFT JOIN recruitment r ON a.recruitment_id = r.id
         WHERE jt.id = #{id}
     </select>
 

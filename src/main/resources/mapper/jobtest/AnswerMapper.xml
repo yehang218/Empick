@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.piveguyz.empickbackend.employment.jobtests.answer.query.mapper.AnswerMapper">
+
+    <!-- QuestionOptionDTO -->
+    <resultMap id="QuestionOptionMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.question.query.dto.QuestionOptionDTO">
+        <id property="id" column="qo_id"/>
+        <result property="optionNumber" column="qo_option_number"/>
+        <result property="content" column="qo_content"/>
+    </resultMap>
+
+    <!-- GradingCriteriaQueryDTO -->
+    <resultMap id="GradingCriteriaMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.grading.query.dto.GradingCriteriaQueryDTO">
+        <id property="id" column="gc_id"/>
+        <result property="content" column="gc_content"/>
+        <result property="scoreWeight" column="gc_score_weight"/>
+    </resultMap>
+
+    <!-- QuestionQueryDTO -->
+    <resultMap id="QuestionMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.question.query.dto.QuestionQueryDTO">
+        <id property="id" column="q_id"/>
+        <result property="content" column="q_content"/>
+        <result property="detailContent" column="q_detail_content"/>
+        <result property="type" column="q_type"
+                typeHandler="com.piveguyz.empickbackend.employment.jobtests.common.typehandler.QuestionTypeHandler"/>
+        <result property="difficulty" column="q_difficulty"
+                typeHandler="com.piveguyz.empickbackend.employment.jobtests.common.typehandler.JobtestDifficultyTypeHandler"/>
+        <result property="answer" column="q_answer"/>
+        <!-- 선지 -->
+        <collection property="options"
+                    ofType="com.piveguyz.empickbackend.employment.jobtests.question.query.dto.QuestionOptionDTO"
+                    resultMap="QuestionOptionMap"/>
+        <!-- 채점 기준 -->
+        <collection property="gradingCriteria"
+                    ofType="com.piveguyz.empickbackend.employment.jobtests.grading.query.dto.GradingCriteriaQueryDTO"
+                    resultMap="GradingCriteriaMap"/>
+    </resultMap>
+
+    <!-- GradingResultQueryDTO -->
+    <resultMap id="GradingResultMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.answer.query.dto.GradingResultQueryDTO">
+        <id property="id" column="gr_id"/>
+        <result property="gradingCriteriaId" column="gr_grading_criteria_id"/>
+        <result property="isSatisfied" column="gr_is_satisfied"/>
+        <result property="answerId" column="gr_answer_id"/>
+    </resultMap>
+
+    <!-- 최상위 AnswerQueryDTO -->
+    <resultMap id="AnswerWithFullMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.answer.query.dto.AnswerQueryDTO">
+        <id property="id" column="a_id"/>
+        <result property="content" column="a_content"/>
+        <result property="attempt" column="a_attempt"/>
+        <result property="isCorrect" column="a_is_correct"
+                typeHandler="com.piveguyz.empickbackend.common.handler.AnswerIsCorrectHandler"/>
+        <result property="score" column="a_score"/>
+        <result property="applicationJobTestId" column="a_application_job_test_id"/>
+        <result property="questionId" column="a_question_id"/>
+
+        <result property="maxScore" column="jq_score"/>
+        <!-- 문제 -->
+        <association property="question"
+                     javaType="com.piveguyz.empickbackend.employment.jobtests.question.query.dto.QuestionQueryDTO"
+                     resultMap="QuestionMap"/>
+        <!-- 채점 결과 -->
+        <collection property="gradingResults"
+                    ofType="com.piveguyz.empickbackend.employment.jobtests.answer.query.dto.GradingResultQueryDTO"
+                    resultMap="GradingResultMap"/>
+    </resultMap>
+
+    <!-- 실제 쿼리 예시 -->
+    <select id="findAnswerWithApplicationJobtestId" resultMap="AnswerWithFullMap" parameterType="int">
+        SELECT a.id                            as a_id,
+               a.content                       as a_content,
+               a.attempt                       as a_attempt,
+               a.is_correct                    as a_is_correct,
+               a.score                         as a_score,
+               a.application_job_test_id       as a_application_job_test_id,
+               a.question_id                   as a_question_id,
+
+               jq.score                        as jq_score,
+
+               q.id                            as q_id,
+               q.content                       as q_content,
+               q.detail_content                as q_detail_content,
+               q.type                          as q_type,
+               q.difficulty                    as q_difficulty,
+               q.answer                        as q_answer,
+
+               qo.id                           as qo_id,
+               qo.option_number                as qo_option_number,
+               qo.content                      as qo_content,
+
+               gc.id                           as gc_id,
+               gc.content                      as gc_content,
+               gc.score_weight                 as gc_score_weight,
+
+               gr.id                           as gr_id,
+               gr.question_grading_criteria_id as gr_grading_criteria_id,
+               gr.is_satisfied                 as gr_is_satisfied,
+               gr.answer_id                    as gr_answer_id
+
+        FROM answer a
+                 LEFT JOIN question q ON a.question_id = q.id
+                 LEFT JOIN question_option qo ON qo.question_id = q.id
+                 LEFT JOIN question_grading_criteria gc ON gc.question_id = q.id
+                 LEFT JOIN grading_result gr ON gr.answer_id = a.id
+                 LEFT JOIN application_job_test ajt ON ajt.id = a.application_job_test_id
+                 LEFT JOIN job_test_question jq ON jq.question_id = a.question_id AND jq.job_test_id = ajt.job_test_id
+        WHERE a.application_job_test_id = #{applicationJobtestId}
+    </select>
+
+</mapper>

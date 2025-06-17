@@ -34,7 +34,4 @@ public class InterviewEntity {
 
     @Column(name = "score")
     private Double score;
-
-    @Column(name = "interview_review")
-    private String interviewReview;
 }

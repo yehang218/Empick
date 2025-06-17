@@ -3,6 +3,8 @@ package com.piveguyz.empickbackend.employment.recruitment.query.controller;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantQueryDTO;
+import com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQueryDTO;
 import com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryConditionDTO;
 import com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryDTO;
 import com.piveguyz.empickbackend.employment.recruitment.query.service.RecruitmentQueryService;
@@ -60,5 +62,15 @@ public class RecruitmentQueryController {
 
 		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS, dto));
+	}
+
+	@Operation(summary = "채용공고별 지원서 조회", description = "특정 채용공고에 등록된 모든 지원서를 조회합니다.")
+	@GetMapping("/{recruitmentId}/applications")
+	public ResponseEntity<CustomApiResponse<List<ApplicationQueryDTO>>> getApplicationsByRecruitmentId(
+		@PathVariable("recruitmentId") int recruitmentId
+	) {
+		List<ApplicationQueryDTO> result = recruitmentQueryService.findApplicationsByRecruitmentId(recruitmentId);
+		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+			.body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
 	}
 }
