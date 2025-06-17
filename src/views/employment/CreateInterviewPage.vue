@@ -4,9 +4,27 @@
             <v-row>
                 <!-- 지원서 선택 -->
                 <v-col cols="6">
-                    <v-select v-model="selectedApplicationId" :items="applicationOptions" item-title="applicantName"
+                    <v-select v-model="selectedApplicationId" :items="applicationOptions" item-title="label"
                         item-value="id" label="지원서 선택" />
                 </v-col>
+
+                <v-row v-if="selectedApplication">
+                    <v-col cols="12">
+                        <v-card class="pa-4 mt-2">
+                            <h3>선택된 지원서 정보</h3>
+                            <p><strong>채용 공고 제목:</strong> {{ selectedApplication.recruitmentTitle }}</p>
+                            <p><strong>제출일:</strong> {{ selectedApplication.createdAt }}</p>
+                            <p><strong>지원자 이름:</strong> {{ selectedApplication.applicant.name }}</p>
+                            <p><strong>이메일:</strong> {{ selectedApplication.applicant.email }}</p>
+                            <p><strong>전화번호:</strong> {{ selectedApplication.applicant.phone }}</p>
+                            <p><strong>자기소개서 평가 점수:</strong> {{ selectedApplication.coverLetterScore ?? '미평가' }}</p>
+
+                            <v-btn color="secondary" @click="goToApplicationDetail(selectedApplication.id)">
+                                지원서 상세보기
+                            </v-btn>
+                        </v-card>
+                    </v-col>
+                </v-row>
 
                 <!-- 평가표 선택 버튼 -->
                 <v-col cols="6">
@@ -52,11 +70,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useInterviewStore } from '@/stores/interviewStore'
 import { useApplicantStore } from '@/stores/applicantStore'
+import { useRecruitmentStore } from '@/stores/recruitmentStore'
 
 import InterviewSheetModal from '@/components/employment/InterviewSheetModal.vue'
 
@@ -66,8 +85,13 @@ const selectedDate = route.query.date  // 'YYYY-MM-DD' 형식
 const applicationStore = useApplicationStore()
 const applicantStore = useApplicantStore()
 const interviewStore = useInterviewStore()
+const recruitmentStore = useRecruitmentStore()
 
+const selectedApplication = computed(() => {
+    return applicationOptions.value.find(app => app.id === selectedApplicationId.value)
+})
 const selectedApplicationId = ref(null)
+
 const selectedSheet = ref(null)
 
 const showSheetModal = ref(false)
@@ -154,14 +178,42 @@ const submitInterview = async () => {
 }
 
 onMounted(async () => {
-    const rawList = await applicationStore.fetchAllApplications()
-    const withNames = await Promise.all(rawList.map(async app => {
-        const applicant = await applicantStore.fetchApplicantById(app.applicantId)
-        return {
-            ...app,
-            applicantName: applicant.name // ✅ 이름 추가
-        }
-    }))
-    applicationOptions.value = withNames
+    await applicationStore.fetchAllApplications()
+    const rawList = applicationStore.applicationList
+
+    const withDetails = await Promise.all(
+        rawList.map(async app => {
+            try {
+                // 지원자 정보 가져오기
+                await applicantStore.fetchApplicantById(app.applicantId)
+                const applicant = applicantStore.selectedApplicant
+                if (!applicant) return null
+
+                // 채용 공고 정보 가져오기
+                await recruitmentStore.loadRecruitmentDetail(app.recruitmentId)
+                const recruitment = recruitmentStore.detail
+                if (!recruitment) return null
+
+                return {
+                    ...app,
+                    applicantName: applicant.name,
+                    recruitmentTitle: recruitment.title,
+                    label: `${applicant.name} - ${recruitment.title}`,
+                    applicant,
+                }
+            } catch (error) {
+                // 커스텀 에러의 경우: 코드 또는 상태로 판단
+                if (error.code === 'RECRUITMENT_NOT_FOUND' || error.status === 404) {
+                    return null
+                }
+
+                // 예상 외 에러는 콘솔에 표시
+                console.warn(`❌ 지원서 ${app.id} 처리 중 오류 발생`, error)
+                return null
+            }
+        })
+    )
+
+    applicationOptions.value = withDetails.filter(Boolean)  // null 제거
 })
 </script>
