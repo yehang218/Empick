@@ -103,7 +103,7 @@
                         <div class="d-flex align-center">
                             <v-avatar size="48" color="primary" class="mr-4">
                                 <span class="text-white text-h6">{{ selectedApplicants[0]?.name?.charAt(0) || '?'
-                                }}</span>
+                                    }}</span>
                             </v-avatar>
                             <div>
                                 <div class="text-h6">{{ selectedApplicants[0]?.name || '이름 없음' }}</div>
@@ -205,10 +205,11 @@
         <v-row class="mt-8">
             <v-col cols="12" class="d-flex flex-column align-center">
                 <v-btn color="success" @click="onRegister" size="large">
-                    {{ selectedApplicants.length > 1 ? `등록 (${currentApplicantIndex + 1}/${selectedApplicants.length})`
-                        : '등록'
-                    }}
+                    {{ currentApplicant?.name || '지원자' }} 등록
                 </v-btn>
+                <div v-if="selectedApplicants.length > 1" class="text-caption text-grey mt-2">
+                    현재 편집 중인 지원자만 등록됩니다 ({{ currentApplicantIndex + 1 }}/{{ selectedApplicants.length }})
+                </div>
             </v-col>
         </v-row>
 
