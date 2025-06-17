@@ -173,10 +173,8 @@ const applicantStore = useApplicantStore();
 const router = useRouter()
 
 const search = ref('')
-const router = useRouter()
 
 
-=======
 const tableHeaders = [
   {
     title: '',
@@ -402,31 +400,6 @@ const handleJobtestSelected = async (jobtest) => {
   }
 };
 
-
-const loadApplicants = async () => {
-  try {
-    const response = await applicantService.fetchAllApplicants();
-    if (response.isSuccess) {
-      applicants.value = response.data.data;
-      applicants.value.forEach(applicant => {
-        if (applicant.birth) {
-          applicant.birth = applicant.birth;
-        }
-      });
-    } else {
-      console.error(`지원자 목록 로드 실패: ${response.message}`);
-      alert(`지원자 목록 로드 실패: ${response.message}`);
-    }
-  } catch (error) {
-    console.error('지원자 목록 로드 중 오류 발생:', error);
-    alert('지원자 목록 로드 중 오류가 발생했습니다. 다시 시도해주세요.');
-  }
-}
-
-onMounted(() => {
-  loadApplicants();
-});
-
 // 검색어 초기화 함수
 const clearSearch = () => {
   search.value = ''
@@ -549,6 +522,11 @@ const toggleSelectAll = (selectAll) => {
     console.log('❌ 전체 해제됨');
   }
 }
+
+// 지원자 등록 페이지로 이동
+const goToApplicantRegistration = () => {
+  router.push('/employment/applicants/register');
+};
 
 </script>
 

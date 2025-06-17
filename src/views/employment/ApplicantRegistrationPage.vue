@@ -109,12 +109,18 @@
                 name: this.applicant.name,
                 phone: this.applicant.phone,
                 email: this.applicant.email,
-                birthDate: this.applicant.birthDate, // LocalDate 형식에 맞게 문자열 전송
+                birth: this.applicant.birthDate,
                 address: this.applicant.address,
                 // profileImage는 백엔드에서 MultipartFile로 받는다면 별도 FormData 처리 필요
                 // 현재는 문자열 URL로만 받는다고 가정하고, 파일 자체는 보내지 않습니다.
-                profileImageUrl: this.applicant.profileImage ? this.applicant.profileImage.name : null, // 파일 이름만 예시로 저장
+                profileImageUrl: this.applicant.profileImage 
+                    ? `/uploads/${this.applicant.profileImage.name}` 
+                    : '/assets/empick_logo.png', // 기본 로고 이미지 경로
             };
+            
+            console.log('전송 페이로드:', payload);
+            console.log('profileImage 상태:', this.applicant.profileImage);
+            console.log('profileImageUrl 전송 값:', payload.profileImageUrl);
 
             const response = await createApplicantService(payload);
             // createApplicantService는 ApiResponseDTO 구조의 data를 반환합니다.
@@ -146,6 +152,20 @@
           address: '',
           profileImage: null,
         };
+      },
+    },
+    watch: {
+      'applicant.profileImage': {
+        handler(newValue) {
+          console.log('profileImage watch - newValue:', newValue);
+          if (newValue) {
+            console.log('profileImage watch - newValue.name:', newValue.name);
+          } else {
+            console.log('profileImage watch - newValue is null or undefined');
+          }
+        },
+        deep: true, // 객체 내부 변경 감지
+        immediate: true, // 초기값도 즉시 감지
       },
     },
   };
