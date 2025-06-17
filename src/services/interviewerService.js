@@ -66,11 +66,9 @@ export const getAllInterviewers = async (options = {}) => {
         const response = await api.get(InterviewAPI.GET_ALL_INTERVIEWERS);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
-        // 성공 상태로 오지 않았다면 에러 처리
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-
         return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
     }, options);
 };
