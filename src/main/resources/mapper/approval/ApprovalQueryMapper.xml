@@ -21,6 +21,16 @@
 
     </resultMap>
 
+    <resultMap id="ApprovalReceivedResultMap" type="ApprovalReceivedQueryDTO">
+        <result column="approval_id" property="approvalId" />
+        <result column="category_name" property="categoryName" />
+        <result column="writer_name" property="writerName" />
+        <result column="created_at" property="createdAt" />
+        <result column="status" property="status"
+                typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler" />
+        <result column="my_approval_step" property="myApprovalStep" />
+    </resultMap>
+
     <select id="findAll" resultMap="ApprovalResultMap">
         SELECT
             id,
@@ -96,5 +106,42 @@
         WHERE writer_id = #{writerId};
     </select>
 
+    <select id="findReceivedApprovals"
+            resultMap="ApprovalReceivedResultMap">
+        SELECT
+            a.id AS approvalId,
+            c.name AS categoryName,
+            m.name AS writerName,
+            a.created_at AS createdAt,
+            a.status,
+
+            -- 내가 몇 번째 결재자인지
+            CASE
+                WHEN a.first_approver_id = #{memberId} THEN 1
+                WHEN a.second_approver_id = #{memberId} THEN 2
+                WHEN a.third_approver_id = #{memberId} THEN 3
+                WHEN a.fourth_approver_id = #{memberId} THEN 4
+                ELSE NULL
+                END AS myApprovalStep,
+
+            -- 내가 결재해야 하는 순서인지 여부
+            CASE
+                WHEN a.first_approver_id = #{memberId} AND a.first_approved_at IS NULL THEN 1
+                WHEN a.second_approver_id = #{memberId} AND a.first_approved_at IS NOT NULL AND a.second_approved_at IS NULL THEN 1
+                WHEN a.third_approver_id = #{memberId} AND a.second_approved_at IS NOT NULL AND a.third_approved_at IS NULL THEN 1
+                WHEN a.fourth_approver_id = #{memberId} AND a.third_approved_at IS NOT NULL AND a.fourth_approved_at IS NULL THEN 1
+                ELSE 0
+                END AS isMyTurn
+
+        FROM approval a
+                 JOIN member m ON a.writer_id = m.id
+                 JOIN approval_category c ON a.category_id = c.id
+        WHERE
+            a.first_approver_id = #{memberId}
+           OR a.second_approver_id = #{memberId}
+           OR a.third_approver_id = #{memberId}
+           OR a.fourth_approver_id = #{memberId}
+        ORDER BY a.created_at DESC
+    </select>
 
 </mapper>

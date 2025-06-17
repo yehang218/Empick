@@ -13,4 +13,6 @@ public interface ApprovalQueryService {
 	List<ApprovalQueryDTO> findByCategoryId(Integer categoryId);
 
 	List<ApprovalQueryDTO> findByWriterId(Integer writerId);
+
+	List<ApprovalQueryDTO> findReceivedApprovals(Integer memberId);
 }
