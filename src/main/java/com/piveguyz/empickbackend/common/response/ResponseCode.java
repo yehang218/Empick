@@ -137,7 +137,8 @@ public enum ResponseCode {
     DUPLICATE_TEMPLATE_TITLE(false, HttpStatus.CONFLICT, 2106, "이미 존재하는 템플릿 제목입니다."),
     INTRODUCE_TEMPLATE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2107, "요청한 자기소개서 템플릿 ID가 존재하지 않습니다."),
     INTRODUCE_TEMPLATE_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2108, "요청한 템플릿 항목 ID가 존재하지 않습니다."),
-    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2112, "이미 존재하는 템플릿 항목명입니다."),
+    DUPLICATE_TEMPLATE_ITEM_TITLE(false, HttpStatus.CONFLICT, 2110, "이미 존재하는 템플릿 항목명입니다."),
+    DUPLICATE_INTRODUCE_FOR_TEMPLATE(false, HttpStatus.CONFLICT, 2112, "이미 해당 템플릿에 대한 지원자의 자기소개서가 존재합니다."),
     INTRODUCE_STANDARD_ITEM_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2113, "해당 자기소개서 기준표 항목을 찾을 수 없습니다."),
     DUPLICATE_STANDARD_ITEM_CONTENT(false, HttpStatus.CONFLICT, 2114, "이미 존재하는 자기소개서 기준표 항목입니다."),
     DUPLICATE_STANDARD_ITEM_CONTENT_TITLE(false, HttpStatus.CONFLICT, 2115, "이미 존재하는 자기소개서 기준표 항목명입니다."),
@@ -247,7 +248,26 @@ public enum ResponseCode {
 
     // 인증 2700 ~ 2799
     INVALID_REFRESH_TOKEN(false, HttpStatus.UNAUTHORIZED, 2700, "유효하지 않은 Refresh Token입니다."),
-    MEMBER_EMPLOYEE_NUMBER_DUPLICATE(false, HttpStatus.UNAUTHORIZED, 2701, "중복된 사번입니다.");
+    MEMBER_EMPLOYEE_NUMBER_DUPLICATE(false, HttpStatus.UNAUTHORIZED, 2701, "중복된 사번입니다."),
+
+
+
+    // 결재 오류 3000~ 3999
+    APPROVAL_APPROVER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 3001, "결재자 정보가 존재하지 않습니다."),
+    APPROVAL_CATEGORY_ITEM_MISMATCH(false, HttpStatus.BAD_REQUEST, 3002, "항목이 결재 유형에 속하지 않습니다."),
+    APPROVAL_DUPLICATE_APPROVER_ORDER(false, HttpStatus.BAD_REQUEST, 3003, "결재 순서가 중복되었습니다."),
+    APPROVAL_NOT_FOUND(false, HttpStatus.NOT_FOUND, 3004, "결재 문서를 찾을 수 없습니다."),
+    APPROVAL_CANCEL_TARGET_NOT_FOUND(false, HttpStatus.NOT_FOUND, 3005, "취소 대상 결재 문서를 찾을 수 없습니다."),
+    APPROVAL_NO_APPROVER(false, HttpStatus.BAD_REQUEST, 3006, "결재자가 최소 1명 이상 필요합니다."),
+    APPROVAL_CONTENT_ITEM_MISSING(false, HttpStatus.BAD_REQUEST, 3007, "결재 문서 항목이 누락되었습니다."),
+    APPROVAL_ALREADY_APPROVED(false, HttpStatus.BAD_REQUEST, 3008, "이미 승인 완료된 문서입니다."),
+    APPROVAL_ALREADY_REJECTED(false, HttpStatus.BAD_REQUEST, 3009, "이미 반려된 문서입니다."),
+    APPROVAL_ALREADY_CANCELED(false, HttpStatus.BAD_REQUEST, 3010, "이미 결재 취소된 문서입니다."),
+    APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3011, "결재 차례가 아닙니다."),
+    APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3012, "반려 사유가 필요합니다."),
+    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다.");
+
+
 
     private final boolean success;
     private final HttpStatus httpStatus;        // HTTP 상태 코드

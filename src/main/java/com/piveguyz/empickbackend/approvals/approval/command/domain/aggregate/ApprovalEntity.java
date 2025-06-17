@@ -55,10 +55,14 @@ public class ApprovalEntity {
     @Column(name = "fourth_approved_at", nullable = true)
     private LocalDateTime fourthApprovedAt;
 
+    @Column(name = "approval_id", nullable = true)
+    private Integer approvalId;
+
     @Builder
     public ApprovalEntity(int categoryId, int writerId,
                           Integer firstApproverId, Integer secondApproverId,
-                          Integer thirdApproverId, Integer fourthApproverId) {
+                          Integer thirdApproverId, Integer fourthApproverId,
+                          Integer approvalId) {
         this.categoryId = categoryId;
         this.writerId = writerId;
         this.firstApproverId = firstApproverId;
@@ -67,5 +71,6 @@ public class ApprovalEntity {
         this.fourthApproverId = fourthApproverId;
         this.status = 0;
         this.createdAt = LocalDateTime.now();
+        this.approvalId = approvalId;
     }
 }
