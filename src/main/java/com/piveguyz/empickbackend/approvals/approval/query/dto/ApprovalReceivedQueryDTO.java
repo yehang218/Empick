@@ -16,4 +16,5 @@ public class ApprovalReceivedQueryDTO {
 	private LocalDateTime createdAt;
 	private ApprovalStatus status;
 	private Integer myApprovalStep;
+	private Integer isMyTurn;
 }
