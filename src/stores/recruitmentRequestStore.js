@@ -4,9 +4,10 @@ import {
     fetchRecruitmentRequestList,
     fetchRecruitmentRequestDetail,
     createRecruitmentRequest,
-    fetchJobList,
-    fetchDepartmentList
 } from '@/services/recruitmentRequestService';
+
+import { fetchJobList } from '@/services/jobService';
+import { fetchDepartmentList } from '@/services/departmentService';
 
 export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () => {
     // 채용 요청서 목록
