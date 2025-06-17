@@ -8,7 +8,7 @@ import {
   updateApplicationStatusService,
   deleteApplicationService,
   createApplicationResponseService,
-  getApplicantByRecruitmentIdService
+  getApplicationsByRecruitmentIdService
 } from '@/services/applicationService';
 
 export const useApplicationStore = defineStore('application', () => {
@@ -76,15 +76,17 @@ export const useApplicationStore = defineStore('application', () => {
     return await createApplicationResponseService(dto);
   };
 
-  // 채용공고별 지원자 조회
-  const loadApplicantByRecruitmentId = async (recruitmentId) => {
+  // 채용공고별 지원서 조회
+  const loadApplicationsByRecruitmentId = async (recruitmentId) => {
     loading.value = true;
     error.value = null;
     try {
-      const result = await getApplicantByRecruitmentIdService(recruitmentId);
+      const result = await getApplicationsByRecruitmentIdService(recruitmentId);
+      applicationList.value = result;
+      return result;
     } catch (err) {
-      error.value = err.message || '지원자 조회 중 오류 발생';
-      console.error('❌ 지원자 조회 오류:', err);
+      error.value = err.message || '지원서 조회 중 오류 발생';
+      console.error('❌ 지원서 조회 오류:', err);
     } finally {
       loading.value = false;
     }
@@ -105,6 +107,6 @@ export const useApplicationStore = defineStore('application', () => {
     deleteApplication,
     createApplicationResponse,
     
-    loadApplicantByRecruitmentId
+    loadApplicationsByRecruitmentId
   };
 });

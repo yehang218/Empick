@@ -43,6 +43,10 @@ export const ApplicationAPI = {
     // 🔸 삭제
     DELETE_APPLICATION: (id) =>
         `/api/v1/employment/application/${id}`,
+
+    GET_APPLICATION_BY_RECRUITMENT_ID: (recruitmentId) =>
+        `/api/v1/employment/recruitments/{recruitmentId}/applications`,
+
 };
 
 export const ApplicationResponseAPI = {

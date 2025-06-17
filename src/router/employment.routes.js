@@ -218,7 +218,7 @@ export const employmentRoutes = [
         }
     },
     {
-        path: '/employment/applicant/recruitments/:recruitmentId',
+        path: '/employment/applications/recruitments/:recruitmentId',
         name: 'ApplicantRecruitmentPage',
         component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
         meta: {
