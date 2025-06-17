@@ -90,20 +90,40 @@ export const useApplicantStore = defineStore('applicant', () => {
         // 정렬
         if (sortKey.value) {
             result.sort((a, b) => {
-                const aValue = a[sortKey.value];
-                const bValue = b[sortKey.value];
+                let aValue = a[sortKey.value];
+                let bValue = b[sortKey.value];
 
-                if (!aValue || !bValue) return 0;
+                // null/undefined 처리
+                if (aValue == null && bValue == null) return 0;
+                if (aValue == null) return 1;
+                if (bValue == null) return -1;
 
-                if (typeof aValue === 'string') {
-                    return sortOrder.value === 'asc'
-                        ? aValue.localeCompare(bValue)
-                        : bValue.localeCompare(aValue);
+                // 날짜 처리 (birth, createdAt, updatedAt)
+                if (sortKey.value === 'birth' || sortKey.value === 'createdAt' || sortKey.value === 'updatedAt') {
+                    aValue = new Date(aValue);
+                    bValue = new Date(bValue);
                 }
 
-                return sortOrder.value === 'asc'
-                    ? aValue - bValue
-                    : bValue - aValue;
+                // 문자열 처리
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    const comparison = aValue.localeCompare(bValue, 'ko', { numeric: true });
+                    return sortOrder.value === 'asc' ? comparison : -comparison;
+                }
+
+                // 숫자 처리
+                if (typeof aValue === 'number' && typeof bValue === 'number') {
+                    return sortOrder.value === 'asc' ? aValue - bValue : bValue - aValue;
+                }
+
+                // 날짜 처리
+                if (aValue instanceof Date && bValue instanceof Date) {
+                    return sortOrder.value === 'asc' ? aValue - bValue : bValue - aValue;
+                }
+
+                // 기본 처리
+                return sortOrder.value === 'asc' ?
+                    String(aValue).localeCompare(String(bValue)) :
+                    String(bValue).localeCompare(String(aValue));
             });
         }
 
@@ -115,13 +135,15 @@ export const useApplicantStore = defineStore('applicant', () => {
     };
 
     const setSort = (options) => {
+        console.log('setSort 호출됨:', options); // 디버깅용 로그
         if (options.sortBy && options.sortBy.length > 0) {
             sortKey.value = options.sortBy[0];
-            sortOrder.value = options.sortDesc[0] ? 'desc' : 'asc';
+            sortOrder.value = options.sortDesc && options.sortDesc[0] ? 'desc' : 'asc';
         } else {
             sortKey.value = '';
             sortOrder.value = 'asc';
         }
+        console.log('정렬 설정:', { sortKey: sortKey.value, sortOrder: sortOrder.value }); // 디버깅용 로그
     };
 
     // 🔍 지원자 ID로 단일 조회

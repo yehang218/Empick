@@ -241,8 +241,20 @@ const handleSearch = debounce((value) => {
   applicantStore.setSearchQuery(value)
 }, 300)
 
-const handleSort = (key) => {
-  applicantStore.setSort(key)
+const handleSort = (options) => {
+  // Vuetify v-data-table의 options 객체에서 정렬 정보 추출
+  if (options.sortBy && options.sortBy.length > 0) {
+    applicantStore.setSort({
+      sortBy: options.sortBy,
+      sortDesc: options.sortDesc || [false] // 기본값 설정
+    });
+  } else {
+    // 정렬 해제
+    applicantStore.setSort({
+      sortBy: [],
+      sortDesc: []
+    });
+  }
 }
 
 const viewDetail = (item) => {
