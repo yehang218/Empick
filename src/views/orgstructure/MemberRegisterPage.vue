@@ -10,9 +10,21 @@
         <v-row v-if="selectedApplicants.length > 0">
             <v-col cols="12">
                 <v-card class="mb-6" elevation="2">
-                    <v-card-title class="d-flex align-center">
-                        <v-icon class="mr-2" color="primary">mdi-account-multiple</v-icon>
-                        <span>선택된 지원자 정보 ({{ selectedApplicants.length }}명)</span>
+                    <v-card-title class="d-flex align-center justify-space-between">
+                        <div class="d-flex align-center">
+                            <v-icon class="mr-2" color="primary">mdi-account-multiple</v-icon>
+                            <span>선택된 지원자 정보 ({{ selectedApplicants.length }}명)</span>
+                        </div>
+                        <!-- 다중 선택 시 전체 선택/해제 및 일괄 등록 버튼 -->
+                        <div v-if="selectedApplicants.length > 1" class="d-flex align-center">
+                            <v-checkbox v-model="selectAllForRegistration" :indeterminate="isIndeterminate"
+                                label="전체 선택" hide-details density="compact" class="mr-4"
+                                @update:model-value="toggleSelectAllForRegistration" />
+                            <v-btn color="success" variant="tonal" size="small"
+                                :disabled="selectedForRegistration.length === 0" @click="onBulkRegister">
+                                일괄 등록 ({{ selectedForRegistration.length }}명)
+                            </v-btn>
+                        </div>
                     </v-card-title>
 
                     <!-- 다중 선택 시 스크롤박스 표시 -->
@@ -20,24 +32,35 @@
                         <div class="selected-applicants-scroll" style="max-height: 200px; overflow-y: auto;">
                             <v-list density="compact">
                                 <v-list-item v-for="(applicant, index) in selectedApplicants"
-                                    :key="applicant.applicantId" class="mb-2" @click="selectCurrentApplicant(index)"
+                                    :key="applicant.applicantId" class="mb-2"
                                     :class="{ 'selected-applicant': currentApplicantIndex === index }"
                                     style="cursor: pointer;">
                                     <template v-slot:prepend>
-                                        <v-avatar size="40" color="primary">
+                                        <v-checkbox :model-value="isSelectedForRegistration(applicant)"
+                                            @update:model-value="toggleRegistrationSelection(applicant)" hide-details
+                                            density="compact" class="mr-2" @click.stop />
+                                        <v-avatar size="40" color="primary" @click="selectCurrentApplicant(index)">
                                             <span class="text-white">{{ applicant.name?.charAt(0) || '?' }}</span>
                                         </v-avatar>
                                     </template>
-                                    <v-list-item-title>{{ applicant.name || '이름 없음' }}</v-list-item-title>
-                                    <v-list-item-subtitle>
-                                        {{ applicant.email || '이메일 없음' }} | {{ applicant.phone || '연락처 없음' }}
-                                    </v-list-item-subtitle>
+                                    <div @click="selectCurrentApplicant(index)" class="flex-grow-1">
+                                        <v-list-item-title>{{ applicant.name || '이름 없음' }}</v-list-item-title>
+                                        <v-list-item-subtitle>
+                                            {{ applicant.email || '이메일 없음' }} | {{ applicant.phone || '연락처 없음' }}
+                                        </v-list-item-subtitle>
+                                    </div>
                                     <template v-slot:append>
-                                        <v-chip size="small"
-                                            :color="currentApplicantIndex === index ? 'primary' : 'grey'"
-                                            variant="tonal">
-                                            {{ currentApplicantIndex === index ? '현재 편집중' : '대기' }}
-                                        </v-chip>
+                                        <div class="d-flex flex-column align-center">
+                                            <v-chip size="small"
+                                                :color="currentApplicantIndex === index ? 'primary' : 'grey'"
+                                                variant="tonal" class="mb-1">
+                                                {{ currentApplicantIndex === index ? '현재 편집중' : '대기' }}
+                                            </v-chip>
+                                            <v-chip v-if="isSelectedForRegistration(applicant)" size="x-small"
+                                                color="success" variant="tonal">
+                                                등록 대상
+                                            </v-chip>
+                                        </div>
                                     </template>
                                 </v-list-item>
                             </v-list>
@@ -47,6 +70,13 @@
                             <span class="text-subtitle-2 text-grey">현재 편집중인 지원자:</span>
                             <v-chip color="primary" variant="tonal">
                                 {{ currentApplicant?.name || '선택된 지원자 없음' }}
+                            </v-chip>
+                        </div>
+                        <div v-if="selectedForRegistration.length > 0"
+                            class="mt-2 d-flex align-center justify-space-between">
+                            <span class="text-subtitle-2 text-success">등록 대상 지원자:</span>
+                            <v-chip color="success" variant="tonal">
+                                {{selectedForRegistration.map(a => a.name).join(', ')}}
                             </v-chip>
                         </div>
                     </v-card-text>
@@ -190,10 +220,27 @@ const pendingNavigation = ref(null)
 const selectedApplicants = ref([])
 const currentApplicantIndex = ref(0)
 
+// 다중 등록 관련 상태
+const selectAllForRegistration = ref(false)
+const selectedForRegistration = ref([])
+
 // 현재 편집중인 지원자
 const currentApplicant = computed(() => {
     return selectedApplicants.value[currentApplicantIndex.value] || null
 })
+
+// 체크박스 indeterminate 상태
+const isIndeterminate = computed(() => {
+    const selectedCount = selectedForRegistration.value.length
+    const totalCount = selectedApplicants.value.length
+    return selectedCount > 0 && selectedCount < totalCount
+})
+
+// 전체 선택 상태 업데이트
+watch(selectedForRegistration, (newValue) => {
+    const totalCount = selectedApplicants.value.length
+    selectAllForRegistration.value = newValue.length === totalCount && totalCount > 0
+}, { deep: true })
 
 const departments = [
     { label: '인사', value: 1 },
@@ -233,6 +280,12 @@ onMounted(() => {
 
                 // 첫 번째 지원자 데이터로 폼 초기화
                 loadApplicantToForm(applicantsData[0])
+
+                // 다중 선택 시 기본적으로 모든 지원자를 등록 대상으로 선택
+                if (applicantsData.length > 1) {
+                    selectedForRegistration.value = [...applicantsData]
+                    selectAllForRegistration.value = true
+                }
 
                 console.log('✅ 지원자 데이터 로드 완료:', selectedApplicants.value.length, '명')
             }
@@ -278,6 +331,89 @@ const nextApplicant = () => {
     if (currentApplicantIndex.value < selectedApplicants.value.length - 1) {
         currentApplicantIndex.value++
         loadApplicantToForm(currentApplicant.value)
+    }
+}
+
+// 다중 등록 관련 함수들
+const toggleSelectAllForRegistration = (selectAll) => {
+    console.log('🔄 전체 등록 선택 토글:', selectAll)
+    if (selectAll) {
+        selectedForRegistration.value = [...selectedApplicants.value]
+    } else {
+        selectedForRegistration.value = []
+    }
+}
+
+const toggleRegistrationSelection = (applicant) => {
+    console.log('✅ 등록 대상 토글:', applicant.name)
+    const index = selectedForRegistration.value.findIndex(a => a.applicantId === applicant.applicantId)
+
+    if (index > -1) {
+        selectedForRegistration.value.splice(index, 1)
+        console.log('❌ 등록 대상에서 제외됨')
+    } else {
+        selectedForRegistration.value.push(applicant)
+        console.log('✅ 등록 대상에 추가됨')
+    }
+}
+
+const isSelectedForRegistration = (applicant) => {
+    return selectedForRegistration.value.some(a => a.applicantId === applicant.applicantId)
+}
+
+const onBulkRegister = async () => {
+    console.log('📝 일괄 등록 시작:', selectedForRegistration.value.length, '명')
+
+    if (selectedForRegistration.value.length === 0) {
+        toast.warning('등록할 지원자를 선택해주세요.')
+        return
+    }
+
+    let successCount = 0
+    let failCount = 0
+    const failedApplicants = []
+
+    for (const applicant of selectedForRegistration.value) {
+        try {
+            console.log('📝 등록 중:', applicant.name)
+
+            // 해당 지원자 데이터로 폼 설정
+            loadApplicantToForm(applicant)
+
+            // 사원 등록 실행
+            const result = await regStore.registerMemberWithImage()
+
+            if (result) {
+                successCount++
+                console.log('✅ 등록 성공:', applicant.name)
+            } else {
+                failCount++
+                failedApplicants.push(applicant.name)
+                console.log('❌ 등록 실패:', applicant.name)
+            }
+
+            // 폼 초기화 (다음 지원자를 위해)
+            regStore.resetForm()
+
+        } catch (error) {
+            failCount++
+            failedApplicants.push(applicant.name)
+            console.error('❌ 등록 중 오류:', applicant.name, error)
+        }
+    }
+
+    // 결과 알림
+    if (successCount > 0 && failCount === 0) {
+        toast.success(`${successCount}명의 사원 등록이 모두 완료되었습니다!`)
+    } else if (successCount > 0 && failCount > 0) {
+        toast.warning(`${successCount}명 등록 성공, ${failCount}명 등록 실패\n실패: ${failedApplicants.join(', ')}`)
+    } else {
+        toast.error(`모든 등록이 실패했습니다.\n실패: ${failedApplicants.join(', ')}`)
+    }
+
+    // 성공한 경우 지원자 목록으로 이동
+    if (successCount > 0) {
+        router.push('/employment/applicants')
     }
 }
 
