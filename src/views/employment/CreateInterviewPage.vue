@@ -78,6 +78,7 @@ import { useApplicantStore } from '@/stores/applicantStore'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 
 import InterviewSheetModal from '@/components/employment/InterviewSheetModal.vue'
+import router from '@/router'
 
 
 const route = useRoute()
@@ -121,7 +122,7 @@ watch(selectedMinute, (val) => {
 
 const getTimeString = () => {
     if (!selectedHour.value || !selectedMinute.value) return ''
-    return `${selectedHour.value}:${selectedMinute.value}`
+    return `${selectedHour.value}:${selectedMinute.value}:00`
 }
 
 const address = ref('')
@@ -146,8 +147,6 @@ const checkAvailability = async () => {
         await interviewStore.checkDatetimeAvailability(datetime)
         console.log('✅ 응답 받음:', interviewStore.isDatetimeAvailable)
         isDatetimeAvailable.value = interviewStore.isDatetimeAvailable
-        console.log('isDatetimeAvailable : ', isDatetimeAvailable);
-        console.log('interviewStore.isDatetimeAvailable : ', interviewStore.isDatetimeAvailable);
     } catch (e) {
         isDatetimeAvailable.value = null;
         console.error('❌ 시간 확인 실패:', e)
@@ -161,17 +160,22 @@ const onSheetSelected = (sheet) => {
 
 const submitInterview = async () => {
     const timeString = getTimeString()
+    console.log('selectedDate : ', selectedDate)
+    console.log('timeString : ', timeString)
     const datetime = `${selectedDate}T${timeString}`
+    console.log('datetime : ', datetime)
     const dto = {
         applicationId: selectedApplicationId.value,
         sheetId: selectedSheet.value?.id,
         datetime,
         address: address.value,
     }
+    console.log('dto : ', dto)
 
     try {
         await interviewStore.createInterview(dto)
         alert('면접이 등록되었습니다!')
+        router.push('/employment/interviews')
     } catch (e) {
         alert('등록 실패: ' + e.message)
     }
@@ -183,6 +187,7 @@ onMounted(async () => {
 
     const withDetails = await Promise.all(
         rawList.map(async app => {
+            console.log(app)
             try {
                 // 지원자 정보 가져오기
                 await applicantStore.fetchApplicantById(app.applicantId)
@@ -191,7 +196,7 @@ onMounted(async () => {
 
                 // 채용 공고 정보 가져오기
                 await recruitmentStore.loadRecruitmentDetail(app.recruitmentId)
-                const recruitment = recruitmentStore.detail
+                const recruitment = recruitmentStore.detail.recruitment 
                 if (!recruitment) return null
 
                 return {
@@ -200,14 +205,9 @@ onMounted(async () => {
                     recruitmentTitle: recruitment.title,
                     label: `${applicant.name} - ${recruitment.title}`,
                     applicant,
+                    recruitment
                 }
             } catch (error) {
-                // 커스텀 에러의 경우: 코드 또는 상태로 판단
-                if (error.code === 'RECRUITMENT_NOT_FOUND' || error.status === 404) {
-                    return null
-                }
-
-                // 예상 외 에러는 콘솔에 표시
                 console.warn(`❌ 지원서 ${app.id} 처리 중 오류 발생`, error)
                 return null
             }
