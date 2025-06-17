@@ -6,7 +6,7 @@ import { FileAPI } from './file';
 import { MailAPI } from './mail';
 import { RecruitmentAPI } from './recruitment';
 import { ApplicantAPI, ApplicantBookmarkAPI, ApplicationAPI, ApplicationResponseAPI } from './application';
-
+import { ApprovalAPI } from './approval';
 
 
 export const API = {
@@ -21,5 +21,6 @@ export const API = {
     APPLICANTBOOKMARK: ApplicantBookmarkAPI,
     APPLICATION: ApplicationAPI,
     APPLICATIONRESPONSE: ApplicationResponseAPI,
+    APPROVAL: ApprovalAPI,
 };
 

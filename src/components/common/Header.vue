@@ -45,7 +45,7 @@
             <teleport to="body">
                 <v-container v-if="selectedMenu" class="menu-panel" fluid @mouseleave="selectedMenu = ''">
                     <div class="menu-columns">
-                        <div v-for="section in fullMenu[selectedMenu]" :key="section.label" class="menu-section">
+                        <div v-for="section in filteredMenuObject[selectedMenu]" :key="section.label" class="menu-section">
                             <h3 class="menu-title">{{ section.label }}</h3>
                             <ul v-if="section.children.length" class="submenu-list">
                                 <li v-for="child in section.children" :key="child.label" class="submenu-item"
@@ -63,34 +63,32 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import logo from '@/assets/logo.png'
-import { fullMenu } from '@/json/fullMenu.js'
+import { fullMenu } from '@/constants/common/fullMenu.js'
+import { filterMenuByRoles } from '@/utils/menuAccess'
 
 const router = useRouter()
 const selectedMenu = ref('')
-const userRole = ref('인사팀') // 현재는 인사팀으로 설정
 const searchInput = ref('')
 
-const filteredMenu = computed(() => {
-    const visibleMenus = []
-    for (const [key, sections] of Object.entries(fullMenu)) {
-        const hasVisibleSection = sections.some(section =>
-            !section.role || section.role.includes(userRole.value)
-        )
-        if (hasVisibleSection) visibleMenus.push(key)
-    }
-    return visibleMenus
-})
+const authStore = useAuthStore()
+const userRoles = computed(() => authStore.userInfo?.roles || [])
+
+const filteredMenuObject = computed(() => filterMenuByRoles(fullMenu, userRoles.value))
+const filteredMenu = computed(() => Object.keys(filteredMenuObject.value))
+
+console.log('userInfo:', authStore.userInfo);
+console.log('userRoles:', userRoles.value);
 
 const searchableItems = computed(() => {
     const items = []
-    for (const sections of Object.values(fullMenu)) {
+    const filtered = filterMenuByRoles(fullMenu, userRoles.value)
+    for (const sections of Object.values(filtered)) {
         for (const section of sections) {
-            if (!section.role || section.role.includes(userRole.value)) {
-                for (const child of section.children || []) {
-                    items.push({ label: child.label, path: child.path })
-                }
+            for (const child of section.children || []) {
+                items.push({ label: child.label, path: child.path })
             }
         }
     }

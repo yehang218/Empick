@@ -20,18 +20,20 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.vue'
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue'
 import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue'
 import { createQuestionService } from '@/services/jobtestQuestionService'
 import CreateQuestionRequestDTO from '@/dto/employment/jobtest/createQuestionRequestDTO'
+import { useMemberStore } from '@/stores/memberStore'
 
 const emit = defineEmits(['close', 'saved'])
 const toast = useToast()
 
 const activeTab = ref('MULTIPLE')
+const memberStore = useMemberStore()
 
 const form = ref({
     type: 'MULTIPLE',
@@ -39,7 +41,7 @@ const form = ref({
     detailContent: '',
     difficulty: 'EASY',
     answer: '',
-    createdMemberId: 1,
+    createdMemberId: '',
     questionOptions: [],
     gradingCriteria: []
 })
@@ -124,6 +126,15 @@ function validateForm() {
 
     return true
 }
+
+onMounted(async () => {
+    await memberStore.getMyInfo();
+    if (!memberStore.form.id) {
+        toast.error('등록자 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+    }
+    form.value.createdMemberId = memberStore.form.id;
+})
 </script>
 
 <style scoped></style>
