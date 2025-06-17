@@ -207,13 +207,13 @@ export const employmentRoutes = [
         component: () => import('@/views/employment/ApplicantPage.vue'),
         meta: { requiresAuth: true }
     },
+    // 지원서 상세 조회 페이지 (기존 ApplicationPage를 상세 페이지로 사용)
     {
-        path: '/employment/application',
-        name: 'ApplicationPage',
+        path: '/employment/applications/:applicationId',
+        name: 'ApplicationDetail',
         component: () => import('@/views/employment/ApplicationPage.vue'),
+        props: true,
         meta: {
-            hideHeader: false,
-            hideSidebar: false,
             requiresAuth: true
         }
     },
@@ -225,4 +225,5 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     }
+
 ]; 
