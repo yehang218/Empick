@@ -15,9 +15,8 @@
           </v-btn>
 
           <!-- 👤 사원 등록 버튼 -->
-          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="handleRegisterClick"
-            :disabled="!selectedApplicants.length">
-            사원 등록 ({{ selectedApplicants.length }}개 선택)
+          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="handleRegisterClick">
+            사원 등록
           </v-btn>
 
           <!-- 📝 문제 할당 버튼 -->
@@ -50,19 +49,8 @@
 
       <!-- 📋 지원자 테이블 -->
       <v-data-table :headers="tableHeaders" :items="applicantStore.filteredAndSortedApplicants" :items-per-page="8"
-        item-key="uniqueKey" class="elevation-1" @update:options="handleSort" return-object>
-
-        <!-- 전체 선택 체크박스 헤더 -->
-        <template #header.select>
-          <v-checkbox :model-value="isAllSelected" :indeterminate="isIndeterminate"
-            @update:model-value="toggleSelectAll" hide-details density="compact" />
-        </template>
-
-        <!-- 커스텀 체크박스 컬럼 -->
-        <template #item.select="{ item }">
-          <v-checkbox :model-value="isSelected(item)" @update:model-value="toggleSelection(item)" hide-details
-            density="compact" />
-        </template>
+        item-value="uniqueKey" class="elevation-1" v-model:selected="selectedApplicants" @update:options="handleSort"
+        @update:selected="onSelectionChange" show-select return-object select-strategy="page">
 
         <!-- 이름 + 지원 횟수 표시 -->
         <template #item.name="{ item }">
@@ -96,9 +84,9 @@
           </v-chip>
         </template>
 
-        <!-- 직무 -->
-        <template #item.jobName="{ item }">
-          {{ item.jobName || '미지정' }}
+        <!-- 지원공고 -->
+        <template #item.recruitmentTitle="{ item }">
+          {{ item.recruitmentTitle || '공고 정보 없음' }}
         </template>
 
         <!-- 지원서 확인 텍스트 버튼 -->
@@ -118,6 +106,15 @@
         <span class="ml-2 text-grey">
           선택된 지원자: {{ getSelectedApplicantNames().join(', ') }}
         </span>
+      </v-card-text>
+
+      <!-- 디버깅용 정보 표시 -->
+      <v-card-text class="text-caption text-info">
+        <div>총 데이터 수: {{ applicantStore.filteredAndSortedApplicants.length }}</div>
+        <div>선택된 항목 수: {{ selectedApplicants.length }}</div>
+        <div v-if="selectedApplicants.length > 0">
+          첫 번째 선택된 항목: {{ selectedApplicants[0]?.name }} ({{ selectedApplicants[0]?.uniqueKey }})
+        </div>
       </v-card-text>
 
       <!-- 로딩 상태 표시 -->
@@ -168,13 +165,6 @@ const search = ref('')
 
 const tableHeaders = [
   {
-    title: '',
-    key: 'select',
-    sortable: false,
-    align: 'center',
-    width: '50px'
-  },
-  {
     title: '이름',
     key: 'name',
     sortable: true,
@@ -211,8 +201,8 @@ const tableHeaders = [
     align: 'center'
   },
   {
-    title: '직무',
-    key: 'jobName',
+    title: '지원공고',
+    key: 'recruitmentTitle',
     sortable: true,
     align: 'start'
   }
@@ -323,7 +313,7 @@ const viewDetail = (item) => {
       profileUrl: item.profileUrl,
       birth: item.birth,
       address: item.address,
-      recruitmentId: item.recruitmentId,
+      recruitmentTitle: item.recruitmentTitle,
       introduceRatingResultId: item.introduceRatingResultId,
       jobId: item.jobId,
       jobName: item.jobName,
@@ -457,61 +447,23 @@ const handleRegisterClick = () => {
 
   // 라우터를 통해 MemberRegisterPage로 데이터 전달
   router.push({
-    path: '/orgstructure/member-register',
+    path: '/orgstructure/member/register',
     query: {
       applicants: JSON.stringify(selectedApplicantsData)
     }
   })
 }
 
-// 커스텀 체크박스 관련 함수들
-const isSelected = (item) => {
-  return selectedApplicants.value.some(selected => selected.uniqueKey === item.uniqueKey);
-}
+const onSelectionChange = (selectedItems) => {
+  console.log('🔄 선택 변경 이벤트 발생!');
+  console.log('🔄 전달받은 selectedItems:', selectedItems);
+  console.log('🔄 선택된 항목 개수:', selectedItems.length);
+  console.log('🔄 선택된 항목들의 uniqueKey:', selectedItems.map(item => item.uniqueKey));
 
-const toggleSelection = (item) => {
-  console.log('✅ 체크박스 클릭:', item.name);
-  const isCurrentlySelected = isSelected(item);
+  // 로컬 상태 업데이트
+  selectedApplicants.value = selectedItems;
 
-  if (isCurrentlySelected) {
-    // 선택 해제
-    selectedApplicants.value = selectedApplicants.value.filter(
-      selected => selected.uniqueKey !== item.uniqueKey
-    );
-    console.log('❌ 선택 해제됨');
-  } else {
-    // 선택 추가
-    selectedApplicants.value.push(item);
-    console.log('✅ 선택 추가됨');
-  }
-
-  console.log('📊 현재 선택된 항목 수:', selectedApplicants.value.length);
-}
-
-// 전체 선택 관련 computed 속성들
-const isAllSelected = computed(() => {
-  const totalItems = applicantStore.filteredAndSortedApplicants.length;
-  return totalItems > 0 && selectedApplicants.value.length === totalItems;
-});
-
-const isIndeterminate = computed(() => {
-  const selectedCount = selectedApplicants.value.length;
-  const totalItems = applicantStore.filteredAndSortedApplicants.length;
-  return selectedCount > 0 && selectedCount < totalItems;
-});
-
-const toggleSelectAll = (selectAll) => {
-  console.log('🔄 전체 선택 토글:', selectAll);
-
-  if (selectAll) {
-    // 전체 선택
-    selectedApplicants.value = [...applicantStore.filteredAndSortedApplicants];
-    console.log('✅ 전체 선택됨:', selectedApplicants.value.length);
-  } else {
-    // 전체 해제
-    selectedApplicants.value = [];
-    console.log('❌ 전체 해제됨');
-  }
+  console.log('🔄 업데이트된 로컬 selectedApplicants:', selectedApplicants.value);
 }
 
 </script>

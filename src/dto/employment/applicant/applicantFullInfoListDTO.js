@@ -9,6 +9,7 @@ class ApplicantFullInfoListDTO {
         birth,
         address,
         recruitmentId,
+        recruitmentTitle,
         introduceRatingResultId,
         jobId,
         jobName,
@@ -43,6 +44,7 @@ class ApplicantFullInfoListDTO {
         this.birth = birth;
         this.address = address;
         this.recruitmentId = recruitmentId;
+        this.recruitmentTitle = recruitmentTitle;
         this.introduceRatingResultId = introduceRatingResultId;
         this.jobId = jobId;
         this.jobName = jobName;
@@ -80,6 +82,7 @@ class ApplicantFullInfoListDTO {
             json.birth,
             json.address,
             json.recruitmentId,
+            json.recruitmentTitle,
             json.introduceRatingResultId,
             json.jobId,
             json.jobName,
