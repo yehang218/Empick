@@ -166,7 +166,7 @@ public class MemberQueryController {
         """
     )
     @Parameters({
-            @Parameter(name = "employeeNumber", description = "조회할 사원의 사번", required = true, example = "1001")
+            @Parameter(name = "employeeNumber", description = "조회할 사원의 사번", required = true, example = "100004")
     })
     @ApiResponses(value = {
             @ApiResponse(

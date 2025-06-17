@@ -15,4 +15,6 @@ public interface ApprovalQueryMapper {
     List<ApprovalQueryDTO> findByCategoryId(Integer categoryId);
 
     List<ApprovalQueryDTO> findByWriterId(Integer writerId);
+
+    List<ApprovalQueryDTO> findReceivedApprovals(Integer memberId);
 }

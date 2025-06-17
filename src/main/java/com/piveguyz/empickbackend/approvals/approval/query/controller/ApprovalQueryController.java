@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -51,5 +52,15 @@ public class ApprovalQueryController {
 		ResponseCode result = ResponseCode.SUCCESS;
 		return ResponseEntity.status(result.getHttpStatus())
 				.body(CustomApiResponse.of(result, dtoList));
+	}
+
+	// 자신이 결재자인 결재문서 조회
+	@GetMapping("/received")
+	public ResponseEntity<CustomApiResponse<List<ApprovalQueryDTO>>> findReceivedApprovals(
+		@RequestParam("memberId") Integer memberId) {
+
+		List<ApprovalQueryDTO> dtoList = service.findReceivedApprovals(memberId);
+		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+			.body(CustomApiResponse.of(ResponseCode.SUCCESS, dtoList));
 	}
 }

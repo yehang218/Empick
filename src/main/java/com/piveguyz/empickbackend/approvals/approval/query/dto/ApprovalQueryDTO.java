@@ -13,7 +13,7 @@ public class ApprovalQueryDTO {
 	private Integer categoryId;
 	private Integer writerId;
 	private LocalDateTime createdAt;
-	private ApprovalStatus status;		// -1 : 반려, 0 : 결재 진행중, 1 : 결재 완료
+	private ApprovalStatus status;		// -2: 결재 취소, -1 : 반려, 0 : 결재 진행중, 1 : 결재 완료
 	private Integer firstApproverId;
 	private Integer secondApproverId;
 	private Integer thirdApproverId;
