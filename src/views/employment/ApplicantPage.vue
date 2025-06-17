@@ -102,7 +102,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
 import { useApplicantStore } from '@/stores/applicantStore';
