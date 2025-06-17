@@ -457,7 +457,7 @@ const handleRegisterClick = () => {
 
   // 라우터를 통해 MemberRegisterPage로 데이터 전달
   router.push({
-    path: '/orgstructure/member/register',
+    path: '/orgstructure/member-register',
     query: {
       applicants: JSON.stringify(selectedApplicantsData)
     }
