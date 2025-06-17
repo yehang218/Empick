@@ -15,6 +15,9 @@ public class ApplicantFullInfoDTO {
     // 지원자의 고유 식별자 (PK)
     private int applicantId;
 
+    // 지원서의 고유 식별자 (application.id)
+    private int applicationId;
+
     // 지원자 이름
     private String name;
 
@@ -54,5 +57,30 @@ public class ApplicantFullInfoDTO {
 
     // 수정한 사원의 memberId (nullable, 시스템 처리일 수도 있음)
     private Integer updatedBy;
+
+    // === 추가된 필드들 ===
+
+    // 자기소개서 평가 관련 정보 (introduce_rating_result 테이블에서)
+    private String introduceEvaluationContent;  // 자기소개서 평가 내용
+    private Integer introduceScore;             // 자기소개서 평가 점수
+    private String introduceStatus;             // 자기소개서 평가 상태
+
+    // 지원서 응답 내용 (application_response 테이블에서)
+    private String motivation;                  // 입사 동기
+    private String experience;                  // 경력 사항
+    private String skills;                      // 기술 스택
+    private String education;                   // 학력 사항
+    private String portfolioUrl;               // 포트폴리오 URL
+    private String coverLetter;                // 자기소개서 전체
+
+    // 실무테스트 결과 (application_job_test 테이블에서)
+    private Double jobtestTotalScore;          // 실무테스트 총점
+    private Double jobtestEvaluationScore;     // 실무테스트 평가 점수
+    private String jobtestStatus;              // 실무테스트 상태
+
+    // 면접 결과 (interview 테이블에서)
+    private Double interviewScore;             // 면접 점수
+    private String interviewAddress;           // 면접 장소
+    private LocalDateTime interviewDatetime;   // 면접 일시
 
 }
