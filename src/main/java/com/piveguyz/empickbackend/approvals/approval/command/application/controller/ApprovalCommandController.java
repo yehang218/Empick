@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "결재 API", description = "결재 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/approvals")
+@RequestMapping("/api/v1/approval/documents")
 public class ApprovalCommandController {
 
     private final ApprovalCommandService approvalCommandService;

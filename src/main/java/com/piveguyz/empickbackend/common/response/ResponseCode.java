@@ -247,7 +247,25 @@ public enum ResponseCode {
 
     // 인증 2700 ~ 2799
     INVALID_REFRESH_TOKEN(false, HttpStatus.UNAUTHORIZED, 2700, "유효하지 않은 Refresh Token입니다."),
-    MEMBER_EMPLOYEE_NUMBER_DUPLICATE(false, HttpStatus.UNAUTHORIZED, 2701, "중복된 사번입니다.");
+    MEMBER_EMPLOYEE_NUMBER_DUPLICATE(false, HttpStatus.UNAUTHORIZED, 2701, "중복된 사번입니다."),
+
+
+
+    // 결재 오류 3000~ 3999
+    APPROVAL_APPROVER_NOT_FOUND(false, HttpStatus.NOT_FOUND, 3001, "결재자 정보가 존재하지 않습니다."),
+    APPROVAL_CATEGORY_ITEM_MISMATCH(false, HttpStatus.BAD_REQUEST, 3002, "항목이 결재 유형에 속하지 않습니다."),
+    APPROVAL_DUPLICATE_APPROVER_ORDER(false, HttpStatus.BAD_REQUEST, 3003, "결재 순서가 중복되었습니다."),
+    APPROVAL_NOT_FOUND(false, HttpStatus.NOT_FOUND, 3004, "결재 문서를 찾을 수 없습니다."),
+    APPROVAL_CANCEL_TARGET_NOT_FOUND(false, HttpStatus.NOT_FOUND, 3005, "취소 대상 결재 문서를 찾을 수 없습니다."),
+    APPROVAL_NO_APPROVER(false, HttpStatus.BAD_REQUEST, 3006, "결재자가 최소 1명 이상 필요합니다."),
+    APPROVAL_CONTENT_ITEM_MISSING(false, HttpStatus.BAD_REQUEST, 3007, "결재 문서 항목이 누락되었습니다."),
+    APPROVAL_ALREADY_APPROVED(false, HttpStatus.BAD_REQUEST, 3008, "이미 승인 완료된 문서입니다."),
+    APPROVAL_ALREADY_REJECTED(false, HttpStatus.BAD_REQUEST, 3009, "이미 반려된 문서입니다."),
+    APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3010, "결재 차례가 아닙니다."),
+    APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3011, "반려 사유가 필요합니다."),
+    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3012, "이미 처리된 결재입니다.");
+
+
 
     private final boolean success;
     private final HttpStatus httpStatus;        // HTTP 상태 코드
