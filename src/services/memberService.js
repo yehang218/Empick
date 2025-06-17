@@ -1,8 +1,5 @@
 import api from '@/apis/apiClient';
 import { API } from '@/apis/routes';
-import { MemberAPI } from '@/apis/routes/member';
-import { withErrorHandling } from '@/utils/errorHandler';
-import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 
 /**
  * 신규 사원 등록 서비스
@@ -81,37 +78,12 @@ export const profileImageUploadService = async (memberId, formData) => {
     }
 };
 
-export const getMemberList = async (params) => {
-    return withErrorHandling(async () => {
-        const response = await MemberAPI.getMemberList(params);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
+export const getMemberRoleService = async (employeeNumber) => {
+    const response = await api.get(API.MEMBER.ROLE(employeeNumber));
+    return response.data;
 };
 
-export const getMemberDetail = async (memberId) => {
-    return withErrorHandling(async () => {
-        const response = await MemberAPI.getMemberDetail(memberId);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
-};
-
-export const updateMember = async (memberId, memberData) => {
-    return withErrorHandling(async () => {
-        const response = await MemberAPI.updateMember(memberId, memberData);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
-};
-
-export const updateMemberProfile = async (memberId, profileData) => {
-    return withErrorHandling(async () => {
-        const response = await MemberAPI.updateMemberProfile(memberId, profileData);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
-};
-
-export const deleteMember = async (memberId) => {
-    return withErrorHandling(async () => {
-        const response = await MemberAPI.deleteMember(memberId);
-        return ApiResponseDTO.fromJSON(response.data);
-    });
+export const getMyRoleService = async () => {
+    const response = await api.get(API.MEMBER.MY_ROLE);
+    return response.data;
 };
