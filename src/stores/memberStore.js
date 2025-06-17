@@ -6,9 +6,11 @@ import {
     profileImageFetchService,
     profileImageUploadService,
     getMyRoleService,
-    getMemberRoleService
+    getMemberRoleService,
+    findMembersService
 } from '@/services/memberService';
 import MemberRoleDTO from '@/dto/member/memberRoleDTO';
+import { MemberResponseDTO } from '@/dto/member/memberResponseDTO';
 
 export const useMemberStore = defineStore('member', {
     state: () => ({
@@ -173,6 +175,11 @@ export const useMemberStore = defineStore('member', {
         async getMemberRole(employeeNumber) {
             const response = await getMemberRoleService(employeeNumber);
             return response.map(role => MemberRoleDTO.fromJSON(role));
+        },
+
+        async findMembers(employeeNumber) {
+            const response = await findMembersService(employeeNumber);
+            return response.map(member => MemberResponseDTO.fromJSON(member));
         }
     },
 }); 
