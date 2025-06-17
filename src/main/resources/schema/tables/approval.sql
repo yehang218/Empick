@@ -29,7 +29,7 @@ CREATE TABLE `approval` (
     `category_id`        INT      NOT NULL,
     `writer_id`          INT      NOT NULL COMMENT '기안자 id',
     `created_at`         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `status`             TINYINT  NOT NULL DEFAULT 0 COMMENT '결재 상태 (-1: 반려, 0: 진행중, 1: 완료)',
+    `status`             TINYINT  NOT NULL DEFAULT 0 COMMENT '결재 상태 (-2: 취소, -1: 반려, 0: 진행중, 1: 완료)',
     `first_approver_id`  INT      NULL,
     `second_approver_id` INT      NULL,
     `third_approver_id`  INT      NULL,
@@ -38,6 +38,7 @@ CREATE TABLE `approval` (
     `second_approved_at` DATETIME NULL,
     `third_approved_at`  DATETIME NULL,
     `fourth_approved_at` DATETIME NULL,
+    `approval_id`          INT NULL             COMMENT '취소 대상 결재 id',
 
     FOREIGN KEY (`category_id`) REFERENCES `approval_category` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`writer_id`) REFERENCES `member` (`id`) ON DELETE CASCADE,
