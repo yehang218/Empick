@@ -17,7 +17,9 @@
 
     <resultMap id="ApplicantFullInfoResultMap"
                type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicantFullInfoDTO">
+        <!-- 기존 필드들 -->
         <result property="applicantId" column="applicant_id"/>
+        <result property="applicationId" column="application_id"/>
         <result property="name" column="name"/>
         <result property="phone" column="phone"/>
         <result property="email" column="email"/>
@@ -32,7 +34,25 @@
         <result property="status" column="status"/>
         <result property="updatedAt" column="updated_at"/>
         <result property="updatedBy" column="updated_by"/>
+
+        <!-- 추가된 필드들 -->
+        <result property="introduceEvaluationContent" column="introduce_evaluation_content"/>
+        <result property="introduceScore" column="introduce_score"/>
+        <result property="introduceStatus" column="introduce_status"/>
+        <result property="motivation" column="motivation"/>
+        <result property="experience" column="experience"/>
+        <result property="skills" column="skills"/>
+        <result property="education" column="education"/>
+        <result property="portfolioUrl" column="portfolio_url"/>
+        <result property="coverLetter" column="cover_letter"/>
+        <result property="jobtestTotalScore" column="jobtest_total_score"/>
+        <result property="jobtestEvaluationScore" column="jobtest_evaluation_score"/>
+        <result property="jobtestStatus" column="jobtest_status"/>
+        <result property="interviewScore" column="interview_score"/>
+        <result property="interviewAddress" column="interview_address"/>
+        <result property="interviewDatetime" column="interview_datetime" javaType="java.time.LocalDateTime"/>
     </resultMap>
+
 
     <select id="findAllApplicantFullInfo" resultMap="ApplicantFullInfoResultMap">
         SELECT DISTINCT
@@ -43,6 +63,7 @@
             a.profile_url,
             a.birth,
             a.address,
+            ap.id AS application_id,  -- 디버깅을 위해 추가
             ap.recruitment_id,
             ap.introduce_rating_result_id,
             ap.created_at,
@@ -50,12 +71,63 @@
             j.id as job_id,
             j.name as job_name,
             ap.updated_at,
-            ap.updated_by
+            ap.updated_by,
+
+                      -- 자기소개서 평가 결과
+            irr.content as introduce_evaluation_content,
+            irr.rating_score as introduce_score,
+            irr.status as introduce_status,
+
+                      -- 지원서 응답 내용 (간단한 서브쿼리로 처리)
+            (SELECT ar1.content FROM application_response ar1
+                                         JOIN application_item ai1 ON ar1.application_item_id = ai1.id
+                                         JOIN application_item_category aic1 ON ai1.application_item_category_id = aic1.id
+             WHERE ar1.application_id = ap.id AND aic1.id = 1 LIMIT 1) as motivation,
+
+            (SELECT ar2.content FROM application_response ar2
+                                         JOIN application_item ai2 ON ar2.application_item_id = ai2.id
+                                         JOIN application_item_category aic2 ON ai2.application_item_category_id = aic2.id
+             WHERE ar2.application_id = ap.id AND aic2.id = 2 LIMIT 1) as experience,
+
+            (SELECT ar3.content FROM application_response ar3
+                                         JOIN application_item ai3 ON ar3.application_item_id = ai3.id
+                                         JOIN application_item_category aic3 ON ai3.application_item_category_id = aic3.id
+             WHERE ar3.application_id = ap.id AND aic3.id = 3 LIMIT 1) as skills,
+
+            (SELECT ar4.content FROM application_response ar4
+                                         JOIN application_item ai4 ON ar4.application_item_id = ai4.id
+                                         JOIN application_item_category aic4 ON ai4.application_item_category_id = aic4.id
+             WHERE ar4.application_id = ap.id AND aic4.id = 4 LIMIT 1) as education,
+
+            (SELECT ar5.content FROM application_response ar5
+                                         JOIN application_item ai5 ON ar5.application_item_id = ai5.id
+                                         JOIN application_item_category aic5 ON ai5.application_item_category_id = aic5.id
+             WHERE ar5.application_id = ap.id AND aic5.id = 5 LIMIT 1) as portfolio_url,
+
+            (SELECT ar6.content FROM application_response ar6
+                                         JOIN application_item ai6 ON ar6.application_item_id = ai6.id
+                                         JOIN application_item_category aic6 ON ai6.application_item_category_id = aic6.id
+             WHERE ar6.application_id = ap.id AND aic6.id = 6 LIMIT 1) as cover_letter,
+
+                      -- 실무테스트 결과
+            ajt.grading_total_score as jobtest_total_score,
+            ajt.evaluation_score as jobtest_evaluation_score,
+            ajt.grading_status as jobtest_status,
+
+                      -- 면접 결과
+            iv.score as interview_score,
+            iv.address as interview_address,
+            iv.datetime as interview_datetime
+
         FROM applicant AS a
                  LEFT JOIN application ap ON a.id = ap.applicant_id
                  LEFT JOIN recruitment r ON ap.recruitment_id = r.id
                  LEFT JOIN recruitment_request rq ON rq.id = r.recruitment_request_id
                  LEFT JOIN job j ON j.id = rq.job_id
+                 LEFT JOIN introduce_rating_result irr ON ap.introduce_rating_result_id = irr.id
+                 LEFT JOIN application_job_test ajt ON ap.id = ajt.application_id
+                 LEFT JOIN interview iv ON ap.id = iv.application_id
+        ORDER BY ap.created_at DESC
     </select>
 
     <select id="findAllApplicant" resultMap="ApplicantResultMap">
