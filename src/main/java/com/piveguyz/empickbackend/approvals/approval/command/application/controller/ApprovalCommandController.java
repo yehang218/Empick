@@ -1,6 +1,9 @@
 package com.piveguyz.empickbackend.approvals.approval.command.application.controller;
 
+import com.piveguyz.empickbackend.approvals.approval.command.application.dto.ApproveCancelRequestDTO;
+import com.piveguyz.empickbackend.approvals.approval.command.application.dto.ApproveRequestDTO;
 import com.piveguyz.empickbackend.approvals.approval.command.application.dto.CreateApprovalCommandDTO;
+import com.piveguyz.empickbackend.approvals.approval.command.application.dto.RejectRequestDTO;
 import com.piveguyz.empickbackend.approvals.approval.command.application.service.ApprovalCommandService;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
@@ -35,5 +38,50 @@ public class ApprovalCommandController {
         Integer approvalId = approvalCommandService.createApproval(dto);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, approvalId));
+    }
+    
+    @Operation(
+            summary = "결재 문서 승인",
+            description = """
+                    결재 문서를 승인합니다.
+                    """
+    )
+    @ApiResponses(value = {
+    })
+    @PostMapping("/{approvalId}/approve")
+    public ResponseEntity<CustomApiResponse<Void>> approve(@RequestBody ApproveRequestDTO dto) {
+        approvalCommandService.approve(dto);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS));
+    }
+
+    @Operation(
+            summary = "결재 문서 반려",
+            description = """
+                    결재 문서를 반려합니다.
+                    """
+    )
+    @ApiResponses(value = {
+    })
+    @PostMapping("/{approvalId}/reject")
+    public ResponseEntity<CustomApiResponse<Void>> reject(@RequestBody RejectRequestDTO dto) {
+        approvalCommandService.reject(dto);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS));
+    }
+
+    @Operation(
+            summary = "취소 결재 문서 승인",
+            description = """
+                    취소 결재 문서를 승인합니다.
+                    """
+    )
+    @ApiResponses(value = {
+    })
+    @PostMapping("/{approvalId}/approve-cancel")
+    public ResponseEntity<CustomApiResponse<Void>> approveCancel(@RequestBody ApproveCancelRequestDTO dto) {
+        approvalCommandService.approveCancel(dto);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS));
     }
 }
