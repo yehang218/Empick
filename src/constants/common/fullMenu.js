@@ -9,12 +9,12 @@ export const fullMenu = {
             path: '/orgstructure/profile',
             children: []
         },
-        {
-            label: '근태 기록',
-            roles: [RoleCode.USER, RoleCode.HR_ACCESS],
-            path: '/myinfo/attendance',
-            children: []
-        },
+        // {
+        //     label: '근태 기록',
+        //     roles: [RoleCode.USER, RoleCode.HR_ACCESS],
+        //     path: '/myinfo/attendance',
+        //     children: []
+        // },
         {
             label: '일정 확인',
             roles: [RoleCode.USER, RoleCode.HR_ACCESS],

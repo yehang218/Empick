@@ -1,7 +1,7 @@
 <template>
     <div class="attendance-page">
         <!-- 페이지 제목 -->
-        <h1 class="page-title">근태현황</h1>
+        <h1 class="page-title">{{ userName }}님 로그인하셨습니다</h1>
 
         <!-- 날짜 선택 스위치 및 출퇴근 버튼 -->
         <div class="date-selector-container">
@@ -56,11 +56,18 @@ import MonthlyWorkSummaryCard from '@/components/attendance/MonthlyWorkSummaryCa
 import WeekAccordionList from '@/components/attendance/WeekAccordionList.vue'
 import { useAttendanceStore } from '@/stores/attendanceStore'
 import { useAuthStore } from '@/stores/authStore'
+import { useMemberStore } from '@/stores/memberStore'
 
 // 현재 날짜 상태
 const currentDate = ref(new Date())
 const attendanceStore = useAttendanceStore()
 const authStore = useAuthStore()
+const memberStore = useMemberStore()
+
+// 사용자 이름 가져오기
+const userName = computed(() => {
+    return memberStore.form.name || '사용자'
+})
 
 // 계산된 속성들
 const currentYear = computed(() => currentDate.value.getFullYear())
@@ -154,6 +161,7 @@ watch(() => authStore.userInfo, async (newUser, oldUser) => {
     // 사용자가 변경되었을 때 (로그인 또는 다른 사용자로 변경)
     if (newUser !== oldUser) {
         await Promise.all([
+            memberStore.getMyInfo(), // 사용자 정보 다시 로드
             loadAttendanceData(),
             updateTargetHours(),
             updateRemainingWorkDays(),
@@ -165,6 +173,7 @@ watch(() => authStore.userInfo, async (newUser, oldUser) => {
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
     await Promise.all([
+        memberStore.getMyInfo(), // 사용자 정보 로드
         loadAttendanceData(),
         updateTargetHours(),
         updateRemainingWorkDays(),
