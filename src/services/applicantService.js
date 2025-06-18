@@ -46,7 +46,7 @@ export const getApplicantFullInfoListService = async (options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(item => ApplicantResponseDTO.fromJSON(item));
+    return apiResponse.data.map(item => ApplicantFullInfoListDTO.fromJSON(item));
   }, options);
 };
 
