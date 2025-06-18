@@ -76,6 +76,7 @@ import { useApplicationStore } from '@/stores/applicationStore'
 import { useInterviewStore } from '@/stores/interviewStore'
 import { useApplicantStore } from '@/stores/applicantStore'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
+import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
 
 import InterviewSheetModal from '@/components/employment/InterviewSheetModal.vue'
 import router from '@/router'
@@ -87,11 +88,34 @@ const applicationStore = useApplicationStore()
 const applicantStore = useApplicantStore()
 const interviewStore = useInterviewStore()
 const recruitmentStore = useRecruitmentStore()
+const interviewCriteriaStore = useInterviewCriteriaStore
 
-const selectedApplication = ref(null)
-const selectedSheet = ref(null)
+
+
+
 const selectedHour = ref('')
 const selectedMinute = ref('')
+
+const applicationList = ref([])
+const selectedApplication = ref(null)
+const selectedApplicationId = ref(null);
+
+watch(selectedApplicationId, (newId) => {
+    selectedApplication.value = applicationList.value.find(app => app.id === newId) || null
+})
+
+const selectedApplicant = ref(null)
+const selectedRecruitment = ref(null)
+
+const sheetList = ref([])
+const selectedSheet = ref(null)
+
+const criteriaList = ref([])
+const selectedCriteria = ref(null)
+
+const address = ref('')
+const isDatetimeAvailable = ref(null)
+const applicationOptions = ref([])
 
 const hours = Array.from({ length: 10 }, (_, i) => String(i + 9).padStart(2, '0')) // ['09', '10', ..., '18']
 const minutes = ['00', '10', '20', '30', '40', '50']
@@ -113,9 +137,7 @@ const getTimeString = () => {
     return `${selectedHour.value}:${selectedMinute.value}:00`
 }
 
-const address = ref('')
-const isDatetimeAvailable = ref(null)
-const applicationOptions = ref([])
+
 
 const checkAvailability = async () => {
     const timeString = getTimeString()
@@ -153,7 +175,7 @@ const submitInterview = async () => {
     const datetime = `${selectedDate}T${timeString}`
     console.log('datetime : ', datetime)
     const dto = {
-        applicationId: selectedApplicationId.value,
+        applicationId: selectedApplication.value.id,
         sheetId: selectedSheet.value?.id,
         datetime,
         address: address.value,
@@ -171,37 +193,44 @@ const submitInterview = async () => {
 
 onMounted(async () => {
     await applicationStore.fetchAllApplications()
-    const rawList = applicationStore.applicationList
+    const applications = applicationStore.applicationList
+    if (!Array.isArray(applications)) {
+        console.error("applicationList is not an array:", applications)
+        return
+    }
+    applicationList.value = applicationStore.applicationList
 
     const withDetails = await Promise.all(
-        rawList.map(async app => {
-            console.log(app)
+        applicationList.value.map(async app => {
             try {
                 // 지원자 정보 가져오기
                 await applicantStore.fetchApplicantById(app.applicantId)
-                const applicant = applicantStore.selectedApplicant
-                if (!applicant) return null
+                selectedApplicant.value = applicantStore.selectedApplicant
+                console.log('selectedApplicant :', selectedApplicant.value)
+                if (!selectedApplicant.value) return null
 
-                // 채용 공고 정보 가져오기
                 await recruitmentStore.loadRecruitmentDetail(app.recruitmentId)
-                const recruitment = recruitmentStore.detail.recruitment 
-                if (!recruitment) return null
+                selectedRecruitment.value = recruitmentStore.detail.value.recruitment
+                console.log('selectedRecruitment', selectedRecruitment)
+                if (!selectedRecruitment) return null
 
                 return {
                     ...app,
-                    applicantName: applicant.name,
-                    recruitmentTitle: recruitment.title,
-                    label: `${applicant.name} - ${recruitment.title}`,
-                    applicant,
-                    recruitment
-                }
-            } catch (error) {
-                console.warn(`❌ 지원서 ${app.id} 처리 중 오류 발생`, error)
-                return null
-            }
-        })
-    )
+                    applicantName: selectedApplicant.value.name,
+                    recruitmentTitle: selectedRecruitment.value.title,
+                    label: ${ selectedApplicant.value.name } - ${ selectedRecruitment.value.title },
+                selectedRecruitment
 
+            } catch (error) {
+                console.error('에러 발생:', {
+                    message: err.response?.data?.message ?? err.message,
+                    code: err.response?.data?.code,
+                    status: err.response?.status
+                })
+            }
+        }
+        )
+    )
     applicationOptions.value = withDetails.filter(Boolean)  // null 제거
 })
 
