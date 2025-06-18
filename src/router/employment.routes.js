@@ -254,7 +254,7 @@ export const employmentRoutes = [
                 requiresAuth: true
             }
         },
-        // 자기소개서 템플릿
+        // 자기소개서 
         {
             path: '/employment/introduce-standard-items/:templateId',
             name: 'IntroduceStandardItemPage',
@@ -278,11 +278,20 @@ export const employmentRoutes = [
             component: () => import('@/views/employment/IntroduceTemplateDetailPage.vue')
         },
         {
-            path: '/employment/introduce-items/manage',
-            name: 'IntroduceTemplateItemManagePage',
-            component: () => import('@/views/employment/IntroduceTemplateItemManagePage.vue')
+            path: '/employment/introduce-standard-items/manage',
+            name: 'IntroduceStandardItemCreatePage',
+            component: () => import('@/views/employment/IntroduceStandardItemCreatePage.vue')
         },
-
+        {
+            path: '/employment/introduce-standard/create',
+            name: 'IntroduceStandardCreatePage',
+            component: () => import('@/views/employment/IntroduceStandardCreatePage.vue')
+        },
+        {
+            path: '/employment/introduce-standard/list',
+            name: 'IntroduceStandardListPage',
+            component: () => import('@/views/employment/IntroduceStandardListPage.vue')
+        },
 
     // 채용공고별 지원자 목록 페이지
     {

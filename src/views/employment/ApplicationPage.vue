@@ -199,9 +199,7 @@
       </v-col>
 
 
-      // <!-- 우측: 평가 컴포넌트 -->
-      // <v-col cols="12" md="6">
-      // <component :is="evaluationComponent" :evaluationData="introduceEvaluationData" />
+      
       <!-- 우측: 평가 상세 -->
       <v-col cols="12" lg="7">
         <v-card class="modern-card evaluation-detail-card">
@@ -285,24 +283,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-
+import { ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useToast } from 'vue-toastification'
-import apiClient from '@/apis/apiClient' // 직접 axios 호출을 위해 임포트
-
-const route = useRoute()
-const applicationStore = useApplicationStore()
-const toast = useToast()
-const applicationId = Number(route.params.id)
+import apiClient from '@/apis/apiClient'
 
 const route = useRoute()
 const router = useRouter()
+const applicationStore = useApplicationStore()
+const toast = useToast()
+const applicationId = Number(route.params.applicationId)
+
+const IntroduceResult = defineAsyncComponent(() => import('@/components/employment/IntroduceEvaluationInput.vue'))
+// const TestResult = defineAsyncComponent(() => import('@/components/employment/TestResult.vue'))
+// const InterviewResult = defineAsyncComponent(() => import('@/components/employment/InterviewResult.vue'))
 
 const evaluationComponent = ref(IntroduceResult)
-
 const selectedEvaluation = ref('자기소개서')
 const viewMode = ref('detail')
 
@@ -433,25 +430,16 @@ onMounted(() => {
 
 const selectEvaluation = (type) => {
   selectedEvaluation.value = type
-
   switch (type) {
     case '자기소개서':
       evaluationComponent.value = IntroduceResult
       break
-
     // case '실무 테스트':
-    //   evaluationComponent.value = () => import('@/components/employment/TestResult.vue')
+    //   evaluationComponent.value = TestResult
     //   break
     // case '면접':
-    //   evaluationComponent.value = () => import('@/components/employment/InterviewResult.vue')
+    //   evaluationComponent.value = InterviewResult
     //   break
-
-    case '실무 테스트':
-      // evaluationComponent.value = TestResult
-      break
-    case '면접':
-      // evaluationComponent.value = InterviewResult
-      break
     default:
       evaluationComponent.value = IntroduceResult
   }
