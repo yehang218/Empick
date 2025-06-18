@@ -30,11 +30,12 @@
             </v-row>
 
             <!-- 사원 목록 테이블 -->
-            <v-card class="mb-4" elevation="0" style="border: 1px solid #e0e0e0;">
-                <v-data-table :headers="headers" :items="paginatedMembers" :loading="loading" hide-default-footer
-                    class="member-table" @click:row="handleRowClick">
+            <v-card class="mb-4 member-list-card" elevation="0">
+                <v-data-table :headers="tableHeaders" :items="filteredMembers" :items-per-page="8" :loading="loading"
+                    item-key="id" class="member-table" @click:row="handleRowClick" @update:sort-by="handleSort">
+
                     <!-- 아바타 + 이름 컬럼 -->
-                    <template #item.profile="{ item }">
+                    <template #item.name="{ item }">
                         <div class="d-flex align-center py-2">
                             <v-avatar size="40" class="mr-3">
                                 <v-img v-if="item.pictureUrl" :src="item.pictureUrl" :alt="item.name" />
@@ -48,7 +49,7 @@
                     </template>
 
                     <!-- 부서 컬럼 -->
-                    <template #item.department="{ item }">
+                    <template #item.departmentName="{ item }">
                         <div>
                             <div class="font-weight-medium">{{ item.departmentName || '-' }}</div>
                             <div class="text-caption text-grey-darken-1">{{ item.jobName || '-' }}</div>
@@ -57,9 +58,10 @@
 
                     <!-- 상태 컬럼 -->
                     <template #item.status="{ item }">
-                        <v-chip :color="getStatusColor(item.status)" size="small" variant="flat">
-                            {{ getStatusLabel(item.status) }}
-                        </v-chip>
+                        <div class="status-badge" :class="getStatusClass(item.status)">
+                            <div class="status-dot"></div>
+                            <span class="status-text">{{ getStatusLabel(item.status) }}</span>
+                        </div>
                     </template>
 
                     <!-- 입사일 컬럼 -->
@@ -75,7 +77,7 @@
 
                     <!-- 로딩 상태 -->
                     <template #loading>
-                        <v-skeleton-loader type="table-row@10" />
+                        <v-skeleton-loader type="table-row@8" />
                     </template>
 
                     <!-- 데이터 없음 -->
@@ -88,12 +90,6 @@
                     </template>
                 </v-data-table>
             </v-card>
-
-            <!-- 페이지네이션 -->
-            <div class="d-flex justify-center">
-                <v-pagination v-model="currentPage" :length="totalPages" :total-visible="7"
-                    @update:modelValue="handlePageChange" />
-            </div>
         </template>
     </v-container>
 </template>
@@ -119,18 +115,17 @@ const hasHRAccess = computed(() =>
 const searchQuery = ref('')
 const selectedDepartment = ref(null)
 const selectedStatus = ref('전체')
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
 const loading = ref(false)
 const members = ref([])
 
 // 테이블 헤더 정의
-const headers = [
-    { title: '이름', key: 'profile', sortable: false, width: '200px' },
+const tableHeaders = [
+    { title: '이름', key: 'name', sortable: true, width: '200px' },
     { title: '사번', key: 'employeeNumber', sortable: true, width: '120px' },
-    { title: '이메일', key: 'email', sortable: false, width: '200px' },
-    { title: '연락처', key: 'phone', sortable: false, width: '150px' },
-    { title: '부서', key: 'department', sortable: false, width: '150px' },
+    { title: '이메일', key: 'email', sortable: true, width: '200px' },
+    { title: '연락처', key: 'phone', sortable: true, width: '150px' },
+    { title: '부서', key: 'departmentName', sortable: true, width: '150px' },
+    { title: '상태', key: 'status', sortable: true, width: '100px' },
     { title: '입사일시', key: 'hireAt', sortable: true, width: '120px' },
     { title: '', key: 'actions', sortable: false, width: '60px' }
 ]
@@ -138,8 +133,8 @@ const headers = [
 // 상태 옵션
 const statusOptions = [
     { title: '전체', value: '전체' },
-    { title: '재직', value: 1 },
-    { title: '퇴사', value: 0 }
+    { title: '출근', value: 1 },
+    { title: '미출근', value: 0 }
 ]
 
 // 부서 옵션 (computed)
@@ -148,7 +143,7 @@ const departmentOptions = computed(() => {
     return uniqueDepartments.map(dept => ({ title: dept, value: dept }))
 })
 
-// 필터링된 사원 목록
+// 필터링된 사원 목록 (v-data-table이 내장 정렬과 페이징 처리)
 const filteredMembers = computed(() => {
     let result = [...members.value]
 
@@ -175,18 +170,6 @@ const filteredMembers = computed(() => {
     return result
 })
 
-// 페이지네이션된 사원 목록
-const paginatedMembers = computed(() => {
-    const start = (currentPage.value - 1) * itemsPerPage.value
-    const end = start + itemsPerPage.value
-    return filteredMembers.value.slice(start, end)
-})
-
-// 총 페이지 수
-const totalPages = computed(() =>
-    Math.ceil(filteredMembers.value.length / itemsPerPage.value)
-)
-
 // 메서드들
 const loadMembers = async () => {
     loading.value = true
@@ -203,19 +186,20 @@ const loadMembers = async () => {
 }
 
 const handleSearch = () => {
-    currentPage.value = 1
+    // 검색 시 필터만 적용 (v-data-table이 자동으로 처리)
 }
 
 const handleDepartmentFilter = () => {
-    currentPage.value = 1
+    // 부서 필터 변경 시 (v-data-table이 자동으로 처리)
 }
 
 const handleStatusFilter = () => {
-    currentPage.value = 1
+    // 상태 필터 변경 시 (v-data-table이 자동으로 처리)
 }
 
-const handlePageChange = (page) => {
-    currentPage.value = page
+const handleSort = (sortBy) => {
+    // v-data-table의 내장 정렬 처리
+    console.log('정렬 변경:', sortBy)
 }
 
 const handleRowClick = (event, { item }) => {
@@ -227,18 +211,18 @@ const goToMemberDetail = (member) => {
     router.push(`/orgstructure/members/${member.employeeNumber}`)
 }
 
-const getStatusColor = (status) => {
+const getStatusClass = (status) => {
     switch (status) {
-        case 1: return 'success'
-        case 0: return 'error'
-        default: return 'grey'
+        case 1: return 'status-present'
+        case 0: return 'status-absent'
+        default: return 'status-unknown'
     }
 }
 
 const getStatusLabel = (status) => {
     switch (status) {
-        case 1: return '재직'
-        case 0: return '퇴사'
+        case 1: return '출근'
+        case 0: return '미출근'
         default: return '알 수 없음'
     }
 }
@@ -274,7 +258,7 @@ const getMockMembers = async () => {
             jobName: 'PM',
             rankName: '사원',
             status: 1,
-            hireAt: '2022-03-01',
+            hireAt: '2023-05-15',
             pictureUrl: null
         },
         {
@@ -286,8 +270,8 @@ const getMockMembers = async () => {
             departmentName: '회계',
             jobName: '대사장',
             rankName: '사원',
-            status: 1,
-            hireAt: '2022-03-01',
+            status: 0,
+            hireAt: '2021-08-10',
             pictureUrl: null
         },
         {
@@ -298,22 +282,48 @@ const getMockMembers = async () => {
             phone: '(229) 555-0109',
             departmentName: '인사',
             jobName: '대사장',
-            rankName: '인사',
+            rankName: '차장',
             status: 1,
-            hireAt: '2022-03-01',
+            hireAt: '2020-12-01',
             pictureUrl: null
         },
         {
             id: 5,
-            name: 'Brooklyn Simmons',
-            employeeNumber: '87364523',
-            email: 'brooklyns@mail.com',
-            phone: '(603) 555-0123',
+            name: 'Alice Johnson',
+            employeeNumber: '12345678',
+            email: 'alice@mail.com',
+            phone: '(555) 123-4567',
             departmentName: '영업',
             jobName: '영업관리',
             rankName: '대리',
             status: 1,
-            hireAt: '2022-03-01',
+            hireAt: '2024-01-15',
+            pictureUrl: null
+        },
+        {
+            id: 6,
+            name: 'David Lee',
+            employeeNumber: '98765432',
+            email: 'david@mail.com',
+            phone: '(555) 987-6543',
+            departmentName: '마케팅',
+            jobName: '마케팅기획',
+            rankName: '과장',
+            status: 1,
+            hireAt: '2019-06-20',
+            pictureUrl: null
+        },
+        {
+            id: 7,
+            name: 'Emma Wilson',
+            employeeNumber: '45678901',
+            email: 'emma@mail.com',
+            phone: '(555) 456-7890',
+            departmentName: '백엔드/개발',
+            jobName: '개발자',
+            rankName: '사원',
+            status: 0,
+            hireAt: '2023-02-28',
             pictureUrl: null
         }
     ]
@@ -331,26 +341,114 @@ watch(searchQuery, () => {
 </script>
 
 <style scoped>
+.member-list-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
 .member-table :deep(.v-data-table__wrapper) {
-    border-radius: 8px;
+    border-radius: 12px;
+}
+
+.member-table :deep(.v-data-table-header th) {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+    border-bottom: 1px solid #e8eaed;
+    font-weight: 600;
+    color: #374151;
+    transition: background-color 0.2s ease;
+}
+
+.member-table :deep(.v-data-table-header th:hover) {
+    background-color: rgba(255, 255, 255, 0.8);
 }
 
 .member-table :deep(tbody tr) {
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, border-left 0.2s ease;
+    background-color: #ffffff;
 }
 
 .member-table :deep(tbody tr:hover) {
-    background-color: #f5f5f5;
-}
-
-.member-table :deep(.v-data-table-header th) {
-    background-color: #fafafa;
-    font-weight: 600;
-    border-bottom: 1px solid #e0e0e0;
+    background-color: #f8f9fa;
+    border-left: 3px solid #1976d2;
 }
 
 .member-table :deep(.v-data-table__td) {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f2f5;
+}
+
+/* 상태 배지 스타일 */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-text {
+    line-height: 1;
+}
+
+.status-present {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.status-present .status-dot {
+    background-color: #4caf50;
+}
+
+.status-absent {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+.status-absent .status-dot {
+    background-color: #f44336;
+}
+
+.status-unknown {
+    background-color: #f5f5f5;
+    color: #666;
+    border: 1px solid #e0e0e0;
+}
+
+.status-unknown .status-dot {
+    background-color: #9e9e9e;
+}
+
+/* 아바타 개선 */
+.member-table :deep(.v-avatar) {
+    border: 2px solid #f0f2f5;
+    transition: border-color 0.2s ease;
+}
+
+.member-table :deep(tbody tr:hover .v-avatar) {
+    border-color: #1976d2;
+}
+
+/* 텍스트 스타일 개선 */
+.font-weight-medium {
+    color: #1a1a1a;
+    font-weight: 500;
+}
+
+.text-caption {
+    color: #666;
+    font-size: 11px;
 }
 </style>
