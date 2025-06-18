@@ -14,7 +14,16 @@ export const employmentRoutes = [
     {
         path: '/employment/jobtest-questions/create',
         name: 'JobtestQuestionCreate',
-        component: () => import('@/views/employment/JobtestQuestionCreatePage.vue'),
+        component: () => import('@/views/employment/JobtestQuestionFormPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    // 실무테스트 문제 수정 페이지
+    {
+        path: '/employment/jobtest-questions/:id/edit',
+        name: 'JobtestQuestionEdit',
+        component: () => import('@/views/employment/JobtestQuestionFormPage.vue'),
         meta: {
             requiresAuth: true
         }
