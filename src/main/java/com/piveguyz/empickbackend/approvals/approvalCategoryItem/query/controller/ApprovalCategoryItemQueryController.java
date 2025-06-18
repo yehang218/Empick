@@ -20,27 +20,31 @@ import java.util.List;
 @Tag(name = "결재 유형별 항목 API", description = "결재 유형별 항목 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/approval-category-item")
+@RequestMapping("/api/v1/approval/categories/{categoryId}/items")
 public class ApprovalCategoryItemQueryController {
 	private final ApprovalCategoryItemQueryService service;
 
-	@GetMapping
-	public ResponseEntity<CustomApiResponse<List<ApprovalCategoryItemQueryDTO>>> findAll() {
-		List<ApprovalCategoryItemQueryDTO> dtoList = service.findAll();
-		ResponseCode result = ResponseCode.SUCCESS;
-		return ResponseEntity.status(result.getHttpStatus())
-			.body(CustomApiResponse.of(result, dtoList));
-	}
+//	@GetMapping
+//	public ResponseEntity<CustomApiResponse<List<ApprovalCategoryItemQueryDTO>>> findAll() {
+//		List<ApprovalCategoryItemQueryDTO> dtoList = service.findAll();
+//		ResponseCode result =  	ResponseCode.SUCCESS;
+//		return ResponseEntity.status(result.getHttpStatus())
+//			.body(CustomApiResponse.of(result, dtoList));
+//	}
 
-	@GetMapping("{id}")
-	public ResponseEntity<CustomApiResponse<ApprovalCategoryItemQueryDTO>> findById(@PathVariable("id") Integer id) {
+	// 카테고리 내 단일 항목
+	@GetMapping("{itemId}")
+	public ResponseEntity<CustomApiResponse<ApprovalCategoryItemQueryDTO>> findById(
+					@PathVariable("categoryId") Integer categoryId,
+					@PathVariable("itemId") Integer id) {
 		ApprovalCategoryItemQueryDTO dto = service.findById(id);
 		ResponseCode result = ResponseCode.SUCCESS;
 		return ResponseEntity.status(result.getHttpStatus())
 				.body(CustomApiResponse.of(result, dto));
 	}
 
-	@GetMapping("/category/{categoryId}")
+	// 카테고리별 전체 항목
+	@GetMapping
 	public ResponseEntity<CustomApiResponse<List<ApprovalCategoryItemQueryDTO>>> findByCategoryId(@PathVariable("categoryId") Integer categoryId) {
 		List<ApprovalCategoryItemQueryDTO> dtoList = service.findByCategoryId(categoryId);
 		ResponseCode result = ResponseCode.SUCCESS;
