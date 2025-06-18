@@ -224,8 +224,15 @@ export const employmentRoutes = [
         props: true,
         meta: {
             requiresAuth: true
-
         }
+    },
+
+    // 채용공고별 지원자 목록 페이지
+    {
+        path: '/employment/applicant/recruitments/:recruitmentId',
+        name: 'ApplicantRecruitmentPage',
+        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
+
     },
 
     // 채용공고별 지원자 목록 페이지
@@ -240,13 +247,14 @@ export const employmentRoutes = [
 
         // 지원자 인적사항 등록 페이지
         {
-            path: '/employment/applicants/register',
+            path: '/applicants/register',
             name: 'ApplicantRegistrationPage',
             component: () => import('@/views/employment/ApplicantRegistrationPage.vue'),
             meta: {
                 requiresAuth: true
             }
         },
+        // 자기소개서 템플릿
         {
             path: '/employment/introduce-standard-items/:templateId',
             name: 'IntroduceStandardItemPage',
@@ -255,17 +263,18 @@ export const employmentRoutes = [
         },
 
         {
-            path: '/employment/recruitments/introduce-templates',
+            path: '/employment/introduce-templates',
             name: 'IntroduceTemplateListPage',
             component: () => import('@/views/employment/IntroduceTemplateListPage.vue')
         },
         {
-            path: '/employment/recruitments/introduce-templates/create',
+            path: '/employment/introduce-templates/create',
             name: 'IntroduceTemplateCreatePage',
             component: () => import('@/views/employment/IntroduceTemplateCreatePage.vue')
         },
         {
-            path: '/employment/recruitments/introduce-templates/:id',
+            path: '/employment/introduce-templates/:id',
+            name: 'IntroduceTemplateDetailPage',
             component: () => import('@/views/employment/IntroduceTemplateDetailPage.vue')
         },
         {

@@ -75,11 +75,11 @@ onMounted(async () => {
   } catch (error) {
     console.error('템플릿 상세 로드 실패:', error)
     alert('템플릿 상세 정보를 불러오는 데 실패했습니다.')
-    router.push('/employment/recruitments/introduce-templates')
+    router.push('/employment/introduce-templates')
   }
 })
 
-const goList = () => router.push('/employment/recruitments/introduce-templates')
+const goList = () => router.push('/employment/introduce-templates')
 
 // const goToEdit = () => {
 //   alert('수정 페이지로 이동 (기능 미구현)');
