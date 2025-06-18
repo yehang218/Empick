@@ -1,7 +1,7 @@
 <template>
   <v-container class="template-detail-container">
     <div class="header-area">
-      <h2 class="page-title">채용 공고 템플릿 조회</h2>
+      <h2 class="page-title">자기소개서 템플릿 상세 조회</h2>
       <!-- <v-btn color="success" class="edit-btn" @click="goToEdit">
         <v-icon left>mdi-pencil</v-icon> 수정하기
       </v-btn> -->
