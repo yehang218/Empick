@@ -79,11 +79,31 @@ export const profileImageUploadService = async (memberId, formData) => {
 };
 
 export const getMemberRoleService = async (employeeNumber) => {
-    const response = await api.get(API.MEMBER.ROLE(employeeNumber));
-    return response.data;
+    try {
+        const response = await api.get(API.MEMBER.ROLE(employeeNumber));
+        return response.data;
+    } catch (error) {
+        console.error('회원 역할 조회 API 오류:', error)
+        throw error;
+    }
 };
 
 export const getMyRoleService = async () => {
-    const response = await api.get(API.MEMBER.MY_ROLE);
-    return response.data;
+    try {
+        const response = await api.get(API.MEMBER.MY_ROLE);
+        return response.data;
+    } catch (error) {
+        console.error('내 역할 조회 API 오류:', error)
+        throw error;
+    }
+};
+
+export const findMembersService = async (employeeNumber) => {
+    try {
+        const response = await api.get(API.MEMBER.FIND_MEMBERS, { params: employeeNumber });
+        return response.data;
+    } catch (error) {
+        console.error('회원 조회 API 오류:', error)
+        throw error;
+    }
 };

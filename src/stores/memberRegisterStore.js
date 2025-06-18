@@ -50,7 +50,7 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 this.profileImageUrl = e.target.result
             }
             reader.readAsDataURL(file)
-            this.form.pictureUrl = `profiles/${this.employeeNumber}.png`
+            this.form.pictureUrl = this.employeeNumber ? `profiles/${this.employeeNumber}.png` : 'profiles/temp.png'
         },
         clearProfileImage() {
             this.profileImageFile = null
@@ -127,7 +127,7 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
 
         async registerMemberWithImage() {
             const requiredFields = [
-                'name', 'phone', 'pictureUrl', 'email', 'address'
+                'name', 'phone', 'email', 'address'
             ]
             const fieldLabels = {
                 name: '이름',
@@ -136,7 +136,15 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 email: '이메일',
                 address: '주소',
             }
+
+            // 기본 필수 필드 검증
             const missing = requiredFields.filter(key => !this.form[key] || this.form[key].toString().trim() === '')
+
+            // 프로필 이미지 검증: pictureUrl이 없고 profileImageFile도 없으면 오류
+            if (!this.form.pictureUrl && !this.profileImageFile) {
+                missing.push('pictureUrl')
+            }
+
             if (missing.length > 0) {
                 throw new Error('다음 항목을 입력해 주세요: ' + missing.map(key => fieldLabels[key] || key).join(', '))
             }
