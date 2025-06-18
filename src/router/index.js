@@ -26,12 +26,8 @@ export const routeMap = Object.fromEntries(
 const routes = [
     {
         path: '/',
-        redirect: '/dashboard'
-    },
-    {
-        path: '/dashboard',
-        name: 'DashboardPage',
-        component: () => import('@/views/DashboardPage.vue'),
+        name: 'MainPage',
+        component: () => import('@/views/MainPage.vue'),
         meta: {
             requiresAuth: true
         }

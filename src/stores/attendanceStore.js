@@ -2,6 +2,16 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { attendanceService } from '@/services/attendanceService';
+import {
+    formatMinutesToDuration,
+    calculateTimeDifferenceInMinutes,
+    categorizeWorkHours,
+    calculateNightWorkHours,
+    groupAttendanceByDate,
+    groupAttendanceByWeek,
+    calculateMonthlyStats,
+    transformAttendanceDataForUI
+} from '@/utils/attendance/attendanceCalculator';
 
 export const useAttendanceStore = defineStore('attendance', () => {
     // 근태 기록 관련 상태
@@ -334,6 +344,8 @@ export const useAttendanceStore = defineStore('attendance', () => {
         };
     };
 
+
+
     return {
         // 상태
         attendanceRecords, currentRecord, myRecords, myRecentRecords, memberRecords,
@@ -350,6 +362,11 @@ export const useAttendanceStore = defineStore('attendance', () => {
         fetchMyRecentAttendanceRecords, fetchMyAttendanceRecordsByDateRange,
         fetchMemberAttendanceRecords,
         // 캐시 관리
-        clearAllCache, clearTodayCache
+        clearAllCache, clearTodayCache,
+        // 데이터 계산 및 변환
+        formatMinutesToDuration, calculateTimeDifferenceInMinutes,
+        categorizeWorkHours, calculateNightWorkHours,
+        groupAttendanceByDate, groupAttendanceByWeek,
+        calculateMonthlyStats, transformAttendanceDataForUI
     };
 });
