@@ -1,11 +1,14 @@
 package com.piveguyz.empickbackend.employment.jobtests.question.command.application.dto;
 
 import com.piveguyz.empickbackend.employment.jobtests.common.enums.JobtestDifficulty;
+import com.piveguyz.empickbackend.employment.jobtests.grading.command.application.dto.CreateGradingCriteriaCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.enums.QuestionType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.util.List;
 
 @Getter
 @ToString
@@ -17,6 +20,9 @@ public class UpdateQuestionCommandDTO {
     private JobtestDifficulty difficulty;
     private String answer;
     private int updatedMemberId;
+
+    private List<CreateQuestionOptionCommandDTO> questionOptions;
+    private List<CreateGradingCriteriaCommandDTO> gradingCriteria;
 
     @Builder
     public UpdateQuestionCommandDTO(String content, String detailContent, QuestionType type,
