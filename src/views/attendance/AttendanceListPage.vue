@@ -299,6 +299,16 @@ watch(searchQuery, () => {
     background-color: #f44336;
 }
 
+.status-no-record {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffcc02;
+}
+
+.status-no-record .status-dot {
+    background-color: #ff9800;
+}
+
 .status-unknown {
     background-color: #f5f5f5;
     color: #666;

@@ -81,6 +81,7 @@ export const getStatusClass = (status) => {
     switch (status) {
         case 1: return 'status-present'
         case 0: return 'status-absent'
+        case -1: return 'status-no-record'
         default: return 'status-unknown'
     }
 }
@@ -89,6 +90,7 @@ export const getStatusLabel = (status) => {
     switch (status) {
         case 1: return '출근'
         case 0: return '미출근'
+        case -1: return '기록없음'
         default: return '알 수 없음'
     }
 }
@@ -114,5 +116,6 @@ export const TABLE_HEADERS = [
 export const STATUS_OPTIONS = [
     { title: '전체', value: '전체' },
     { title: '출근', value: 1 },
-    { title: '미출근', value: 0 }
+    { title: '미출근', value: 0 },
+    { title: '기록없음', value: -1 }
 ] 

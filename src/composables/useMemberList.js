@@ -41,10 +41,21 @@ export const useMemberList = () => {
     // 비즈니스 로직: 출근 상태 계산
     const enrichMembersWithAttendance = async (memberList) => {
         // TODO: 실제 근태 API 연동 시 이 로직을 수정
-        return memberList.map((member) => ({
-            ...member,
-            status: Math.random() > 0.3 ? 1 : 0
-        }))
+        return memberList.map((member) => {
+            const random = Math.random()
+            let status
+            if (random > 0.7) {
+                status = 1  // 30% 출근
+            } else if (random > 0.3) {
+                status = 0  // 40% 미출근
+            } else {
+                status = -1 // 30% 기록없음
+            }
+            return {
+                ...member,
+                status: status
+            }
+        })
     }
 
     // 프로필 이미지 로딩
@@ -93,7 +104,6 @@ export const useMemberList = () => {
             if (selectedStatus.value && selectedStatus.value !== '전체') {
                 result = filterByStatus(result, selectedStatus.value)
             }
-
             return result
         })
     }
@@ -115,7 +125,12 @@ export const useMemberList = () => {
 
     // 상태 필터 로직
     const filterByStatus = (members, status) => {
-        return members.filter(member => member.status === status)
+        return members.filter(member => {
+            // 타입 변환을 통한 안전한 비교
+            const memberStatus = Number(member.status)
+            const filterStatus = Number(status)
+            return memberStatus === filterStatus
+        })
     }
 
     // 부서 옵션 생성
