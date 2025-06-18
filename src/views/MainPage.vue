@@ -70,12 +70,23 @@ const currentMonth = computed(() => currentDate.value.getMonth() + 1)
 const rawAttendanceRecords = computed(() => attendanceStore.myRecords)
 
 // 계산된 근무 시간 데이터
-const workingHours = computed(() => {
-    if (!rawAttendanceRecords.value.length) return { hours: 0, minutes: 0 }
+const workingHours = ref({ hours: 0, minutes: 0 })
+
+// 근무 시간 계산 함수
+const updateWorkingHours = async () => {
+    if (!rawAttendanceRecords.value.length) {
+        workingHours.value = { hours: 0, minutes: 0 }
+        return
+    }
 
     const stats = attendanceStore.calculateMonthlyStats(rawAttendanceRecords.value)
-    return attendanceStore.parseTimeString(stats.totalHours)
-})
+    workingHours.value = await attendanceStore.parseTimeString(stats.totalHours)
+}
+
+// rawAttendanceRecords 변경 감지
+watch(rawAttendanceRecords, () => {
+    updateWorkingHours()
+}, { immediate: true })
 
 // 목표 근무 시간
 const targetHours = ref({ hours: 0, minutes: 0 })
@@ -145,7 +156,8 @@ watch(() => authStore.userInfo, async (newUser, oldUser) => {
         await Promise.all([
             loadAttendanceData(),
             updateTargetHours(),
-            updateRemainingWorkDays()
+            updateRemainingWorkDays(),
+            updateWorkingHours()
         ])
     }
 }, { deep: true })
@@ -155,7 +167,8 @@ onMounted(async () => {
     await Promise.all([
         loadAttendanceData(),
         updateTargetHours(),
-        updateRemainingWorkDays()
+        updateRemainingWorkDays(),
+        updateWorkingHours()
     ])
 })
 

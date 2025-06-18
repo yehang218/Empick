@@ -398,12 +398,10 @@ export const useAttendanceStore = defineStore('attendance', () => {
         return workDays;
     };
 
-    // 시간 문자열 파싱 (예: "51h 45m" → {hours: 51, minutes: 45})
-    const parseTimeString = (timeString) => {
-        if (!timeString) return { hours: 0, minutes: 0 };
-
-        const [hours, minutes] = timeString.replace('h', '').replace('m', '').split(' ').map(Number);
-        return { hours: hours || 0, minutes: minutes || 0 };
+    // 시간 문자열 파싱은 attendanceFormatter.js로 위임
+    const parseTimeString = async (timeString) => {
+        const { parseTimeString: formatterParseTimeString } = await import('@/utils/attendance/attendanceFormatter');
+        return formatterParseTimeString(timeString);
     };
 
     // 목표 근무시간 계산
