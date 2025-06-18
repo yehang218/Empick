@@ -13,12 +13,13 @@
             <!-- 제목 및 액션 버튼 -->
             <div class="d-flex justify-space-between align-center mb-6">
                 <h2 class="text-h5 font-weight-bold">사원 목록</h2>
-                <div class="d-flex gap-2">
+                <div class="d-flex" style="gap: 16px;">
                     <v-btn color="grey" variant="outlined" prepend-icon="mdi-refresh" @click="loadMembers"
                         :loading="loading">
                         새로고침
                     </v-btn>
-                    <v-btn color="primary" prepend-icon="mdi-plus" @click="() => router.push('/orgstructure/register')">
+                    <v-btn color="primary" prepend-icon="mdi-plus"
+                        @click="() => router.push('/orgstructure/member-register')">
                         사원 등록
                     </v-btn>
                 </div>

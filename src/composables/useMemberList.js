@@ -1,11 +1,13 @@
 import { ref, computed } from 'vue'
 import { useMemberStore } from '@/stores/memberStore'
 import { useDepartmentStore } from '@/stores/departmentStore'
+import { useAttendanceStore } from '@/stores/attendanceStore'
 import { useToast } from '@/composables/useToast'
 
 export const useMemberList = () => {
     const memberStore = useMemberStore()
     const departmentStore = useDepartmentStore()
+    const attendanceStore = useAttendanceStore()
     const { showToast } = useToast()
 
     // 상태
@@ -40,22 +42,50 @@ export const useMemberList = () => {
 
     // 비즈니스 로직: 출근 상태 계산
     const enrichMembersWithAttendance = async (memberList) => {
-        // TODO: 실제 근태 API 연동 시 이 로직을 수정
-        return memberList.map((member) => {
-            const random = Math.random()
-            let status
-            if (random > 0.7) {
-                status = 1  // 30% 출근
-            } else if (random > 0.3) {
-                status = 0  // 40% 미출근
-            } else {
-                status = -1 // 30% 기록없음
-            }
-            return {
-                ...member,
-                status: status
-            }
-        })
+        // 실제 근태 API를 통해 각 사원의 오늘 출근 상태 조회
+        const membersWithAttendance = await Promise.all(
+            memberList.map(async (member) => {
+                try {
+                    // 각 사원의 오늘 출근 기록 조회
+                    const todayAttendance = await attendanceStore.fetchMemberAttendanceRecords(member.id, {
+                        silent: true // 에러 시 토스트 표시 안함
+                    })
+
+                    let status = -1 // 기본값: 기록없음
+
+                    if (todayAttendance && todayAttendance.length > 0) {
+                        // 오늘 날짜 기준으로 출근 기록 확인
+                        const today = new Date().toISOString().split('T')[0]
+                        const todayRecord = todayAttendance.find(record => {
+                            const recordDate = new Date(record.checkInTime || record.createdAt).toISOString().split('T')[0]
+                            return recordDate === today
+                        })
+
+                        if (todayRecord) {
+                            // 출근 기록이 있으면 출근 상태
+                            status = 1
+                        } else {
+                            // 기록은 있지만 오늘 출근 기록이 없으면 미출근
+                            status = 0
+                        }
+                    }
+
+                    return {
+                        ...member,
+                        status: status
+                    }
+                } catch (error) {
+                    console.warn(`사원 ${member.name}의 근태 정보 조회 실패:`, error)
+                    // API 실패 시 기본값으로 설정 (기록없음)
+                    return {
+                        ...member,
+                        status: -1
+                    }
+                }
+            })
+        )
+
+        return membersWithAttendance
     }
 
     // 프로필 이미지 로딩
