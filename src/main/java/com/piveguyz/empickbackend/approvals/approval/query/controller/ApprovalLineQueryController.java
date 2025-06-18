@@ -3,8 +3,11 @@ package com.piveguyz.empickbackend.approvals.approval.query.controller;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.mapper.ApprovalQueryMapper;
 import com.piveguyz.empickbackend.approvals.approval.query.service.ApprovalLineService;
+import com.piveguyz.empickbackend.common.response.CustomApiResponse;
+import com.piveguyz.empickbackend.common.response.ResponseCode;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,10 +22,11 @@ public class ApprovalLineQueryController {
 
     // 결재라인 미리보기
     @GetMapping("/{categoryId}/lines")
-    public List<ApprovalLineQueryDTO> getApprovalLinePreview(
+    public ResponseEntity<CustomApiResponse<List<ApprovalLineQueryDTO>>> getApprovalLinePreview(
             @PathVariable Integer categoryId,
             @RequestParam Integer writerId
     ) {
-        return approvalLineService.getApprovalLinePreview(categoryId, writerId);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, approvalLineService.getApprovalLinePreview(categoryId, writerId)));
     }
 }

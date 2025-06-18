@@ -268,7 +268,7 @@ public enum ResponseCode {
     APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3011, "결재 차례가 아닙니다."),
     APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3012, "반려 사유가 필요합니다."),
     APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다."),
-    APPROVAL_LINE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 3014, "결재 라인이 존재하지 않습니다."),
+    APPROVAL_LINE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 3014, "결재 라인이 존재하지 않습니다.\n관리자에게 문의하세요."),
     APPROVAL_CATEGORY_MISSING(false, HttpStatus.BAD_REQUEST, 3015, "결재 유형이 존재하지 않습니다."),
     APPROVAL_WRITER_MISSING(false, HttpStatus.BAD_REQUEST, 3016, "결재 요청자가 존재하지 않습니다.");
 
