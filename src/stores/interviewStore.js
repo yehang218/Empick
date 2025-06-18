@@ -44,7 +44,13 @@ export const useInterviewStore = defineStore('interview', () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await getInterviewByIdService(id);
+      const data = await getInterviewByApplicationIdService(applicationId);
+      if (data) {
+        selectedInterview.value = data;
+      } else {
+        selectedInterview.value = null;
+        console.log('!error : fetchInterviewById');
+      }
       selectedInterview.value = data;
       return data;
     } catch (err) {

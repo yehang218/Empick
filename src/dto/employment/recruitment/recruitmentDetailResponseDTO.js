@@ -40,7 +40,7 @@ export default class RecruitmentDetailResponseDTO {
             recruitmentRequestId: json.recruitmentRequestId
         }
 
-        return new recruitmentDetailResponseDTO(
+        return new RecruitmentDetailResponseDTO(
             recruitment,
             null, // request
             null, // template

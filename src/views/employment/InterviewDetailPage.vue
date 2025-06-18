@@ -1,60 +1,120 @@
-<!-- InterviewDetailPage.vue -->
 <template>
     <div>
-        <h2>면접 상세 정보</h2>
+        <h2 class="mb-4">면접 상세 정보</h2>
 
         <v-alert v-if="loading" type="info">로딩 중...</v-alert>
         <v-alert v-else-if="!selectedInterview" type="warning">면접 정보가 없습니다. 면접을 배정해주세요.</v-alert>
-        <v-card v-if="selectedApplicant && selectedApplicant.name" class="pa-4" elevation="1">
-            <h3>지원자 정보</h3>
-            <v-row>
-                <v-col cols="12" md="3">
-                    <!-- <v-img :src="selectedApplicant.profileUrl" aspect-ratio="1" class="rounded" contain /> -->
-                </v-col>
-                <v-col cols="12" md="9">
-                    <p><strong>이름:</strong> {{ selectedApplicant.name }}</p>
-                    <p><strong>연락처:</strong> {{ selectedApplicant.phone }}</p>
-                    <p><strong>이메일:</strong> {{ selectedApplicant.email }}</p>
-                    <p><strong>주소:</strong> {{ selectedApplicant.address }}</p>
-                    <p><strong>생년월일:</strong> {{ formatDate(selectedApplicant.birth, 'date') }}</p>
-                </v-col>
-            </v-row>
-        </v-card>
-        <v-card v-if="selectedInterview" class="pa-4 mt-4" outlined>
-            <v-card-title>
-                면접 ID: {{ selectedInterview.id }}
-                <v-spacer />
-                <v-btn icon @click="startEditing">
-                    <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-            </v-card-title>
-            <v-card-text>
-                <div><strong>지원서 ID:</strong> {{ selectedInterview.applicationId }}</div>
-                <div><strong>평가표 ID:</strong> {{ selectedInterview.sheetId }}</div>
-                <div><strong>면접 일시:</strong> {{ formatDate(selectedInterview.datetime) }}</div>
-                <div><strong>면접 장소:</strong> {{ selectedInterview.address }}</div>
-                <div><strong>점수:</strong> {{ selectedInterview.score }}</div>
-            </v-card-text>
-        </v-card>
+
+        <!-- 상단 좌우 정보 카드 -->
+        <v-row dense>
+            <!-- 지원자 정보 -->
+            <v-col cols="12" md="6">
+                <v-card v-if="selectedApplicant" class="pa-4" elevation="1">
+                    <h3>지원자 정보</h3>
+                    <v-row>
+                        <v-col cols="12" md="3">
+                            <!-- <v-img :src="selectedApplicant.profileUrl" aspect-ratio="1" class="rounded" contain /> -->
+                        </v-col>
+                        <v-col cols="12" md="9">
+                            <p><strong>이름:</strong> {{ selectedApplicant.name }}</p>
+                            <p><strong>연락처:</strong> {{ selectedApplicant.phone }}</p>
+                            <p><strong>이메일:</strong> {{ selectedApplicant.email }}</p>
+                            <p><strong>주소:</strong> {{ selectedApplicant.address }}</p>
+                            <p><strong>생년월일:</strong> {{ formatDate(selectedApplicant.birth, 'date') }}</p>
+                        </v-col>
+                    </v-row>
+                </v-card>
+            </v-col>
+
+            <!-- 면접 정보 -->
+            <v-col cols="12" md="6">
+                <v-card v-if="selectedInterview" class="pa-4" elevation="1">
+                    <v-card-title class="d-flex align-center justify-space-between">
+                        <span>면접 정보</span>
+                        <v-btn icon size="small" @click="startEditing" title="면접 정보 수정">
+                            <v-icon>mdi-pencil</v-icon>
+                        </v-btn>
+                    </v-card-title>
+                    <v-card-text>
+                        <div><strong>면접 ID:</strong> {{ selectedInterview.id }}</div>
+                        <div><strong>지원서 ID:</strong> {{ selectedInterview.applicationId }}</div>
+                        <div><strong>평가표 ID:</strong> {{ selectedInterview.sheetId }}</div>
+                        <div><strong>면접 일시:</strong> {{ formatDate(selectedInterview.datetime) }}</div>
+                        <div><strong>면접 장소:</strong>
+                            <template v-if="isZoomUrl(selectedInterview.address)">
+                                <a :href="selectedInterview.address" target="_blank"
+                                    class="text-primary text-decoration-underline">
+                                    {{ selectedInterview.address }}
+                                </a>
+                            </template>
+                            <template v-else>
+                                {{ selectedInterview.address }}
+                            </template>
+                        </div>
+
+                        <div><strong>점수:</strong> {{ selectedInterview.score }}</div>
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
+
+        <!-- 평가 기준 목록 -->
         <v-card class="pa-4 mt-4" outlined>
-            <v-card-title>
-                평가 기준 목록
-            </v-card-title>
+            <v-card-title>평가 기준 목록</v-card-title>
             <v-divider />
             <v-list>
-                <v-list-item v-for="(criteria, index) in criteriaList" :key="criteria.id" class="mb-2">
-                    <v-list-item-content>
-                        <v-list-item-title class="font-weight-bold">
-                            {{ index + 1 }}. {{ criteria.title }} (가중치 : {{ criteria.weight }}%)
-                        </v-list-item-title>
-                        <v-list-item-subtitle>
-                            {{ criteria.content }}
-                        </v-list-item-subtitle>
-                    </v-list-item-content>
-                </v-list-item>
+                <v-list-item v-for="(criteria, index) in criteriaList" :key="criteria.id"
+                    :title="`${index + 1}. ${criteria.title} (가중치 : ${criteria.weight * 100}%)`"
+                    :subtitle="criteria.content" class="mb-2" />
             </v-list>
         </v-card>
 
+        <!-- 면접관 평가 점수 카드 -->
+        <v-card class="pa-4 mt-6" outlined>
+            <v-card-title class="d-flex justify-space-between align-center">
+                <span>면접관 평가 보기</span>
+                <div>
+                    <v-btn icon @click="prevInterviewer" :disabled="currentIndex === 0">
+                        <v-icon>mdi-chevron-left</v-icon>
+                    </v-btn>
+                    <span class="mx-4">{{ currentInterviewer?.name || '면접관' }}</span>
+                    <v-btn icon @click="nextInterviewer" :disabled="currentIndex === allScores.length - 1">
+                        <v-icon>mdi-chevron-right</v-icon>
+                    </v-btn>
+                </div>
+            </v-card-title>
+            <v-divider />
+
+            <v-container fluid class="pa-0">
+                <v-row v-for="(item, index) in evaluationItems" :key="index" class="py-4">
+                    <v-col cols="12">
+                        <div class="d-flex justify-space-between align-center mb-1">
+                            <div>
+                                <h4 class="text-subtitle-1 font-weight-bold">
+                                    {{ index + 1 }}. {{ item.title }}
+                                </h4>
+                            </div>
+                            <span class="text-body-1 font-weight-bold">
+                                {{ item.score }}/100
+                                <span class="text-caption grey--text ml-2">({{ item.weight }}%)</span>
+                            </span>
+                        </div>
+                        <p class="mb-1 grey--text text--darken-1">{{ item.criteria }}</p>
+                        <v-card class="pa-3 mt-2" outlined>
+                            <p class="mb-0">{{ item.evaluation }}</p>
+                        </v-card>
+                    </v-col>
+                    <v-divider v-if="index < evaluationItems.length - 1"></v-divider>
+                </v-row>
+            </v-container>
+        </v-card>
+
+        <!-- 평가 등록 버튼 -->
+        <v-btn color="primary" class="mt-6" @click="goToInputInterviewScorePage">
+            평가 등록하기
+        </v-btn>
+
+        <!-- 면접 수정 다이얼로그 -->
         <v-dialog v-model="dialog" max-width="500px">
             <v-card>
                 <v-card-title>면접 정보 수정</v-card-title>
@@ -80,6 +140,7 @@
             </v-card>
         </v-dialog>
 
+        <!-- 하단 버튼 -->
         <v-btn v-if="!selectedInterview && !loading" color="primary" class="mt-4">
             면접 배정하기
         </v-btn>
@@ -88,6 +149,7 @@
         </v-btn>
     </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
@@ -114,10 +176,17 @@ const selectedApplicant = ref(null)
 const selectedInterview = ref(null)
 const selectedInterviewSheet = ref(null)
 const selectedCriteria = ref(null)
+const criteriaList = ref([])
 
-const criteriaList = ref([]);
+
 const loading = computed(() => interviewStore.loading || criteriaStore.loading);
 const error = computed(() => interviewStore.error || criteriaStore.error);
+
+const goToInputInterviewScorePage = () => router.push('/employment/interview-score')
+
+const isZoomUrl = (url) => {
+    return typeof url === 'string' && url.startsWith('http');
+};
 
 const fetchAll = async () => {
     try {
@@ -210,17 +279,40 @@ const saveChanges = async () => {
 
         console.log('[debug] 최종 datetimeStr:', datetimeStr);
 
-        await interviewStore.updateInterviewDatetime(interview.value.id, datetimeStr);
-        await interviewStore.updateInterviewAddress(interview.value.id, editAddress.value);
+        await interviewStore.updateInterviewDatetime(selectedInterview.value.id, datetimeStr);
+        await interviewStore.updateInterviewAddress(selectedInterview.value.id, editAddress.value);
 
-        await interviewStore.fetchInterviewById(interview.value.id);
+        await interviewStore.fetchInterviewById(selectedInterview.value.id);
 
         alert('면접 정보가 성공적으로 수정되었습니다.');
         dialog.value = false;
     } catch (err) {
         console.error('면접 정보 수정 실패:', err);
-        alert('면접 정보 수정에 실패했습니다.');
     }
 };
+
+const allScores = ref([]) // [{interviewerId: 1, scores: [...]}, ...]
+const currentIndex = ref(0)
+
+const currentScoreData = computed(() => allScores.value[currentIndex.value])
+const evaluationItems = computed(() => {
+    return criteriaList.value.map(criteria => {
+        const matched = currentScoreData.value?.scores.find(score => score.criteriaId === criteria.id)
+        return {
+            title: criteria.title,
+            weight: criteria.weight * 100,
+            criteria: criteria.content,
+            score: matched?.score ?? 0,
+            evaluation: matched?.review ?? '평가 없음'
+        }
+    })
+})
+
+const prev = () => {
+    if (currentIndex.value > 0) currentIndex.value--
+}
+const next = () => {
+    if (currentIndex.value < allScores.value.length - 1) currentIndex.value++
+}
 
 </script>

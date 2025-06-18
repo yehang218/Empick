@@ -4,7 +4,9 @@
         <InterviewEvaluationInput v-if="criteriaItems.length > 0" v-model:criteria="criteriaItems" />
 
         <!-- 저장 버튼 -->
-        <v-btn color="primary" class="mt-4" @click="saveAll">💾 평가 저장</v-btn>
+        <v-btn color="primary" class="mt-4" @click="saveAll" :disabled="!isFormValid">
+            💾 평가 저장
+        </v-btn>
     </div>
 </template>
 
@@ -19,7 +21,7 @@ import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
 import { useInterviewScoreStore } from '@/stores/interviewScoreStore'
 import { useAuthStore } from '@/stores/authStore'
 
-const interviewId = 2000 // 임시
+const interviewId = Number(route.params.interviewId)
 
 const router = useRouter()
 const route = useRoute()
@@ -30,6 +32,12 @@ const scoreStore = useInterviewScoreStore()
 const authStore = useAuthStore()
 
 const criteriaItems = ref([])
+
+const isFormValid = computed(() =>
+    criteriaItems.value.every(item =>
+        item.score != null && item.comment.trim() !== ''
+    )
+)
 
 const fetchAll = async () => {
     try {
