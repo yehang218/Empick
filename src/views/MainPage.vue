@@ -55,10 +55,12 @@ import { ref, computed, onMounted, watch } from 'vue'
 import MonthlyWorkSummaryCard from '@/components/attendance/MonthlyWorkSummaryCard.vue'
 import WeekAccordionList from '@/components/attendance/WeekAccordionList.vue'
 import { useAttendanceStore } from '@/stores/attendanceStore'
+import { useAuthStore } from '@/stores/authStore'
 
 // 현재 날짜 상태
 const currentDate = ref(new Date())
 const attendanceStore = useAttendanceStore()
+const authStore = useAuthStore()
 
 // 계산된 속성들
 const currentYear = computed(() => currentDate.value.getFullYear())
@@ -136,6 +138,18 @@ watch([currentYear, currentMonth], () => {
     loadAttendanceData()
 }, { immediate: false })
 
+// 사용자 변경 감지 (로그인/로그아웃 시)
+watch(() => authStore.userInfo, async (newUser, oldUser) => {
+    // 사용자가 변경되었을 때 (로그인 또는 다른 사용자로 변경)
+    if (newUser !== oldUser) {
+        await Promise.all([
+            loadAttendanceData(),
+            updateTargetHours(),
+            updateRemainingWorkDays()
+        ])
+    }
+}, { deep: true })
+
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
     await Promise.all([
@@ -166,14 +180,16 @@ const goToToday = () => {
 const hasTodayCheckIn = computed(() => {
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
     const dailyData = attendanceStore.groupAttendanceByDate(rawAttendanceRecords.value)
-    return dailyData[today]?.checkIn !== null
+    const todayData = dailyData[today]
+    return todayData && todayData.checkIn !== null
 })
 
 // 오늘 퇴근 기록 확인
 const hasTodayCheckOut = computed(() => {
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
     const dailyData = attendanceStore.groupAttendanceByDate(rawAttendanceRecords.value)
-    return dailyData[today]?.checkOut !== null
+    const todayData = dailyData[today]
+    return todayData && todayData.checkOut !== null
 })
 
 // 출퇴근 메서드
