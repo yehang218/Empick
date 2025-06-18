@@ -7,76 +7,164 @@ DROP TABLE IF EXISTS introduce_rating_result;
 
 
 -- introduce_template_item
-CREATE TABLE introduce_template_item
+create table introduce_template_item
 (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    member_id INT NOT NULL,
-    introduce_template_id INT NOT NULL,
-    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id),
-    FOREIGN KEY (member_id) REFERENCES member(id)
+    id                    int auto_increment
+        primary key,
+    title                 varchar(255) not null,
+    member_id             int          not null,
+    introduce_template_id int          null
 );
+
+create index fk_introduce_template
+    on introduce_template_item (introduce_template_id);
+
+create index member_id
+    on introduce_template_item (member_id);
 
 -- introduce_template
-CREATE TABLE introduce_template
+create table introduce_template
 (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    member_id INT NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES member(id)
+    id                         int auto_increment
+        primary key,
+    title                      varchar(255) not null,
+    member_id                  int          not null,
+    introduce_template_item_id int          not null,
+    constraint introduce_template_ibfk_1
+        foreign key (member_id) references member (id),
+    constraint introduce_template_ibfk_2
+        foreign key (introduce_template_item_id) references introduce_template_item (id)
 );
 
--- introduce_standard_item
-CREATE TABLE introduce
+create index introduce_template_item_id
+    on introduce_template (introduce_template_item_id);
+
+create index member_id
+    on introduce_template (member_id);
+
+create table introduce_standard_item
 (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR(255) NOT NULL,
-    applicant_id INT NOT NULL,
-    introduce_template_id INT NOT NULL,
-    FOREIGN KEY (applicant_id) REFERENCES applicant(id),
-    FOREIGN KEY (introduce_template_id) REFERENCES introduce_template(id)
+    id                    int auto_increment
+        primary key,
+    content               varchar(255) not null,
+    member_id             int          not null,
+    introduce_standard_id int          not null,
+    constraint introduce_standard_item_ibfk_1
+        foreign key (member_id) references member (id)
 );
 
--- introduce
-CREATE TABLE introduce_standard
+create index member_id
+    on introduce_standard_item (member_id);
+
+
+
+-- auto-generated definition
+create table introduce
 (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR(255) NOT NULL,
-    member_id INT NOT NULL,
-    introduce_id INT NOT NULL,
-    introduce_standard_item_id INT NOT NULL,
-    updated_by INT NULL,
-    updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (introduce_id) REFERENCES introduce(id),
-    FOREIGN KEY (introduce_standard_item_id) REFERENCES introduce_standard_item(id),
-    FOREIGN KEY (updated_by) REFERENCES member(id)
+    id                    int auto_increment
+        primary key,
+    content               varchar(255) not null,
+    member_id             int          not null,
+    introduce_template_id int          not null,
+    updated_by            int          null,
+    updated_at            datetime     null,
+    constraint introduce_ibfk_1
+        foreign key (member_id) references member (id),
+    constraint introduce_ibfk_2
+        foreign key (introduce_template_id) references introduce_template (id),
+    constraint introduce_ibfk_3
+        foreign key (updated_by) references member (id)
 );
 
--- introduce_standard
-CREATE TABLE introduce_standard_item
+create index introduce_template_id
+    on introduce (introduce_template_id);
+
+create index member_id
+    on introduce (member_id);
+
+create index updated_by
+    on introduce (updated_by);
+
+
+
+-- auto-generated definition
+create table introduce_standard
 (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    content VARCHAR(255) NOT NULL,
-    member_id INT NOT NULL,
-    introduce_standard_id INT NOT NULL,
-    FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (introduce_standard_id) REFERENCES introduce_standard(id)
+    id                         int auto_increment
+        primary key,
+    content                    varchar(255) not null,
+    member_id                  int          not null,
+    introduce_id               int          not null,
+    introduce_standard_item_id int          not null,
+    updated_by                 int          null,
+    updated_at                 datetime     null,
+    constraint introduce_standard_ibfk_1
+        foreign key (member_id) references member (id),
+    constraint introduce_standard_ibfk_2
+        foreign key (introduce_id) references introduce (id),
+    constraint introduce_standard_ibfk_3
+        foreign key (introduce_standard_item_id) references introduce_standard_item (id),
+    constraint introduce_standard_ibfk_4
+        foreign key (updated_by) references member (id)
 );
 
--- introduce_rating_result
-CREATE TABLE introduce_rating_result
+create index introduce_id
+    on introduce_standard (introduce_id);
+
+create index introduce_standard_item_id
+    on introduce_standard (introduce_standard_item_id);
+
+create index member_id
+    on introduce_standard (member_id);
+
+create index updated_by
+    on introduce_standard (updated_by);
+
+
+
+-- auto-generated definition
+create table introduce_standard_item
 (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    member_id INT NOT NULL,
-    content LONGTEXT NOT NULL,
-    rating_score INT NOT NULL,
-    introduce_standard_id INT NOT NULL,
-    status TINYINT(1) NOT NULL COMMENT '확인=1, 탈락=0, 보류=2',
-    updated_by INT NULL,
-    updated_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES member(id),
-    FOREIGN KEY (introduce_standard_id) REFERENCES introduce_standard(id),
-    FOREIGN KEY (updated_by) REFERENCES member(id)
+    id                    int auto_increment
+        primary key,
+    content               varchar(255) not null,
+    member_id             int          not null,
+    introduce_standard_id int          not null,
+    constraint introduce_standard_item_ibfk_1
+        foreign key (member_id) references member (id)
 );
+
+create index member_id
+    on introduce_standard_item (member_id);
+
+
+
+-- auto-generated definition
+create table introduce_rating_result
+(
+    id                    int auto_increment
+        primary key,
+    member_id             int        not null,
+    content               longtext   not null,
+    rating_score          int        not null,
+    introduce_standard_id int        not null,
+    status                tinyint(1) not null comment '확인=1, 탈락=0, 보류=2',
+    updated_by            int        null,
+    updated_at            datetime   null,
+    constraint introduce_rating_result_ibfk_1
+        foreign key (member_id) references member (id),
+    constraint introduce_rating_result_ibfk_2
+        foreign key (introduce_standard_id) references introduce_standard (id),
+    constraint introduce_rating_result_ibfk_3
+        foreign key (updated_by) references member (id)
+);
+
+create index introduce_standard_id
+    on introduce_rating_result (introduce_standard_id);
+
+create index member_id
+    on introduce_rating_result (member_id);
+
+create index updated_by
+    on introduce_rating_result (updated_by);
 
