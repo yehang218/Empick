@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useApprovalWriteStore } from '@/stores/approvalWriteStore';
 import { useMemberStore } from '@/stores/memberStore';
@@ -116,6 +116,7 @@ const memberId = ref(null);
 const { form, categoryList, categoryItems, loading } = storeToRefs(approvalStore);
 
 onMounted(async () => {
+    approvalStore.resetForm();
     await approvalStore.fetchCategories();
     await memberStore.getMyInfo();
     memberId.value = memberStore.form.id;
@@ -183,6 +184,10 @@ const handleSubmit = async () => {
         alert(error.message || '결재 요청 중 오류가 발생했습니다.');
     }
 };
+
+onBeforeUnmount(() => {
+    approvalStore.resetForm();
+});
 
 </script>
 

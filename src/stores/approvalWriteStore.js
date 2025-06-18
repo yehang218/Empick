@@ -20,7 +20,14 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
 
     // 폼 리셋
     const resetForm = () => {
-        form.value = new CreateApprovalDTO();
+        form.value = {
+            categoryId: null,
+            createdAt: '',
+            contents: [],
+            approvers: []
+        };
+        categoryItems.value = [];
+        approvalLine.value = [];
     };
 
     // 외부 JSON으로 폼 세팅
