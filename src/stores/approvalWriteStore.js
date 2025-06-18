@@ -1,11 +1,11 @@
-// stores/approvalWriteStore.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { CreateApprovalDTO, ApproverDTO, ApprovalContentDTO } from '@/dto/approval/approval/createApprovalDTO';
 import {
     getApprovalCategories,
     getApprovalCategoryItems,
-    createApprovalService
+    createApprovalService,
+    getApprovalLine
 } from '@/services/approvalService';
 import { InputTypeEnum } from '@/constants/common/inputType';
 
@@ -15,6 +15,7 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
     const categoryList = ref([]);
     const categoryItems = ref([]);
     const approverList = ref([]);
+    const approvalLine = ref([]);
     const loading = ref(false);
 
     // 폼 리셋
@@ -53,6 +54,16 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
                 item => new ApprovalContentDTO({ itemId: item.id, content: '' })
             );
             form.value.categoryId = categoryId;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    // 결재라인 불러오기
+    const fetchApprovalLine = async (categoryId, writerId) => {
+        loading.value = true;
+        try {
+            approvalLine.value = await getApprovalLine(categoryId, writerId);
         } finally {
             loading.value = false;
         }
@@ -99,12 +110,12 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
     const validateForm = (form) => {
         if (!form.categoryId) throw new Error('카테고리를 선택해주세요');
         if (!form.writerId) throw new Error('작성자 정보가 없습니다');
-        if (!form.approvers?.length) throw new Error('최소 한 명의 결재자를 지정해주세요');
+        if (!form.approvers?.length) throw new Error('지정된 결재가 없습니다.\n 관리자에게 문의해주세요.');
         if (!form.contents?.length) throw new Error('결재 항목이 없습니다');
         
         // 결재자 유효성 검사
-        if (!Array.isArray(form.approvers)) throw new Error('결재자 정보가 올바르지 않습니다');
-        if (!form.approvers.every(a => a && a.memberId)) throw new Error('모든 결재자를 선택해주세요');
+        // if (!Array.isArray(form.approvers)) throw new Error('결재자 정보가 올바르지 않습니다');
+        // if (!form.approvers.every(a => a && a.memberId)) throw new Error('모든 결재자를 선택해주세요');
         
         // 결재 내용 유효성 검사
         if (!Array.isArray(form.contents)) throw new Error('결재 내용이 올바르지 않습니다');
@@ -115,9 +126,10 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
 
     return {
         // 상태
-        form, categoryList, categoryItems, approverList, loading,
+        form, categoryList, categoryItems, approverList, loading, approvalLine,
         // 메서드
         resetForm, setFormFromJson,
-        fetchCategories, fetchCategoryItems, submitApproval
+        fetchCategories, fetchCategoryItems, submitApproval,
+        fetchApprovalLine,
     };
 });

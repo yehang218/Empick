@@ -28,4 +28,7 @@ export const ApprovalAPI = {
     
     // 자신이 결재자인 결재문서 목록 조회
     RECEIVED_DOCUMENTS: (memberId) => `/api/v1/approval/received?memberId=${memberId}`,
+
+    // 카테고리별 결재 라인
+    APPROVAL_LINE: (categoryId) => `/api/v1/approval/categories/${categoryId}/lines`,
 };

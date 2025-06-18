@@ -71,3 +71,19 @@ export const getReceivedApprovals = async (memberId) => {
     const res = await api.get(ApprovalAPI.RECEIVED_DOCUMENTS(memberId));
     return res.data.data.map(item => new ApprovalReceivedListDTO(item));
 };
+
+// 결재 라인 조회
+export const getApprovalLine = async (categoryId, writerId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(
+            ApprovalAPI.APPROVAL_LINE(categoryId) + `?writerId=${writerId}`
+        );
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.data;
+    }, options);
+};
