@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate;
 
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultUpdateCommandDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 @Builder
 public class IntroduceRatingResultEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,12 +25,8 @@ public class IntroduceRatingResultEntity {
     @Column(name = "rating_score", nullable = false)
     private Integer ratingScore;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private IntroduceRatingResultStatus status;
-
     @Column(name = "updated_at")
-    private java.time.LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "updated_by")
     private Integer updatedBy;
@@ -40,4 +36,11 @@ public class IntroduceRatingResultEntity {
 
     @Column(name = "introduce_standard_id", nullable = false)
     private Integer introduceStandardId;
+
+    public void updateIntroduceRatingResultEntity(IntroduceRatingResultUpdateCommandDTO dto) {
+        this.content = dto.getContent();
+        this.ratingScore = dto.getRatingScore();
+        this.updatedAt = LocalDateTime.now();
+        this.updatedBy = dto.getUpdatedBy();
+    }
 }

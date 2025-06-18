@@ -2,10 +2,12 @@ package com.piveguyz.empickbackend.employment.introduce.command.application.cont
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultCreateCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultUpdateCommandDTO;
 import com.piveguyz.empickbackend.employment.introduce.command.application.service.IntroduceRatingResultCommandService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,20 +22,21 @@ public class IntroduceRatingResultCommandController {
 
     @Operation(summary = "자기소개서 평가 결과 등록", description = "자기소개서 평가 결과를 등록한다.")
     @PostMapping
-    public ResponseEntity<CustomApiResponse<IntroduceRatingResultCommandDTO>> create(
-            @RequestBody IntroduceRatingResultCommandDTO dto) {
-        IntroduceRatingResultCommandDTO createdDTO = introduceRatingResultCommandService.create(dto);
+    public ResponseEntity<CustomApiResponse<IntroduceRatingResultCreateCommandDTO>> create(
+            @RequestBody IntroduceRatingResultCreateCommandDTO dto) {
+        IntroduceRatingResultCreateCommandDTO createdDTO = introduceRatingResultCommandService.create(dto);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, createdDTO));
     }
 
     @Operation(summary = "자기소개서 평가 결과 수정", description = "자기소개서 평가 결과를 수정한다.")
-    @PatchMapping
-    public ResponseEntity<CustomApiResponse<IntroduceRatingResultCommandDTO>> update(
-            @RequestBody IntroduceRatingResultCommandDTO dto) {
-        IntroduceRatingResultCommandDTO updatedDTO = introduceRatingResultCommandService.update(dto);
+    @PatchMapping("/{id}")
+    public ResponseEntity<CustomApiResponse<IntroduceRatingResultUpdateCommandDTO>> update(
+            @PathVariable int id,
+            @RequestBody @Valid IntroduceRatingResultUpdateCommandDTO dto) {
+        IntroduceRatingResultUpdateCommandDTO updateDTO = introduceRatingResultCommandService.update(id, dto);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
-                .body(CustomApiResponse.of(ResponseCode.SUCCESS, updatedDTO));
+                .body((CustomApiResponse.of(ResponseCode.SUCCESS, updateDTO)));
     }
 
     @Operation(summary = "자기소개서 평가 결과 삭제", description = "자기소개서 평가 결과를 삭제한다.")

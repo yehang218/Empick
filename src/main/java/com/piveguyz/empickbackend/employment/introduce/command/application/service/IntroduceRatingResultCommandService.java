@@ -1,11 +1,13 @@
 package com.piveguyz.empickbackend.employment.introduce.command.application.service;
 
-import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultCreateCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultUpdateCommandDTO;
+import jakarta.validation.Valid;
 
 public interface IntroduceRatingResultCommandService {
-    IntroduceRatingResultCommandDTO create(IntroduceRatingResultCommandDTO dto);
-
-    IntroduceRatingResultCommandDTO update(IntroduceRatingResultCommandDTO dto);
+    IntroduceRatingResultCreateCommandDTO create(IntroduceRatingResultCreateCommandDTO dto);
 
     Integer delete(int id);
+
+    IntroduceRatingResultUpdateCommandDTO update(int id, @Valid IntroduceRatingResultUpdateCommandDTO dto);
 }

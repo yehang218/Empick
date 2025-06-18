@@ -1,39 +1,45 @@
 package com.piveguyz.empickbackend.employment.introduce.command.application.mapper;
 
-import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultCreateCommandDTO;
+import com.piveguyz.empickbackend.employment.introduce.command.application.dto.IntroduceRatingResultUpdateCommandDTO;
 import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceRatingResultEntity;
-import org.springframework.stereotype.Component;
 
-@Component
 
 public class IntroduceRatingResultCommandMapper {
 
-    public IntroduceRatingResultCommandDTO toDTO(IntroduceRatingResultEntity entity) {
+    // 등록용 DTO → Entity
+    public static IntroduceRatingResultEntity toEntity(IntroduceRatingResultCreateCommandDTO dto) {
+        if (dto == null) return null;
+
+        return IntroduceRatingResultEntity.builder()
+                .content(dto.getContent())
+                .ratingScore(dto.getRatingScore())
+                .memberId(dto.getMemberId())
+                .introduceStandardId(dto.getIntroduceStandardId())
+                .build();
+    }
+
+    // Entity → 등록 결과 DTO
+    public static IntroduceRatingResultCreateCommandDTO toCreateDto(IntroduceRatingResultEntity entity) {
         if (entity == null) return null;
 
-        return IntroduceRatingResultCommandDTO.builder()
-                .id(entity.getId())
+        return IntroduceRatingResultCreateCommandDTO.builder()
                 .content(entity.getContent())
                 .ratingScore(entity.getRatingScore())
-                .status(entity.getStatus())
-                .statusLabel(entity.getStatus().getLabel()) // 프론트 출력용 라벨 포함
-                .updatedBy(entity.getUpdatedBy())
                 .memberId(entity.getMemberId())
                 .introduceStandardId(entity.getIntroduceStandardId())
                 .build();
     }
 
-    public IntroduceRatingResultEntity toEntity(IntroduceRatingResultCommandDTO dto) {
-        if (dto == null) return null;
+    // Entity → 수정 결과 DTO
+    public static IntroduceRatingResultUpdateCommandDTO toUpdateDto(IntroduceRatingResultEntity entity) {
+        if (entity == null) return null;
 
-        return IntroduceRatingResultEntity.builder()
-                .id(dto.getId())
-                .content(dto.getContent())
-                .ratingScore(dto.getRatingScore())
-                .status(dto.getStatus())
-                .updatedBy(dto.getUpdatedBy())
-                .memberId(dto.getMemberId())
-                .introduceStandardId(dto.getIntroduceStandardId())
+        return IntroduceRatingResultUpdateCommandDTO.builder()
+                .id(entity.getId())
+                .content(entity.getContent())
+                .ratingScore(entity.getRatingScore())
+                .updatedBy(entity.getUpdatedBy())
                 .build();
     }
 }
