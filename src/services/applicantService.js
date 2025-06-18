@@ -4,7 +4,7 @@ import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import ApplicantResponseDTO from '@/dto/employment/application/applicantResponseDTO';
 // import ApplicantCommandDTO from '@/dto/employment/employment/applicant/applicantCommandDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
-import axios from '@/apis/axios';
+// import axios from '@/apis/axios';
 
 const APPLICANT_API_BASE_URL = '/api/v1/employment/applicant';
 
@@ -123,7 +123,7 @@ const applicantService = {
    */
   async registerApplicant(applicantData) {
     try {
-      const response = await axios.post(ApplicantAPI.CREATE_APPLICANT, applicantData);
+      const response = await api.post(ApplicantAPI.CREATE_APPLICANT, applicantData);
       return response.data; // CustomApiResponse 구조를 따른 응답
     } catch (error) {
       console.error('지원자 등록 실패:', error);
@@ -137,7 +137,7 @@ const applicantService = {
    */
   async fetchAllApplicants() {
     try {
-      const response = await axios.get(APPLICANT_API_BASE_URL);
+      const response = await api.get(APPLICANT_API_BASE_URL);
       return response.data; // CustomApiResponse 구조를 따른 응답
     } catch (error) {
       console.error('지원자 목록 조회 실패:', error);
