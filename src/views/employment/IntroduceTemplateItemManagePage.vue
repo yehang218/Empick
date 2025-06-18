@@ -1,6 +1,6 @@
 <template>
-  <v-container class="standard-item-manage-container">
-    <h2 class="page-title">자기소개서 항목 관리</h2>
+  <v-container class="template-item-manage-container">
+    <h2 class="page-title">자기소개서 템플릿 항목 관리</h2>
 
     <v-card class="mb-6 pa-4">
       <v-text-field
@@ -90,7 +90,7 @@ const removeItem = async (id) => {
 </script>
 
 <style scoped>
-.standard-item-manage-container {
+.template-item-manage-container {
   max-width: 800px;
   margin: 0 auto;
   padding: 24px;

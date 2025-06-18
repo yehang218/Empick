@@ -279,8 +279,8 @@ export const employmentRoutes = [
         },
         {
             path: '/employment/introduce-items/manage',
-            name: 'IntroduceStandardItemManagePage',
-            component: () => import('@/views/employment/IntroduceStandardItemManagePage.vue')
+            name: 'IntroduceTemplateItemManagePage',
+            component: () => import('@/views/employment/IntroduceTemplateItemManagePage.vue')
         },
 
 
