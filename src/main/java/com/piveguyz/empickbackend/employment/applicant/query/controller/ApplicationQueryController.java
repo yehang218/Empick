@@ -47,11 +47,11 @@ public class ApplicationQueryController {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "해당 ID 없음")
     })
-    public ResponseEntity<CustomApiResponse<List<ApplicationQueryDTO>>> getApplicationById(
+    public ResponseEntity<CustomApiResponse<ApplicationQueryDTO>> getApplicationById(
             @Parameter(description = "조회할 지원서 ID", required = true)
             @PathVariable("id") int id) {
 
-        List<ApplicationQueryDTO> result = applicationQueryService.findApplicationById(id);
+        ApplicationQueryDTO result = applicationQueryService.findApplicationById(id);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
     }
