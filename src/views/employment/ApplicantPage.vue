@@ -20,6 +20,11 @@
             사원 등록 ({{ selectedApplicants.length }}개 선택)
           </v-btn>
 
+          <!-- ➕ 지원자 추가 버튼 (새로 추가) -->
+          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="goToApplicantRegistration">
+            지원자 추가
+          </v-btn>
+
           <!-- 📝 문제 할당 버튼 -->
           <v-btn color="secondary" variant="tonal" size="small" style="min-width: 90px" @click="handleAssignClick"
             :disabled="!selectedApplicants.length">
@@ -142,6 +147,9 @@
 </template>
 
 <script setup>
+
+// import { ref, computed, onMounted } from 'vue'
+
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
@@ -165,6 +173,7 @@ const applicantStore = useApplicantStore();
 const router = useRouter()
 
 const search = ref('')
+
 
 const tableHeaders = [
   {
@@ -513,6 +522,11 @@ const toggleSelectAll = (selectAll) => {
     console.log('❌ 전체 해제됨');
   }
 }
+
+// 지원자 등록 페이지로 이동
+const goToApplicantRegistration = () => {
+  router.push('/employment/applicants/register');
+};
 
 </script>
 

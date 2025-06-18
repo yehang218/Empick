@@ -39,7 +39,7 @@ export const createApplicationService = async (dto, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationResponseDTO.fromJSON(apiResponse.data);
+    return ApplicationResponseDTO.fromJSON(apiResponse.data); // ✅ 여기
   }, options);
 };
 
