@@ -21,12 +21,13 @@ export const useMemberList = () => {
         try {
             const memberList = await memberStore.findMembers()
             const membersWithAttendance = await enrichMembersWithAttendance(memberList)
+            const membersWithImages = await loadMemberProfileImages(membersWithAttendance)
 
-            members.value = membersWithAttendance
+            members.value = membersWithImages
             await departmentStore.loadDepartmentList()
 
-            showToast(`${membersWithAttendance.length}명의 사원 정보를 불러왔습니다.`, 'success')
-            return membersWithAttendance
+            showToast(`${membersWithImages.length}명의 사원 정보를 불러왔습니다.`, 'success')
+            return membersWithImages
         } catch (err) {
             error.value = err
             showToast('사원 목록을 불러오는데 실패했습니다.', 'error')
@@ -44,6 +45,33 @@ export const useMemberList = () => {
             ...member,
             status: Math.random() > 0.3 ? 1 : 0
         }))
+    }
+
+    // 프로필 이미지 로딩
+    const loadMemberProfileImages = async (memberList) => {
+        return memberList.map((member) => {
+            console.log(`사원 ${member.name}의 pictureUrl:`, member.pictureUrl)
+
+            // pictureUrl이 있으면 그대로 사용, 없으면 API로 이미지 로드
+            if (member.pictureUrl) {
+                member.profileImageUrl = member.pictureUrl
+            } else {
+                // 개별 이미지 로드는 필요시에만 (성능 고려)
+                member.profileImageUrl = ''
+            }
+            return member
+        })
+    }
+
+    // 개별 사원의 프로필 이미지 로드 (필요시 호출)
+    const loadSingleProfileImage = async (memberId) => {
+        try {
+            await memberStore.fetchProfileImage(memberId)
+            return memberStore.profileImageUrl
+        } catch (error) {
+            console.warn(`프로필 이미지 로드 실패 (사원 ID: ${memberId}):`, error)
+            return ''
+        }
     }
 
     // 검색 및 필터링 로직
@@ -117,6 +145,7 @@ export const useMemberList = () => {
         loadMembers,
         createMemberFilter,
         createDepartmentOptions,
+        loadSingleProfileImage,
 
         // 유틸리티
         filterBySearch,

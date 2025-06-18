@@ -5,22 +5,32 @@
                 <!-- 기본 정보 -->
                 <div class="flex-1" style="min-width: 200px;">
                     <h4 class="text-subtitle-1 font-weight-bold mb-3 text-primary">기본 정보</h4>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">사원번호:</span>
-                            <span class="info-value">{{ member.employeeNumber }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">이름:</span>
-                            <span class="info-value">{{ member.name }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">직급:</span>
-                            <span class="info-value">{{ member.rankName || '-' }}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">입사일:</span>
-                            <span class="info-value">{{ formatDate(member.hireAt) }}</span>
+                    <div class="d-flex align-start gap-3">
+                        <!-- 프로필 이미지 -->
+                        <v-avatar size="60" class="mt-1">
+                            <v-img v-if="member.profileImageUrl || member.pictureUrl"
+                                :src="member.profileImageUrl || member.pictureUrl" :alt="member.name" />
+                            <v-icon v-else icon="mdi-account-circle" size="60" color="grey-lighten-1" />
+                        </v-avatar>
+
+                        <!-- 정보 -->
+                        <div class="info-grid flex-1">
+                            <div class="info-item">
+                                <span class="info-label">사원번호:</span>
+                                <span class="info-value">{{ member.employeeNumber }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">이름:</span>
+                                <span class="info-value">{{ member.name }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">직급:</span>
+                                <span class="info-value">{{ member.rankName || '-' }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">입사일:</span>
+                                <span class="info-value">{{ formatDate(member.hireAt) }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>

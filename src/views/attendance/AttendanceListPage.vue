@@ -50,7 +50,9 @@
                     <template #item.name="{ item }">
                         <div class="d-flex align-center py-2">
                             <v-avatar size="40" class="mr-3">
-                                <v-img v-if="item.pictureUrl" :src="item.pictureUrl" :alt="item.name" />
+                                <v-img v-if="item.profileImageUrl || item.pictureUrl"
+                                    :src="item.profileImageUrl || item.pictureUrl" :alt="item.name"
+                                    @error="handleImageError(item)" />
                                 <v-icon v-else icon="mdi-account-circle" size="40" color="grey-lighten-1" />
                             </v-avatar>
                             <div>
@@ -139,7 +141,8 @@ const {
     loading,
     loadMembers,
     createMemberFilter,
-    createDepartmentOptions
+    createDepartmentOptions,
+    loadSingleProfileImage
 } = useMemberList()
 
 // UI 상태
@@ -187,6 +190,19 @@ const handleViewAttendance = (member) => {
 const handleSendMail = (member) => {
     console.log('메일 발송:', member)
     // TODO: 메일 발송 모달 열기
+}
+
+// 프로필 이미지 에러 처리
+const handleImageError = async (member) => {
+    console.log('프로필 이미지 로드 실패, API로 재시도:', member.name)
+    try {
+        const imageUrl = await loadSingleProfileImage(member.id)
+        if (imageUrl) {
+            member.profileImageUrl = imageUrl
+        }
+    } catch (error) {
+        console.warn('프로필 이미지 API 로드도 실패:', error)
+    }
 }
 
 
