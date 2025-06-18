@@ -38,14 +38,14 @@ export const fullMenu = {
             roles: [RoleCode.HR_ACCESS],
             children: [
                 { label: "신규 사원 등록", path: "/orgstructure/members/new" },
-                { label: "사원 목록", path: "/orgstructure/members/list" },
+                { label: "사원 목록", path: "/attendance/all" },
                 { label: "사원정보변경 요청", path: "/orgstructure/members/edit-request" }
             ]
         }
     ],
     근태: [
         {
-            label: '전체 사원 근태 기록',
+            label: '사원 근태 관리',
             roles: [RoleCode.HR_ACCESS],
             path: '/attendance/all',
             children: []
