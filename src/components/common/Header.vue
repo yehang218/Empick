@@ -139,9 +139,7 @@ function goTo(path) {
 
 .menu-panel {
     position: fixed;
-    /* 🔥 전체 뷰포트 기준 */
     top: 70px;
-    /* 헤더 height 맞추기 */
     left: 0;
     width: 100%;
     background-color: white;
@@ -149,20 +147,24 @@ function goTo(path) {
     border-bottom: 1px solid #eee;
     padding: 24px 48px 36px;
     z-index: 9999;
-    /* 🔥 Vuetify Drawer보다 높게 */
 }
 
 .menu-columns {
     display: flex;
-    gap: 60px;
+    gap: 30px;
     flex-wrap: wrap;
     max-width: 1200px;
-    margin: 0 auto;
+    margin-left: 115px;
+    margin-right: 0;
+    justify-content: flex-start;
 }
 
 .menu-section {
-    min-width: 160px;
+    min-width: 140px;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .menu-title {
@@ -170,12 +172,19 @@ function goTo(path) {
     font-weight: bold;
     margin-bottom: 8px;
     color: #333;
+    text-align: left;
+    width: 100%;
 }
 
 .submenu-list {
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .submenu-item {
@@ -183,6 +192,8 @@ function goTo(path) {
     padding: 4px 0;
     color: #5F8D4E;
     cursor: pointer;
+    text-align: left;
+    width: 100%;
 }
 
 .submenu-item:hover {
