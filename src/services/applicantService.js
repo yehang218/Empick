@@ -46,7 +46,7 @@ export const getApplicantFullInfoListService = async (options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(item => ApplicantResponseDTO.fromJSON(item));
+    return apiResponse.data.map(item => ApplicantFullInfoListDTO.fromJSON(item));
   }, options);
 };
 
@@ -113,6 +113,7 @@ export const removeApplicantBookmarkService = async (memberId, applicantId, opti
 
     return apiResponse.data;
   }, options);
+
 };
 
 const applicantService = {

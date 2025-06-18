@@ -1,7 +1,7 @@
 import api from '@/apis/apiClient'
 import { API } from '@/apis/routes'
 import ApiResponseDTO from '@/dto/common/apiResponseDTO'
-import recruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
+import RecruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
 import recruitmentDetailResponseDTO from '@/dto/employment/recruitment/recruitmentDetailResponseDTO'
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler'
@@ -16,7 +16,7 @@ export const fetchRecruitmentList = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400)
         }
 
-        return apiResponse.data.map(item => recruitmentResponseDTO.fromJSON(item))
+        return apiResponse.data.map(item => RecruitmentResponseDTO.fromJSON(item))
     }, options)
 }
 
