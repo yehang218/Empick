@@ -68,7 +68,7 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
         for (ApprovalLineEntity line : approvalLineList) {
             // 부서+직책 기준 결재자(멤버) 찾기
             Optional<MemberEntity> approverOpt =
-                    memberRepository.findFirstByDeptIdAndPositionId(deptId, line.getPositionId());
+                    memberRepository.findFirstByDepartmentIdAndPositionId(deptId, line.getPositionId());
             Integer approverId = approverOpt
                     .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_APPROVER_NOT_FOUND))
                     .getId();

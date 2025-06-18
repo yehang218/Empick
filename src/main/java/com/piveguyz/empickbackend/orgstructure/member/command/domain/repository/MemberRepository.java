@@ -11,5 +11,5 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
 
     boolean existsByEmployeeNumber(int randomNumber);
 
-    Optional<MemberEntity> findFirstByDeptIdAndPositionId(Integer deptId, Integer positionId);
+    Optional<MemberEntity> findFirstByDepartmentIdAndPositionId(Integer deptId, int positionId);
 }
