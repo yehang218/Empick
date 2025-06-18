@@ -4,4 +4,5 @@ import com.piveguyz.empickbackend.employment.interviews.interview.command.domain
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InterviewRepository extends JpaRepository<InterviewEntity, Integer> {
+    boolean existsByApplicationId(Integer applicationId);
 }
