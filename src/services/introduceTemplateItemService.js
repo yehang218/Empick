@@ -5,8 +5,8 @@ export const fetchItems = async () => {
   return res.data.data
 }
 
-export const createItem = async (content, memberId) => {
-  const res = await api.post('/api/v1/employment/introduce-template-item', { title: content, memberId })
+export const createItem = async ({ title, memberId, introduceTemplateId }) => {
+  const res = await api.post('/api/v1/employment/introduce-template-item', { title, memberId, introduceTemplateId })
   return res.data.data
 }
 
