@@ -119,121 +119,44 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useDepartmentStore } from '@/stores/departmentStore'
 import { useAuthStore } from '@/stores/authStore'
-import { useMemberStore } from '@/stores/memberStore'
-import { useToast } from '@/composables/useToast'
+import { useMemberList } from '@/composables/useMemberList'
 import { RoleCode } from '@/constants/common/RoleCode'
-import dayjs from 'dayjs'
+import { TABLE_HEADERS, STATUS_OPTIONS, getStatusClass, getStatusLabel, formatDate } from '@/utils/memberUtils'
 import AttendanceSummaryCard from '@/components/attendance/AttendanceSummaryCard.vue'
 
 const router = useRouter()
-const departmentStore = useDepartmentStore()
 const authStore = useAuthStore()
-const memberStore = useMemberStore()
-const { showToast } = useToast()
 
 // 🛡 권한 체크
 const hasHRAccess = computed(() =>
     authStore.userInfo?.roles?.includes(RoleCode.HR_ACCESS)
 )
 
-// 반응형 데이터
+// 비즈니스 로직 (Composable)
+const {
+    members,
+    loading,
+    loadMembers,
+    createMemberFilter,
+    createDepartmentOptions
+} = useMemberList()
+
+// UI 상태
 const searchQuery = ref('')
 const selectedDepartment = ref(null)
 const selectedStatus = ref('전체')
-const loading = ref(false)
-const members = ref([])
 const expanded = ref([])
 
-// 테이블 헤더 정의
-const tableHeaders = [
-    { title: '이름', key: 'name', sortable: true, width: '200px' },
-    { title: '사번', key: 'employeeNumber', sortable: true, width: '120px' },
-    { title: '이메일', key: 'email', sortable: true, width: '200px' },
-    { title: '연락처', key: 'phone', sortable: true, width: '150px' },
-    { title: '부서', key: 'departmentName', sortable: true, width: '150px' },
-    { title: '상태', key: 'status', sortable: true, width: '100px' },
-    { title: '입사일시', key: 'hireAt', sortable: true, width: '120px' }
-]
+// 상수
+const tableHeaders = TABLE_HEADERS
+const statusOptions = STATUS_OPTIONS
 
-// 상태 옵션
-const statusOptions = [
-    { title: '전체', value: '전체' },
-    { title: '출근', value: 1 },
-    { title: '미출근', value: 0 }
-]
+// 계산된 속성
+const departmentOptions = createDepartmentOptions()
+const filteredMembers = createMemberFilter(searchQuery, selectedDepartment, selectedStatus)
 
-// 부서 옵션 (computed) - departmentStore 데이터 사용
-const departmentOptions = computed(() => {
-    // departmentStore에서 부서 목록 가져오기
-    if (departmentStore.departmentList.length > 0) {
-        return departmentStore.departmentList.map(dept => ({
-            title: dept.name || dept.departmentName,
-            value: dept.name || dept.departmentName
-        }))
-    }
-
-    // fallback: 현재 사원들의 부서명으로 생성
-    const uniqueDepartments = [...new Set(members.value.map(m => m.departmentName).filter(Boolean))]
-    return uniqueDepartments.map(dept => ({ title: dept, value: dept }))
-})
-
-// 필터링된 사원 목록 (v-data-table이 내장 정렬과 페이징 처리)
-const filteredMembers = computed(() => {
-    let result = [...members.value]
-
-    // 검색 필터
-    if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase()
-        result = result.filter(member =>
-            member.name?.toLowerCase().includes(query) ||
-            member.employeeNumber?.toString().includes(query) ||
-            member.email?.toLowerCase().includes(query)
-        )
-    }
-
-    // 부서 필터
-    if (selectedDepartment.value) {
-        result = result.filter(member => member.departmentName === selectedDepartment.value)
-    }
-
-    // 상태 필터
-    if (selectedStatus.value && selectedStatus.value !== '전체') {
-        result = result.filter(member => member.status === selectedStatus.value)
-    }
-
-    return result
-})
-
-// 메서드들
-const loadMembers = async () => {
-    loading.value = true
-    try {
-        // employeeNumber를 전달하지 않으면 전체 조회
-        const memberList = await memberStore.findMembers()
-
-        // 임시로 랜덤 출근 상태 설정 (실제로는 각 사원별 근태 API 호출 필요)
-        const membersWithAttendance = memberList.map((member) => {
-            // 실제 구현에서는 각 사원의 오늘 출근 기록을 확인해야 함
-            // 현재는 임시로 랜덤 상태 설정
-            member.status = Math.random() > 0.3 ? 1 : 0
-            return member
-        })
-
-        members.value = membersWithAttendance
-        await departmentStore.loadDepartmentList()
-        showToast(`${membersWithAttendance.length}명의 사원 정보를 불러왔습니다.`, 'success')
-    } catch (error) {
-        console.error('사원 목록 로딩 실패:', error)
-        showToast('사원 목록을 불러오는데 실패했습니다.', 'error')
-        // API 실패 시 빈 배열로 설정
-        members.value = []
-    } finally {
-        loading.value = false
-    }
-}
-
+// 이벤트 핸들러 (UI 관련만)
 const handleSearch = () => {
     // 검색 시 필터만 적용 (v-data-table이 자동으로 처리)
 }
@@ -251,10 +174,8 @@ const handleSort = (sortBy) => {
     console.log('정렬 변경:', sortBy)
 }
 
-// handleRowClick 제거 - 이제 expand 기능 사용
-
+// 네비게이션 (라우팅 관련)
 const goToMemberDetail = (member) => {
-    // 사원 상세 페이지로 이동 (향후 구현)
     router.push(`/orgstructure/members/${member.employeeNumber}`)
 }
 
@@ -266,27 +187,6 @@ const handleViewAttendance = (member) => {
 const handleSendMail = (member) => {
     console.log('메일 발송:', member)
     // TODO: 메일 발송 모달 열기
-}
-
-const getStatusClass = (status) => {
-    switch (status) {
-        case 1: return 'status-present'
-        case 0: return 'status-absent'
-        default: return 'status-unknown'
-    }
-}
-
-const getStatusLabel = (status) => {
-    switch (status) {
-        case 1: return '출근'
-        case 0: return '미출근'
-        default: return '알 수 없음'
-    }
-}
-
-const formatDate = (dateString) => {
-    if (!dateString) return '-'
-    return dayjs(dateString).format('YYYY-MM-DD')
 }
 
 

@@ -3,6 +3,8 @@
  * 데이터 변환, 포맷팅, 상태 처리
  */
 
+import dayjs from 'dayjs'
+
 /**
  * 멤버 상태에 따른 색상 반환
  * @param {number} status - 멤버 상태 (1: 재직중, 0: 휴직중, -1: 퇴직)
@@ -72,4 +74,45 @@ export const formatPhoneNumber = (phone) => {
 export const getEmailDomain = (email) => {
     if (!email || !email.includes('@')) return ''
     return email.split('@')[1]
-} 
+}
+
+// 상태 관련 유틸리티
+export const getStatusClass = (status) => {
+    switch (status) {
+        case 1: return 'status-present'
+        case 0: return 'status-absent'
+        default: return 'status-unknown'
+    }
+}
+
+export const getStatusLabel = (status) => {
+    switch (status) {
+        case 1: return '출근'
+        case 0: return '미출근'
+        default: return '알 수 없음'
+    }
+}
+
+// 날짜 포맷팅
+export const formatDate = (dateString) => {
+    if (!dateString) return '-'
+    return dayjs(dateString).format('YYYY-MM-DD')
+}
+
+// 테이블 헤더 정의
+export const TABLE_HEADERS = [
+    { title: '이름', key: 'name', sortable: true, width: '200px' },
+    { title: '사번', key: 'employeeNumber', sortable: true, width: '120px' },
+    { title: '이메일', key: 'email', sortable: true, width: '200px' },
+    { title: '연락처', key: 'phone', sortable: true, width: '150px' },
+    { title: '부서', key: 'departmentName', sortable: true, width: '150px' },
+    { title: '상태', key: 'status', sortable: true, width: '100px' },
+    { title: '입사일시', key: 'hireAt', sortable: true, width: '120px' }
+]
+
+// 상태 옵션
+export const STATUS_OPTIONS = [
+    { title: '전체', value: '전체' },
+    { title: '출근', value: 1 },
+    { title: '미출근', value: 0 }
+] 
