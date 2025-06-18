@@ -17,4 +17,6 @@ public interface JobtestQuestionRepository extends JpaRepository<JobtestQuestion
     Integer findMaxOptionNumberByJobTestId(@Param("jobTestId") int jobTestId);
 
     Optional<JobtestQuestionEntity> findByJobTestIdAndQuestionId(int jobTestId, int questionId);
+
+    boolean existsByQuestionId(int id);
 }
