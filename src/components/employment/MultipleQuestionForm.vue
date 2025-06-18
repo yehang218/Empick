@@ -36,6 +36,8 @@
 </template>
 
 <script setup>
+import { onMounted, watch } from 'vue'
+
 const props = defineProps({
     form: Object,
     errors: {
@@ -64,4 +66,25 @@ function selectAnswer(selectedIdx) {
     // 자동으로 form.answer도 설정
     props.form.answer = props.form.questionOptions[selectedIdx].content;
 }
+
+function initializeCorrectOption() {
+    if (
+        !props.form ||
+        !props.form.answer ||
+        !props.form.questionOptions ||
+        props.form.questionOptions.length === 0
+    ) return;
+
+    props.form.questionOptions.forEach(option => {
+        option.isAnswer = option.content === props.form.answer;
+    });
+}
+
+onMounted(() => {
+    initializeCorrectOption()
+})
+
+watch(() => props.form.answer, () => {
+    initializeCorrectOption()
+})
 </script>

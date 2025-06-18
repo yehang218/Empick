@@ -4,6 +4,39 @@ import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 import ApprovalReceivedListDTO from '@/dto/approval/approval/approvalReceivedListDTO';
 
+import ApprovalCategoryDTO from '@/dto/approval/approvalCategory/approvalCategoryDTO';
+import ApprovalCategoryItemDTO from '@/dto/approval/approvalCategoryItem/approvalCategoryItemDTO';
+import { CreateApprovalDTO } from '@/dto/approval/approval/createApprovalDTO';
+
+// 결재 카테고리 목록 조회
+export const getApprovalCategories = async (options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(ApprovalAPI.CATEGORIES);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return (apiResponse.data || []).map(ApprovalCategoryDTO.fromJSON);
+    }, options);
+};
+
+// 선택 카테고리의 결재 항목 조회
+export const getApprovalCategoryItems = async (categoryId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(ApprovalAPI.CATEGORY_ITEMS(categoryId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return (apiResponse.data || []).map(ApprovalCategoryItemDTO.fromJSON);
+    }, options);
+};
+
+
 // 결재 문서 목록 조회 (작성자 기준)
 export const getApprovalsByWriterId = async (writerId) => {  };
 
@@ -14,7 +47,18 @@ export const getApprovalsByApproverId = async (approverId) => {  };
 export const getApprovalById = async (approvalId) => { };
 
 // 결재 생성
-export const createApproval = async (dto) => {  };
+export const createApprovalService = async (dto, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.post(ApprovalAPI.DOCUMENTS, dto.toJSON());
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.message;
+    }, options);
+};
 
 // 승인 처리
 export const approveApproval = async (approvalId) => {  };

@@ -81,8 +81,8 @@ export const fullMenu = {
             children: [
                 { label: '채용 공고', path: routeMap.RecruitmentList },
                 { label: '채용 요청서', path: routeMap.RecruitmentRequestList },
-                // { label: '채용 공고 템플릿', path: '/employment/recruitments/templates' },
-                { label: '자기소개서 템플릿', path: '/employment/recruitments/resumes' }
+//                 { label: '채용 공고 템플릿', path: '/employment/recruitments/templates' },
+                { label: '자기소개서 템플릿', path: routeMap.IntroduceTemplateListPage }
             ]
         },
         {
@@ -98,7 +98,7 @@ export const fullMenu = {
             label: '지원자',
             roles: [RoleCode.HR_ACCESS],
             children: [
-                { label: '지원자 목록', path: '/employment/applicant' }
+                { label: '지원자 목록', path: routeMap.ApplicantPage }
             ]
         },
         {
