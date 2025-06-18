@@ -27,23 +27,3 @@ CREATE TABLE `attendance_record`
         ON DELETE RESTRICT,
     CONSTRAINT `fk_attendance_record_category` FOREIGN KEY (`attendance_category_id`) REFERENCES `attendance_category` (`id`)
 );
-
--- 🔁 근태 기록 수정 요청
-CREATE TABLE `attendance_record_change_request`
-(
-    `id`                   INT      NOT NULL AUTO_INCREMENT COMMENT '수정 요청 번호',
-    `attendance_record_id` INT      NOT NULL COMMENT '수정 대상 근태 기록 ID',
-    `reason`               LONGTEXT NOT NULL COMMENT '수정 요청 사유',
-    `request_at`           DATETIME NOT NULL COMMENT '요청 시각',
-    `status`               TINYINT  NOT NULL DEFAULT 0 COMMENT '0=요청, 1=승인, 2=반려',
-    `approved_member_id`   INT      NOT NULL COMMENT '승인자 ID',  -- ✅ NOT NULL + RESTRICT 적용
-    `approved_at`          DATETIME NULL COMMENT '승인 시각',
-    `created_at`           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성 시각',
-    `updated_at`           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 시각',
-    PRIMARY KEY (`id`),
-    KEY `idx_change_status` (`status`),
-    CONSTRAINT `fk_change_request_record` FOREIGN KEY (`attendance_record_id`) REFERENCES `attendance_record` (`id`)
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_change_request_approver` FOREIGN KEY (`approved_member_id`) REFERENCES `member` (`id`)
-        ON DELETE RESTRICT
-);
