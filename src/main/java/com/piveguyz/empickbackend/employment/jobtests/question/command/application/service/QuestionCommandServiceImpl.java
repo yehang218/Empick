@@ -73,6 +73,16 @@ public class QuestionCommandServiceImpl implements QuestionCommandService {
             throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_UPDATED_MEMBER);
         }
 
+        // 답안에서 참조중이라면
+        if(answerRepository.existsByQuestionId(id)) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_USED_IN_ANSWER);
+        }
+
+        // 실무테스트에서 참조중이라면
+        if(jobtestQuestionRepository.existsByQuestionId(id)) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_QUESTION_USED_IN_JOBTEST);
+        }
+
         question.updateQuestionEntity(updateQuestionCommandDTO);
 
         QuestionEntity updatedEntity = questionRepository.save(question);
