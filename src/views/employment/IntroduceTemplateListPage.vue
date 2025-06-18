@@ -31,16 +31,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchTemplates, deleteTemplate } from '@/services/introduceTemplateService'
+import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const templates = ref([])
+const introduceTemplateStore = useIntroduceTemplateStore()
+const templates = introduceTemplateStore.templates
 
 onMounted(async () => {
   try {
-    templates.value = await fetchTemplates()
-    console.log('Fetched templates:', templates.value)
+    await introduceTemplateStore.loadTemplates()
+    // console.log('Fetched templates:', introduceTemplateStore.templates)
   } catch (error) {
     console.error('템플릿 목록 로드 실패:', error)
     alert('템플릿 목록을 불러오는 데 실패했습니다.')
@@ -53,25 +54,15 @@ const goDetail = (id) => router.push(`/employment/recruitments/introduce-templat
 const removeTemplate = async (id) => {
   if (confirm('정말로 이 템플릿을 삭제하시겠습니까? 관련 항목도 함께 삭제됩니다.')) {
     try {
-      await deleteTemplate(id)
+      await introduceTemplateStore.removeTemplate(id)
       alert('템플릿이 성공적으로 삭제되었습니다.')
-      await loadTemplates()
+      // await introduceTemplateStore.loadTemplates() // store에서 이미 반영됨
     } catch (error) {
       console.error('템플릿 삭제 실패:', error)
       alert('템플릿 삭제에 실패했습니다. 서버 오류일 수 있습니다.')
     }
   }
 }
-
-const loadTemplates = async () => {
-  try {
-    templates.value = await fetchTemplates()
-  } catch (error) {
-    console.error('템플릿 목록 재로드 실패:', error)
-  }
-}
-
-onMounted(loadTemplates)
 </script>
 
 <style scoped>
