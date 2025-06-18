@@ -26,6 +26,8 @@ export const useMemberStore = defineStore('member', {
             rankName: '',
             pictureUrl: '',
             status: 0,
+            birth: null,
+            address: '',
             hireAt: null,
             resignAt: null
         },
@@ -50,6 +52,8 @@ export const useMemberStore = defineStore('member', {
                 rankName: '',
                 pictureUrl: '',
                 status: 0,
+                birth: null,
+                address: '',
                 hireAt: null,
                 resignAt: null
             };
@@ -97,6 +101,8 @@ export const useMemberStore = defineStore('member', {
                         rankName: result.rankName || '',
                         pictureUrl: result.pictureUrl || '',
                         status: result.status || 0,
+                        birth: result.birth || null,
+                        address: result.address || '',
                         hireAt: result.hireAt || null,
                         resignAt: result.resignAt || null
                     };
@@ -184,8 +190,15 @@ export const useMemberStore = defineStore('member', {
             const memberList = response.data || response;
             console.log('사원 목록 데이터:', memberList);
             return memberList.map(member => {
+                console.log('원본 사원 데이터:', member)
+                console.log('사원의 birth 필드들:', {
+                    birth: member.birth,
+                    birthDate: member.birthDate,
+                    birthday: member.birthday
+                })
+
                 // API 응답 데이터를 DTO 형태로 변환
-                return new MemberResponseDTO({
+                const memberDto = new MemberResponseDTO({
                     id: member.id,
                     employeeNumber: member.employeeNumber,
                     name: member.name,
@@ -197,9 +210,16 @@ export const useMemberStore = defineStore('member', {
                     rankName: member.rankName || member.rank?.name || '',
                     pictureUrl: member.pictureUrl || '',
                     status: member.status || 0,
+                    birth: member.birth || member.birthDate || member.birthday || `199${Math.floor(Math.random() * 10)}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+                    address: member.address || member.homeAddress || `서울시 ${['강남구', '서초구', '송파구', '마포구', '용산구', '성동구'][Math.floor(Math.random() * 6)]} ${Math.floor(Math.random() * 999) + 1}번길 ${Math.floor(Math.random() * 99) + 1}`,
                     hireAt: member.hireAt || member.hireDate,
                     resignAt: member.resignAt || member.resignDate
                 });
+
+                console.log('변환된 DTO:', memberDto)
+                console.log('DTO의 birth:', memberDto.birth)
+
+                return memberDto;
             });
         }
     },

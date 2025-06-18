@@ -45,7 +45,7 @@
             <v-card class="mb-4 member-list-card" elevation="0">
                 <v-data-table :headers="tableHeaders" :items="filteredMembers" :items-per-page="8" :loading="loading"
                     item-key="id" class="member-table" show-expand v-model:expanded="expanded"
-                    @update:sort-by="handleSort">
+                    @update:sort-by="handleSort" @click:row="handleRowClick">
 
                     <!-- 아바타 + 이름 컬럼 -->
                     <template #item.name="{ item }">
@@ -176,6 +176,41 @@ const handleStatusFilter = () => {
 const handleSort = (sortBy) => {
     // v-data-table의 내장 정렬 처리
     console.log('정렬 변경:', sortBy)
+}
+
+const handleRowClick = (event, { item }) => {
+    console.log('클릭한 사원 데이터:', item)
+    console.log('사원의 birth 데이터:', item.birth)
+
+    // 사원 상세 페이지로 이동 (sessionStorage 사용)
+    const memberDataWithImage = {
+        ...item,
+        // 현재 표시되고 있는 프로필 이미지 URL 포함
+        profileImageUrl: item.profileImageUrl || item.pictureUrl || '',
+        // 생년월일 포함
+        birth: item.birth,
+        // 주소 포함
+        address: item.address
+    }
+
+    console.log('전달할 데이터:', memberDataWithImage)
+    console.log('전달할 birth 데이터:', memberDataWithImage.birth)
+
+    // sessionStorage에 데이터 저장 (새로고침 시에도 유지됨)
+    try {
+        // eslint-disable-next-line no-undef
+        sessionStorage.setItem('memberDetailData', JSON.stringify(memberDataWithImage))
+        console.log('sessionStorage에 데이터 저장 완료')
+    } catch (error) {
+        console.error('sessionStorage 저장 실패:', error)
+        // fallback으로 전역 변수 사용
+        globalThis.memberDetailData = memberDataWithImage
+    }
+
+    router.push({
+        name: 'AttendanceDetailPage',
+        params: { id: item.id }
+    })
 }
 
 // 네비게이션 (라우팅 관련)
