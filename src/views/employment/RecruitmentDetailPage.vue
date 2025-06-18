@@ -30,6 +30,11 @@ const loading = computed(() => store.loadingDetail)
 const error = computed(() => store.detailError)
 const deleteDialog = ref(false)
 
+const goToRecruitmentList = () => {
+    const currentPage = route.query.page || 1;
+    router.push({ path: '/employment/recruitments', query: { page: currentPage } });
+};
+
 const getInputComponent = (type) => {
     switch (type) {
         case 'TEXT': return 'v-text-field'
@@ -102,7 +107,7 @@ const getStatusColor = (status) => {
         <v-card v-else-if="detail" class="pa-6" flat>
             <v-row align="center" justify="space-between" class="mb-6">
                 <v-col cols="auto" class="d-flex align-center">
-                    <v-icon @click="$router.back()" class="me-2 cursor-pointer" size="28" color="black">
+                    <v-icon @click="goToRecruitmentList" class="me-2 cursor-pointer" size="28" color="black">
                         mdi-arrow-left
                     </v-icon>
                     <h2 class="text-h5 font-weight-bold me-3">
@@ -115,8 +120,10 @@ const getStatusColor = (status) => {
                 </v-col>
 
                 <v-col cols="auto" class="d-flex gap-2">
-                    <v-btn class="mr-2" variant="outlined" color="success"
-                        :to="`/employment/applicants?recruitmentId=${detail.recruitment.id}`">
+                    <v-btn class="mr-2" variant="outlined" color="success" :to="{
+                        path: `/employment/applicant/recruitments/${detail.recruitment.id}`,
+                        query: { page: $route.query.page }
+                    }">
                         지원자 현황 보기
                     </v-btn>
                     <v-btn class="mr-2" variant="outlined" color="success" @click="applicationItemDialog = true">

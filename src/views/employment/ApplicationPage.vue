@@ -493,6 +493,12 @@ const updateStatus = () => {
 
 const goBack = () => {
   // 뒤로가기 또는 목록으로 이동
-  router.push('/employment/applicant')
+  const from = route.query.from;
+  const page = route.query.page;
+  if (from) {
+    router.push(page ? { path: from, query: { page } } : { path: from });
+  } else {
+    router.push('/employment/applicant');
+  }
 }
 </script>

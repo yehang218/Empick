@@ -86,7 +86,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
-import recruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
+import RecruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
 import { getInputTypeLabel } from '@/constants/employment/inputTypes'
 import { useMemberStore } from '@/stores/memberStore'
 
@@ -186,7 +186,7 @@ const submit = async () => {
         isRequired: requiredIds.value.includes(id)
     }))
 
-    const dto = recruitmentCreateDTO.fromForm({
+    const dto = RecruitmentCreateDTO.fromForm({
         ...draft,
         recruitmentRequestId: draft.recruitmentRequestId,
         recruitType: draft.recruitType,

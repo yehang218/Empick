@@ -34,7 +34,7 @@ export const createApplicationService = async (dto, options = {}) => {
   return withErrorHandling(async () => {
     const response = await api.post(ApplicationAPI.CREATE_APPLICATION, dto);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
-    
+
     if (!apiResponse.success) {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }

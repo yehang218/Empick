@@ -5,6 +5,8 @@ export const ApplicantAPI = {
         `/api/v1/employment/applicant/${id}`,
     SEARCH_APPLICANTS_BY_NAME: (name) =>
         `/api/v1/employment/applicant/search?name=${encodeURIComponent(name)}`,
+    GET_APPLICANTS_BY_RECRUITMENT_ID: (recruitmentId) =>
+        `/api/v1/employment/recruitments/${recruitmentId}/applicants`,
 
     // 🔸 생성
     CREATE_APPLICANT: '/api/v1/employment/applicant/create',
@@ -42,6 +44,10 @@ export const ApplicationAPI = {
     // 🔸 삭제
     DELETE_APPLICATION: (id) =>
         `/api/v1/employment/application/${id}`,
+
+    GET_APPLICATION_BY_RECRUITMENT_ID: (recruitmentId) =>
+        `/api/v1/employment/recruitments/${recruitmentId}/applications`,
+
 };
 
 export const ApplicationResponseAPI = {
