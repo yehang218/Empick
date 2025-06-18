@@ -36,8 +36,57 @@ export const useMemberStore = defineStore('member', {
         loading: false,
         error: '',
         profileImageUrl: '',
-        defaultProfileImageUrl: '/images/default-profile.png'
+        defaultProfileImageUrl: '/images/default-profile.png',
+
+        // 캐싱 관련 state
+        membersCache: [],
+        membersCacheTimestamp: null,
+        cacheExpiryTime: 5 * 60 * 1000, // 5분
+        profileImageCache: new Map(), // 프로필 이미지 캐시
+
+        // 페이징 관련 state
+        currentPage: 1,
+        pageSize: 10,
+        totalMembers: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        paginatedMembers: [],
+        paginationCache: new Map() // 페이지별 캐시
     }),
+    getters: {
+        // 캐시가 유효한지 확인
+        isCacheValid: (state) => {
+            if (!state.membersCacheTimestamp || state.membersCache.length === 0) {
+                return false
+            }
+            const now = Date.now()
+            return (now - state.membersCacheTimestamp) < state.cacheExpiryTime
+        },
+
+        // 캐시된 사원 목록 반환
+        cachedMembers: (state) => state.membersCache,
+
+        // 페이징 정보
+        paginationInfo: (state) => ({
+            currentPage: state.currentPage,
+            pageSize: state.pageSize,
+            totalMembers: state.totalMembers,
+            totalPages: state.totalPages,
+            hasNextPage: state.hasNextPage,
+            hasPrevPage: state.hasPrevPage
+        }),
+
+        // 현재 페이지 캐시 유효성 확인
+        isPageCacheValid: (state) => (page) => {
+            const cacheKey = `page_${page}_${state.pageSize}`
+            const cachedPage = state.paginationCache.get(cacheKey)
+            if (!cachedPage) return false
+
+            const now = Date.now()
+            return (now - cachedPage.timestamp) < state.cacheExpiryTime
+        }
+    },
     actions: {
         reset() {
             this.form = {
@@ -148,14 +197,49 @@ export const useMemberStore = defineStore('member', {
 
         async fetchProfileImage(memberId) {
             try {
+                // 캐시에서 먼저 확인
+                const cacheKey = `profile_${memberId}`
+                if (this.profileImageCache.has(cacheKey)) {
+                    const cachedData = this.profileImageCache.get(cacheKey)
+                    // 캐시가 1시간 이내인 경우 사용
+                    if (Date.now() - cachedData.timestamp < 60 * 60 * 1000) {
+                        console.log('캐시된 프로필 이미지 사용:', memberId)
+                        this.profileImageUrl = cachedData.url
+                        return
+                    } else {
+                        // 만료된 캐시 제거
+                        URL.revokeObjectURL(cachedData.url)
+                        this.profileImageCache.delete(cacheKey)
+                    }
+                }
+
+                console.log('API에서 프로필 이미지 가져오기:', memberId)
                 const blob = await profileImageFetchService(memberId);
                 console.log('받은 blob:', blob, '타입:', blob instanceof Blob, 'size:', blob.size, 'type:', blob.type);
-                this.profileImageUrl = URL.createObjectURL(blob);
-                console.log('profileImageUrl', this.profileImageUrl);
+
+                const imageUrl = URL.createObjectURL(blob);
+                this.profileImageUrl = imageUrl;
+
+                // 캐시에 저장
+                this.profileImageCache.set(cacheKey, {
+                    url: imageUrl,
+                    timestamp: Date.now()
+                })
+
+                console.log('프로필 이미지 로드 및 캐시 완료:', imageUrl);
             } catch (err) {
                 console.error('프로필 이미지 로드 실패:', err);
                 this.profileImageUrl = '';
             }
+        },
+
+        // 프로필 이미지 캐시 정리
+        clearProfileImageCache() {
+            this.profileImageCache.forEach(cachedData => {
+                URL.revokeObjectURL(cachedData.url)
+            })
+            this.profileImageCache.clear()
+            console.log('프로필 이미지 캐시 정리 완료')
         },
 
         async uploadProfileImage(memberId, formData) {
@@ -183,7 +267,31 @@ export const useMemberStore = defineStore('member', {
             return response.map(role => MemberRoleDTO.fromJSON(role));
         },
 
-        async findMembers(employeeNumber = null) {
+        async findMembers(employeeNumber = null, forceRefresh = false) {
+            // 특정 사원 조회인 경우 캐시 사용 안함
+            if (employeeNumber) {
+                return await this.fetchMembersFromAPI(employeeNumber)
+            }
+
+            // 캐시가 유효하고 강제 새로고침이 아닌 경우 캐시 반환
+            if (!forceRefresh && this.isCacheValid) {
+                console.log('캐시된 사원 목록 사용:', this.membersCache.length, '명')
+                return [...this.membersCache] // 복사본 반환
+            }
+
+            // API에서 새로운 데이터 가져오기
+            console.log('API에서 새로운 사원 목록 가져오기')
+            const members = await this.fetchMembersFromAPI()
+
+            // 캐시 업데이트
+            this.membersCache = members
+            this.membersCacheTimestamp = Date.now()
+            console.log('사원 목록 캐시 업데이트 완료:', members.length, '명')
+
+            return [...members] // 복사본 반환
+        },
+
+        async fetchMembersFromAPI(employeeNumber = null) {
             const response = await findMembersService(employeeNumber);
             console.log('findMembers API 응답:', response);
             // API 응답 구조: {success: true, code: 200, message: '...', data: Array}
@@ -221,6 +329,118 @@ export const useMemberStore = defineStore('member', {
 
                 return memberDto;
             });
+        },
+
+        // 캐시 무효화
+        invalidateMembersCache() {
+            this.membersCache = []
+            this.membersCacheTimestamp = null
+            console.log('사원 목록 캐시 무효화')
+        },
+
+        // 페이징된 사원 목록 조회
+        async findMembersPaginated(page = 1, pageSize = 10, forceRefresh = false) {
+            console.log(`페이징 조회 시작: 페이지 ${page}, 크기 ${pageSize}`)
+
+            const cacheKey = `page_${page}_${pageSize}`
+
+            // 캐시 확인 (강제 새로고침이 아닌 경우)
+            if (!forceRefresh && this.isPageCacheValid(page)) {
+                const cachedPage = this.paginationCache.get(cacheKey)
+                console.log('캐시된 페이지 데이터 사용:', page)
+
+                // 상태 업데이트
+                this.currentPage = page
+                this.pageSize = pageSize
+                this.paginatedMembers = cachedPage.members
+                this.totalMembers = cachedPage.totalMembers
+                this.totalPages = cachedPage.totalPages
+                this.hasNextPage = page < this.totalPages
+                this.hasPrevPage = page > 1
+
+                return {
+                    members: [...cachedPage.members],
+                    pagination: this.paginationInfo
+                }
+            }
+
+            try {
+                // API에서 페이징된 데이터 가져오기
+                const response = await this.fetchMembersPaginatedFromAPI(page, pageSize)
+
+                // 상태 업데이트
+                this.currentPage = page
+                this.pageSize = pageSize
+                this.paginatedMembers = response.members
+                this.totalMembers = response.totalMembers
+                this.totalPages = response.totalPages
+                this.hasNextPage = page < this.totalPages
+                this.hasPrevPage = page > 1
+
+                // 페이지 캐시에 저장
+                this.paginationCache.set(cacheKey, {
+                    members: response.members,
+                    totalMembers: response.totalMembers,
+                    totalPages: response.totalPages,
+                    timestamp: Date.now()
+                })
+
+                console.log(`페이징 조회 완료: ${response.members.length}명, 총 ${response.totalMembers}명`)
+
+                return {
+                    members: [...response.members],
+                    pagination: this.paginationInfo
+                }
+            } catch (error) {
+                console.error('페이징 조회 실패:', error)
+                throw error
+            }
+        },
+
+        // API에서 페이징된 데이터 가져오기 (실제 구현은 API 스펙에 따라 수정 필요)
+        async fetchMembersPaginatedFromAPI(page, pageSize) {
+            // 현재는 기존 API를 사용하여 클라이언트 사이드 페이징 구현
+            // 실제 서버 사이드 페이징 API가 있다면 해당 API 사용
+            console.log('API에서 페이징된 사원 목록 가져오기')
+
+            // 전체 데이터 가져오기 (임시)
+            const allMembers = await this.fetchMembersFromAPI()
+
+            // 클라이언트 사이드 페이징
+            const startIndex = (page - 1) * pageSize
+            const endIndex = startIndex + pageSize
+            const paginatedMembers = allMembers.slice(startIndex, endIndex)
+
+            const totalMembers = allMembers.length
+            const totalPages = Math.ceil(totalMembers / pageSize)
+
+            return {
+                members: paginatedMembers,
+                totalMembers,
+                totalPages,
+                currentPage: page,
+                pageSize
+            }
+        },
+
+        // 페이징 캐시 무효화
+        invalidatePaginationCache() {
+            this.paginationCache.clear()
+            this.currentPage = 1
+            this.totalMembers = 0
+            this.totalPages = 0
+            this.hasNextPage = false
+            this.hasPrevPage = false
+            this.paginatedMembers = []
+            console.log('페이징 캐시 무효화')
+        },
+
+        // 페이지 크기 변경
+        setPageSize(newPageSize) {
+            if (this.pageSize !== newPageSize) {
+                this.pageSize = newPageSize
+                this.invalidatePaginationCache() // 페이지 크기 변경 시 캐시 무효화
+            }
         }
     },
 }); 

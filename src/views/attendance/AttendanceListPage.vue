@@ -14,7 +14,7 @@
             <div class="d-flex justify-space-between align-center mb-6">
                 <h2 class="text-h5 font-weight-bold">사원 목록</h2>
                 <div class="d-flex" style="gap: 16px;">
-                    <v-btn color="grey" variant="outlined" prepend-icon="mdi-refresh" @click="loadMembers"
+                    <v-btn color="grey" variant="outlined" prepend-icon="mdi-refresh" @click="refreshCurrentPage"
                         :loading="loading">
                         새로고침
                     </v-btn>
@@ -41,10 +41,23 @@
                 </v-col>
             </v-row>
 
+            <!-- 페이징 정보 -->
+            <div class="d-flex justify-space-between align-center mb-3">
+                <div class="text-body-2 text-grey-darken-1">
+                    총 {{ totalMembers }}명 중 {{ ((currentPage - 1) * pageSize) + 1 }}~{{ Math.min(currentPage * pageSize,
+                        totalMembers) }}명 표시 ({{ currentPage }}/{{ totalPages }} 페이지)
+                </div>
+                <div class="d-flex align-center" style="gap: 8px;">
+                    <span class="text-body-2">페이지당:</span>
+                    <v-select v-model="pageSize" :items="[10, 20, 50, 100]" variant="outlined" density="compact"
+                        hide-details style="width: 80px;" @update:modelValue="handlePageSizeChange" />
+                </div>
+            </div>
+
             <!-- 사원 목록 테이블 -->
             <v-card class="mb-4 member-list-card" elevation="0">
-                <v-data-table :headers="tableHeaders" :items="filteredMembers" :items-per-page="8" :loading="loading"
-                    item-key="id" class="member-table" show-expand v-model:expanded="expanded"
+                <v-data-table :headers="tableHeaders" :items="members" :items-per-page="-1" :loading="loading"
+                    item-key="id" class="member-table" show-expand v-model:expanded="expanded" hide-default-footer
                     @update:sort-by="handleSort" @click:row="handleRowClick">
 
                     <!-- 아바타 + 이름 컬럼 -->
@@ -115,6 +128,14 @@
                     </template>
                 </v-data-table>
             </v-card>
+
+            <!-- 페이징 네비게이션 -->
+            <div class="d-flex justify-center mt-4" v-if="totalPages > 1">
+                <v-pagination v-model="currentPage" :length="totalPages" :total-visible="7" :disabled="loading"
+                    @update:modelValue="handlePageChange" />
+            </div>
+
+
         </template>
     </v-container>
 </template>
@@ -140,8 +161,14 @@ const hasHRAccess = computed(() =>
 const {
     members,
     loading,
+    currentPage,
+    pageSize,
+    totalMembers,
+    totalPages,
     loadMembers,
-    createMemberFilter,
+    goToPage,
+    changePageSize,
+    refreshCurrentPage,
     createDepartmentOptions,
     loadSingleProfileImage
 } = useMemberList()
@@ -158,7 +185,7 @@ const statusOptions = STATUS_OPTIONS
 
 // 계산된 속성
 const departmentOptions = createDepartmentOptions()
-const filteredMembers = createMemberFilter(searchQuery, selectedDepartment, selectedStatus)
+// const filteredMembers = createMemberFilter(searchQuery, selectedDepartment, selectedStatus) // 페이징과 충돌하므로 임시 비활성화
 
 // 이벤트 핸들러 (UI 관련만)
 const handleSearch = () => {
@@ -177,6 +204,23 @@ const handleSort = (sortBy) => {
     // v-data-table의 내장 정렬 처리
     console.log('정렬 변경:', sortBy)
 }
+
+const handlePageChange = (page) => {
+    if (!loading.value) {
+        if (page !== currentPage.value) {
+            goToPage(page)
+        } else {
+            // 같은 페이지를 클릭한 경우 새로고침
+            refreshCurrentPage()
+        }
+    }
+}
+
+const handlePageSizeChange = (newSize) => {
+    changePageSize(newSize)
+}
+
+
 
 const handleRowClick = (event, { item }) => {
     console.log('클릭한 사원 데이터:', item)
@@ -244,8 +288,12 @@ const handleImageError = async (member) => {
 
 
 // 라이프사이클
-onMounted(() => {
-    loadMembers()
+onMounted(async () => {
+    try {
+        await loadMembers(1) // 첫 페이지 로드
+    } catch (error) {
+        console.error('초기 데이터 로드 실패:', error)
+    }
 })
 
 // 검색어 변경 시 디바운싱
