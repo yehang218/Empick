@@ -31,7 +31,8 @@ const routes = [
         name: 'MainPage',
         component: () => import('@/views/MainPage.vue'),
         meta: {
-            requiresAuth: true
+            requiresAuth: true,
+            requiredRoles: ['ROLE_USER', 'ROLE_HR_ACCESS']
         }
     },
     ...allRouteModules
