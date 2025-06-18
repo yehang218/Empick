@@ -58,6 +58,7 @@
             score
         FROM interview
         WHERE `datetime` BETWEEN #{start} AND #{end}
+        ORDER BY datetime ASC;
     </select>
 
     <select id="checkAvailable" resultMap="InterviewResultMap">
