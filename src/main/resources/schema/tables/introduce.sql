@@ -25,22 +25,18 @@ create index member_id
 -- introduce_template
 create table introduce_template
 (
-    id                         int auto_increment
+    id        int auto_increment
         primary key,
-    title                      varchar(255) not null,
-    member_id                  int          not null,
-    introduce_template_item_id int          not null,
+    title     varchar(255) not null,
+    member_id int          not null,
     constraint introduce_template_ibfk_1
-        foreign key (member_id) references member (id),
-    constraint introduce_template_ibfk_2
-        foreign key (introduce_template_item_id) references introduce_template_item (id)
+        foreign key (member_id) references member (id)
 );
-
-create index introduce_template_item_id
-    on introduce_template (introduce_template_item_id);
 
 create index member_id
     on introduce_template (member_id);
+
+
 
 create table introduce_standard_item
 (
@@ -88,37 +84,18 @@ create index updated_by
 
 
 -- auto-generated definition
-create table introduce_standard
+create table introduce_template
 (
-    id                         int auto_increment
+    id        int auto_increment
         primary key,
-    content                    varchar(255) not null,
-    member_id                  int          not null,
-    introduce_id               int          not null,
-    introduce_standard_item_id int          not null,
-    updated_by                 int          null,
-    updated_at                 datetime     null,
-    constraint introduce_standard_ibfk_1
-        foreign key (member_id) references member (id),
-    constraint introduce_standard_ibfk_2
-        foreign key (introduce_id) references introduce (id),
-    constraint introduce_standard_ibfk_3
-        foreign key (introduce_standard_item_id) references introduce_standard_item (id),
-    constraint introduce_standard_ibfk_4
-        foreign key (updated_by) references member (id)
+    title     varchar(255) not null,
+    member_id int          not null,
+    constraint introduce_template_ibfk_1
+        foreign key (member_id) references member (id)
 );
 
-create index introduce_id
-    on introduce_standard (introduce_id);
-
-create index introduce_standard_item_id
-    on introduce_standard (introduce_standard_item_id);
-
 create index member_id
-    on introduce_standard (member_id);
-
-create index updated_by
-    on introduce_standard (updated_by);
+    on introduce_template (member_id);
 
 
 
