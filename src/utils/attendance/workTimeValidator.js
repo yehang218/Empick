@@ -30,12 +30,15 @@ export const validateWorkTime = (startTime, endTime) => {
 
     const diffMinutes = (end - start) / (1000 * 60)
 
-    // 최대/최소 근무시간 검증
+    // 최대/최소 근무시간 검증 (근로기준법 기준)
     const maxMinutes = BUSINESS_RULES.VALIDATION_RULES.MAX_WORK_HOURS_PER_DAY * 60
+    const maxSpecialMinutes = BUSINESS_RULES.VALIDATION_RULES.MAX_WORK_HOURS_PER_DAY_SPECIAL * 60
     const minMinutes = BUSINESS_RULES.VALIDATION_RULES.MIN_WORK_HOURS_PER_DAY * 60
 
-    if (diffMinutes > maxMinutes) {
-        errors.push(`하루 최대 근무시간(${BUSINESS_RULES.VALIDATION_RULES.MAX_WORK_HOURS_PER_DAY}시간)을 초과했습니다.`)
+    if (diffMinutes > maxSpecialMinutes) {
+        errors.push(`특별한 사정 시에도 하루 최대 근무시간(${BUSINESS_RULES.VALIDATION_RULES.MAX_WORK_HOURS_PER_DAY_SPECIAL}시간)을 초과할 수 없습니다.`)
+    } else if (diffMinutes > maxMinutes) {
+        warnings.push(`하루 최대 근무시간(${BUSINESS_RULES.VALIDATION_RULES.MAX_WORK_HOURS_PER_DAY}시간)을 초과했습니다. 특별한 사정이 있는지 확인해주세요.`)
     }
 
     if (diffMinutes < minMinutes) {
@@ -46,6 +49,16 @@ export const validateWorkTime = (startTime, endTime) => {
     const maxContinuousMinutes = BUSINESS_RULES.VALIDATION_RULES.MAX_CONTINUOUS_WORK_HOURS * 60
     if (diffMinutes > maxContinuousMinutes) {
         warnings.push(`연속 근무시간(${BUSINESS_RULES.VALIDATION_RULES.MAX_CONTINUOUS_WORK_HOURS}시간)을 초과했습니다. 휴게시간을 확인해주세요.`)
+    }
+
+    // 휴게시간 검증 (근로기준법 제54조)
+    const breakRequiredAfterMinutes = BUSINESS_RULES.VALIDATION_RULES.REQUIRE_BREAK_AFTER_HOURS * 60
+    if (diffMinutes >= breakRequiredAfterMinutes) {
+        const requiredBreakMinutes = diffMinutes >= 480 ?
+            BUSINESS_RULES.VALIDATION_RULES.MIN_BREAK_DURATION_8HOURS :
+            BUSINESS_RULES.VALIDATION_RULES.MIN_BREAK_DURATION_4HOURS
+
+        warnings.push(`${BUSINESS_RULES.VALIDATION_RULES.REQUIRE_BREAK_AFTER_HOURS}시간 이상 근무 시 최소 ${requiredBreakMinutes}분의 휴게시간이 필요합니다.`)
     }
 
     return {
@@ -72,11 +85,15 @@ export const isLateArrival = (checkInTime, standardStartTime = WORK_TIME_CONFIG.
     const threshold = BUSINESS_RULES.TARDINESS_RULES.LATE_THRESHOLD_MINUTES
     const gracePeriod = BUSINESS_RULES.TARDINESS_RULES.GRACE_PERIOD_MINUTES
 
+    const seriousThreshold = BUSINESS_RULES.TARDINESS_RULES.SERIOUS_LATE_THRESHOLD_MINUTES
+
     return {
-        isLate: diffMinutes > (threshold + gracePeriod),
-        lateMinutes: Math.max(0, diffMinutes - gracePeriod),
-        isInGracePeriod: diffMinutes > 0 && diffMinutes <= gracePeriod,
-        severity: diffMinutes > (threshold * 2) ? 'severe' : 'minor'
+        isLate: diffMinutes > threshold,
+        lateMinutes: Math.max(0, diffMinutes),
+        isInGracePeriod: gracePeriod > 0 && diffMinutes > 0 && diffMinutes <= gracePeriod,
+        severity: diffMinutes >= seriousThreshold ? 'severe' : diffMinutes > threshold ? 'minor' : 'none',
+        isSeriousLate: diffMinutes >= seriousThreshold,
+        legalViolation: diffMinutes > 0 // 한국 법적으로는 1분이라도 늦으면 지각
     }
 }
 
@@ -113,14 +130,35 @@ export const isOvertime = (startTime, endTime) => {
     if (!validation.isValid) return { isOvertime: false, overtimeMinutes: 0 }
 
     const overtimeMinutes = Math.max(0, validation.workMinutes - WORK_TIME_CONFIG.OVERTIME_THRESHOLD)
-    const needsApproval = BUSINESS_RULES.APPROVAL_RULES.REQUIRE_APPROVAL_FOR_OVERTIME &&
-        overtimeMinutes > BUSINESS_RULES.APPROVAL_RULES.AUTO_APPROVE_THRESHOLD_MINUTES
+    const maxOvertimeMinutes = WORK_TIME_CONFIG.MAX_OVERTIME_DAILY * 60
+    const maxSpecialOvertimeMinutes = (WORK_TIME_CONFIG.MAX_OVERTIME_DAILY + WORK_TIME_CONFIG.MAX_SPECIAL_OVERTIME_DAILY) * 60
+
+    // 한국 법적으로는 모든 연장근무에 사전 승인 필요
+    const needsApproval = BUSINESS_RULES.APPROVAL_RULES.REQUIRE_APPROVAL_FOR_OVERTIME && overtimeMinutes > 0
+
+    let severity = 'none'
+    let legalViolation = false
+
+    if (overtimeMinutes > maxSpecialOvertimeMinutes) {
+        severity = 'critical'
+        legalViolation = true
+    } else if (overtimeMinutes > maxOvertimeMinutes) {
+        severity = 'high'
+    } else if (overtimeMinutes > 240) { // 4시간 초과
+        severity = 'medium'
+    } else if (overtimeMinutes > 0) {
+        severity = 'low'
+    }
 
     return {
         isOvertime: overtimeMinutes > 0,
         overtimeMinutes,
         needsApproval,
-        severity: overtimeMinutes > 120 ? 'high' : overtimeMinutes > 60 ? 'medium' : 'low'
+        severity,
+        legalViolation,
+        exceedsNormalLimit: overtimeMinutes > maxOvertimeMinutes,
+        exceedsSpecialLimit: overtimeMinutes > maxSpecialOvertimeMinutes,
+        compensationRate: WORK_TIME_CONFIG.OVERTIME_RATE
     }
 }
 
@@ -151,14 +189,21 @@ export const isNightWork = (startTime, endTime) => {
 
     const needsApproval = BUSINESS_RULES.APPROVAL_RULES.REQUIRE_APPROVAL_FOR_NIGHT_WORK && nightMinutes > 0
 
+    const maxNightWorkMinutes = BUSINESS_RULES.SPECIAL_WORK_RULES.NIGHT_WORK_MAX_HOURS * 60
+    const legalViolation = nightMinutes > maxNightWorkMinutes
+
     return {
         isNightWork: nightMinutes > 0,
         nightMinutes,
         needsApproval,
+        legalViolation,
+        exceedsLimit: nightMinutes > maxNightWorkMinutes,
+        compensationRate: WORK_TIME_CONFIG.NIGHT_WORK_RATE,
         nightWorkPeriod: {
             start: overlapStart < overlapEnd ? overlapStart.toTimeString().substring(0, 8) : null,
             end: overlapStart < overlapEnd ? overlapEnd.toTimeString().substring(0, 8) : null
-        }
+        },
+        severity: nightMinutes > maxNightWorkMinutes ? 'critical' : nightMinutes > 240 ? 'high' : 'normal'
     }
 }
 
@@ -209,5 +254,66 @@ export const analyzeWorkTime = (startTime, endTime, date = null) => {
                 ...(isWeekendWork ? ['주말근무'] : [])
             ]
         }
+    }
+}
+
+/**
+ * 주간 근무시간 유효성 검증 (근로기준법 제53조)
+ * @param {Array} weeklyRecords - 주간 근무 기록 배열
+ * @returns {Object} 주간 근무시간 검증 결과
+ */
+export const validateWeeklyWorkTime = (weeklyRecords) => {
+    const errors = []
+    const warnings = []
+
+    let totalWeeklyMinutes = 0
+    let totalOvertimeMinutes = 0
+    let workDays = 0
+
+    weeklyRecords.forEach(record => {
+        if (record.startTime && record.endTime) {
+            const dailyValidation = validateWorkTime(record.startTime, record.endTime)
+            if (dailyValidation.isValid) {
+                totalWeeklyMinutes += dailyValidation.workMinutes
+                const dailyOvertimeMinutes = Math.max(0, dailyValidation.workMinutes - WORK_TIME_CONFIG.OVERTIME_THRESHOLD)
+                totalOvertimeMinutes += dailyOvertimeMinutes
+                workDays++
+            }
+        }
+    })
+
+    const maxWeeklyMinutes = BUSINESS_RULES.VALIDATION_RULES.MAX_WEEKLY_HOURS * 60
+    const maxSpecialWeeklyMinutes = BUSINESS_RULES.VALIDATION_RULES.MAX_WEEKLY_HOURS_SPECIAL * 60
+    const standardWeeklyMinutes = WORK_TIME_CONFIG.WEEKLY_STANDARD_MINUTES
+
+    if (totalWeeklyMinutes > maxSpecialWeeklyMinutes) {
+        errors.push(`특별한 사정 시에도 주 최대 근무시간(${BUSINESS_RULES.VALIDATION_RULES.MAX_WEEKLY_HOURS_SPECIAL}시간)을 초과할 수 없습니다.`)
+    } else if (totalWeeklyMinutes > maxWeeklyMinutes) {
+        warnings.push(`주 최대 근무시간(${BUSINESS_RULES.VALIDATION_RULES.MAX_WEEKLY_HOURS}시간)을 초과했습니다. 특별한 사정이 있는지 확인해주세요.`)
+    }
+
+    const maxWeeklyOvertimeMinutes = WORK_TIME_CONFIG.MAX_OVERTIME_WEEKLY * 60
+    if (totalOvertimeMinutes > maxWeeklyOvertimeMinutes) {
+        errors.push(`주 최대 연장근무시간(${WORK_TIME_CONFIG.MAX_OVERTIME_WEEKLY}시간)을 초과했습니다.`)
+    }
+
+    // 주휴일 보장 검증
+    const restDays = 7 - workDays
+    const requiredRestDays = BUSINESS_RULES.REST_RULES.WEEKLY_REST_DAYS
+    if (restDays < requiredRestDays) {
+        warnings.push(`주 ${requiredRestDays}일 휴일이 보장되어야 합니다. 현재 휴일: ${restDays}일`)
+    }
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        totalWeeklyMinutes,
+        totalOvertimeMinutes,
+        workDays,
+        restDays,
+        exceedsNormalLimit: totalWeeklyMinutes > maxWeeklyMinutes,
+        exceedsSpecialLimit: totalWeeklyMinutes > maxSpecialWeeklyMinutes,
+        weeklyProgress: (totalWeeklyMinutes / standardWeeklyMinutes) * 100
     }
 } 
