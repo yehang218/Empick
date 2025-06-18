@@ -7,14 +7,14 @@
                 <span class="time-range">06:00:00 ~ 22:00:00</span>
                 <v-icon class="info-icon" size="small" color="grey">mdi-information-outline</v-icon>
             </div>
-            <div class="action-buttons">
+            <!-- <div class="action-buttons">
                 <v-btn variant="outlined" size="small" prepend-icon="mdi-calendar-month">
                     월별근무상세
                 </v-btn>
                 <v-btn variant="outlined" size="small" prepend-icon="mdi-download">
                     엑셀 다운로드
                 </v-btn>
-            </div>
+            </div> -->
         </div>
 
         <!-- 메인 콘텐츠 -->
