@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import RecruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
@@ -146,6 +146,16 @@ onMounted(async () => {
         console.log('불러온 카테고리:', store.applicationItemCategoryList)
     } else {
         console.log('이미 있는 카테고리:', store.applicationItemCategoryList)
+    }
+
+    // draftRecruitment에 선택된 항목 정보가 있으면 복원
+    if (store.draftRecruitment) {
+        if (store.draftRecruitment.selectedApplicationItemIds) {
+            store.selectedApplicationItemIds = store.draftRecruitment.selectedApplicationItemIds
+        }
+        if (store.draftRecruitment.selectedApplicationItemRequiredIds) {
+            store.selectedApplicationItemRequiredIds = store.draftRecruitment.selectedApplicationItemRequiredIds
+        }
     }
 })
 
@@ -211,6 +221,14 @@ const submit = async () => {
 
     router.push('/employment/recruitments')
 }
+
+// 선택된 항목 변경 시 draftRecruitment에도 반영
+watch([selectedIds, requiredIds], ([ids, reqIds]) => {
+    if (store.draftRecruitment) {
+        store.draftRecruitment.selectedApplicationItemIds = ids
+        store.draftRecruitment.selectedApplicationItemRequiredIds = reqIds
+    }
+}, { deep: true })
 </script>
 
 <style scoped>
