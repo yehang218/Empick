@@ -8,13 +8,16 @@
         <id column="id" property="id"/>
         <result column="category_id" property="categoryId"/>
         <result column="name" property="name"/>
+        <result column="input_type" property="inputType"
+                typeHandler="com.piveguyz.empickbackend.common.handler.InputTypeHandler" />
     </resultMap>
 
     <select id="findAll" resultMap="ApprovalCategoryItemResultMap">
         SELECT
             id,
             category_id,
-            name
+            name,
+            input_type
         FROM approval_category_item;
     </select>
 
@@ -22,7 +25,8 @@
         SELECT
             id,
             category_id,
-            name
+            name,
+            input_type
         FROM approval_category_item
         WHERE id = #{id};
     </select>
@@ -31,7 +35,8 @@
         SELECT
             id,
             category_id,
-            name
+            name,
+            input_type
         FROM approval_category_item
         WHERE category_id = #{categoryId};
     </select>
