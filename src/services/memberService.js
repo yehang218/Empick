@@ -100,7 +100,8 @@ export const getMyRoleService = async () => {
 
 export const findMembersService = async (employeeNumber) => {
     try {
-        const response = await api.get(API.MEMBER.FIND_MEMBERS, { params: employeeNumber });
+        const params = employeeNumber ? { employeeNumber } : {};
+        const response = await api.get(API.MEMBER.FIND_MEMBERS, { params });
         return response.data;
     } catch (error) {
         console.error('회원 조회 API 오류:', error)

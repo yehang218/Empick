@@ -31,4 +31,8 @@ export class MemberResponseDTO {
         this.hireAt = hireAt;
         this.resignAt = resignAt;
     }
+
+    static fromJSON(data) {
+        return new MemberResponseDTO(data);
+    }
 }

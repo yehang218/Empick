@@ -177,9 +177,30 @@ export const useMemberStore = defineStore('member', {
             return response.map(role => MemberRoleDTO.fromJSON(role));
         },
 
-        async findMembers(employeeNumber) {
+        async findMembers(employeeNumber = null) {
             const response = await findMembersService(employeeNumber);
-            return response.map(member => MemberResponseDTO.fromJSON(member));
+            console.log('findMembers API 응답:', response);
+            // API 응답 구조: {success: true, code: 200, message: '...', data: Array}
+            const memberList = response.data || response;
+            console.log('사원 목록 데이터:', memberList);
+            return memberList.map(member => {
+                // API 응답 데이터를 DTO 형태로 변환
+                return new MemberResponseDTO({
+                    id: member.id,
+                    employeeNumber: member.employeeNumber,
+                    name: member.name,
+                    email: member.email,
+                    phone: member.phone,
+                    departmentName: member.departmentName || member.department?.name || '',
+                    positionName: member.positionName || member.position?.name || '',
+                    jobName: member.jobName || member.job?.name || '',
+                    rankName: member.rankName || member.rank?.name || '',
+                    pictureUrl: member.pictureUrl || '',
+                    status: member.status || 0,
+                    hireAt: member.hireAt || member.hireDate,
+                    resignAt: member.resignAt || member.resignDate
+                });
+            });
         }
     },
 }); 

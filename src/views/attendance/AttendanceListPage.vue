@@ -10,8 +10,19 @@
 
         <!-- 권한 있는 경우 메인 콘텐츠 -->
         <template v-else>
-            <!-- 제목 -->
-            <h2 class="text-h5 font-weight-bold mb-6">사원 목록</h2>
+            <!-- 제목 및 액션 버튼 -->
+            <div class="d-flex justify-space-between align-center mb-6">
+                <h2 class="text-h5 font-weight-bold">사원 목록</h2>
+                <div class="d-flex gap-2">
+                    <v-btn color="grey" variant="outlined" prepend-icon="mdi-refresh" @click="loadMembers"
+                        :loading="loading">
+                        새로고침
+                    </v-btn>
+                    <v-btn color="primary" prepend-icon="mdi-plus" @click="() => router.push('/orgstructure/register')">
+                        사원 등록
+                    </v-btn>
+                </div>
+            </div>
 
             <!-- 검색 및 필터 영역 -->
             <v-row class="mb-4" align="center">
@@ -32,7 +43,8 @@
             <!-- 사원 목록 테이블 -->
             <v-card class="mb-4 member-list-card" elevation="0">
                 <v-data-table :headers="tableHeaders" :items="filteredMembers" :items-per-page="8" :loading="loading"
-                    item-key="id" class="member-table" @click:row="handleRowClick" @update:sort-by="handleSort">
+                    item-key="id" class="member-table" show-expand v-model:expanded="expanded"
+                    @update:sort-by="handleSort">
 
                     <!-- 아바타 + 이름 컬럼 -->
                     <template #item.name="{ item }">
@@ -69,10 +81,16 @@
                         {{ formatDate(item.hireAt) }}
                     </template>
 
-                    <!-- 액션 컬럼 -->
-                    <template #item.actions="{ item }">
-                        <v-btn icon="mdi-chevron-right" variant="text" size="small"
-                            @click.stop="goToMemberDetail(item)" />
+
+
+                    <!-- 확장된 행 내용 -->
+                    <template #expanded-row="{ item }">
+                        <tr>
+                            <td :colspan="tableHeaders.length" class="pa-0">
+                                <AttendanceSummaryCard :member="item" @view-detail="goToMemberDetail"
+                                    @view-attendance="handleViewAttendance" @send-mail="handleSendMail" />
+                            </td>
+                        </tr>
                     </template>
 
                     <!-- 로딩 상태 -->
@@ -84,8 +102,12 @@
                     <template #no-data>
                         <div class="text-center py-8">
                             <v-icon size="64" color="grey-lighten-2">mdi-account-group-outline</v-icon>
-                            <div class="text-h6 mt-2 text-grey-darken-1">검색된 사원이 없습니다</div>
-                            <div class="text-body-2 text-grey-darken-1">검색 조건을 변경해보세요</div>
+                            <div class="text-h6 mt-2 text-grey-darken-1">
+                                {{ members.length === 0 ? '등록된 사원이 없습니다' : '검색된 사원이 없습니다' }}
+                            </div>
+                            <div class="text-body-2 text-grey-darken-1">
+                                {{ members.length === 0 ? '사원을 먼저 등록해주세요' : '검색 조건을 변경해보세요' }}
+                            </div>
                         </div>
                     </template>
                 </v-data-table>
@@ -99,12 +121,17 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDepartmentStore } from '@/stores/departmentStore'
 import { useAuthStore } from '@/stores/authStore'
+import { useMemberStore } from '@/stores/memberStore'
+import { useToast } from '@/composables/useToast'
 import { RoleCode } from '@/constants/common/RoleCode'
 import dayjs from 'dayjs'
+import AttendanceSummaryCard from '@/components/attendance/AttendanceSummaryCard.vue'
 
 const router = useRouter()
 const departmentStore = useDepartmentStore()
 const authStore = useAuthStore()
+const memberStore = useMemberStore()
+const { showToast } = useToast()
 
 // 🛡 권한 체크
 const hasHRAccess = computed(() =>
@@ -117,6 +144,7 @@ const selectedDepartment = ref(null)
 const selectedStatus = ref('전체')
 const loading = ref(false)
 const members = ref([])
+const expanded = ref([])
 
 // 테이블 헤더 정의
 const tableHeaders = [
@@ -126,8 +154,7 @@ const tableHeaders = [
     { title: '연락처', key: 'phone', sortable: true, width: '150px' },
     { title: '부서', key: 'departmentName', sortable: true, width: '150px' },
     { title: '상태', key: 'status', sortable: true, width: '100px' },
-    { title: '입사일시', key: 'hireAt', sortable: true, width: '120px' },
-    { title: '', key: 'actions', sortable: false, width: '60px' }
+    { title: '입사일시', key: 'hireAt', sortable: true, width: '120px' }
 ]
 
 // 상태 옵션
@@ -137,8 +164,17 @@ const statusOptions = [
     { title: '미출근', value: 0 }
 ]
 
-// 부서 옵션 (computed)
+// 부서 옵션 (computed) - departmentStore 데이터 사용
 const departmentOptions = computed(() => {
+    // departmentStore에서 부서 목록 가져오기
+    if (departmentStore.departmentList.length > 0) {
+        return departmentStore.departmentList.map(dept => ({
+            title: dept.name || dept.departmentName,
+            value: dept.name || dept.departmentName
+        }))
+    }
+
+    // fallback: 현재 사원들의 부서명으로 생성
     const uniqueDepartments = [...new Set(members.value.map(m => m.departmentName).filter(Boolean))]
     return uniqueDepartments.map(dept => ({ title: dept, value: dept }))
 })
@@ -174,12 +210,25 @@ const filteredMembers = computed(() => {
 const loadMembers = async () => {
     loading.value = true
     try {
-        // 실제로는 memberStore에서 전체 사원 목록을 가져오는 메서드가 필요합니다
-        // 현재는 예시 데이터로 대체
-        members.value = await getMockMembers()
+        // employeeNumber를 전달하지 않으면 전체 조회
+        const memberList = await memberStore.findMembers()
+
+        // 임시로 랜덤 출근 상태 설정 (실제로는 각 사원별 근태 API 호출 필요)
+        const membersWithAttendance = memberList.map((member) => {
+            // 실제 구현에서는 각 사원의 오늘 출근 기록을 확인해야 함
+            // 현재는 임시로 랜덤 상태 설정
+            member.status = Math.random() > 0.3 ? 1 : 0
+            return member
+        })
+
+        members.value = membersWithAttendance
         await departmentStore.loadDepartmentList()
+        showToast(`${membersWithAttendance.length}명의 사원 정보를 불러왔습니다.`, 'success')
     } catch (error) {
         console.error('사원 목록 로딩 실패:', error)
+        showToast('사원 목록을 불러오는데 실패했습니다.', 'error')
+        // API 실패 시 빈 배열로 설정
+        members.value = []
     } finally {
         loading.value = false
     }
@@ -202,13 +251,21 @@ const handleSort = (sortBy) => {
     console.log('정렬 변경:', sortBy)
 }
 
-const handleRowClick = (event, { item }) => {
-    goToMemberDetail(item)
-}
+// handleRowClick 제거 - 이제 expand 기능 사용
 
 const goToMemberDetail = (member) => {
     // 사원 상세 페이지로 이동 (향후 구현)
     router.push(`/orgstructure/members/${member.employeeNumber}`)
+}
+
+const handleViewAttendance = (member) => {
+    console.log('근태 기록 보기:', member)
+    // TODO: 근태 기록 페이지로 이동
+}
+
+const handleSendMail = (member) => {
+    console.log('메일 발송:', member)
+    // TODO: 메일 발송 모달 열기
 }
 
 const getStatusClass = (status) => {
@@ -232,102 +289,7 @@ const formatDate = (dateString) => {
     return dayjs(dateString).format('YYYY-MM-DD')
 }
 
-// Mock 데이터 함수 (실제로는 API 호출로 대체)
-const getMockMembers = async () => {
-    return [
-        {
-            id: 1,
-            name: 'Brooklyn Simmons',
-            employeeNumber: '87364523',
-            email: 'brooklyns@mail.com',
-            phone: '(603) 555-0123',
-            departmentName: '인사',
-            jobName: '인사관리',
-            rankName: '대리',
-            status: 1,
-            hireAt: '2022-03-01',
-            pictureUrl: null
-        },
-        {
-            id: 2,
-            name: 'Kristin Watson',
-            employeeNumber: '93874563',
-            email: 'kristinw@mail.com',
-            phone: '(219) 555-0114',
-            departmentName: '백엔드/개발',
-            jobName: 'PM',
-            rankName: '사원',
-            status: 1,
-            hireAt: '2023-05-15',
-            pictureUrl: null
-        },
-        {
-            id: 3,
-            name: 'Jacob Jones',
-            employeeNumber: '23847569',
-            email: 'jacbj@mail.com',
-            phone: '(319) 555-0115',
-            departmentName: '회계',
-            jobName: '대사장',
-            rankName: '사원',
-            status: 0,
-            hireAt: '2021-08-10',
-            pictureUrl: null
-        },
-        {
-            id: 4,
-            name: 'Cody Fisher',
-            employeeNumber: '39485632',
-            email: 'codyf@mail.com',
-            phone: '(229) 555-0109',
-            departmentName: '인사',
-            jobName: '대사장',
-            rankName: '차장',
-            status: 1,
-            hireAt: '2020-12-01',
-            pictureUrl: null
-        },
-        {
-            id: 5,
-            name: 'Alice Johnson',
-            employeeNumber: '12345678',
-            email: 'alice@mail.com',
-            phone: '(555) 123-4567',
-            departmentName: '영업',
-            jobName: '영업관리',
-            rankName: '대리',
-            status: 1,
-            hireAt: '2024-01-15',
-            pictureUrl: null
-        },
-        {
-            id: 6,
-            name: 'David Lee',
-            employeeNumber: '98765432',
-            email: 'david@mail.com',
-            phone: '(555) 987-6543',
-            departmentName: '마케팅',
-            jobName: '마케팅기획',
-            rankName: '과장',
-            status: 1,
-            hireAt: '2019-06-20',
-            pictureUrl: null
-        },
-        {
-            id: 7,
-            name: 'Emma Wilson',
-            employeeNumber: '45678901',
-            email: 'emma@mail.com',
-            phone: '(555) 456-7890',
-            departmentName: '백엔드/개발',
-            jobName: '개발자',
-            rankName: '사원',
-            status: 0,
-            hireAt: '2023-02-28',
-            pictureUrl: null
-        }
-    ]
-}
+
 
 // 라이프사이클
 onMounted(() => {
@@ -450,5 +412,45 @@ watch(searchQuery, () => {
 .text-caption {
     color: #666;
     font-size: 11px;
+}
+
+/* 확장된 행 스타일 */
+.member-table :deep(.v-data-table__expanded__content) {
+    background-color: #f8f9fa;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #666;
+    min-width: 80px;
+    font-size: 13px;
+}
+
+.info-value {
+    color: #333;
+    font-weight: 400;
+    font-size: 13px;
+}
+
+/* 확장 아이콘 스타일 */
+.member-table :deep(.v-data-table__expand-icon) {
+    color: #1976d2;
+    transition: transform 0.2s ease;
+}
+
+.member-table :deep(.v-data-table__expand-icon--active) {
+    transform: rotate(90deg);
 }
 </style>
