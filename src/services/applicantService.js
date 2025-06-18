@@ -112,7 +112,7 @@ export const removeApplicantBookmarkService = async (memberId, applicantId, opti
     }
 
     return apiResponse.data;
-  }, options);
+  }, options)
 };
 
 const applicantService = {

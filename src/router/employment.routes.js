@@ -224,6 +224,7 @@ export const employmentRoutes = [
         props: true,
         meta: {
             requiresAuth: true
+
         }
     },
 
@@ -236,6 +237,7 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
+
         // 지원자 인적사항 등록 페이지
         {
             path: '/employment/applicants/register',
@@ -271,5 +273,15 @@ export const employmentRoutes = [
             name: 'IntroduceStandardItemManagePage',
             component: () => import('@/views/employment/IntroduceStandardItemManagePage.vue')
         },
-];
 
+
+    // 채용공고별 지원자 목록 페이지
+    {
+        path: '/employment/applicant/recruitments/:recruitmentId',
+        name: 'ApplicantRecruitmentPage',
+        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    }
+];
