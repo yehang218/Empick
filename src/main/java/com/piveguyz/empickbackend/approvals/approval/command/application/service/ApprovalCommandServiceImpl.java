@@ -34,40 +34,48 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
 
     @Override
     public Integer createApproval(CreateApprovalCommandDTO dto) {
-        if (dto.getContents() == null || dto.getContents().isEmpty()) {
+        // 필수값 검증
+        if (dto.getCategoryId() == null)
+            throw new BusinessException(ResponseCode.APPROVAL_CATEGORY_MISSING);
+        if (dto.getWriterId() == null)
+            throw new BusinessException(ResponseCode.APPROVAL_WRITER_MISSING);
+        if (dto.getContents() == null || dto.getContents().isEmpty())
             throw new BusinessException(ResponseCode.APPROVAL_CONTENT_ITEM_MISSING);
+
+        // 항목 유효성 체크
+        for (CreateApprovalCommandDTO.ApprovalContentDTO contentDTO : dto.getContents()) {
+            boolean valid = approvalCategoryItemRepository
+                    .existsByIdAndCategoryId(contentDTO.getItemId(), dto.getCategoryId());
+            if (!valid) {
+                throw new BusinessException(ResponseCode.APPROVAL_CATEGORY_ITEM_MISMATCH);
+            }
         }
 
-        // 결재 라인 조회 (approval_line 테이블)
-        List<ApprovalLineEntity> approvalLine = approvalLineRepository
-                .findByApprovalCategoryIdOrderByStepOrderAsc(dto.getCategoryId());
+        // 작성자 정보
+        MemberEntity writer = memberRepository.findById(dto.getWriterId())
+                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+        Integer deptId = writer.getDepartmentId();
 
-        if (approvalLine.isEmpty()) {
+        // 결재라인 불러오기
+        List<ApprovalLineEntity> approvalLineList =
+                approvalLineRepository.findByApprovalCategoryIdOrderByStepOrderAsc(dto.getCategoryId());
+        if (approvalLineList.isEmpty()) {
             throw new BusinessException(ResponseCode.APPROVAL_LINE_NOT_FOUND);
         }
 
-        // 기안자의 부서 조회
-        MemberEntity writer = memberRepository.findById(dto.getWriterId())
-                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
-        Integer deptId = writer.getDepartmentId(); // 부서 기준 할당
-
-        // 결재자 자동 할당
+        // 결재자 매핑 (최대 4단계)
         Map<Integer, Integer> approverMap = new HashMap<>();
-        for (ApprovalLineEntity line : approvalLine) {
-            // 해당 부서에서 지정된 직책의 멤버 찾기 (없으면 예외)
-            Integer step = line.getStepOrder();
-            Integer positionId = line.getPositionId();
-
-            Optional<MemberEntity> approverOpt = memberRepository
-                    .findFirstByDeptIdAndPositionId(deptId, positionId);
-
-            Integer memberId = approverOpt
+        for (ApprovalLineEntity line : approvalLineList) {
+            // 부서+직책 기준 결재자(멤버) 찾기
+            Optional<MemberEntity> approverOpt =
+                    memberRepository.findFirstByDeptIdAndPositionId(deptId, line.getPositionId());
+            Integer approverId = approverOpt
                     .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_APPROVER_NOT_FOUND))
                     .getId();
-
-            approverMap.put(step, memberId);
+            approverMap.put(line.getStepOrder(), approverId);
         }
 
+        // approval entity 생성
         ApprovalEntity approval = ApprovalEntity.builder()
                 .categoryId(dto.getCategoryId())
                 .writerId(dto.getWriterId())
@@ -88,6 +96,7 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
                         .content(c.getContent())
                         .build())
                 .toList();
+
         approvalContentRepository.saveAll(contents);
 
         return approval.getId();
@@ -101,7 +110,7 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_APPROVED);
         if (approval.getStatus() == -1)
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_REJECTED);
-        if(approval.getStatus() == -2)
+        if (approval.getStatus() == -2)
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_CANCELED);
     }
 
@@ -171,7 +180,7 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
 
             // 만약 결재 취소 요청이었다면
             Integer targetApprovalId = approval.getApprovalId();
-            if(targetApprovalId != null) approveCancel(targetApprovalId);
+            if (targetApprovalId != null) approveCancel(targetApprovalId);
             approval.setStatus(1);
         } else {
             approval.setStatus(0); // 계속 진행중
