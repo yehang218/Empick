@@ -3,20 +3,13 @@
  * 출퇴근 시간 계산, 근무시간 분류, 데이터 그룹핑 등의 기능을 제공
  */
 
+import { WORK_TIME_CONFIG } from '@/config/attendance'
+import { formatMinutesToDuration } from './attendanceFormatter.js'
+
 // ==================== 시간 계산 함수들 ====================
 
-/**
- * 시간 포맷팅 (분 → "Xh Ym" 형태)
- * @param {number} totalMinutes - 총 분 수
- * @returns {string} 포맷된 시간 문자열
- */
-export const formatMinutesToDuration = (totalMinutes) => {
-    if (!totalMinutes || totalMinutes < 0) return '0h 0m';
-
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${hours}h ${minutes}m`;
-};
+// formatMinutesToDuration은 attendanceFormatter.js로 이동됨
+export { formatMinutesToDuration } from './attendanceFormatter.js'
 
 /**
  * 시간 차이 계산 (분 단위)
@@ -35,7 +28,8 @@ export const calculateTimeDifferenceInMinutes = (startTime, endTime) => {
         end.setDate(end.getDate() + 1);
     }
 
-    return Math.max(0, (end - start) / (1000 * 60));
+    // 소수점 버리기 (Math.floor 사용)
+    return Math.max(0, Math.floor((end - start) / (1000 * 60)));
 };
 
 /**
@@ -58,15 +52,16 @@ export const calculateNightWorkHours = (startTime, endTime) => {
     let nightMinutes = 0;
 
     // 22:00-24:00 구간
-    const nightStart = new Date(`2024-01-01T22:00:00`);
-    const nightEnd = new Date(`2024-01-02T06:00:00`);
+    const nightStart = new Date(`2024-01-01T${WORK_TIME_CONFIG.NIGHT_WORK_START}`);
+    const nightEnd = new Date(`2024-01-02T${WORK_TIME_CONFIG.NIGHT_WORK_END}`);
 
     // 야간 시간대와 근무시간의 교집합 계산
     const overlapStart = new Date(Math.max(start.getTime(), nightStart.getTime()));
     const overlapEnd = new Date(Math.min(end.getTime(), nightEnd.getTime()));
 
     if (overlapStart < overlapEnd) {
-        nightMinutes = (overlapEnd - overlapStart) / (1000 * 60);
+        // 소수점 버리기 (Math.floor 사용)
+        nightMinutes = Math.floor((overlapEnd - overlapStart) / (1000 * 60));
     }
 
     return Math.max(0, nightMinutes);
@@ -90,8 +85,8 @@ export const categorizeWorkHours = (startTime, endTime) => {
         };
     }
 
-    // 기본 근무시간 (8시간 = 480분)
-    const regularLimit = 8 * 60;
+    // 기본 근무시간 (설정에서 가져옴)
+    const regularLimit = WORK_TIME_CONFIG.STANDARD_WORK_MINUTES;
     const regularMinutes = Math.min(totalMinutes, regularLimit);
     const overtimeMinutes = Math.max(0, totalMinutes - regularLimit);
 
@@ -189,12 +184,13 @@ export const groupAttendanceByWeek = (year, month, records) => {
                     const endTime = dayData.checkOut?.time || '00:00:00';
                     const workHours = categorizeWorkHours(startTime, endTime);
 
+                    // 타임존 문제 해결: dateStr에서 직접 날짜 추출
+                    const dayOfMonth = dateStr.split('-')[2]; // "2024-12-18" -> "18"
+
                     const dayInfo = {
-                        date: currentDate.getDate().toString().padStart(2, '0'),
+                        date: dayOfMonth,
                         startTime: startTime,
                         endTime: endTime,
-                        startLocation: !!dayData.checkIn,
-                        endLocation: !!dayData.checkOut,
                         totalDuration: workHours.total,
                         regularHours: workHours.regular,
                         overtimeHours: workHours.overtime,
@@ -250,7 +246,8 @@ export const calculateMonthlyStats = (records) => {
         }
     });
 
-    const avgMinutesPerDay = workDays > 0 ? totalMinutes / workDays : 0;
+    // 평균 계산 시 소수점 버리기
+    const avgMinutesPerDay = workDays > 0 ? Math.floor(totalMinutes / workDays) : 0;
 
     return {
         totalHours: formatMinutesToDuration(totalMinutes),

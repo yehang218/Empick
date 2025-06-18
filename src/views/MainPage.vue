@@ -24,8 +24,14 @@
             </div>
 
             <div class="attendance-buttons">
-                <v-btn variant="outlined" @click="checkIn">출근</v-btn>
-                <v-btn variant="outlined" @click="checkOut">퇴근</v-btn>
+                <v-btn variant="outlined" :disabled="hasTodayCheckIn" :color="hasTodayCheckIn ? 'grey' : 'primary'"
+                    @click="checkIn">
+                    {{ hasTodayCheckIn ? '출근완료' : '출근' }}
+                </v-btn>
+                <v-btn variant="outlined" :disabled="!hasTodayCheckIn || hasTodayCheckOut"
+                    :color="hasTodayCheckOut ? 'grey' : (!hasTodayCheckIn ? 'grey' : 'primary')" @click="checkOut">
+                    {{ hasTodayCheckOut ? '퇴근완료' : '퇴근' }}
+                </v-btn>
             </div>
         </div>
 
@@ -36,55 +42,108 @@
 
             <!-- 주차별 근태 상세 -->
             <div class="week-section">
-                <WeekAccordionList :year="currentYear" :month="currentMonth" :attendance-data="attendanceData"
-                    @approval-request="handleApprovalRequest" @time-edit="handleTimeEdit" />
+                <WeekAccordionList :year="currentYear" :month="currentMonth"
+                    :raw-attendance-records="rawAttendanceRecords" @approval-request="handleApprovalRequest"
+                    @time-edit="handleTimeEdit" />
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import MonthlyWorkSummaryCard from '@/components/attendance/MonthlyWorkSummaryCard.vue'
 import WeekAccordionList from '@/components/attendance/WeekAccordionList.vue'
+import { useAttendanceStore } from '@/stores/attendanceStore'
 
 // 현재 날짜 상태
 const currentDate = ref(new Date())
+const attendanceStore = useAttendanceStore()
 
 // 계산된 속성들
 const currentYear = computed(() => currentDate.value.getFullYear())
 const currentMonth = computed(() => currentDate.value.getMonth() + 1)
 
-// 근무 시간 데이터 (예시)
-const workingHours = ref({
-    hours: 51,
-    minutes: 45
+// Store에서 로딩 상태와 데이터 가져오기
+const rawAttendanceRecords = computed(() => attendanceStore.myRecords)
+
+// 계산된 근무 시간 데이터
+const workingHours = computed(() => {
+    if (!rawAttendanceRecords.value.length) return { hours: 0, minutes: 0 }
+
+    const stats = attendanceStore.calculateMonthlyStats(rawAttendanceRecords.value)
+    return attendanceStore.parseTimeString(stats.totalHours)
 })
 
-const targetHours = ref({
-    hours: 51,
-    minutes: 24
-})
+// 목표 근무 시간
+const targetHours = ref({ hours: 0, minutes: 0 })
 
-const remainingWorkDays = ref(14)
-
-// 출석 데이터 (예시)
-const attendanceData = ref([
-    {
-        date: '05',
-        startTime: '07:45:00',
-        endTime: '17:50:00',
-        startLocation: true,
-        endLocation: true,
-        totalDuration: '9h 5m 0s',
-        regularHours: '9h 5m 0s',
-        overtimeHours: '0h 0m 0s',
-        nightHours: '0h 0m 0s',
-        needsApproval: false,
-        selected: true,
-        breakTime: true
+// 목표 시간 계산 함수
+const updateTargetHours = async () => {
+    try {
+        const result = await attendanceStore.calculateTargetHours(currentYear.value, currentMonth.value)
+        targetHours.value = result
+    } catch (error) {
+        console.error('MainPage - 목표 시간 계산 에러:', error)
+        targetHours.value = { hours: 0, minutes: 0 }
     }
-])
+}
+
+// 날짜 변경 시 목표 시간 업데이트
+watch([currentYear, currentMonth], () => {
+    updateTargetHours()
+}, { immediate: true })
+
+// 남은 근무일 계산
+const remainingWorkDays = ref(0)
+
+// 남은 근무일 계산 함수
+const updateRemainingWorkDays = async () => {
+    const today = new Date()
+
+    // 현재 월이 아니면 0 반환
+    if (today.getFullYear() !== currentYear.value || today.getMonth() + 1 !== currentMonth.value) {
+        remainingWorkDays.value = 0
+        return
+    }
+
+    try {
+        remainingWorkDays.value = await attendanceStore.getWorkDaysRemaining(currentYear.value, currentMonth.value)
+    } catch (error) {
+        console.error('남은 근무일 계산 실패:', error)
+        remainingWorkDays.value = 0
+    }
+}
+
+// 날짜 변경 시 남은 근무일 업데이트
+watch([currentYear, currentMonth], () => {
+    updateRemainingWorkDays()
+}, { immediate: true })
+
+// 이제 WeekAccordionList가 직접 Store에서 데이터를 변환하므로 제거
+
+// 근태 데이터 로드 (Store 함수 사용)
+const loadAttendanceData = async () => {
+    try {
+        await attendanceStore.loadMonthlyAttendanceData(currentYear.value, currentMonth.value)
+    } catch (error) {
+        console.error('근태 데이터 로드 실패:', error)
+    }
+}
+
+// 날짜 변경 시 데이터 재로드
+watch([currentYear, currentMonth], () => {
+    loadAttendanceData()
+}, { immediate: false })
+
+// 컴포넌트 마운트 시 데이터 로드
+onMounted(async () => {
+    await Promise.all([
+        loadAttendanceData(),
+        updateTargetHours(),
+        updateRemainingWorkDays()
+    ])
+})
 
 // 날짜 네비게이션 메서드
 const previousMonth = () => {
@@ -103,13 +162,59 @@ const goToToday = () => {
     currentDate.value = new Date()
 }
 
+// 오늘 출근 기록 확인
+const hasTodayCheckIn = computed(() => {
+    const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    const dailyData = attendanceStore.groupAttendanceByDate(rawAttendanceRecords.value)
+    return dailyData[today]?.checkIn !== null
+})
+
+// 오늘 퇴근 기록 확인
+const hasTodayCheckOut = computed(() => {
+    const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+    const dailyData = attendanceStore.groupAttendanceByDate(rawAttendanceRecords.value)
+    return dailyData[today]?.checkOut !== null
+})
+
 // 출퇴근 메서드
-const checkIn = () => {
-    console.log('출근 처리')
+const checkIn = async () => {
+    // 이미 오늘 출근한 경우 중복 출근 방지
+    if (hasTodayCheckIn.value) {
+        alert('오늘은 이미 출근하셨습니다.')
+        return
+    }
+
+    try {
+        await attendanceStore.createCheckInRecord()
+        await loadAttendanceData()
+        console.log('출근 처리 완료')
+    } catch (error) {
+        console.error('출근 처리 실패:', error)
+        alert('출근 처리에 실패했습니다. 다시 시도해주세요.')
+    }
 }
 
-const checkOut = () => {
-    console.log('퇴근 처리')
+const checkOut = async () => {
+    // 아직 출근하지 않은 경우 퇴근 불가
+    if (!hasTodayCheckIn.value) {
+        alert('출근 기록이 없습니다. 먼저 출근해주세요.')
+        return
+    }
+
+    // 이미 오늘 퇴근한 경우 중복 퇴근 방지
+    if (hasTodayCheckOut.value) {
+        alert('오늘은 이미 퇴근하셨습니다.')
+        return
+    }
+
+    try {
+        await attendanceStore.createCheckOutRecord()
+        await loadAttendanceData()
+        console.log('퇴근 처리 완료')
+    } catch (error) {
+        console.error('퇴근 처리 실패:', error)
+        alert('퇴근 처리에 실패했습니다. 다시 시도해주세요.')
+    }
 }
 
 // 주차별 이벤트 처리

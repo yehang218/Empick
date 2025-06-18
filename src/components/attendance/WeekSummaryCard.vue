@@ -18,21 +18,15 @@
                 </div>
 
                 <div class="data-cell time-cell">
-                    <span class="time-text" :class="{ 'has-location': day.startLocation }">
+                    <span class="time-text">
                         {{ day.startTime }}
                     </span>
-                    <v-icon v-if="day.startLocation" size="small" class="location-icon">
-                        mdi-map-marker
-                    </v-icon>
                 </div>
 
                 <div class="data-cell time-cell">
-                    <span class="time-text" :class="{ 'has-location': day.endLocation }">
+                    <span class="time-text">
                         {{ day.endTime }}
                     </span>
-                    <v-icon v-if="day.endLocation" size="small" class="location-icon">
-                        mdi-map-marker
-                    </v-icon>
                 </div>
 
                 <div class="data-cell duration-cell">
@@ -62,12 +56,8 @@
                 <div v-for="(day, index) in weekData" :key="index" class="timeline-row">
                     <!-- 근무시간 바 -->
                     <div class="work-bar" :style="getWorkBarStyle(day)">
-                        <span class="work-label">출근</span>
-                    </div>
-
-                    <!-- 휴무 표시 -->
-                    <div v-if="day.breakTime" class="break-indicator" :style="getBreakStyle(day)">
-                        휴무
+                        <span class="work-label start-label">출근</span>
+                        <span class="work-label end-label">퇴근</span>
                     </div>
 
                     <!-- 점심시간 구분선 -->
@@ -89,8 +79,6 @@ defineProps({
                 date: '05',
                 startTime: '07:45:00',
                 endTime: '17:50:00',
-                startLocation: true,
-                endLocation: true,
                 totalDuration: '9h 5m 0s',
                 regularHours: '9h 5m 0s',
                 overtimeHours: '0h 0m 0s',
@@ -117,12 +105,7 @@ const getWorkBarStyle = (day) => {
     }
 }
 
-// 휴무 표시 스타일 계산
-const getBreakStyle = () => {
-    return {
-        left: '70%' // 17시 근처
-    }
-}
+
 
 // 승인 요청 처리
 const requestApproval = (day) => {
@@ -224,19 +207,10 @@ defineEmits(['requestApproval', 'editTime'])
                 width: 120px;
                 min-width: 120px;
                 justify-content: center;
-                gap: 4px;
 
                 .time-text {
                     color: #1976d2;
                     font-weight: 500;
-
-                    &.has-location {
-                        color: #1976d2;
-                    }
-                }
-
-                .location-icon {
-                    color: #666;
                 }
             }
 
@@ -306,26 +280,25 @@ defineEmits(['requestApproval', 'editTime'])
                 border-radius: 4px;
                 display: flex;
                 align-items: center;
-                justify-content: flex-start;
+                justify-content: space-between;
                 padding: 0 8px;
 
                 .work-label {
                     color: white;
                     font-size: 12px;
                     font-weight: 500;
-                }
-            }
+                    display: flex;
+                    align-items: center;
+                    height: 100%;
 
-            .break-indicator {
-                position: absolute;
-                top: 20px;
-                background: #81c784;
-                color: white;
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-size: 10px;
-                font-weight: 500;
-                transform: translateX(-50%);
+                    &.start-label {
+                        justify-content: flex-start;
+                    }
+
+                    &.end-label {
+                        justify-content: flex-end;
+                    }
+                }
             }
 
             .lunch-break-line,

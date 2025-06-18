@@ -32,6 +32,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import WeekSummaryCard from './WeekSummaryCard.vue'
+import { useAttendanceStore } from '@/stores/attendanceStore'
 
 // Props
 const props = defineProps({
@@ -43,114 +44,85 @@ const props = defineProps({
         type: Number,
         default: () => new Date().getMonth() + 1
     },
-    attendanceData: {
+    rawAttendanceRecords: {
         type: Array,
         default: () => []
     }
 })
 
-// 주차별 데이터
+const attendanceStore = useAttendanceStore()
+
+// 아코디언 상태를 관리하는 반응형 데이터
 const weekList = ref([])
 
-// 주차 계산 함수
-const calculateWeeks = (year, month) => {
-    const weeks = []
-    const firstDay = new Date(year, month - 1, 1)
-    const lastDay = new Date(year, month, 0)
+// 현재 주차 계산
+const getCurrentWeekNumber = () => {
+    const today = new Date()
 
-    let currentWeekStart = new Date(firstDay)
-    let weekNumber = 1
+    // 현재 월이 아니면 -1 반환 (아무 주차도 열지 않음)
+    if (today.getFullYear() !== props.year || today.getMonth() + 1 !== props.month) {
+        return -1
+    }
 
-    // 첫 주의 시작을 월요일로 맞추기 (선택사항)
+    const currentDate = today.getDate()
+    const firstDay = new Date(props.year, props.month - 1, 1)
     const firstDayOfWeek = firstDay.getDay()
-    if (firstDayOfWeek !== 1) { // 월요일이 아니면
-        currentWeekStart.setDate(firstDay.getDate() - (firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1))
+
+    // 첫 주의 시작을 월요일로 맞추기
+    let weekStart = 1
+    if (firstDayOfWeek !== 1) {
+        weekStart = 1 - (firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1)
     }
 
-    while (currentWeekStart <= lastDay) {
-        const weekEnd = new Date(currentWeekStart)
-        weekEnd.setDate(currentWeekStart.getDate() + 6)
-
-        // 해당 주의 일자들 계산
-        const weekDays = []
-        for (let i = 0; i < 7; i++) {
-            const currentDate = new Date(currentWeekStart)
-            currentDate.setDate(currentWeekStart.getDate() + i)
-
-            // 해당 월의 날짜만 포함
-            if (currentDate.getMonth() === month - 1) {
-                const dayData = findAttendanceData(currentDate)
-                if (dayData) {
-                    weekDays.push(dayData)
-                }
-            }
+    // 현재 날짜가 속한 주차 계산
+    let weekNumber = 1
+    while (weekStart <= currentDate) {
+        const weekEnd = weekStart + 6
+        if (currentDate >= weekStart && currentDate <= weekEnd) {
+            return weekNumber
         }
-
-        if (weekDays.length > 0) {
-            weeks.push({
-                weekNumber,
-                startDate: new Date(currentWeekStart),
-                endDate: new Date(weekEnd),
-                days: weekDays,
-                expanded: weekNumber === 2, // 기본적으로 2주차만 펼쳐짐
-                totalHours: calculateWeekTotalHours(weekDays)
-            })
-            weekNumber++
-        }
-
-        currentWeekStart.setDate(currentWeekStart.getDate() + 7)
+        weekStart += 7
+        weekNumber++
     }
 
-    return weeks
+    return 1 // 기본값
 }
 
-// 출석 데이터 찾기
-const findAttendanceData = (date) => {
-    const dateStr = date.getDate().toString().padStart(2, '0')
+// Store에서 주차별 데이터 가져와서 상태 업데이트
+const updateWeekList = () => {
+    if (!props.rawAttendanceRecords.length) {
+        weekList.value = []
+        return
+    }
 
-    // 실제 데이터가 있으면 사용, 없으면 기본 데이터
-    const existingData = props.attendanceData.find(data =>
-        data.date === dateStr
+    const newWeekData = attendanceStore.groupAttendanceByWeek(
+        props.year,
+        props.month,
+        props.rawAttendanceRecords
     )
 
-    if (existingData) {
-        return existingData
-    }
+    const currentWeek = getCurrentWeekNumber()
 
-    // 기본 데이터 (예시)
-    return {
-        date: dateStr,
-        startTime: '09:00:00',
-        endTime: '18:00:00',
-        startLocation: true,
-        endLocation: true,
-        totalDuration: '8h 0m 0s',
-        regularHours: '8h 0m 0s',
-        overtimeHours: '0h 0m 0s',
-        nightHours: '0h 0m 0s',
-        needsApproval: false,
-        selected: false,
-        breakTime: true
-    }
-}
+    // 기존 expanded 상태 보존하면서 업데이트
+    weekList.value = newWeekData.map((newWeek, index) => {
+        const existingWeek = weekList.value[index]
 
-// 주차별 총 근무시간 계산
-const calculateWeekTotalHours = (days) => {
-    let totalMinutes = 0
+        // 기존 상태가 있으면 보존, 없으면 현재 주차인지 확인
+        const shouldExpand = existingWeek
+            ? existingWeek.expanded
+            : newWeek.weekNumber === currentWeek
 
-    days.forEach(day => {
-        const duration = day.totalDuration
-        const match = duration.match(/(\d+)h\s*(\d+)m/)
-        if (match) {
-            totalMinutes += parseInt(match[1]) * 60 + parseInt(match[2])
+        return {
+            ...newWeek,
+            expanded: shouldExpand
         }
     })
-
-    const hours = Math.floor(totalMinutes / 60)
-    const minutes = totalMinutes % 60
-
-    return `${hours}h ${minutes}m`
 }
+
+// Props 변경 감지
+watch([() => props.year, () => props.month, () => props.rawAttendanceRecords], () => {
+    updateWeekList()
+}, { immediate: true, deep: true })
 
 // 주차 범위 포맷팅
 const formatWeekRange = (startDate, endDate) => {
@@ -174,15 +146,7 @@ const handleTimeEdit = (dayData) => {
     emit('time-edit', dayData)
 }
 
-// 주차 데이터 초기화
-const initializeWeeks = () => {
-    weekList.value = calculateWeeks(props.year, props.month)
-}
-
-// Props 변경 감지
-watch([() => props.year, () => props.month], () => {
-    initializeWeeks()
-}, { immediate: true })
+// Props 변경 감지는 watch에서 처리됨
 
 // Emits
 const emit = defineEmits(['approval-request', 'time-edit'])

@@ -22,14 +22,14 @@
             <!-- 좌측: 진행률 및 시간 -->
             <div class="progress-section">
                 <div class="month-info">
-                    <span class="month">09월</span>
-                    <span class="sub-text">(총 근무구간은 51h 24m 이상은 권장)</span>
+                    <span class="month">{{ month }}</span>
+                    <span class="sub-text">(총 근무구간은 {{ targetHours.hours }}h {{ targetHours.minutes }}m 이상은 권장)</span>
                 </div>
 
                 <div class="time-display">
-                    <span class="hours">51</span>
+                    <span class="hours">{{ workingHours.hours }}</span>
                     <span class="unit">h</span>
-                    <span class="minutes">45</span>
+                    <span class="minutes">{{ workingHours.minutes }}</span>
                     <span class="unit">m</span>
                 </div>
 
@@ -37,22 +37,22 @@
                 <div class="progress-container">
                     <v-progress-linear :model-value="progressPercentage" height="8" color="success"
                         bg-color="grey-lighten-3" rounded></v-progress-linear>
-                    <span class="progress-text">{{ progressPercentage.toFixed(1) }}%</span>
+                    <span class="progress-text">{{ formattedProgressPercentage }}</span>
                 </div>
 
                 <!-- 통계 정보 -->
                 <div class="stats-info">
                     <div class="stat-item">
                         <span class="label">남은 근무시간:</span>
-                        <span class="value">최소 11h 14m ~ 최대 16h 38m</span>
+                        <span class="value">{{ remainingTimeRange }}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="label">남은 09월 근무시간:</span>
-                        <span class="value">51h 24m</span>
+                        <span class="label">남은 {{ month }} 근무시간:</span>
+                        <span class="value">{{ targetHours.hours }}h {{ targetHours.minutes }}m</span>
                     </div>
                     <div class="stat-item">
                         <span class="label">일일 예상 필요 평균:</span>
-                        <span class="value">8h 18m 평균 (남은 근무일: 14 일)</span>
+                        <span class="value">{{ dailyAverageNeeded }} 평균 (남은 근무일: {{ remainingWorkDays }} 일)</span>
                     </div>
                 </div>
             </div>
@@ -61,72 +61,102 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 
 // Props
 const props = defineProps({
     workingHours: {
         type: Object,
         default: () => ({
-            hours: 51,
-            minutes: 45
+            hours: 0,
+            minutes: 0
         })
     },
     targetHours: {
         type: Object,
         default: () => ({
-            hours: 51,
-            minutes: 24
+            hours: 0,
+            minutes: 0
         })
     },
     month: {
         type: String,
-        default: '09월'
+        default: '월'
     },
     remainingWorkDays: {
         type: Number,
-        default: 14
+        default: 0
     }
 })
 
-// 시간/분 옵션
-const hours = computed(() => {
-    return Array.from({ length: 24 }, (_, i) => ({
-        title: i.toString().padStart(2, '0'),
-        value: i.toString().padStart(2, '0')
-    }))
-})
-
-const minutes = computed(() => {
-    return Array.from({ length: 60 }, (_, i) => ({
-        title: i.toString().padStart(2, '0'),
-        value: i.toString().padStart(2, '0')
-    }))
-})
-
-const statusOptions = [
-    { title: '휴근', value: 'absent' },
-    { title: '출근', value: 'present' },
-    { title: '지각', value: 'late' },
-    { title: '조퇴', value: 'early_leave' },
-    { title: '반차', value: 'half_day' }
-]
-
 // 진행률 계산
 const progressPercentage = computed(() => {
-    const currentMinutes = props.workingHours.hours * 60 + props.workingHours.minutes
-    const targetMinutes = props.targetHours.hours * 60 + props.targetHours.minutes
-    return (currentMinutes / targetMinutes) * 100
+    // 안전한 값 추출
+    const currentHours = props.workingHours?.hours || 0
+    const currentMins = props.workingHours?.minutes || 0
+    const targetHours = props.targetHours?.hours || 0
+    const targetMins = props.targetHours?.minutes || 0
+
+    const currentMinutes = currentHours * 60 + currentMins
+    const targetMinutes = targetHours * 60 + targetMins
+
+    if (targetMinutes === 0) return 0
+
+    const percentage = (currentMinutes / targetMinutes) * 100
+    return isNaN(percentage) ? 0 : percentage
 })
 
-// 메서드
-const closeDetailModal = () => {
-    // 모달 닫기 로직
-    console.log('모달 닫기')
-}
+// 포맷팅된 진행률
+const formattedProgressPercentage = computed(() => {
+    const percentage = progressPercentage.value
+    return `${percentage.toFixed(1)}%`
+})
+
+// 남은 근무시간 범위 계산
+const remainingTimeRange = computed(() => {
+    // 안전한 값 추출
+    const currentHours = props.workingHours?.hours || 0
+    const currentMins = props.workingHours?.minutes || 0
+    const targetHours = props.targetHours?.hours || 0
+    const targetMins = props.targetHours?.minutes || 0
+
+    const currentMinutes = currentHours * 60 + currentMins
+    const targetMinutes = targetHours * 60 + targetMins
+    const remainingMinutes = Math.max(0, targetMinutes - currentMinutes)
+
+    // 최소: 남은 시간 그대로, 최대: 남은 시간 + 여유시간(5시간)
+    const minHours = Math.floor(remainingMinutes / 60)
+    const minMins = remainingMinutes % 60
+    const maxTotalMinutes = remainingMinutes + (5 * 60) // 5시간 여유
+    const maxHours = Math.floor(maxTotalMinutes / 60)
+    const maxMins = maxTotalMinutes % 60
+
+    return `최소 ${minHours}h ${minMins}m ~ 최대 ${maxHours}h ${maxMins}m`
+})
+
+// 일일 평균 필요 시간 계산
+const dailyAverageNeeded = computed(() => {
+    if (!props.remainingWorkDays || props.remainingWorkDays === 0) return '0h 0m'
+
+    // 안전한 값 추출
+    const currentHours = props.workingHours?.hours || 0
+    const currentMins = props.workingHours?.minutes || 0
+    const targetHours = props.targetHours?.hours || 0
+    const targetMins = props.targetHours?.minutes || 0
+
+    const currentMinutes = currentHours * 60 + currentMins
+    const targetMinutes = targetHours * 60 + targetMins
+    const remainingMinutes = Math.max(0, targetMinutes - currentMinutes)
+
+    const avgMinutesPerDay = Math.ceil(remainingMinutes / props.remainingWorkDays)
+    const hours = Math.floor(avgMinutesPerDay / 60)
+    const minutes = avgMinutesPerDay % 60
+
+    return `${hours}h ${minutes}m`
+})
 
 // Emits
-defineEmits(['update:workingHours', 'downloadExcel', 'viewMonthlyDetail'])
+defineEmits(['downloadExcel', 'viewMonthlyDetail'])
 </script>
 
 <style scoped>

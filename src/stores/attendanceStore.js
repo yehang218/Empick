@@ -1,7 +1,7 @@
 // stores/attendanceStore.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { attendanceService } from '@/services/attendanceService';
+import * as attendanceService from '@/services/attendanceService';
 import {
     formatMinutesToDuration,
     calculateTimeDifferenceInMinutes,
@@ -344,6 +344,114 @@ export const useAttendanceStore = defineStore('attendance', () => {
         };
     };
 
+    // 모든 데이터 상태 초기화 (로그아웃 시 사용)
+    const resetAllData = () => {
+        // 모든 데이터 상태 초기화
+        attendanceRecords.value = [];
+        currentRecord.value = null;
+        myRecords.value = [];
+        myRecentRecords.value = [];
+        memberRecords.value = [];
+        attendanceCategories.value = [];
+        currentCategory.value = null;
+        categoriesCount.value = 0;
+        todayCheckin.value = null;
+        todayCheckout.value = null;
+
+        // 캐시도 함께 초기화
+        clearAllCache();
+    };
+
+    // ==================== View 지원 함수들 ====================
+
+    // 월별 근무일 계산
+    const getWorkDaysInMonth = async (year, month) => {
+        const { WORK_TIME_CONFIG } = await import('@/config/attendance');
+        const firstDay = new Date(year, month - 1, 1);
+        const lastDay = new Date(year, month, 0);
+        let workDays = 0;
+
+        for (let day = firstDay; day <= lastDay; day.setDate(day.getDate() + 1)) {
+            const dayOfWeek = day.getDay();
+            if (!WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayOfWeek)) { // 설정된 주말 제외
+                workDays++;
+            }
+        }
+
+        return workDays;
+    };
+
+    // 남은 근무일 계산
+    const getWorkDaysRemaining = async (year, month) => {
+        const { WORK_TIME_CONFIG } = await import('@/config/attendance');
+        const today = new Date();
+        const lastDay = new Date(year, month, 0);
+        let workDays = 0;
+
+        for (let day = new Date(today); day <= lastDay; day.setDate(day.getDate() + 1)) {
+            const dayOfWeek = day.getDay();
+            if (!WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayOfWeek)) { // 설정된 주말 제외
+                workDays++;
+            }
+        }
+
+        return workDays;
+    };
+
+    // 시간 문자열 파싱 (예: "51h 45m" → {hours: 51, minutes: 45})
+    const parseTimeString = (timeString) => {
+        if (!timeString) return { hours: 0, minutes: 0 };
+
+        const [hours, minutes] = timeString.replace('h', '').replace('m', '').split(' ').map(Number);
+        return { hours: hours || 0, minutes: minutes || 0 };
+    };
+
+    // 목표 근무시간 계산
+    const calculateTargetHours = async (year, month) => {
+        const { WORK_TIME_CONFIG } = await import('@/config/attendance');
+        const workDaysInMonth = await getWorkDaysInMonth(year, month);
+        const targetMinutes = workDaysInMonth * WORK_TIME_CONFIG.STANDARD_WORK_MINUTES;
+        const hours = Math.floor(targetMinutes / WORK_TIME_CONFIG.MINUTES_PER_HOUR);
+        const minutes = targetMinutes % WORK_TIME_CONFIG.MINUTES_PER_HOUR;
+
+        return { hours, minutes };
+    };
+
+    // 출근 기록 생성
+    const createCheckInRecord = async () => {
+        const { ATTENDANCE_CONSTANTS } = await import('@/config/attendance');
+        const checkInData = {
+            attendanceCategoryId: ATTENDANCE_CONSTANTS.CATEGORY_IDS.CHECK_IN,
+            recordTime: new Date().toISOString()
+        };
+
+        return await createAttendanceRecord(checkInData);
+    };
+
+    // 퇴근 기록 생성
+    const createCheckOutRecord = async () => {
+        const { ATTENDANCE_CONSTANTS } = await import('@/config/attendance');
+        const checkOutData = {
+            attendanceCategoryId: ATTENDANCE_CONSTANTS.CATEGORY_IDS.CHECK_OUT,
+            recordTime: new Date().toISOString()
+        };
+
+        return await createAttendanceRecord(checkOutData);
+    };
+
+    // 월별 데이터 로드 (날짜 변환 포함)
+    const loadMonthlyAttendanceData = async (year, month) => {
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0);
+
+        // LocalDateTime 형식으로 변환 (시작일은 00:00:00, 종료일은 23:59:59)
+        const startDateStr = startDate.toISOString().slice(0, 19); // "2025-05-01T00:00:00"
+        endDate.setHours(23, 59, 59, 999); // 해당 날의 마지막 시간으로 설정
+        const endDateStr = endDate.toISOString().slice(0, 19); // "2025-05-31T23:59:59"
+
+        return await fetchMyAttendanceRecordsByDateRange(startDateStr, endDateStr);
+    };
+
 
 
     return {
@@ -362,11 +470,15 @@ export const useAttendanceStore = defineStore('attendance', () => {
         fetchMyRecentAttendanceRecords, fetchMyAttendanceRecordsByDateRange,
         fetchMemberAttendanceRecords,
         // 캐시 관리
-        clearAllCache, clearTodayCache,
+        clearAllCache, clearTodayCache, resetAllData,
         // 데이터 계산 및 변환
         formatMinutesToDuration, calculateTimeDifferenceInMinutes,
         categorizeWorkHours, calculateNightWorkHours,
         groupAttendanceByDate, groupAttendanceByWeek,
-        calculateMonthlyStats, transformAttendanceDataForUI
+        calculateMonthlyStats, transformAttendanceDataForUI,
+        // View 지원 함수들
+        getWorkDaysInMonth, getWorkDaysRemaining, parseTimeString,
+        calculateTargetHours, createCheckInRecord, createCheckOutRecord,
+        loadMonthlyAttendanceData
     };
 });
