@@ -19,6 +19,7 @@ CREATE TABLE `approval_category_item` (
     `id`          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `category_id` INT          NOT NULL,
     `name`        VARCHAR(255) NOT NULL COMMENT '항목 이름',
+    input_type  tinyint      not null comment '입력 타입 (0: TEXT, 1: TEXTAREA, 2: FILE 등)',
 
     FOREIGN KEY (`category_id`) REFERENCES `approval_category` (`id`) ON DELETE CASCADE
 );

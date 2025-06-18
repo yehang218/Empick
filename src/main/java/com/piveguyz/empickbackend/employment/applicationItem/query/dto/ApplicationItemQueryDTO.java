@@ -1,5 +1,6 @@
 package com.piveguyz.empickbackend.employment.applicationItem.query.dto;
 
+import com.piveguyz.empickbackend.common.enums.InputType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

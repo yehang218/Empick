@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.employment.applicationItem.query.dto;
+package com.piveguyz.empickbackend.common.enums;
 
 import lombok.Getter;
 

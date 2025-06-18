@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.employment.applicationItem.command.domain.aggregate;
 
-import com.piveguyz.empickbackend.employment.applicationItem.query.dto.InputType;
+import com.piveguyz.empickbackend.common.enums.InputType;
 
 import jakarta.persistence.*;
 import lombok.*;
