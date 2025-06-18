@@ -1,10 +1,20 @@
+// 채용공고별 지원서 항목 DTO
 export default class ApplicationItemDTO {
-    constructor() {
-        // 필요한 필드는 나중에 채움
+    constructor(id, applicationItemCategoryId, categoryName, inputType, isRequired) {
+        this.id = id
+        this.applicationItemCategoryId = applicationItemCategoryId
+        this.categoryName = categoryName
+        this.inputType = inputType
+        this.isRequired = isRequired
     }
 
     static fromJSON(json) {
-        if (!json) return null
-        return new ApplicationItemDTO()
+        return new ApplicationItemDTO(
+            json.id,
+            json.applicationItemCategoryId,
+            json.categoryName,
+            json.inputType,
+            json.isRequired
+        )
     }
 }

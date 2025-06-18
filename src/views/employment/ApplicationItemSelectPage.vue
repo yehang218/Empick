@@ -1,4 +1,5 @@
 <template>
+    <IntroduceTemplateSelectModal v-model="showTemplateModal" @select="onTemplateSelected" />
     <v-container fluid class="pa-6">
         <v-row justify="space-between" align="center" class="mb-4">
             <div class="d-flex align-center">
@@ -9,12 +10,12 @@
             </div>
 
             <v-btn color="secondary" @click="selectIntroduceTemplate">
-                자기소개서 템플릿 선택 (임시)
+                자기소개서 템플릿 선택
             </v-btn>
         </v-row>
 
         <v-row>
-            <!-- 중앙: 미리보기 영역 -->
+            <!-- 미리보기 영역 -->
             <v-col cols="8" class="preview-pane">
                 <h3 class="text-h6 font-weight-bold mb-3">미리보기</h3>
 
@@ -49,7 +50,7 @@
                 </template>
             </v-col>
 
-            <!-- 우측: 항목 카테고리 선택 -->
+            <!-- 항목 카테고리 선택 -->
             <v-col cols="4" class="scroll-pane">
                 <h3 class="text-h6 font-weight-bold mb-3">항목 선택</h3>
                 <v-list density="compact">
@@ -89,12 +90,14 @@ import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import RecruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
 import { getInputTypeLabel } from '@/constants/employment/inputTypes'
 import { useMemberStore } from '@/stores/memberStore'
+import IntroduceTemplateSelectModal from '@/components/employment/IntroduceTemplateSelectModal.vue'
 
 const router = useRouter()
 const route = useRoute()
 const store = useRecruitmentStore()
 const memberStore = useMemberStore()
 const requestId = route.query.requestId
+const showTemplateModal = ref(false)
 
 // 선택된 항목 ID와 필수 여부
 const selectedIds = computed({
@@ -127,10 +130,7 @@ const goBack = () => {
 }
 
 const selectIntroduceTemplate = () => {
-    if (store.draftRecruitment) {
-        store.draftRecruitment.introduceTemplateId = 1
-        alert('자기소개서 템플릿이 임시로 선택되었습니다.')
-    }
+    showTemplateModal.value = true
 }
 
 const selectedItemsByGroup = (children) => {
@@ -148,6 +148,13 @@ onMounted(async () => {
         console.log('이미 있는 카테고리:', store.applicationItemCategoryList)
     }
 })
+
+const onTemplateSelected = (templateId) => {
+    if (store.draftRecruitment) {
+        store.draftRecruitment.introduceTemplateId = templateId
+        alert('자기소개서 템플릿이 선택되었습니다.')
+    }
+}
 
 const getInputComponent = (inputType) => {
     switch (inputType) {
