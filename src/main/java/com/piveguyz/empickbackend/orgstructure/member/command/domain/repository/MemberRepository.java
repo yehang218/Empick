@@ -10,4 +10,6 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Integer> {
     boolean existsByEmail(String email);
 
     boolean existsByEmployeeNumber(int randomNumber);
+
+    Optional<MemberEntity> findFirstByDeptIdAndPositionId(Integer deptId, Integer positionId);
 }

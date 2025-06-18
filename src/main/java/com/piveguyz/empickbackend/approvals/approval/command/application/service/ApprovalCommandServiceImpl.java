@@ -3,19 +3,24 @@ package com.piveguyz.empickbackend.approvals.approval.command.application.servic
 import com.piveguyz.empickbackend.approvals.approval.command.application.dto.*;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.aggregate.ApprovalContentEntity;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.aggregate.ApprovalEntity;
+import com.piveguyz.empickbackend.approvals.approval.command.domain.aggregate.ApprovalLineEntity;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalCategoryItemRepository;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalContentRepository;
+import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalLineRepository;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalRepository;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEntity;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,46 +30,42 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
     private final ApprovalRepository approvalRepository;
     private final ApprovalCategoryItemRepository approvalCategoryItemRepository;
     private final ApprovalContentRepository approvalContentRepository;
+    private final ApprovalLineRepository approvalLineRepository;
 
     @Override
     public Integer createApproval(CreateApprovalCommandDTO dto) {
-        // 결재자/항목 필수 검증
-        if (dto.getApprovers() == null || dto.getApprovers().isEmpty()) {
-            throw new BusinessException(ResponseCode.APPROVAL_NO_APPROVER);
-        }
         if (dto.getContents() == null || dto.getContents().isEmpty()) {
             throw new BusinessException(ResponseCode.APPROVAL_CONTENT_ITEM_MISSING);
         }
 
-        // 결재 순서 중복 검사
-        Map<Integer, Integer> approverMap;
-        try {
-            approverMap = dto.getApprovers().stream()
-                    .collect(Collectors.toMap(
-                            CreateApprovalCommandDTO.ApproverDTO::getOrder,
-                            CreateApprovalCommandDTO.ApproverDTO::getMemberId,
-                            (a, b) -> {
-                                throw new BusinessException(ResponseCode.APPROVAL_DUPLICATE_APPROVER_ORDER);
-                            }
-                    ));
-        } catch (IllegalStateException e) {
-            throw new BusinessException(ResponseCode.APPROVAL_DUPLICATE_APPROVER_ORDER);
+        // 결재 라인 조회 (approval_line 테이블)
+        List<ApprovalLineEntity> approvalLine = approvalLineRepository
+                .findByApprovalCategoryIdOrderByStepOrderAsc(dto.getCategoryId());
+
+        if (approvalLine.isEmpty()) {
+            throw new BusinessException(ResponseCode.APPROVAL_LINE_NOT_FOUND);
         }
 
-        // 결재선의 모든 결재자가 member에 있는지
-        for (Integer memberId : approverMap.values()) {
-            if (memberId != null && !memberRepository.existsById(memberId)) {
-                throw new BusinessException(ResponseCode.APPROVAL_APPROVER_NOT_FOUND);
-            }
-        }
+        // 기안자의 부서 조회
+        MemberEntity writer = memberRepository.findById(dto.getWriterId())
+                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+        Integer deptId = writer.getDepartmentId(); // 부서 기준 할당
 
-        // 항목 유효성 체크
-        for (CreateApprovalCommandDTO.ApprovalContentDTO contentDTO : dto.getContents()) {
-            boolean valid = approvalCategoryItemRepository
-                    .existsByIdAndCategoryId(contentDTO.getItemId(), dto.getCategoryId());
-            if (!valid) {
-                throw new BusinessException(ResponseCode.APPROVAL_CATEGORY_ITEM_MISMATCH);
-            }
+        // 결재자 자동 할당
+        Map<Integer, Integer> approverMap = new HashMap<>();
+        for (ApprovalLineEntity line : approvalLine) {
+            // 해당 부서에서 지정된 직책의 멤버 찾기 (없으면 예외)
+            Integer step = line.getStepOrder();
+            Integer positionId = line.getPositionId();
+
+            Optional<MemberEntity> approverOpt = memberRepository
+                    .findFirstByDeptIdAndPositionId(deptId, positionId);
+
+            Integer memberId = approverOpt
+                    .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_APPROVER_NOT_FOUND))
+                    .getId();
+
+            approverMap.put(step, memberId);
         }
 
         ApprovalEntity approval = ApprovalEntity.builder()
@@ -87,7 +88,6 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
                         .content(c.getContent())
                         .build())
                 .toList();
-
         approvalContentRepository.saveAll(contents);
 
         return approval.getId();
