@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { loginService, logoutService } from '@/services/authService';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '@/stores/memberStore'
+import { useApprovalStore } from '@/stores/approvalStore'
 
 import { jwtDecode } from 'jwt-decode';
 
@@ -50,11 +51,20 @@ console.log('userInfo.value (최종)', userInfo.value);
 
             if (response.user) {
                 userInfo.value = {
-                    ...response.user, // ...user 뒤에
-                    roles             // roles를 마지막에 덮어쓰기!
+                    ...response.user,
+                    roles
                 };
             } else {
                 userInfo.value = { roles };
+            }
+
+            // 멤버 정보 및 결재문서 자동 로딩
+            const memberStore = useMemberStore();
+            await memberStore.getMyInfo();
+            const approvalStore = useApprovalStore();
+            if (memberStore.form.id) {
+                await approvalStore.loadReceivedApprovals(memberStore.form.id);
+                await approvalStore.loadRequestedApprovals(memberStore.form.id);
             }
 
             console.log('로그인 성공, 토큰 저장 완료');
@@ -88,6 +98,8 @@ console.log('userInfo.value (최종)', userInfo.value);
             userInfo.value = null;
 
             useMemberStore().reset();
+            useApprovalStore().reset();
+            localStorage.removeItem('auth-store');
 
             // 로그아웃 후 로그인 페이지로 이동
             router.push('/login');

@@ -69,6 +69,7 @@ export const useApprovalStore = defineStore('approval', () => {
         requestedList.value = [];
         loadingRequested.value = false;
         errorRequested.value = null;
+        localStorage.removeItem('approval-store');
     };
 
     return {

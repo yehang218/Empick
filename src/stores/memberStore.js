@@ -58,6 +58,8 @@ export const useMemberStore = defineStore('member', {
             this.loading = false;
             this.error = '';
             this.profileImageUrl = '';
+
+            localStorage.removeItem('member-store');
         },
         async registerMember(memberData) {
             this.loading = true;
@@ -182,4 +184,10 @@ export const useMemberStore = defineStore('member', {
             return response.map(member => MemberResponseDTO.fromJSON(member));
         }
     },
-}); 
+}, {
+    persist: {
+        key: 'member-store',
+        storage: localStorage,
+        paths: ['form']
+    }
+});
