@@ -4,6 +4,7 @@ import { loginService, logoutService } from '@/services/authService';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '@/stores/memberStore'
 import { useAttendanceStore } from '@/stores/attendanceStore'
+import { setLoggingOut } from '@/utils/errorHandler';
 
 import { jwtDecode } from 'jwt-decode';
 
@@ -79,6 +80,9 @@ export const useAuthStore = defineStore('auth', () => {
 
     // 로그아웃 액션
     const logout = async () => {
+        // 로그아웃 시작 플래그 설정
+        setLoggingOut(true);
+
         loading.value = true;
         error.value = null;
 
@@ -101,6 +105,8 @@ export const useAuthStore = defineStore('auth', () => {
             error.value = err?.response?.data?.message || '로그아웃 중 오류가 발생했습니다.';
         } finally {
             loading.value = false;
+            // 로그아웃 완료 플래그 해제
+            setLoggingOut(false);
         }
     };
 
