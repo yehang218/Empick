@@ -14,6 +14,8 @@ export class MemberResponseDTO {
         rankName = '',
         pictureUrl = '',
         status = 0,
+        birth = null,
+        address = '',
         hireAt = null,
         resignAt = null
     } = {}) {
@@ -28,7 +30,13 @@ export class MemberResponseDTO {
         this.rankName = rankName;
         this.pictureUrl = pictureUrl;
         this.status = status;
+        this.birth = birth;
+        this.address = address;
         this.hireAt = hireAt;
         this.resignAt = resignAt;
+    }
+
+    static fromJSON(data) {
+        return new MemberResponseDTO(data);
     }
 }
