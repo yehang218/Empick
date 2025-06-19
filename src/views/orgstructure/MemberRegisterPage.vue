@@ -181,6 +181,11 @@ const restoreFormData = (applicant) => {
         // 이미지 정보 복원
         regStore.profileImageFile = savedData.profileImageFile
         regStore.profileImageUrl = savedData.profileImageUrl
+        console.log('📷 이미지 상태 복원:', {
+            hasFile: !!savedData.profileImageFile,
+            fileName: savedData.profileImageFile?.name,
+            hasUrl: !!savedData.profileImageUrl
+        })
 
         // pictureUrl 설정: 이미지 파일이 있으면 임시 경로, 없으면 빈 문자열
         if (savedData.profileImageFile) {
@@ -191,9 +196,12 @@ const restoreFormData = (applicant) => {
             console.log('📷 저장된 이미지 없음')
         }
     } else {
-        // 저장된 데이터가 없으면 기본값으로 로드
+        // 저장된 데이터가 없으면 기본값으로 로드 + 이미지 상태 초기화
         console.log('📝 기본 데이터로 폼 로드:', applicant.name)
         loadApplicantToForm(applicant)
+        // 이미지 상태 명시적 초기화
+        regStore.clearProfileImage()
+        console.log('📷 이미지 상태 초기화됨')
     }
 }
 
@@ -335,6 +343,8 @@ const onBulkRegister = async () => {
                 console.log('📝 기본 데이터로 등록:', applicant.name)
                 // 기본 지원자 데이터로 폼 설정
                 loadApplicantToForm(applicant)
+                // 이미지 상태 명시적 초기화
+                regStore.clearProfileImage()
             }
 
             // 진행 상황 업데이트: 사원 등록 중
@@ -407,17 +417,21 @@ const onProfileImageChange = (event) => {
     handleImageUpload(
         event,
         (file) => {
+            console.log('📷 프로필 이미지 설정:', currentApplicant.value?.name, file.name)
             regStore.setProfileImage(file)
             // 현재 지원자의 이미지 정보를 즉시 저장
             if (currentApplicant.value) {
                 saveCurrentFormData(getCurrentFormData())
+                console.log('💾 이미지 설정 후 폼 데이터 저장됨')
             }
         },
         () => {
+            console.log('📷 프로필 이미지 제거:', currentApplicant.value?.name)
             regStore.clearProfileImage()
             // 현재 지원자의 이미지 정보를 즉시 저장
             if (currentApplicant.value) {
                 saveCurrentFormData(getCurrentFormData())
+                console.log('💾 이미지 제거 후 폼 데이터 저장됨')
             }
         }
     )
@@ -448,7 +462,7 @@ const onRegister = async () => {
             // 다중 선택 시 다음 지원자로 이동
             if (selectedApplicants.value.length > 1 && currentApplicantIndex.value < selectedApplicants.value.length - 1) {
                 handleNextApplicant()
-                regStore.resetForm() // 폼 초기화 후 다음 지원자 데이터 로드
+                regStore.resetForm() // 폼 초기화 (이미지 상태 포함)
                 restoreFormData(currentApplicant.value)
             } else {
                 // 모든 지원자 등록 완료 또는 단일 선택 시
