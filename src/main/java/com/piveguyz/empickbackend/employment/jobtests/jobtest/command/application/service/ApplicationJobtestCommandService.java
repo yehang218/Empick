@@ -13,4 +13,6 @@ public interface ApplicationJobtestCommandService {
     int deleteApplicationJobtest(int id);
 
     void updateGradingStatusAndScore(int applicationJobTestId, double totalScore);
+
+    void finishExam(int applicationJobTestId);
 }

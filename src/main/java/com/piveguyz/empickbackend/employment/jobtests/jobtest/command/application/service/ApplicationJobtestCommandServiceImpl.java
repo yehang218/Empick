@@ -91,7 +91,13 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
         applicationJobtestRepository.save(applicationJobtest);
     }
 
-
+    @Override
+    public void finishExam(int applicationJobTestId) {
+        ApplicationJobtestEntity applicationJobtest = applicationJobtestRepository.findById(applicationJobTestId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_APPLICATION_JOBTEST));
+        applicationJobtest.destroyEntryCode();
+        applicationJobtest.updateSubittedAt();
+    }
 
 
     private void validateMemberExists(Integer memberId) {

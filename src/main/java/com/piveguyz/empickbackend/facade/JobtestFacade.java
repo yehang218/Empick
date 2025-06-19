@@ -57,6 +57,9 @@ public class JobtestFacade {
 
     // 실무테스트 채점
     public List<UpdateAnswerCommandDTO> gradeApplicationJobTest(int applicationJobTestId) {
+        // 입장 코드 파기(재시험 불가)
+        applicationJobtestCommandService.finishExam(applicationJobTestId);
+
         List<AnswerEntity> answers = answerCommandService.findByApplicationJobtestId(applicationJobTestId);
         List<UpdateAnswerCommandDTO> updateAnswers = new ArrayList<>();
         double totalScore = 0.0;
