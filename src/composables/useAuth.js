@@ -29,7 +29,8 @@ export const useAuth = () => {
 
     // 🏢 주요 권한별 단축 함수들
     const hasUserAccess = computed(() =>
-        userRoles.value.includes(RoleCode.USER)
+        // ROLE_USER는 기본 권한으로 간주하여 인증된 사용자라면 항상 허용
+        isAuthenticated.value || userRoles.value.includes(RoleCode.USER)
     )
 
     const hasHRAccess = computed(() =>
