@@ -24,14 +24,17 @@
             </div>
 
             <div class="attendance-buttons">
-                <v-btn variant="outlined" :disabled="hasTodayCheckIn" :color="hasTodayCheckIn ? 'grey' : 'primary'"
-                    @click="checkIn">
-                    {{ hasTodayCheckIn ? '출근완료' : '출근' }}
-                </v-btn>
-                <v-btn variant="outlined" :disabled="!hasTodayCheckIn || hasTodayCheckOut"
-                    :color="hasTodayCheckOut ? 'grey' : (!hasTodayCheckIn ? 'grey' : 'primary')" @click="checkOut">
-                    {{ hasTodayCheckOut ? '퇴근완료' : '퇴근' }}
-                </v-btn>
+                <!-- 현재 달인 경우에만 출퇴근 버튼 표시 -->
+                <template v-if="isCurrentMonth">
+                    <v-btn variant="outlined" :disabled="hasTodayCheckIn" :color="hasTodayCheckIn ? 'grey' : 'primary'"
+                        @click="checkIn">
+                        {{ hasTodayCheckIn ? '출근완료' : '출근' }}
+                    </v-btn>
+                    <v-btn variant="outlined" :disabled="!hasTodayCheckIn || hasTodayCheckOut"
+                        :color="hasTodayCheckOut ? 'grey' : (!hasTodayCheckIn ? 'grey' : 'primary')" @click="checkOut">
+                        {{ hasTodayCheckOut ? '퇴근완료' : '퇴근' }}
+                    </v-btn>
+                </template>
                 <!-- 개발용 캐시 초기화 버튼 -->
                 <v-btn variant="text" size="small" color="orange" @click="clearCache" class="ml-2">
                     캐시 초기화
@@ -76,6 +79,12 @@ const userName = computed(() => {
 // 계산된 속성들
 const currentYear = computed(() => currentDate.value.getFullYear())
 const currentMonth = computed(() => currentDate.value.getMonth() + 1)
+
+// 현재 달인지 확인하는 computed
+const isCurrentMonth = computed(() => {
+    const today = new Date()
+    return currentYear.value === today.getFullYear() && currentMonth.value === (today.getMonth() + 1)
+})
 
 // Store에서 로딩 상태와 데이터 가져오기
 const rawAttendanceRecords = computed(() => attendanceStore.myRecords)
@@ -266,6 +275,12 @@ const handleApprovalRequest = (dayData) => {
 
 const handleTimeEdit = (dayData) => {
     console.log('시간 수정:', dayData)
+}
+
+// 캐시 초기화 함수
+const clearCache = () => {
+    attendanceStore.resetAllData()
+    alert('캐시가 초기화되었습니다.')
 }
 </script>
 
