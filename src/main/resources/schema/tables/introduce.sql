@@ -145,3 +145,23 @@ create index member_id
 create index updated_by
     on introduce_rating_result (updated_by);
 
+create table introduce_template_item_response
+(
+    id                         int auto_increment comment '응답 ID'
+        primary key,
+    introduce_id               int      not null comment '자기소개서 ID',
+    introduce_template_item_id int      not null comment '자기소개서 템플릿 항목 ID',
+    content                    longtext not null comment '지원자 응답 내용',
+    constraint introduce_template_item_response_ibfk_1
+        foreign key (introduce_id) references introduce (id),
+    constraint introduce_template_item_response_ibfk_2
+        foreign key (introduce_template_item_id) references introduce_template_item (id)
+);
+
+create index introduce_id
+    on introduce_template_item_response (introduce_id);
+
+create index introduce_template_item_id
+    on introduce_template_item_response (introduce_template_item_id);
+
+
