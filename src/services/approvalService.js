@@ -3,6 +3,7 @@ import { ApprovalAPI } from '@/apis/routes/approval';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 import ApprovalReceivedListDTO from '@/dto/approval/approval/approvalReceivedListDTO';
+import ApprovalSentListDTO from '@/dto/approval/approval/approvalSentListDTO';
 
 import ApprovalCategoryDTO from '@/dto/approval/approvalCategory/approvalCategoryDTO';
 import ApprovalCategoryItemDTO from '@/dto/approval/approvalCategoryItem/approvalCategoryItemDTO';
@@ -38,7 +39,10 @@ export const getApprovalCategoryItems = async (categoryId, options = {}) => {
 
 
 // 결재 문서 목록 조회 (작성자 기준)
-export const getApprovalsByWriterId = async (writerId) => {  };
+export const getApprovalsByWriterId = async (writerId) => {
+    const res = await api.get(ApprovalAPI.DOCUMENTS_BY_WRITER(writerId));
+    return res.data.data.map(item => new ApprovalSentListDTO(item));
+};
 
 // 결재 문서 목록 조회 (결재자 기준)
 export const getApprovalsByApproverId = async (approverId) => {  };
