@@ -32,6 +32,10 @@
                     :color="hasTodayCheckOut ? 'grey' : (!hasTodayCheckIn ? 'grey' : 'primary')" @click="checkOut">
                     {{ hasTodayCheckOut ? '퇴근완료' : '퇴근' }}
                 </v-btn>
+                <!-- 개발용 캐시 초기화 버튼 -->
+                <v-btn variant="text" size="small" color="orange" @click="clearCache" class="ml-2">
+                    캐시 초기화
+                </v-btn>
             </div>
         </div>
 

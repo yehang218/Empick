@@ -415,16 +415,19 @@ export const useAttendanceStore = defineStore('attendance', () => {
         return { hours, minutes };
     };
 
-    // 한국 시간(KST)으로 ISO 문자열 생성
+    // 로컬 시간을 ISO 문자열로 변환
     const getKSTISOString = () => {
         const now = new Date();
-        // 한국 시간대(UTC+9)로 변환
-        const kstOffset = 9 * 60; // 9시간을 분으로 변환
-        const utc = now.getTime() + (now.getTimezoneOffset() * 60000); // UTC 시간
-        const kst = new Date(utc + (kstOffset * 60000)); // KST 시간
 
-        // ISO 형식으로 변환 (타임존 정보 제거)
-        return kst.toISOString().slice(0, 19); // "2024-12-18T10:06:48"
+        // 로컬 시간을 YYYY-MM-DDTHH:mm:ss 형식으로 직접 변환
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
     };
 
     // 출근 기록 생성
