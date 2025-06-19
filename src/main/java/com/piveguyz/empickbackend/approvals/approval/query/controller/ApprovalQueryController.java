@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "결재 문서 API", description = "결재 문서 관련 전체 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/approval")
+@RequestMapping("/api/v1/approval/documents")
 public class ApprovalQueryController {
 	private final ApprovalQueryService service;
 
