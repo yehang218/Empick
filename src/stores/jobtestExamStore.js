@@ -3,6 +3,14 @@ import { ref } from 'vue';
 import { verifyJobtestEntryService } from '@/services/jobtestService';
 import { JobtestEntryRequestDTO } from '@/dto/employment/jobtest/jobtestEntryRequestDTO';
 
+function mapApiQuestions(apiQuestions) {
+    return apiQuestions.map(q => ({
+        ...q,
+        type: mapApiTypeToTypeName(q.type),
+        options: (q.options || []).map(opt => opt.content)
+    }));
+}
+
 export const useJobtestExamStore = defineStore('jobtestExam', () => {
     const errorMessage = ref('');
     const examData = ref(null);
@@ -23,10 +31,18 @@ export const useJobtestExamStore = defineStore('jobtestExam', () => {
         }
     };
 
+    async function fetchExamData(apiResponse) {
+        // apiResponse.data.questions를 가공해서 저장
+        examData.value = {
+            ...apiResponse.data,
+            questions: mapApiQuestions(apiResponse.data.questions)
+        };
+    }
 
     return {
         errorMessage,
         verifyEntryCode,
         examData,
+        fetchExamData,
     };
 });
