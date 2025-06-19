@@ -14,10 +14,14 @@
 
                     <!-- 리스트 클릭 이벤트 감지용 래퍼 div -->
                     <div @click="handleRowClick">
-                        <ListView :headers="headers" :data="pagedList" />
+                        <ListView
+                            :headers="headers"
+                            :data="formattedList"
+                            :itemsPerPage="itemsPerPage"
+                            :page="page"
+                            @update:page="page = $event"
+                        />
                     </div>
-
-                    <Pagination v-model="page" :length="totalPages" />
 
                 </v-card>
             </v-col>
@@ -31,7 +35,6 @@ import { useRouter } from 'vue-router';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
 import ListView from '@/components/common/ListView.vue';
 import dayjs from 'dayjs';
-import Pagination from '@/components/common/Pagination.vue'
 
 const store = useRecruitmentRequestStore();
 const router = useRouter();

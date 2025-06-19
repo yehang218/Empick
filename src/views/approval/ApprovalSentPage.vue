@@ -14,15 +14,15 @@
         </v-row>
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
-        <ListView v-else :headers="headers" :data="pagedList" @item-click="goToDetail">
+        <ListView v-else :headers="headers" :data="filteredList" :itemsPerPage="itemsPerPage" :page="page"
+            @update:page="page = $event" @item-click="goToDetail">
             <template #item.status="{ item }">
-                <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small
-                    class="font-weight-bold" outlined>
+                <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small class="font-weight-bold"
+                    outlined>
                     {{ item.status }}
                 </v-chip>
             </template>
         </ListView>
-        <Pagination v-model="page" :length="totalPages" />
     </v-container>
 </template>
 
@@ -32,7 +32,6 @@ import { useRouter } from 'vue-router';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useMemberStore } from '@/stores/memberStore';
 import ListView from '@/components/common/ListView.vue';
-import Pagination from '@/components/common/Pagination.vue';
 import dayjs from 'dayjs';
 import { getApprovalStatusLabel } from '@/constants/approval/approvalStatus.js';
 
