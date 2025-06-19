@@ -73,7 +73,7 @@ const addItem = async () => {
 }
 
 const goToCreateTemplate = () => {
-  router.push('/employment/recruitments/introduce-templates/create')
+  router.push('/employment/introduce-templates/create')
 }
 
 const removeItem = async (id) => {

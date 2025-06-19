@@ -61,11 +61,11 @@ const items = computed(() => introduceItemStore.items)
 const selectedItemIds = ref([])
 
 function goToManage() {
-  router.push({ name: 'IntroduceStandardItemManagePage' })
+  router.push('/employment/introduce-items/manage')
 }
 
 function goToTemplateList() {
-  router.push('/employment/recruitments/introduce-templates')
+  router.push('/employment/introduce-templates')
 }
 
 onMounted(async () => {
@@ -90,7 +90,7 @@ const submit = async () => {
   try {
     await introduceTemplateStore.addTemplate(title.value, 1, selectedItemIds.value)
     alert('템플릿이 성공적으로 등록되었습니다.')
-    router.push('/employment/recruitments/introduce-templates')
+    router.push('/employment/introduce-templates')
   } catch (error) {
     console.error('템플릿 등록 실패:', error)
     alert('템플릿 등록에 실패했습니다. 서버 오류일 수 있습니다.')
