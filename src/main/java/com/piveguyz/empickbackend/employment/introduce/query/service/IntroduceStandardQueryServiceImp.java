@@ -23,4 +23,9 @@ public class IntroduceStandardQueryServiceImp implements IntroduceStandardQueryS
     public List<IntroduceStandardItemQueryDTO> findAllIntroduceStandardItem() {
         return IntroduceStandardMapper.findAllIntroduceStandardItem();
     }
+
+    @Override
+    public IntroduceStandardQueryDTO getIntroduceStandardById(int id) {
+        return IntroduceStandardMapper.findIntroduceStandardById(id);
+    }
 }
