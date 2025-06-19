@@ -324,7 +324,7 @@ const onBulkRegister = async () => {
             setRegistrationProgress(applicant.applicantId, 'processing', 50, '사원 등록 중...')
 
             // 사원 등록 실행
-            const result = await regStore.registerMemberWithImage()
+            const result = await regStore.registerMember(regStore.form, regStore.profileImageFile)
 
             if (result) {
                 successCount++
@@ -408,7 +408,7 @@ const onRegister = async () => {
         // 현재 폼 데이터 저장
         saveCurrentFormData(getCurrentFormData())
 
-        const result = await regStore.registerMemberWithImage()
+        const result = await regStore.registerMember(regStore.form, regStore.profileImageFile)
         if (result) {
             const currentName = currentApplicant.value?.name || '지원자'
             toast.success(`${currentName}의 사원 등록이 완료되었습니다!`)
