@@ -1,4 +1,4 @@
-export default class approvalReceivedListDTO {
+export default class ApprovalReceivedListDTO {
     constructor(data) {
         this.approvalId = data.approvalId;
         this.categoryName = data.categoryName;

@@ -21,8 +21,13 @@
                     {{ item.myApprovalStatus }}
                 </v-chip>
             </template>
+            <template #item.status="{ item }">
+                <v-chip :color="getStatusColor(item.statusLabel)" text-color="white" small
+                    class="font-weight-bold" outlined>
+                    {{ item.statusLabel }}
+                </v-chip>
+            </template>
         </ListView>
-
 
         <Pagination v-model="page" :length="totalPages" />
     </v-container>
@@ -42,9 +47,9 @@ const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
 const router = useRouter();
 
-const receivedList = computed(() => approvalStore.receivedList);
-const loading = computed(() => approvalStore.loadingReceived);
-const error = computed(() => approvalStore.errorReceived);
+const receivedList = approvalStore.receivedList;
+const loading = approvalStore.loadingReceived;
+const error = approvalStore.errorReceived;
 
 const headers = [
     { key: 'approvalId', label: '문서번호' },
@@ -62,11 +67,11 @@ const selectedStatus = ref('ALL');
 const selectedMyStatus = ref('ALL');
 
 const statusSummary = computed(() => {
-    const all = receivedList.value.length;
-    const canceled = receivedList.value.filter(i => i.status === 'CANCELED').length;
-    const rejected = receivedList.value.filter(i => i.status === 'REJECTED').length;
-    const inProgress = receivedList.value.filter(i => i.status === 'IN_PROGRESS').length;
-    const approved = receivedList.value.filter(i => i.status === 'APPROVED').length;
+    const all = receivedList.length;
+    const canceled = receivedList.filter(i => i.status === 'CANCELED').length;
+    const rejected = receivedList.filter(i => i.status === 'REJECTED').length;
+    const inProgress = receivedList.filter(i => i.status === 'IN_PROGRESS').length;
+    const approved = receivedList.filter(i => i.status === 'APPROVED').length;
     return {
         all,
         canceled,
@@ -85,8 +90,8 @@ const statusOptions = computed(() => [
 ]);
 
 const filteredList = computed(() => {
-    if (selectedStatus.value === 'ALL') return receivedList.value;
-    return receivedList.value.filter(item => item.status === selectedStatus.value);
+    if (selectedStatus.value === 'ALL') return receivedList;
+    return receivedList.filter(item => item.status === selectedStatus.value);
 });
 
 const pagedList = computed(() => {
@@ -109,7 +114,7 @@ const pagedList = computed(() => {
             myApprovalStatus,
             canApproveChip: item.status === 'IN_PROGRESS' && isMyTurn, // 핵심!
             createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD HH:mm') : '',
-            status: getApprovalStatusLabel(item.status)
+            statusLabel: getApprovalStatusLabel(item.status)
         });
     });
 });
@@ -158,6 +163,21 @@ function getMyApprovalStatusColor(status) {
     }
 }
 
+function getStatusColor(statusLabel) {
+    switch (statusLabel) {
+        case '결재 취소':
+            return 'grey'
+        case '반려':
+            return 'error'
+        case '결재 진행중':
+            return 'warning'
+        case '결재 완료':
+            return 'success'
+        default:
+            return 'grey'
+    }
+}
+
 onMounted(async () => {
     // 내 정보가 없으면 먼저 불러오기
     if (!memberStore.form.id) {
@@ -167,5 +187,9 @@ onMounted(async () => {
         approvalStore.loadReceivedApprovals(memberStore.form.id);
         // console.log('받은 결재 데이터:', approvalStore.receivedList);
     }
+
+    setTimeout(() => {
+        console.log('pagedList:', pagedList.value);
+    }, 2000);
 });
 </script>
