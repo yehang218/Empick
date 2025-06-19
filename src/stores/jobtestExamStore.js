@@ -5,6 +5,7 @@ import { JobtestEntryRequestDTO } from '@/dto/employment/jobtest/jobtestEntryReq
 
 export const useJobtestExamStore = defineStore('jobtestExam', () => {
     const errorMessage = ref('');
+    const examData = ref(null);
 
     /**
      * 입장 코드 검증
@@ -26,5 +27,6 @@ export const useJobtestExamStore = defineStore('jobtestExam', () => {
     return {
         errorMessage,
         verifyEntryCode,
+        examData,
     };
 });

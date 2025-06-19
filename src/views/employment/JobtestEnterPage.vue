@@ -93,8 +93,7 @@ const handleEntry = async () => {
     isSubmitting.value = true
     try {
         const data = await jobtestExamStore.verifyEntryCode(Number(props.jobtestId), entryCodeInput.value);
-        modalMessage.value = `"${data.title}" 시험에 입장합니다.`;
-        console.log(data)
+        jobtestExamStore.examData = data;
         router.push({ name: 'JobtestExam', params: { applicationJobTestId: data.applicationJobTestId } });
     } catch (err) {
 

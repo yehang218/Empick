@@ -17,6 +17,7 @@
     </div>
   </template>
   <script setup>
+  
   defineProps({
     question: Object,
     answer: [Number, String, null]
