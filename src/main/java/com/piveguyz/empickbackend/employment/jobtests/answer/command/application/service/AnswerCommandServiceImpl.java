@@ -50,7 +50,11 @@ public class AnswerCommandServiceImpl implements AnswerCommandService {
 
             // 답안이 동일한지 비교 (answer 필드가 String 기준이라면)
             boolean isSameAnswer = Objects.equals(entity.getContent(), createAnswerCommandDTO.getContent());
-            int nextAttempt = isSameAnswer ? entity.getAttempt() : entity.getAttempt() + 1;
+
+            // 새 답변도 null이어도 증가 x
+            boolean noNewAnswer = createAnswerCommandDTO.getContent() == null;
+
+            int nextAttempt = (isSameAnswer || noNewAnswer) ? entity.getAttempt() : entity.getAttempt() + 1;
             entity.updateAnswerEntity(createAnswerCommandDTO, nextAttempt);
         } else {
             // 처음 시도라면
