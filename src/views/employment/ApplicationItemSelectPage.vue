@@ -87,7 +87,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
-import RecruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
 import { getInputTypeLabel } from '@/constants/employment/inputTypes'
 import { useMemberStore } from '@/stores/memberStore'
 import IntroduceTemplateSelectModal from '@/components/employment/IntroduceTemplateSelectModal.vue'
@@ -202,19 +201,19 @@ const submit = async () => {
         applicationItemCategoryId: id,
         isRequired: requiredIds.value.includes(id)
     }))
-
-    const dto = RecruitmentCreateDTO.fromForm({
+    
+    const formData = {
         ...draft,
         recruitmentRequestId: draft.recruitmentRequestId,
         recruitType: draft.recruitType,
         applicationItems,
         introduceTemplateId: draft.introduceTemplateId || 1,
         memberId: memberStore.form.id
-    })
+    }
 
-    console.log('📦 전송 DTO:', JSON.stringify(dto, null, 2))
+    console.log('📦 전송 formData:', JSON.stringify(formData, null, 2))
 
-    await store.submitRecruitment(dto)
+    await store.submitRecruitment(formData)
     store.clearDraftRecruitment()
     store.clearDraftApplicationItems()
     store.clearApplicationItemCategoryList()
