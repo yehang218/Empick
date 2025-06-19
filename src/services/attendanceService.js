@@ -1,7 +1,17 @@
 import api from '@/apis/apiClient';
 import { AttendanceAPI } from '@/apis/routes/attendance';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
+import AttendanceRecordResponseDTO from '@/dto/attendance/attendanceRecordResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
+
+// 공통 DTO 변환 헬퍼 함수
+const convertToDTO = (data) => {
+    if (Array.isArray(data)) {
+        return data.map(item => AttendanceRecordResponseDTO.fromJSON(item));
+    } else {
+        return AttendanceRecordResponseDTO.fromJSON(data);
+    }
+};
 
 // 모든 근태 기록 조회
 export const fetchAttendanceRecords = async (options = {}) => {
@@ -13,7 +23,7 @@ export const fetchAttendanceRecords = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -26,7 +36,7 @@ export const fetchAttendanceRecordById = async (id, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -41,7 +51,7 @@ export const fetchAttendanceCategories = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -55,7 +65,7 @@ export const fetchAttendanceCategoryById = async (id, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -69,7 +79,7 @@ export const fetchAttendanceCategoriesByStatus = async (status, options = {}) =>
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -83,7 +93,7 @@ export const fetchAttendanceCategoriesCount = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -97,7 +107,7 @@ export const fetchAttendanceCategoriesBulk = async (ids, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -111,7 +121,7 @@ export const fetchTodayCheckout = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -125,7 +135,7 @@ export const fetchTodayCheckin = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -139,7 +149,7 @@ export const createAttendanceRecord = async (dto, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -153,7 +163,7 @@ export const updateAttendanceRecord = async (recordId, dto, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -169,7 +179,7 @@ export const fetchAttendanceRecordsByDateRange = async (startDate, endDate, opti
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -183,7 +193,7 @@ export const fetchMyAttendanceRecords = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -197,7 +207,7 @@ export const fetchMyRecentAttendanceRecords = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -213,7 +223,7 @@ export const fetchMyAttendanceRecordsByDateRange = async (startDate, endDate, op
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -227,7 +237,7 @@ export const fetchMemberAttendanceRecords = async (memberId, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
 
@@ -241,6 +251,6 @@ export const deleteAttendanceRecord = async (recordId, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data;
+        return convertToDTO(apiResponse.data);
     }, options);
 };
