@@ -100,11 +100,29 @@ export const getMyRoleService = async () => {
 
 export const findMembersService = async (employeeNumber) => {
     try {
+        console.log('🌐 findMembersService 호출:', { employeeNumber });
+        console.log('🔗 API URL:', API.MEMBER.FIND_MEMBERS);
+
         const params = employeeNumber ? { employeeNumber } : {};
+        console.log('📋 요청 파라미터:', params);
+
         const response = await api.get(API.MEMBER.FIND_MEMBERS, { params });
+
+        console.log('✅ API 응답 상태:', response.status);
+        console.log('📄 API 응답 헤더:', response.headers);
+        console.log('📦 API 응답 데이터:', response.data);
+
         return response.data;
     } catch (error) {
-        console.error('회원 조회 API 오류:', error)
+        console.error('❌ 회원 조회 API 오류:', error);
+        console.error('📊 오류 상세 정보:', {
+            message: error.message,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            config: error.config
+        });
+
         throw error;
     }
 };

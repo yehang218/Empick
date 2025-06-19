@@ -105,39 +105,65 @@ export const useMemberList = () => {
     }
 
     // 전체 사원 목록 로드 (클라이언트 사이드 페이지네이션용)
-    const loadAllMembers = async () => {
+    const loadAllMembers = async (forceRefresh = false) => {
         loading.value = true
         loadingMessage.value = '사원 데이터를 불러오는 중...'
 
         try {
-            // 전체 사원 데이터 로드
-            console.log('사원 데이터 로딩 시작...')
-            const allMembers = await memberStore.findMembers()
-            console.log('기본 사원 데이터 로드 완료:', allMembers.length, '명')
+            // 📋 memberStore에서 기본 사원 데이터 로드 (캐싱 지원)
+            console.log('🚀 사원 데이터 로딩 시작...', { forceRefresh })
+            const allMembers = await memberStore.findMembers(null, forceRefresh)
+            console.log('✅ 기본 사원 데이터 로드 완료:', allMembers.length, '명')
 
-            // 실제 근태 정보와 함께 사원 데이터 보강
+            if (!allMembers || allMembers.length === 0) {
+                console.warn('⚠️ 사원 데이터가 비어있습니다.')
+                members.value = []
+                showToast('등록된 사원이 없습니다.', 'warning')
+                return
+            }
+
+            // 🏃‍♂️ 근태 정보와 함께 사원 데이터 보강
             loadingMessage.value = '근태 정보를 조회하는 중...'
-            console.log('근태 정보 조회 시작...')
+            console.log('🏃‍♂️ 근태 정보 조회 시작...')
             const membersWithAttendance = await enrichMembersWithAttendance(allMembers)
 
             members.value = membersWithAttendance
-            console.log('전체 데이터 로드 완료:', membersWithAttendance.length, '명')
-            console.log('첫 번째 사원 샘플:', membersWithAttendance[0])
+            console.log('🎉 전체 데이터 로드 완료:', membersWithAttendance.length, '명')
+            console.log('📋 첫 번째 사원 샘플:', membersWithAttendance[0])
 
-            // 상태별 통계
+            // 📊 상태별 통계
             const stats = {
                 출근: membersWithAttendance.filter(m => m.status === 1).length,
                 미출근: membersWithAttendance.filter(m => m.status === 0).length,
                 기록없음: membersWithAttendance.filter(m => m.status === -1).length
             }
-            console.log('사원 상태 통계:', stats)
+            console.log('📊 사원 상태 통계:', stats)
 
             showToast(`${membersWithAttendance.length}명의 사원 정보를 불러왔습니다.`, 'success')
 
         } catch (error) {
-            console.error('사원 데이터 로드 실패:', error)
+            console.error('❌ 사원 데이터 로드 실패:', error)
+            console.error('📊 오류 상세:', {
+                message: error.message,
+                stack: error.stack,
+                response: error.response?.data
+            })
+
             members.value = []
-            showToast('사원 목록을 불러오는데 실패했습니다.', 'error')
+
+            // 오류 타입에 따른 메시지 구분
+            let errorMessage = '사원 목록을 불러오는데 실패했습니다.'
+            if (error.response?.status === 401) {
+                errorMessage = '인증이 만료되었습니다. 다시 로그인해주세요.'
+            } else if (error.response?.status === 403) {
+                errorMessage = '사원 목록 조회 권한이 없습니다.'
+            } else if (error.response?.status >= 500) {
+                errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+            } else if (error.code === 'NETWORK_ERROR') {
+                errorMessage = '네트워크 연결을 확인해주세요.'
+            }
+
+            showToast(errorMessage, 'error')
         } finally {
             loading.value = false
             loadingMessage.value = ''
@@ -146,7 +172,7 @@ export const useMemberList = () => {
 
     // 새로고침
     const refreshCurrentPage = () => {
-        loadAllMembers()
+        loadAllMembers(true) // 강제 새로고침
     }
 
     // 개별 사원의 프로필 이미지 로드 (필요시 호출)

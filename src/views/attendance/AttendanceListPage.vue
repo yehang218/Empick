@@ -141,22 +141,18 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuth } from '@/composables/useAuth'
 import { useMemberList } from '@/composables/useMemberList'
-import { RoleCode } from '@/constants/common/RoleCode'
 import { TABLE_HEADERS, STATUS_OPTIONS, getStatusClass, getStatusLabel, formatDate } from '@/utils/memberUtils'
 import AttendanceSummaryCard from '@/components/attendance/AttendanceSummaryCard.vue'
 import Pagination from '@/components/common/Pagination.vue'
 
 const router = useRouter()
-const authStore = useAuthStore()
 
 // 🛡 권한 체크
-const hasHRAccess = computed(() =>
-    authStore.userInfo?.roles?.includes(RoleCode.HR_ACCESS)
-)
+const { hasHRAccess } = useAuth()
 
 // 📋 useMemberList 컴포저블 사용
 const {
