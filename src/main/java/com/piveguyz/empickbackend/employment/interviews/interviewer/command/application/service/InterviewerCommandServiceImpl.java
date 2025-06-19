@@ -30,8 +30,15 @@ public class InterviewerCommandServiceImpl implements InterviewerCommandService 
         entity.setId(dto.getId());
         entity.setInterviewId(dto.getInterviewId());
         entity.setInterviewerId(dto.getInterviewerId());
-        entity.setScore(dto.getScore());
-        entity.setReview(dto.getReview());
+        InterviewerEntity savedEntity = repository.save(entity);
+        return mapper.toDTO(savedEntity);
+    }
+
+    @Override
+    public InterviewerCommandDTO updateInterviewerScore(Integer id, Double score) {
+        InterviewerEntity entity = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_NOT_FOUND));
+        entity.setScore(score);
         InterviewerEntity savedEntity = repository.save(entity);
         return mapper.toDTO(savedEntity);
     }

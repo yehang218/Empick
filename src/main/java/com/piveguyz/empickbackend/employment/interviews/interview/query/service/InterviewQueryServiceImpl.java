@@ -37,9 +37,6 @@ public class InterviewQueryServiceImpl implements InterviewQueryService {
     @Override
     public InterviewQueryDTO findByApplicationId(Integer applicationId) {
         InterviewQueryDTO dto = mapper.findByApplicationId(applicationId);
-        if(dto == null){
-            throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_NOT_FOUND);
-        }
         return dto;
     }
 

@@ -21,6 +21,10 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
 
     @Override
     public InterviewCommandDTO create(InterviewCommandDTO dto) {
+        Integer applicationId = dto.getApplicationId();
+        if (repository.existsByApplicationId(applicationId)) {
+            throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_AlREADY_EXIST);
+        }
         InterviewEntity entity = new InterviewEntity();
         entity.setApplicationId(dto.getApplicationId());
         entity.setSheetId(dto.getSheetId());
@@ -57,6 +61,15 @@ public class InterviewCommandServiceImpl implements InterviewCommandService {
         InterviewEntity entity = repository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_NOT_FOUND));
         entity.setAddress(address);
+        InterviewEntity updatedEntity = repository.save(entity);
+        return mapper.toDto(updatedEntity);
+    }
+
+    @Override
+    public InterviewCommandDTO updateScore(Integer id, Double score) {
+        InterviewEntity entity = repository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEW_NOT_FOUND));
+        entity.setScore(score);
         InterviewEntity updatedEntity = repository.save(entity);
         return mapper.toDto(updatedEntity);
     }

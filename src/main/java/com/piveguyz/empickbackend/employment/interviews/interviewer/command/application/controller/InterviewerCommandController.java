@@ -45,25 +45,6 @@ public class InterviewerCommandController {
     }
 
     @Operation(
-            summary = "면접 담당자 점수 수정",
-            description = """
-    - 면접 담당자의 총점을 최신화합니다.
-    """
-    )
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "요청이 성공적으로 처리되었습니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "잘못된 요청입니다."),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2561", description = "해당 면접 담당자가 존재하지 않습니다.")
-    })
-    @PatchMapping("/{id}/score")
-    public ResponseEntity<CustomApiResponse<InterviewerCommandDTO>> updateInterviewerScore(@PathVariable Integer id){
-        InterviewerCommandDTO updatedDTO = facade.updateInterviewerScore(id);
-        ResponseCode result = ResponseCode.SUCCESS;
-        return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, updatedDTO));
-    }
-
-    @Operation(
             summary = "면접 담당자 평가 수정",
             description = """
     - 면접 담당자의 총평을 수정합니다.
