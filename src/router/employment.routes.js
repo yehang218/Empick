@@ -90,6 +90,14 @@ export const employmentRoutes = [
         props: true,
         meta: { requiresAuth: false }
     },
+    // 실무테스트 응시 페이지
+    {
+        path: '/employment/jobtest/exam/take/:applicationJobTestId',
+        name: 'JobtestExam',
+        component: () => import('@/views/employment/JobtestExamPage.vue'),
+        props: true,
+        meta: { requiresAuth: false }
+    },
 
     //    <------------------- 채용공고 -------------------->
     // 채용 요청서 목록 페이지
