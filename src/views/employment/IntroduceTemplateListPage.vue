@@ -47,8 +47,8 @@ onMounted(async () => {
   }
 })
 
-const goCreate = () => router.push('/employment/recruitments/introduce-templates/create')
-const goDetail = (id) => router.push(`/employment/recruitments/introduce-templates/${id}`)
+const goCreate = () => router.push('/employment/introduce-templates/create')
+const goDetail = (id) => router.push(`/employment/introduce-templates/${id}`)
 
 const removeTemplate = async (id) => {
   if (confirm('정말로 이 템플릿을 삭제하시겠습니까? 관련 항목도 함께 삭제됩니다.')) {
