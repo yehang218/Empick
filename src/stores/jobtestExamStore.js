@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { verifyJobtestEntryService } from '@/services/jobtestService';
 import { JobtestEntryRequestDTO } from '@/dto/employment/jobtest/jobtestEntryRequestDTO';
 
-export const useJobtestEntryStore = defineStore('jobtestEntry', () => {
+export const useJobtestExamStore = defineStore('jobtestExam', () => {
     const errorMessage = ref('');
 
     /**
@@ -14,13 +14,14 @@ export const useJobtestEntryStore = defineStore('jobtestEntry', () => {
 
         try {
             const dto = new JobtestEntryRequestDTO(entryCode);
-            const message = await verifyJobtestEntryService(jobtestId, dto, { redirect: false });
-            return message;
+            const data = await verifyJobtestEntryService(jobtestId, dto, { redirect: false });
+            return data;
         } catch (err) {
             errorMessage.value = err?.message || '입장 코드 검증 중 오류가 발생했습니다.';
             throw err;
         }
     };
+
 
     return {
         errorMessage,

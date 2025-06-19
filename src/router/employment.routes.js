@@ -84,7 +84,7 @@ export const employmentRoutes = [
     },
     // 실무테스트 입장 페이지
     {
-        path: '/employment/jobtest/enter/:jobtestId',
+        path: '/employment/jobtest/exam/:jobtestId/enter',
         name: 'JobtestEnter',
         component: () => import('@/views/employment/JobtestEnterPage.vue'),
         props: true,
