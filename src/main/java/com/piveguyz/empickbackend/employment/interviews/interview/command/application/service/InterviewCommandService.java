@@ -10,9 +10,11 @@ public interface InterviewCommandService {
 
     InterviewCommandDTO update(Integer id, InterviewCommandDTO dto);
 
-    InterviewCommandDTO delete(Integer id);
-
     InterviewCommandDTO updateDateTime(Integer id, LocalDateTime datetime);
 
     InterviewCommandDTO updateAddress(Integer id, String address);
+
+    InterviewCommandDTO updateScore(Integer id, Double score);
+
+    InterviewCommandDTO delete(Integer id);
 }

@@ -2,6 +2,7 @@ package com.piveguyz.empickbackend.employment.interviews.interviewScore.command.
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.interviews.facade.InterviewFacade;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.dto.InterviewScoreCommandDTO;
 import com.piveguyz.empickbackend.employment.interviews.interviewScore.command.application.service.InterviewScoreCommandService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/employment/interview-score")
 public class InterviewScoreCommandController {
     private final InterviewScoreCommandService service;
+    private final InterviewFacade facade;
 
     @Autowired
-    public InterviewScoreCommandController(InterviewScoreCommandService service)
+    public InterviewScoreCommandController(InterviewScoreCommandService service, InterviewFacade facade)
     {
         this.service = service;
+        this.facade = facade;
     }
 
     @Operation(
@@ -38,7 +41,7 @@ public class InterviewScoreCommandController {
     })
     @PostMapping
     public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> createInterviewScore(@RequestBody InterviewScoreCommandDTO dto) {
-        InterviewScoreCommandDTO createdDTO = service.create(dto);
+        InterviewScoreCommandDTO createdDTO = facade.createInterviewScore(dto);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, createdDTO));
@@ -60,7 +63,7 @@ public class InterviewScoreCommandController {
     @PatchMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewScoreCommandDTO>> updateInterviewScore(@PathVariable("id") Integer id,
                                                                                             @RequestBody InterviewScoreCommandDTO dto) {
-        InterviewScoreCommandDTO updatedDTO = service.update(id, dto);
+        InterviewScoreCommandDTO updatedDTO = facade.updateInterviewScore(id, dto);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, updatedDTO));

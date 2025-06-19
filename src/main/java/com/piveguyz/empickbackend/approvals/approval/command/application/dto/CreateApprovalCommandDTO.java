@@ -13,16 +13,9 @@ public class CreateApprovalCommandDTO {
 
     private Integer categoryId;
     private Integer writerId;
-    private List<ApproverDTO> approvers; // max 4명까지
     private List<ApprovalContentDTO> contents;
 
     private Integer approvalId;   // 취소 대상 결재 id
-
-    @Getter @Setter
-    public static class ApproverDTO {
-        private Integer order; // 1~4
-        private Integer memberId;
-    }
 
     @Getter @Setter
     public static class ApprovalContentDTO {
