@@ -10,9 +10,10 @@
       <div class="nav-buttons">
         <button @click="prev" :disabled="currentIndex === 0">이전</button>
         <button v-if="currentIndex < questions.length - 1" @click="next">다음</button>
-        <button v-else class="submit-btn" @click="submitTest">제출하기</button>
+        <button v-else class="submit-btn" @click="openSubmitModal">제출하기</button>
       </div>
     </div>
+    <Modal v-if="showSubmitModal" message="제출하시겠습니까?" @confirm="handleSubmitConfirm" @cancel="closeSubmitModal" />
   </div>
 </template>
 
@@ -23,8 +24,8 @@ import { useJobtestExamStore } from '@/stores/jobtestExamStore'
 import ExamSidebar from '@/components/employment/ExamSidebar.vue'
 import QuestionView from '@/components/employment/QuestionView.vue'
 import { QUESTION_TYPES } from '@/constants/employment/questionTypes'
-import { postAnswer } from '@/services/answerService'
 import AnswerRequestDTO from '@/dto/employment/jobtest/answerRequestDTO'
+import Modal from '@/components/common/Modal.vue'
 
 const store = useJobtestExamStore()
 const route = useRoute()
@@ -58,6 +59,8 @@ watch(answers, (val) => {
 }, { deep: true })
 
 const timeLeft = ref(40 * 60) // 40분 (예시)
+
+const showSubmitModal = ref(false)
 
 function updateAnswer(val) {
   answers.value[currentIndex.value] = val
@@ -97,11 +100,19 @@ function moveTo(idx) {
   currentIndex.value = idx
 }
 
-async function submitTest() {
+function openSubmitModal() {
+  showSubmitModal.value = true
+}
+
+function closeSubmitModal() {
+  showSubmitModal.value = false
+}
+
+async function handleSubmitConfirm() {
   await saveCurrentAnswer()
-  // 이후 제출 완료 처리 (예: 서버에 전체 제출 처리 요청, 결과 페이지 이동 등)
-  // router.push({ name: 'JobtestExamResult', params: { applicationJobTestId: examData.value.applicationJobTestId } });
-  alert('제출이 완료되었습니다!');
+  await store.submitAnswers(examData.value.applicationJobTestId)
+  showSubmitModal.value = false
+  router.push({ name: 'JobtestEnter', params: { jobtestId: examData.value.jobtestId } })
 }
 </script>
 

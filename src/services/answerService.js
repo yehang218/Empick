@@ -37,3 +37,15 @@ export const postAnswer = async (answerDTO, options = {}) => {
         return apiResponse.message;
     }, options);
 }
+
+// 답안 채점(제출)
+export const gradeAnswersByApplicationJobtestId = async (applicationJobtestId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.patch(JobtestAPI.GRADE_ANSWER(applicationJobtestId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return apiResponse.message;
+    }, options);
+}

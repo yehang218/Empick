@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { verifyJobtestEntryService } from '@/services/jobtestService';
 import { JobtestEntryRequestDTO } from '@/dto/employment/jobtest/jobtestEntryRequestDTO';
-import { postAnswer } from '@/services/answerService'
+import { postAnswer, gradeAnswersByApplicationJobtestId } from '@/services/answerService'
 
 function mapApiQuestions(apiQuestions) {
     return apiQuestions.map(q => ({
@@ -44,12 +44,17 @@ export const useJobtestExamStore = defineStore('jobtestExam', () => {
         return await postAnswer({ content, applicationJobTestId, questionId })
     }
 
+    async function submitAnswers(applicationJobTestId) {
+        return await gradeAnswersByApplicationJobtestId(applicationJobTestId)
+    }
+
     return {
         errorMessage,
         verifyEntryCode,
         examData,
         fetchExamData,
         saveAnswer,
+        submitAnswers,
     };
 }, {
     persist: {
