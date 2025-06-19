@@ -1,18 +1,8 @@
 <template>
-    <!-- 폼 섹션들만 남김 -->
     <div class="form-content">
         <!-- 기본 정보 섹션 -->
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-icon-wrapper">
-                    <v-icon class="section-icon">mdi-account</v-icon>
-                </div>
-                <div class="section-title">
-                    <h4 class="section-main">기본 정보</h4>
-                    <p class="section-sub">사원의 기본적인 개인 정보를 입력하세요</p>
-                </div>
-            </div>
-            <v-row class="form-fields">
+        <FormSection icon="mdi-account" title="기본 정보" subtitle="사원의 기본적인 개인 정보를 입력하세요">
+            <v-row>
                 <v-col cols="12" sm="6">
                     <v-text-field label="이름" v-model="form.name" required prepend-inner-icon="mdi-account-outline"
                         variant="outlined" />
@@ -22,20 +12,11 @@
                         prepend-inner-icon="mdi-calendar" variant="outlined" />
                 </v-col>
             </v-row>
-        </div>
+        </FormSection>
 
         <!-- 연락처 정보 섹션 -->
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-icon-wrapper">
-                    <v-icon class="section-icon">mdi-phone</v-icon>
-                </div>
-                <div class="section-title">
-                    <h4 class="section-main">연락처 정보</h4>
-                    <p class="section-sub">연락 가능한 정보를 입력하세요</p>
-                </div>
-            </div>
-            <v-row class="form-fields">
+        <FormSection icon="mdi-phone" title="연락처 정보" subtitle="연락 가능한 정보를 입력하세요">
+            <v-row>
                 <v-col cols="12" sm="6">
                     <v-text-field label="연락처" v-model="form.phone" required placeholder="010-1234-5678"
                         prepend-inner-icon="mdi-phone-outline" variant="outlined" />
@@ -49,20 +30,11 @@
                         variant="outlined" />
                 </v-col>
             </v-row>
-        </div>
+        </FormSection>
 
         <!-- 조직 정보 섹션 -->
-        <div class="form-section">
-            <div class="section-header">
-                <div class="section-icon-wrapper">
-                    <v-icon class="section-icon">mdi-office-building</v-icon>
-                </div>
-                <div class="section-title">
-                    <h4 class="section-main">조직 정보</h4>
-                    <p class="section-sub">소속 부서와 직책 정보를 선택하세요</p>
-                </div>
-            </div>
-            <v-row class="form-fields">
+        <FormSection icon="mdi-office-building" title="조직 정보" subtitle="소속 부서와 직책 정보를 선택하세요">
+            <v-row>
                 <v-col cols="12" sm="6">
                     <v-select label="부서" :items="departments" v-model="form.departmentId" item-title="label"
                         item-value="value" required prepend-inner-icon="mdi-domain" variant="outlined" />
@@ -80,12 +52,12 @@
                         required prepend-inner-icon="mdi-star-outline" variant="outlined" />
                 </v-col>
             </v-row>
-        </div>
+        </FormSection>
     </div>
 </template>
 
 <script setup>
-// Vue 3 Composition API - ref 제거
+import FormSection from './FormSection.vue'
 
 // Props
 defineProps({
@@ -144,62 +116,7 @@ defineProps({
     width: 100%;
 }
 
-/* 폼 섹션 */
-.form-section {
-    margin-bottom: 1.5rem;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 16px;
-    padding: 1.5rem;
-    border: 1px solid rgba(226, 232, 240, 0.3);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    height: fit-content;
-}
-
-.section-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.3);
-}
-
-.section-icon-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(226, 232, 240, 0.3);
-}
-
-.section-icon {
-    color: #64748b;
-    font-size: 20px;
-}
-
-.section-title {
-    flex: 1;
-}
-
-.section-main {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #334155;
-    margin: 0 0 0.25rem 0;
-    line-height: 1.3;
-}
-
-.section-sub {
-    font-size: 0.875rem;
-    color: #64748b;
-    margin: 0;
-    font-weight: 400;
-}
+/* FormSection 컴포넌트로 이동됨 */
 
 .form-fields {
     margin: 0;

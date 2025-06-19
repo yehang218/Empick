@@ -2,15 +2,7 @@
     <v-container class="py-8 modern-container" style="max-width: 1200px;">
         <v-row>
             <v-col cols="12">
-                <div class="page-header-modern">
-                    <div class="header-icon-wrapper">
-                        <v-icon size="32" class="header-icon">mdi-account-plus-outline</v-icon>
-                    </div>
-                    <div class="header-content">
-                        <h1 class="page-title-modern">신규 사원 정보 등록</h1>
-                        <p class="page-subtitle-modern">지원자 정보를 기반으로 새로운 사원을 등록합니다</p>
-                    </div>
-                </div>
+                <PageHeader icon="mdi-account-plus-outline" title="신규 사원 정보 등록" subtitle="지원자 정보를 기반으로 새로운 사원을 등록합니다" />
             </v-col>
         </v-row>
 
@@ -29,11 +21,7 @@
 
         <v-row>
             <v-col cols="12">
-                <v-alert v-if="regStore.alertVisible" type="warning" class="mb-4 modern-alert" border="start"
-                    variant="tonal"
-                    style="position:fixed;top:24px;right:32px;left:auto;transform:none;z-index:2000;min-width:320px;max-width:90vw;backdrop-filter:blur(10px);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.1);">
-                    {{ regStore.alertMessage }}
-                </v-alert>
+                <RegistrationAlert :visible="regStore.alertVisible" type="warning" :message="regStore.alertMessage" />
             </v-col>
         </v-row>
 
@@ -41,43 +29,21 @@
         <v-row class="main-content-row">
             <!-- 프로필 이미지 및 등록 버튼 -->
             <v-col cols="12" md="3" class="profile-section">
-                <div class="profile-container">
-                    <div class="profile-image-wrapper" @click="triggerFileInput">
-                        <template v-if="regStore.profileImageUrl">
-                            <v-img :src="regStore.profileImageUrl" class="profile-image" cover />
-                        </template>
-                        <template v-else>
-                            <div class="profile-placeholder">
-                                <v-icon size="48" class="placeholder-icon">mdi-camera-plus</v-icon>
-                                <p class="placeholder-text">사진 업로드</p>
-                            </div>
-                        </template>
-                        <div class="image-overlay">
-                            <v-icon color="white" size="24">mdi-camera-plus</v-icon>
-                        </div>
-                        <input ref="fileInputRef" type="file" accept="image/jpeg,image/png,image/webp"
-                            style="display: none;" @change="onProfileImageChange" />
-                    </div>
-                    <v-btn class="upload-btn" :variant="regStore.profileImageFile ? 'tonal' : 'outlined'"
-                        :color="regStore.profileImageFile ? 'success' : 'primary'" @click="triggerFileInput"
-                        size="small">
-                        <v-icon size="16" class="mr-1">{{ regStore.profileImageFile ? 'mdi-check' : 'mdi-upload'
-                        }}</v-icon>
-                        {{ regStore.photoButtonText }}
+                <ProfileImageUpload :profileImageUrl="regStore.profileImageUrl"
+                    :profileImageFile="regStore.profileImageFile" :photoButtonText="regStore.photoButtonText"
+                    @fileChange="onProfileImageChange" />
+
+                <!-- 등록 버튼 -->
+                <div class="register-section">
+                    <v-btn class="register-btn" color="success" size="large" variant="flat" @click="onRegister">
+                        <v-icon size="18" class="mr-2">mdi-check-circle</v-icon>
+                        {{ currentApplicant?.name || '지원자' }} 등록
                     </v-btn>
 
-                    <!-- 등록 버튼 -->
-                    <div class="register-section">
-                        <v-btn class="register-btn" color="success" size="large" variant="flat" @click="onRegister">
-                            <v-icon size="18" class="mr-2">mdi-check-circle</v-icon>
-                            {{ currentApplicant?.name || '지원자' }} 등록
-                        </v-btn>
-
-                        <div v-if="selectedApplicants.length > 1" class="progress-info">
-                            <div class="progress-text">
-                                <v-icon size="14" class="mr-1">mdi-information-outline</v-icon>
-                                현재 편집 중 ({{ currentApplicantIndex + 1 }}/{{ selectedApplicants.length }})
-                            </div>
+                    <div v-if="selectedApplicants.length > 1" class="progress-info">
+                        <div class="progress-text">
+                            <v-icon size="14" class="mr-1">mdi-information-outline</v-icon>
+                            현재 편집 중 ({{ currentApplicantIndex + 1 }}/{{ selectedApplicants.length }})
                         </div>
                     </div>
                 </div>
@@ -116,9 +82,12 @@ import { useApplicantManager } from '@/composables/useApplicantManager'
 import { useRegistrationProgress } from '@/composables/useRegistrationProgress'
 import { useFileUpload } from '@/composables/useFileUpload'
 import AlertModal from '@/components/common/AlertModal.vue'
+import PageHeader from '@/components/common/PageHeader.vue'
+import RegistrationAlert from '@/components/common/RegistrationAlert.vue'
 import ApplicantInfoCard from '@/components/orgstructure/ApplicantInfoCard.vue'
 import MemberRegistrationForm from '@/components/orgstructure/MemberRegistrationForm.vue'
 import ApplicantNavigation from '@/components/orgstructure/ApplicantNavigation.vue'
+import ProfileImageUpload from '@/components/orgstructure/ProfileImageUpload.vue'
 
 const regStore = useMemberRegisterStore()
 const orgStore = useOrganizationStore()
@@ -156,8 +125,7 @@ const {
 
 const { handleImageUpload } = useFileUpload()
 
-// 파일 입력 ref
-const fileInputRef = ref(null)
+// ProfileImageUpload 컴포넌트로 이동됨
 
 // 현재 폼 데이터를 composable 형태로 변환하는 헬퍼 함수
 const getCurrentFormData = () => {
@@ -428,10 +396,7 @@ const onProfileImageChange = (event) => {
     )
 }
 
-// 파일 입력 트리거 함수
-const triggerFileInput = () => {
-    fileInputRef.value?.click()
-}
+// ProfileImageUpload 컴포넌트로 이동됨
 
 const onRegister = async () => {
     try {
@@ -506,68 +471,7 @@ const cancelLeave = () => {
     padding: 2rem;
 }
 
-/* 페이지 헤더 - 입체감 줄임 */
-.page-header-modern {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.page-header-modern::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%);
-}
-
-.header-icon-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.header-icon {
-    color: #64748b;
-}
-
-.header-content {
-    flex: 1;
-}
-
-.page-title-modern {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin: 0 0 0.5rem 0;
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-}
-
-.page-subtitle-modern {
-    font-size: 1rem;
-    color: #64748b;
-    margin: 0;
-    font-weight: 400;
-    line-height: 1.5;
-}
+/* 페이지 헤더 관련 스타일은 PageHeader 컴포넌트로 이동됨 */
 
 /* 모던 알림 */
 .modern-alert {
@@ -761,86 +665,7 @@ const cancelLeave = () => {
     padding: 1rem;
 }
 
-.profile-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-}
-
-/* 프로필 이미지 스타일 */
-.profile-image-wrapper {
-    position: relative;
-    width: 180px;
-    height: 180px;
-    border-radius: 20px;
-    overflow: hidden;
-    cursor: pointer;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 3px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    transition: all 0.3s ease;
-}
-
-.profile-image-wrapper:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-}
-
-.profile-image-wrapper:hover .image-overlay {
-    opacity: 1;
-}
-
-.profile-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-}
-
-.placeholder-icon {
-    color: #94a3b8;
-    margin-bottom: 0.5rem;
-}
-
-.placeholder-text {
-    color: #64748b;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin: 0;
-}
-
-.image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(2px);
-}
-
-.upload-btn {
-    min-width: 140px;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    text-transform: none !important;
-}
+/* 프로필 이미지 관련 스타일은 ProfileImageUpload 컴포넌트로 이동됨 */
 
 /* 등록 섹션 */
 .register-section {
@@ -895,16 +720,6 @@ const cancelLeave = () => {
         padding: 1rem;
     }
 
-    .page-header-modern {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem;
-    }
-
-    .page-title-modern {
-        font-size: 1.5rem;
-    }
-
     .main-content-row {
         flex-direction: column;
     }
@@ -912,15 +727,6 @@ const cancelLeave = () => {
     .profile-section {
         order: 2;
         margin-top: 1rem;
-    }
-
-    .form-section {
-        order: 1;
-    }
-
-    .profile-image-wrapper {
-        width: 140px;
-        height: 140px;
     }
 
     .register-btn {
@@ -931,16 +737,6 @@ const cancelLeave = () => {
 }
 
 @media (max-width: 480px) {
-    .profile-image-wrapper {
-        width: 120px;
-        height: 120px;
-    }
-
-    .upload-btn {
-        min-width: 120px;
-        font-size: 0.875rem;
-    }
-
     .register-btn {
         width: 140px;
         font-size: 0.8rem !important;
