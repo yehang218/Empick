@@ -14,7 +14,7 @@
         </v-row>
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
-        <ListView v-else :headers="headers" :data="filteredList" :itemsPerPage="itemsPerPage" :page="page"
+        <ListView v-else :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
             @update:page="page = $event" @item-click="goToDetail">
             <template #item.myApprovalStatus="{ item }">
                 <v-chip :color="getMyApprovalStatusColor(item.myApprovalStatus)" text-color="white" small
@@ -110,12 +110,14 @@ const pagedList = computed(() => {
         } else if (item.status === 'CANCELED') {
             myApprovalStatus = '취소됨';
         }
-        return Object.assign({}, item, {
+
+        return {
+            ...item,
             myApprovalStatus,
-            canApproveChip: item.status === 'IN_PROGRESS' && isMyTurn, // 핵심!
-            createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD HH:mm') : '',
+            canApproveChip: item.status === 'IN_PROGRESS' && isMyTurn,
+            createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD') : '',
             statusLabel: getApprovalStatusLabel(item.status)
-        });
+        };
     });
 });
 
