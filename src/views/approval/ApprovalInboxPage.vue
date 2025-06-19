@@ -23,9 +23,9 @@
                 </v-chip>
             </template>
             <template #item.status="{ item }">
-                <v-chip :color="getStatusColor(item.statusLabel)" text-color="white" small class="font-weight-bold"
+                <v-chip :color="getStatusColor(item.status)" text-color="white" small class="font-weight-bold"
                     outlined>
-                    {{ item.statusLabel }}
+                    {{ item.status }}
                 </v-chip>
             </template>
         </ListView>
@@ -116,7 +116,7 @@ const pagedList = computed(() => {
             myApprovalStatus,
             canApproveChip: item.status === 'IN_PROGRESS' && isMyTurn,
             createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD HH:mm') : '',
-            statusLabel: getApprovalStatusLabel(item.status)
+            status: getApprovalStatusLabel(item.status)
         };
     });
 });
@@ -165,8 +165,8 @@ function getMyApprovalStatusColor(status) {
     }
 }
 
-function getStatusColor(statusLabel) {
-    switch (statusLabel) {
+function getStatusColor(status) {
+    switch (status) {
         case '결재 취소':
             return 'grey'
         case '반려':
