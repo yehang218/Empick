@@ -115,7 +115,7 @@ const pagedList = computed(() => {
             ...item,
             myApprovalStatus,
             canApproveChip: item.status === 'IN_PROGRESS' && isMyTurn,
-            createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD') : '',
+            createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD HH:mm') : '',
             statusLabel: getApprovalStatusLabel(item.status)
         };
     });
