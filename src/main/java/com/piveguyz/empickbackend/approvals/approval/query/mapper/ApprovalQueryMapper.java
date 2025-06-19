@@ -2,6 +2,8 @@ package com.piveguyz.empickbackend.approvals.approval.query.mapper;
 
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -20,4 +22,6 @@ public interface ApprovalQueryMapper {
     List<ApprovalQueryDTO> findReceivedApprovals(Integer memberId);
 
     List<ApprovalLineQueryDTO> selectApprovalLinePreview(Integer categoryId, Integer writerId);
+
+    List<ApprovalRequestedListQueryDTO> findRequestedApprovals(Integer memberId);
 }

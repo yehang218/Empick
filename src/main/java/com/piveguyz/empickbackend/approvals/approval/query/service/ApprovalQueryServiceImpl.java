@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.approvals.approval.query.service;
 
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.mapper.ApprovalQueryMapper;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
@@ -44,5 +45,10 @@ public class ApprovalQueryServiceImpl implements ApprovalQueryService {
 	@Override
 	public List<ApprovalQueryDTO> findReceivedApprovals(Integer memberId) {
 		return mapper.findReceivedApprovals(memberId);
+	}
+
+	@Override
+	public List<ApprovalRequestedListQueryDTO> findRequestedApprovals(Integer memberId) {
+		return mapper.findRequestedApprovals(memberId);
 	}
 }
