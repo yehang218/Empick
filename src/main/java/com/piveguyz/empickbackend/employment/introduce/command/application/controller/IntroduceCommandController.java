@@ -25,8 +25,8 @@ public class IntroduceCommandController {
 
     @PostMapping
     @Operation(summary = "자기소개서 등록", description = "지원자가 자기소개서를 등록합니다.")
-    public ResponseEntity<CustomApiResponse<IntroduceCommandDTO>> createIntroduce(
-            @RequestBody @Valid IntroduceCommandDTO dto) {
+    public ResponseEntity<CustomApiResponse<IntroduceCommandDTO>>
+    createIntroduce(@RequestBody @Valid IntroduceCommandDTO dto) {
 
         IntroduceCommandDTO created = introduceCommandService.create(dto);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
