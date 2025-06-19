@@ -108,3 +108,34 @@ export const findMembersService = async (employeeNumber) => {
         throw error;
     }
 };
+
+// 페이지네이션된 사원 목록 조회 (서버사이드) - 향후 구현 예정
+export const findMembersPaginatedService = async (page = 0, size = 10, sortBy = 'name', sortDir = 'asc', filters = {}) => {
+    try {
+        const params = {
+            page: page,
+            size: size,
+            sortBy: sortBy,
+            sortDir: sortDir,
+            ...filters // search, department, status 등
+        };
+
+        const response = await api.get(API.MEMBER.PAGINATED || API.MEMBER.FIND_MEMBERS, { params });
+
+        // 서버에서 페이지네이션 지원 시 이런 형태로 응답이 와야 함:
+        // {
+        //   content: [...],     // 현재 페이지 데이터
+        //   totalElements: 100, // 전체 항목 수
+        //   totalPages: 10,     // 전체 페이지 수
+        //   number: 0,          // 현재 페이지 번호
+        //   size: 10,           // 페이지 크기
+        //   first: true,        // 첫 페이지 여부
+        //   last: false         // 마지막 페이지 여부
+        // }
+
+        return response.data;
+    } catch (error) {
+        console.error('페이지네이션 조회 API 오류:', error);
+        throw error;
+    }
+};

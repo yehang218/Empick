@@ -41,24 +41,21 @@
                 </v-col>
             </v-row>
 
-            <!-- 페이징 정보 -->
+            <!-- 검색 결과 정보 -->
             <div class="d-flex justify-space-between align-center mb-3">
                 <div class="text-body-2 text-grey-darken-1">
-                    총 {{ totalMembers }}명 중 {{ ((currentPage - 1) * pageSize) + 1 }}~{{ Math.min(currentPage * pageSize,
-                        totalMembers) }}명 표시 ({{ currentPage }}/{{ totalPages }} 페이지)
-                </div>
-                <div class="d-flex align-center" style="gap: 8px;">
-                    <span class="text-body-2">페이지당:</span>
-                    <v-select v-model="pageSize" :items="[10, 20, 50, 100]" variant="outlined" density="compact"
-                        hide-details style="width: 80px;" @update:modelValue="handlePageSizeChange" />
+                    총 {{ members.length }}명 중 {{ totalFilteredMembers }}명 검색됨
+                    <span v-if="totalFilteredMembers !== members.length" class="text-primary font-weight-medium">
+                        (필터 적용됨)
+                    </span>
                 </div>
             </div>
 
             <!-- 사원 목록 테이블 -->
             <v-card class="mb-4 member-list-card" elevation="0">
-                <v-data-table :headers="tableHeaders" :items="members" :items-per-page="-1" :loading="loading"
-                    item-key="id" class="member-table" show-expand v-model:expanded="expanded" hide-default-footer
-                    @update:sort-by="handleSort" @click:row="handleRowClick">
+                <v-data-table :headers="tableHeaders" :items="paginatedMembers" :loading="loading" item-key="id"
+                    class="member-table" show-expand v-model:expanded="expanded" @update:sort-by="handleSort"
+                    @click:row="handleRowClick" :items-per-page="-1" hide-default-footer>
 
                     <!-- 아바타 + 이름 컬럼 -->
                     <template #item.name="{ item }">
@@ -127,13 +124,21 @@
                         </div>
                     </template>
                 </v-data-table>
+
+                <!-- 사용자 정의 페이지네이션 -->
+                <div class="d-flex justify-space-between align-center pa-4">
+                    <div class="text-body-2 text-grey-darken-1">
+                        {{ startIndex + 1 }}-{{ endIndex }}개 (총 {{ totalFilteredMembers }}개)
+                    </div>
+                    <div class="d-flex align-center">
+                        <span class="text-body-2 mr-3">페이지당 항목 수:</span>
+                        <v-select v-model="itemsPerPage" :items="[10, 25, 50, 100]" variant="outlined" density="compact"
+                            style="width: 80px;" hide-details @update:modelValue="handleItemsPerPageChange" />
+                    </div>
+                    <Pagination v-model="currentPage" :length="totalPages" :total-visible="7" />
+                </div>
             </v-card>
 
-            <!-- 페이징 네비게이션 -->
-            <div class="d-flex justify-center mt-4" v-if="totalPages > 1">
-                <v-pagination v-model="currentPage" :length="totalPages" :total-visible="7" :disabled="loading"
-                    @update:modelValue="handlePageChange" />
-            </div>
 
 
         </template>
@@ -144,10 +149,12 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useMemberStore } from '@/stores/memberStore'
 import { useMemberList } from '@/composables/useMemberList'
 import { RoleCode } from '@/constants/common/RoleCode'
 import { TABLE_HEADERS, STATUS_OPTIONS, getStatusClass, getStatusLabel, formatDate } from '@/utils/memberUtils'
 import AttendanceSummaryCard from '@/components/attendance/AttendanceSummaryCard.vue'
+import Pagination from '@/components/common/Pagination.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -157,27 +164,52 @@ const hasHRAccess = computed(() =>
     authStore.userInfo?.roles?.includes(RoleCode.HR_ACCESS)
 )
 
-// 비즈니스 로직 (Composable)
+// 클라이언트 사이드 페이지네이션을 위한 간단한 데이터 로딩
+const memberStore = useMemberStore()
+const members = ref([])
+const loading = ref(false)
+
+// 전체 사원 목록 로드
+const loadAllMembers = async () => {
+    loading.value = true
+    try {
+        // 전체 사원 데이터 로드
+        const allMembers = await memberStore.findMembers()
+
+        // 사원별로 기본 상태 설정 (근태 정보는 간단하게 처리)
+        const membersWithStatus = allMembers.map(member => ({
+            ...member,
+            status: Math.random() > 0.5 ? 1 : 0 // 임시로 랜덤 상태 설정 (1: 출근, 0: 미출근)
+        }))
+
+        members.value = membersWithStatus
+        console.log('전체 사원 데이터 로드 완료:', membersWithStatus.length, '명')
+        console.log('첫 번째 사원 샘플:', membersWithStatus[0])
+    } catch (error) {
+        console.error('사원 데이터 로드 실패:', error)
+        members.value = []
+    } finally {
+        loading.value = false
+    }
+}
+
+const refreshCurrentPage = () => {
+    loadAllMembers()
+}
+
+// 기존 composable 함수들
 const {
-    members,
-    loading,
-    currentPage,
-    pageSize,
-    totalMembers,
-    totalPages,
-    loadMembers,
-    goToPage,
-    changePageSize,
-    refreshCurrentPage,
     createDepartmentOptions,
     loadSingleProfileImage
 } = useMemberList()
 
-// UI 상태
+// UI 상태 - 클라이언트 사이드 페이지네이션
 const searchQuery = ref('')
 const selectedDepartment = ref(null)
 const selectedStatus = ref('전체')
 const expanded = ref([])
+const currentPage = ref(1)
+const itemsPerPage = ref(10)
 
 // 상수
 const tableHeaders = TABLE_HEADERS
@@ -185,19 +217,89 @@ const statusOptions = STATUS_OPTIONS
 
 // 계산된 속성
 const departmentOptions = createDepartmentOptions()
-// const filteredMembers = createMemberFilter(searchQuery, selectedDepartment, selectedStatus) // 페이징과 충돌하므로 임시 비활성화
+
+// 직접 필터링 로직 구현
+const filteredMembers = computed(() => {
+    let result = [...members.value]
+
+    console.log('필터링 시작:', {
+        전체사원수: result.length,
+        검색어: searchQuery.value,
+        선택부서: selectedDepartment.value,
+        선택상태: selectedStatus.value
+    })
+
+    // 검색 필터
+    if (searchQuery.value && searchQuery.value.trim()) {
+        const searchTerm = searchQuery.value.toLowerCase().trim()
+        result = result.filter(member =>
+            member.name?.toLowerCase().includes(searchTerm) ||
+            member.employeeNumber?.toString().includes(searchTerm) ||
+            member.email?.toLowerCase().includes(searchTerm)
+        )
+        console.log('검색 필터 후:', result.length, '명')
+    }
+
+    // 부서 필터
+    if (selectedDepartment.value) {
+        result = result.filter(member => member.departmentName === selectedDepartment.value)
+        console.log('부서 필터 후:', result.length, '명')
+    }
+
+    // 상태 필터
+    if (selectedStatus.value && selectedStatus.value !== '전체') {
+        const filterStatus = selectedStatus.value
+        console.log('상태 필터 조건:', { filterStatus, 타입: typeof filterStatus })
+
+        result = result.filter(member => {
+            const memberStatus = member.status
+            console.log('사원 상태 비교:', {
+                사원명: member.name,
+                사원상태: memberStatus,
+                사원상태타입: typeof memberStatus,
+                필터상태: filterStatus,
+                필터상태타입: typeof filterStatus,
+                비교결과: memberStatus == filterStatus
+            })
+            return memberStatus == filterStatus // == 사용 (느슨한 비교)
+        })
+        console.log('상태 필터 후:', result.length, '명')
+    }
+
+    console.log('최종 필터링 결과:', result.length, '명')
+    return result
+})
+
+// 클라이언트 사이드 페이지네이션 계산
+const totalFilteredMembers = computed(() => filteredMembers.value.length)
+const totalPages = computed(() => Math.ceil(totalFilteredMembers.value / itemsPerPage.value))
+
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value)
+const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage.value, totalFilteredMembers.value))
+
+const paginatedMembers = computed(() => {
+    const start = startIndex.value
+    const end = endIndex.value
+    return filteredMembers.value.slice(start, end)
+})
 
 // 이벤트 핸들러 (UI 관련만)
 const handleSearch = () => {
-    // 검색 시 필터만 적용 (v-data-table이 자동으로 처리)
+    console.log('검색어 변경:', searchQuery.value)
+    // 검색 시 첫 페이지로 리셋
+    currentPage.value = 1
 }
 
 const handleDepartmentFilter = () => {
-    // 부서 필터 변경 시 (v-data-table이 자동으로 처리)
+    console.log('부서 필터 변경:', selectedDepartment.value)
+    // 필터 변경 시 첫 페이지로 리셋
+    currentPage.value = 1
 }
 
 const handleStatusFilter = () => {
-    // 상태 필터 변경 시 (v-data-table이 자동으로 처리)
+    console.log('상태 필터 변경:', selectedStatus.value)
+    // 필터 변경 시 첫 페이지로 리셋
+    currentPage.value = 1
 }
 
 const handleSort = (sortBy) => {
@@ -205,20 +307,15 @@ const handleSort = (sortBy) => {
     console.log('정렬 변경:', sortBy)
 }
 
-const handlePageChange = (page) => {
-    if (!loading.value) {
-        if (page !== currentPage.value) {
-            goToPage(page)
-        } else {
-            // 같은 페이지를 클릭한 경우 새로고침
-            refreshCurrentPage()
-        }
-    }
+// 클라이언트 사이드 페이지네이션 핸들러
+const handleItemsPerPageChange = (newSize) => {
+    console.log('페이지 크기 변경됨:', newSize)
+    itemsPerPage.value = newSize
+    // 페이지 크기 변경 시 첫 페이지로 리셋
+    currentPage.value = 1
 }
 
-const handlePageSizeChange = (newSize) => {
-    changePageSize(newSize)
-}
+
 
 
 
@@ -290,7 +387,13 @@ const handleImageError = async (member) => {
 // 라이프사이클
 onMounted(async () => {
     try {
-        await loadMembers(1) // 첫 페이지 로드
+        // 클라이언트 사이드 페이지네이션을 위해 전체 데이터 로드
+        await loadAllMembers() // 전체 데이터 로드
+        console.log('=== 데이터 로드 완료 ===')
+        console.log('전체 사원 수:', members.value.length)
+        console.log('필터링된 사원 수:', filteredMembers.value.length)
+        console.log('현재 페이지:', currentPage.value)
+        console.log('페이지당 항목 수:', itemsPerPage.value)
     } catch (error) {
         console.error('초기 데이터 로드 실패:', error)
     }
@@ -306,7 +409,7 @@ watch(searchQuery, () => {
 .member-list-card {
     border: 1px solid #e0e0e0;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
@@ -462,5 +565,12 @@ watch(searchQuery, () => {
 
 .member-table :deep(.v-data-table__expand-icon--active) {
     transform: rotate(90deg);
+}
+
+/* 페이지네이션 스타일 */
+.member-table :deep(.v-data-table-footer) {
+    padding: 16px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #fafafa;
 }
 </style>
