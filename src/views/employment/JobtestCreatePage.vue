@@ -83,7 +83,7 @@ import SuccessModal from '@/components/common/AlertModal.vue'
 import { useMemberStore } from '@/stores/memberStore'
 
 const router = useRouter();
-const jobtestStore = useJobtestStore()
+const jobtestStore = useJobtestQuestionStore()
 const memberStore = useMemberStore()
 
 const showSuccessModal = ref(false)
