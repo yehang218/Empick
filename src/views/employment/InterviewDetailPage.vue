@@ -77,7 +77,7 @@
                     <v-btn icon @click="prevInterviewer" :disabled="currentIndex === 0">
                         <v-icon>mdi-chevron-left</v-icon>
                     </v-btn>
-                    <span class="mx-4">{{ currentInterviewer?.name || '면접관' }}</span>
+                    <span class="mx-4">익명 {{ currentIndex + 1 }}</span>
                     <v-btn icon @click="nextInterviewer" :disabled="currentIndex === allScores.length - 1">
                         <v-icon>mdi-chevron-right</v-icon>
                     </v-btn>
@@ -109,9 +109,9 @@
             </v-container>
         </v-card>
 
-        <!-- 평가 등록 버튼 -->
+        <!-- 평가 입력 버튼 -->
         <v-btn color="primary" class="mt-6" @click="goToInputInterviewScorePage">
-            평가 등록하기
+            평가 입력하기
         </v-btn>
 
         <!-- 면접 수정 다이얼로그 -->
@@ -158,7 +158,10 @@ import { useInterviewStore } from '@/stores/interviewStore';
 import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore';
 import { useApplicantStore } from '@/stores/applicantStore';
 import { useApplicationStore } from '@/stores/applicationStore';
+import { useInterviewerStore } from '@/stores/interviewerStore';
 import { useInterviewSheetStore } from '@/stores/interviewSheetStore';
+import { useInterviewScoreStore } from '@/stores/interviewScoreStore';
+import { useMemberStore } from '@/stores/memberStore';
 import { useRouter, useRoute } from 'vue-router'; // useRoute 추가
 
 const interviewStore = useInterviewStore();
@@ -166,6 +169,9 @@ const criteriaStore = useInterviewCriteriaStore();
 const applicantStore = useApplicantStore();
 const applicationStore = useApplicationStore();
 const interviewSheetStore = useInterviewSheetStore();
+const interviewerStore = useInterviewerStore();
+const interviewScoreStore = useInterviewScoreStore();
+const memberStore = useMemberStore();
 
 const router = useRouter(); // 페이지 이동용
 const route = useRoute();   // 현재 라우트 정보용
@@ -175,14 +181,28 @@ const selectedApplication = ref(null)
 const selectedApplicant = ref(null)
 const selectedInterview = ref(null)
 const selectedInterviewSheet = ref(null)
+const selectedInterviewer = ref(null)
+const InterviewerList = ref([])
 const selectedCriteria = ref(null)
 const criteriaList = ref([])
+const selectedScore = ref(null)
+const scoreList = ref([])
 
+const currentInterviewer = computed(() => allScores.value[currentIndex.value])
+console.log('currentInterviewer', currentInterviewer);
 
 const loading = computed(() => interviewStore.loading || criteriaStore.loading);
 const error = computed(() => interviewStore.error || criteriaStore.error);
 
-const goToInputInterviewScorePage = () => router.push('/employment/interview-score')
+const goToInputInterviewScorePage = () => {
+    const interviewId = selectedInterview.value?.id;
+    if (!interviewId) {
+        alert('면접 정보가 없습니다.');
+        return;
+    }
+
+    router.push({ name: 'InputInterviewScorePage', params: { interviewId } });
+};
 
 const isZoomUrl = (url) => {
     return typeof url === 'string' && url.startsWith('http');
@@ -216,6 +236,21 @@ const fetchAll = async () => {
         await criteriaStore.fetchCriteriaBySheetId(sheetId)
         criteriaList.value = criteriaStore.criteriaList
         console.log('criteriaList : ', criteriaList)
+
+        await interviewerStore.fetchInterviewersByInterviewId(selectedInterview.value.id)
+        InterviewerList.value = interviewerStore.interviewerList
+
+        // 면접관별 점수 가져오기
+        const scorePromises = InterviewerList.value.map(async (interviewer) => {
+            await interviewScoreStore.fetchScoresByInterviewerId(interviewer.id)
+            await memberStore.fetchM
+            return {
+                interviewerId: interviewer.id,
+                name: interviewer.name,
+                scores: [...interviewScoreStore.scoreList]
+            }
+        })
+        allScores.value = await Promise.all(scorePromises)
 
     } catch (err) {
         console.warn('지원자 정보 없음 or 에러 발생', err);
@@ -308,10 +343,10 @@ const evaluationItems = computed(() => {
     })
 })
 
-const prev = () => {
+const prevInterviewer = () => {
     if (currentIndex.value > 0) currentIndex.value--
 }
-const next = () => {
+const nextInterviewer = () => {
     if (currentIndex.value < allScores.value.length - 1) currentIndex.value++
 }
 

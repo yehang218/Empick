@@ -41,7 +41,7 @@ export const useInterviewerStore = defineStore('interviewer', () => {
         error.value = null;
         try {
             const result = await getInterviewerByIdService(id);
-            selectedInterviewer.value = result?.[0] ?? null;
+            selectedInterviewer.value = result
         } catch (err) {
             error.value = err.message;
             throw err;
