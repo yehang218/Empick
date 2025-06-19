@@ -1,18 +1,19 @@
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import { getReceivedApprovals, getApprovalsByWriterId, getRequestedApprovals } from '@/services/approvalService';
 
 export const useApprovalStore = defineStore('approval', {
     state: () => ({
-        receivedList: [],
+        receivedList: ref([]),
         loadingReceived: false,
         errorReceived: null,
 
-        sentList: [],
+        sentList: ref([]),
         loadingSent: false,
         errorSent: null,
 
         // 요청한 결재 목록
-        requestedList: [],
+        requestedList: ref([]),
         loadingRequested: false,
         errorRequested: null,
     }),
@@ -21,7 +22,7 @@ export const useApprovalStore = defineStore('approval', {
             this.loadingReceived = true;
             this.errorReceived = null;
             try {
-                this.receivedList = await getReceivedApprovals(memberId);
+                this.receivedList.value = await getReceivedApprovals(memberId);
             } catch (e) {
                 this.errorReceived = e;
             } finally {
@@ -33,7 +34,7 @@ export const useApprovalStore = defineStore('approval', {
             this.loadingSent = true;
             this.errorSent = null;
             try {
-                this.sentList = await getApprovalsByWriterId(writerId);
+                this.sentList.value = await getApprovalsByWriterId(writerId);
             } catch (e) {
                 this.errorSent = e;
             } finally {
@@ -45,7 +46,7 @@ export const useApprovalStore = defineStore('approval', {
             this.loadingRequested = true;
             this.errorRequested = null;
             try {
-                this.requestedList = await getRequestedApprovals(memberId);
+                this.requestedList.value = await getRequestedApprovals(memberId);
             } catch (e) {
                 this.errorRequested = e;
             } finally {
