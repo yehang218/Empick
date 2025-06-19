@@ -6,17 +6,10 @@
       <span class="question-score">({{ question.score }}점)</span>
     </div>
     <div v-if="question.type === QUESTION_TYPES.MULTIPLE">
-      <MultipleChoice
-        :options="question.options"
-        :answer="answer"
-        @select="val => $emit('updateAnswer', val)"
-      />
+      <MultipleChoice :options="question.options" :answer="answer" @select="val => $emit('updateAnswer', val)" />
     </div>
     <div v-else-if="question.type === QUESTION_TYPES.SUBJECTIVE">
-      <ShortAnswer
-        :answer="answer"
-        @input="$emit('updateAnswer', $event.target.value)"
-      />
+      <ShortAnswer :answer="answer" @input="val => { $emit('updateAnswer', val) }" />
     </div>
   </div>
 </template>

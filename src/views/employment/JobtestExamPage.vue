@@ -5,8 +5,8 @@
         :timeLeft="timeLeft" @moveTo="moveTo" @submit="submitTest" />
     </div>
     <div class="exam-question-area">
-      <QuestionView :question="questions[currentIndex]" :answer="answers[currentIndex]" :questionIndex="currentIndex"
-        @updateAnswer="updateAnswer" />
+      <QuestionView :question="questions[currentIndex]" :answer="answers[currentIndex] ?? ''"
+        :questionIndex="currentIndex" @updateAnswer="updateAnswer" />
       <div class="nav-buttons">
         <button @click="prev" :disabled="currentIndex === 0">이전</button>
         <button v-if="currentIndex < questions.length - 1" @click="next">다음</button>
@@ -17,12 +17,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJobtestExamStore } from '@/stores/jobtestExamStore'
 import ExamSidebar from '@/components/employment/ExamSidebar.vue'
 import QuestionView from '@/components/employment/QuestionView.vue'
 import { QUESTION_TYPES } from '@/constants/employment/questionTypes'
+import { postAnswer } from '@/services/answerService'
+import AnswerRequestDTO from '@/dto/employment/jobtest/answerRequestDTO'
 
 const store = useJobtestExamStore()
 const route = useRoute()
@@ -37,19 +39,70 @@ const testInfo = computed(() => ({
 const currentIndex = ref(0)
 const answers = ref([])
 
-watch(questions, (newQuestions) => {
-  answers.value = Array(newQuestions.length).fill(null)
-}, { immediate: true })
+const getStorageKey = () => `jobtest-answers-${examData.value?.applicationJobTestId}`
+
+onMounted(() => {
+  const saved = localStorage.getItem(getStorageKey())
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      if (Array.isArray(parsed)) {
+        answers.value = parsed
+      }
+    } catch (e) { /* ignore */ }
+  }
+})
+
+watch(answers, (val) => {
+  localStorage.setItem(getStorageKey(), JSON.stringify(val))
+}, { deep: true })
 
 const timeLeft = ref(40 * 60) // 40분 (예시)
 
 function updateAnswer(val) {
   answers.value[currentIndex.value] = val
 }
-function prev() { if (currentIndex.value > 0) currentIndex.value-- }
-function next() { if (currentIndex.value < questions.value.length - 1) currentIndex.value++ }
-function moveTo(idx) { currentIndex.value = idx }
-function submitTest() { /* 제출 로직 */ }
+
+async function saveCurrentAnswer(idx = currentIndex.value) {
+  const question = questions.value[idx]
+  const answer = answers.value[idx]
+  let content = ''
+  if (question.type === QUESTION_TYPES.MULTIPLE) {
+    content = question.options[answer]?.content || ''
+  } else {
+    content = answer || ''
+  }
+  const dto = new AnswerRequestDTO({
+    content,
+    applicationJobTestId: examData.value.applicationJobTestId,
+    questionId: question.questionId
+  })
+  await store.saveAnswer(dto)
+}
+
+function prev() {
+  if (currentIndex.value > 0) {
+    saveCurrentAnswer()
+    currentIndex.value--
+  }
+}
+
+async function next() {
+  await saveCurrentAnswer()
+  if (currentIndex.value < questions.value.length - 1) currentIndex.value++
+}
+
+function moveTo(idx) {
+  saveCurrentAnswer()
+  currentIndex.value = idx
+}
+
+async function submitTest() {
+  await saveCurrentAnswer()
+  // 이후 제출 완료 처리 (예: 서버에 전체 제출 처리 요청, 결과 페이지 이동 등)
+  // router.push({ name: 'JobtestExamResult', params: { applicationJobTestId: examData.value.applicationJobTestId } });
+  alert('제출이 완료되었습니다!');
+}
 </script>
 
 <style scoped>

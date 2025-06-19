@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { verifyJobtestEntryService } from '@/services/jobtestService';
 import { JobtestEntryRequestDTO } from '@/dto/employment/jobtest/jobtestEntryRequestDTO';
+import { postAnswer } from '@/services/answerService'
 
 function mapApiQuestions(apiQuestions) {
     return apiQuestions.map(q => ({
@@ -39,10 +40,22 @@ export const useJobtestExamStore = defineStore('jobtestExam', () => {
         };
     }
 
+    async function saveAnswer({ content, applicationJobTestId, questionId }) {
+        return await postAnswer({ content, applicationJobTestId, questionId })
+    }
+
     return {
         errorMessage,
         verifyEntryCode,
         examData,
         fetchExamData,
+        saveAnswer,
     };
+}, {
+    persist: {
+        enabled: true,
+        strategies: [
+            { storage: localStorage, paths: ['examData'] }
+        ]
+    }
 });

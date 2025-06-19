@@ -2,16 +2,25 @@
   <input
     class="short-answer-input"
     type="text"
-    :value="answer"
-    @input="$emit('input', $event.target.value)"
+    :value="answer ?? ''"
+    @input="onInput"
     placeholder="답안을 입력하세요"
   />
 </template>
 
 <script setup>
-defineProps({
+import { ref } from 'vue'
+
+const props = defineProps({
   answer: [String, Number, null]
 })
+
+const emit = defineEmits(['input'])
+
+const onInput = (e) => {
+  console.log('ShortAnswer emit:', e.target.value)
+  emit('input', e.target.value)
+}
 </script>
 
 <style scoped>
