@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.employment.introduce.query.dto;
 
-import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceResultStatus;
+import com.piveguyz.empickbackend.employment.introduce.command.domain.aggregate.IntroduceRatingResultStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ public class IntroduceResultQueryDTO {
     private String content;
     private int ratingScore;
     private int introduceStandardId;
-    private IntroduceResultStatus status;
+    private IntroduceRatingResultStatus status;
     private int updatedBy;
     private LocalDateTime updatedAt;
 }
