@@ -14,3 +14,8 @@ export const createIntroduceItemService = async (dto) => {
 export const deleteIntroduceItemService = async (id) => {
   await api.delete(`${IntroduceAPI.DELETE_TEMPLATE_ITEM(id)}`)
 }
+
+export const createIntroduceRatingResult = async (payload) => {
+  // payload: { content, ratingScore, ... }
+  return api.post(IntroduceAPI.CREATE_RATING_RESULT, payload)
+}

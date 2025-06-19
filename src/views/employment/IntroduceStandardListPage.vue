@@ -17,6 +17,9 @@
               <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeStandard(standard.id)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
+              <v-btn size="small" color="primary" variant="text" @click="goToDetail(standard.id)">
+                상세보기
+              </v-btn>
             </template>
           </v-list-item>
           <v-divider v-if="index < standards.length - 1" inset></v-divider>
@@ -30,13 +33,15 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
 import { deleteIntroduceStandard } from '@/services/introduceStandardService'
 
 const router = useRouter()
 const store = useIntroduceStandardStore()
+
+const selectedStandardId = ref(null)
 
 onMounted(() => {
   store.fetchStandards()
@@ -57,6 +62,10 @@ async function removeStandard(id) {
       alert('삭제에 실패했습니다.')
     }
   }
+}
+
+function goToDetail(id) {
+  router.push(`/employment/introduce-standard/${id}`)
 }
 </script>
 

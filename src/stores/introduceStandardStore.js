@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchIntroduceStandards, createIntroduceStandard } from '@/services/introduceStandardService'
+import { fetchIntroduceStandards, createIntroduceStandard, fetchIntroduceStandardDetail } from '@/services/introduceStandardService'
 import { useMemberStore } from '@/stores/memberStore'
 
 export const useIntroduceStandardStore = defineStore('introduceStandard', {
@@ -7,6 +7,7 @@ export const useIntroduceStandardStore = defineStore('introduceStandard', {
     standards: [],
     loading: false,
     error: null,
+    standardDetail: null,
   }),
   actions: {
     async fetchStandards() {
@@ -33,6 +34,11 @@ export const useIntroduceStandardStore = defineStore('introduceStandard', {
           throw new Error('No memberId')
         }
         await createIntroduceStandard(title, memberId, itemIds)
+        this.standards.push({
+          id: Date.now(),
+          content: title,
+          itemIds: [...itemIds],
+        })
         await this.fetchStandards()
       } catch (e) {
         this.error = e
@@ -40,6 +46,9 @@ export const useIntroduceStandardStore = defineStore('introduceStandard', {
       } finally {
         this.loading = false
       }
+    },
+    async fetchStandardDetail(id) {
+      this.standardDetail = await fetchIntroduceStandardDetail(id)
     }
   }
 })

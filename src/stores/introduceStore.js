@@ -3,7 +3,8 @@ import { ref } from 'vue'
 import {
   fetchIntroduceItemsService,
   createIntroduceItemService,
-  deleteIntroduceItemService
+  deleteIntroduceItemService,
+  createIntroduceRatingResult
 } from '@/services/introduceService'
 import { createTemplate } from '@/services/introduceTemplateService'
 import api from '@/apis/apiClient'
@@ -54,9 +55,15 @@ export const useIntroduceStore = defineStore('introduce', () => {
     }
   }
 
+  async function saveIntroduceRatingResult(payload) {
+    // payload: { content, ratingScore, ... }
+    return createIntroduceRatingResult(payload)
+  }
+
   return {
     items, loading, error,
-    fetchItems, addItem, removeItem
+    fetchItems, addItem, removeItem,
+    saveIntroduceRatingResult
   }
 })
 

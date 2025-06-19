@@ -39,6 +39,7 @@ export const IntroduceAPI = {
     // IntroduceStandardQueryController
     GET_ALL_STANDARDS: '/api/v1/employment/introduce-standard',
     GET_ALL_STANDARD_ITEMS: '/api/v1/employment/introduce-standard/item',
+    GET_STANDARD_BY_ID: (id) => `/api/v1/employment/introduce-standard/${id}`,
 
     // IntroduceTemplateQueryController
     GET_ALL_TEMPLATES: '/api/v1/employment/introduce-template',

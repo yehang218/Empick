@@ -198,8 +198,6 @@
         </v-card>
       </v-col>
 
-
-
       <!-- 우측: 평가 상세 -->
       <v-col cols="12" lg="7">
         <v-card class="modern-card evaluation-detail-card">
@@ -215,7 +213,7 @@
           <v-divider class="mb-4" />
           <v-card-text>
             <div v-if="viewMode === 'detail'">
-              <component :is="evaluationComponent" :applicant="applicant" />
+              <component :is="evaluationComponent" :applicant="applicant" :standard-title="selectedStandard?.content" :standard-items="selectedStandard?.items" />
             </div>
             <div v-else class="score-analysis">
               <h4 class="text-h6 mb-4">점수 분석</h4>
@@ -288,7 +286,9 @@ import { useRoute, useRouter } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useToast } from 'vue-toastification'
-
+import IntroduceStandardSelectModal from '@/components/employment/IntroduceStandardSelectModal.vue'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
+import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 
 const route = useRoute()
 const applicationStore = useApplicationStore()
@@ -301,6 +301,12 @@ const evaluationComponent = ref(IntroduceResult)
 
 const selectedEvaluation = ref('자기소개서')
 const viewMode = ref('detail')
+
+const selectedStandard = ref(null)
+const showStandardModal = ref(false)
+
+const standardStore = useIntroduceStandardStore()
+const standardItemStore = useIntroduceStandardItemStore()
 
 // query parameter에서 받은 기본 정보로 applicant 객체 구성
 const applicant = ref({
@@ -347,7 +353,10 @@ const applicant = ref({
 })
 
 // 컴포넌트 마운트 시 query parameter에서 데이터 로드
-onMounted(() => {
+onMounted(async () => {
+  await standardStore.fetchStandards()
+  await standardItemStore.fetchItems()
+
   const query = route.query
 
   // 받은 데이터로 실제 평가 통계 구성
@@ -447,7 +456,6 @@ const selectEvaluation = (type) => {
   }
 }
 
-
 const getCurrentEvaluation = () => {
   return applicant.value.evaluationStats.find(evaluation => evaluation.type === selectedEvaluation.value)
 }
@@ -456,7 +464,6 @@ const getSkillsArray = () => {
   if (!applicant.value.skills) return ['정보 없음']
   return applicant.value.skills.split(/[,،、]\s*/).filter(skill => skill.trim())
 }
-
 
 const getExperiencePreview = () => {
   if (!applicant.value.experience) return '경력 정보 없음'
@@ -513,6 +520,20 @@ const goBack = () => {
   } else {
     router.push('/employment/applicant')
   }
+}
+
+function handleStandardSelect(standard) {
+  selectedStandard.value = standard
+}
+
+// 평가에 사용할 임시 기준표/항목 예시
+const exampleStandard = {
+  content: '예시 기준표 제목',
+  items: [
+    { id: 1, content: '성실성' },
+    { id: 2, content: '책임감' },
+    { id: 3, content: '협업능력' }
+  ]
 }
 </script>
 

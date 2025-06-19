@@ -1,46 +1,57 @@
 <template>
   <div class="evaluation-form">
-    <!-- 전체 항목 묶는 큰 박스 -->
-    <div class="all-criteria-wrapper">
-      <div class="evaluation-box">
-        <div
-          v-for="(item, index) in localCriteria"
-          :key="index"
-          class="criteria-group"
-        >
-          <!-- 상단 정보 블록 -->
-          <div class="criteria-info">
-            <div class="left">
-              <h3>{{ index + 1 }}. {{ item.title }}</h3>
-              <p class="question">{{ item.question }}</p>
-            </div>
-            <div class="right">
-              <span class="weight">가중치 <strong>{{ item.weight }}%</strong></span>
-            </div>
-          </div>
-
-          <!-- 입력 블록 -->
-          <div class="criteria-input">
-            <div class="textarea-wrapper">
-              <textarea
-                v-model="item.comment"
-                placeholder="제시된 평가 기준을 바탕으로 지원자를 평가해 주세요."
-              ></textarea>
-              <div class="score-overlay">
-                <input
-                  type="number"
-                  v-model.number="item.score"
-                  min="0"
-                  max="100"
-                />
-                <span>/100</span>
-              </div>
+    <!-- 기준표 제목/항목 템플릿 상세 스타일 -->
+    <div class="content-card mb-6">
+      <div class="field-group">
+        <label class="field-label">기준표 제목</label>
+        <v-text-field
+          :model-value="localStandardTitle"
+          variant="outlined"
+          readonly
+          hide-details
+          class="field-value-input"
+        ></v-text-field>
+      </div>
+      <template v-if="localStandardItems && localStandardItems.length > 0">
+        <div class="field-group">
+          <label class="field-label">항목 목록</label>
+          <div class="item-list-display">
+            <div v-for="(item, index) in localStandardItems" :key="item.id" class="item-display">
+              <v-text-field
+                :model-value="item.title || item.content"
+                variant="outlined"
+                readonly
+                hide-details
+                class="field-value-input"
+              ></v-text-field>
             </div>
           </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <div class="field-group">
+          <label class="field-label">항목 목록</label>
+          <v-textarea
+            model-value="연결된 자기소개서 항목이 없습니다."
+            variant="outlined"
+            readonly
+            hide-details
+            class="field-value-input no-items-textarea"
+            rows="3"
+          ></v-textarea>
+        </div>
+      </template>
     </div>
-
+    <!-- 기준표 불러오기 버튼 -->
+    <div class="mb-4" style="text-align:right;">
+      <v-btn color="primary" @click="showStandardModal = true">기준표 불러오기</v-btn>
+    </div>
+    <!-- 선택된 기준표 표시 -->
+    <div v-if="selectedStandard" class="mb-2" style="text-align:right; color:#1976d2;">
+      선택된 기준표: {{ selectedStandard.content }}
+    </div>
+    <!-- 전체 항목 묶는 큰 박스 -->
+    <!-- 항목별 평가 영역 전체 삭제 -->
     <!-- 총점 평가 -->
     <div class="total-score">
       <div class="total-header">
@@ -62,11 +73,22 @@
         ></textarea>
       </div>
     </div>
+    <!-- 기준표 선택 모달 -->
+    <IntroduceStandardSelectModal v-model="showStandardModal" @select="onStandardSelect" />
+    <div class="d-flex justify-end mt-4">
+      <v-btn color="success" @click="handleSave">저장</v-btn>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, ref, defineProps, watchEffect } from 'vue'
+import { ref, defineProps, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
+import IntroduceStandardSelectModal from './IntroduceStandardSelectModal.vue'
+import { useIntroduceStore } from '@/stores/introduceStore'
+
+const router = useRouter()
+const introduceStore = useIntroduceStore()
 
 const props = defineProps({
   totalTitle: {
@@ -76,56 +98,57 @@ const props = defineProps({
   evaluationData: {
     type: Object,
     default: () => ({})
+  },
+  standardTitle: {
+    type: String,
+    default: ''
+  },
+  standardItems: {
+    type: Array,
+    default: () => []
   }
 })
 
-const localCriteria = reactive([])
 const localTotalScore = ref(null)
 const localComment = ref('')
 
+const showStandardModal = ref(false)
+const selectedStandard = ref(null)
+
+const localStandardTitle = ref('')
+const localStandardItems = ref([])
+
 watchEffect(() => {
-  if (props.evaluationData && props.evaluationData.items) {
-    // 평가 항목 데이터를 동적으로 설정
-    localCriteria.splice(0, localCriteria.length, ...props.evaluationData.items.map(item => ({
-      title: item.title,
-      question: item.question || '',
-      weight: item.weight || 0,
-      score: item.score || null,
-      comment: item.comment || '',
-    })))
-    // 총점과 총평 초기화
+  if (props.evaluationData) {
     localTotalScore.value = props.evaluationData.totalScore || null
     localComment.value = props.evaluationData.comment || ''
   } else {
-    // 데이터가 없을 경우 기본값으로 초기화
-    localCriteria.splice(0, localCriteria.length, ...[
-      {
-        title: '자신감',
-        question: '자신감이 있는가?',
-        weight: 10,
-        score: null,
-        comment: '',
-      },
-      {
-        title: '기술력',
-        question: '기술에 대한 이해도가 높은가?',
-        weight: 40,
-        score: null,
-        comment: '',
-      },
-      {
-        title: '협업능력',
-        question: '팀과 잘 협력할 수 있는가?',
-        weight: 30,
-        score: null,
-        comment: '',
-      },
-    ])
     localTotalScore.value = null
     localComment.value = ''
   }
+  // props로 받은 기준표 정보가 있으면 반영
+  if (props.standardTitle) localStandardTitle.value = props.standardTitle
+  if (props.standardItems) localStandardItems.value = props.standardItems
 })
 
+const onStandardSelect = (standard) => {
+  selectedStandard.value = standard
+  localStandardTitle.value = standard.content
+  localStandardItems.value = standard.items
+}
+
+const handleSave = async () => {
+  try {
+    await introduceStore.saveIntroduceRatingResult({
+      content: localComment.value,
+      ratingScore: localTotalScore.value,
+      // 필요시 applicantId, standardId 등 추가
+    })
+    alert('평가 결과가 저장되었습니다.')
+  } catch (e) {
+    alert('저장에 실패했습니다.')
+  }
+}
 </script>
 
 <style scoped>
@@ -167,14 +190,6 @@ watchEffect(() => {
   margin-top: 4px;
   font-size: 0.9rem;
   color: #444;
-}
-
-.criteria-info .right .weight {
-  font-size: 0.9rem;
-  color: #1a8917;
-  background: #eef6ee;
-  padding: 4px 8px;
-  border-radius: 12px;
 }
 
 .criteria-input {
@@ -263,5 +278,51 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+.criteria-item-box {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.content-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 32px 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+.field-group {
+  margin-bottom: 24px;
+}
+.field-label {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 8px;
+  display: block;
+}
+.field-value-input.v-text-field .v-input__control,
+.field-value-input.v-textarea .v-input__control {
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  box-shadow: none !important;
+}
+.field-value-input .v-field__outline {
+  border-color: #e0e0e0 !important;
+}
+.field-value-input.v-text-field.v-input--density-compact .v-field--variant-outlined,
+.field-value-input.v-textarea.v-input--density-compact .v-field--variant-outlined {
+  padding: 8px 12px;
+}
+.item-list-display .item-display {
+  margin-bottom: 16px;
+}
+.item-list-display .item-display:last-child {
+  margin-bottom: 0;
+}
+.no-items-textarea.v-textarea .v-input__control textarea {
+  color: #888;
+  font-style: italic;
 }
 </style>

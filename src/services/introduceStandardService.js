@@ -15,3 +15,8 @@ export const deleteIntroduceStandard = async (id) => {
 export const createIntroduceStandard = async (title, memberId, itemIds) => {
   return apiClient.post(IntroduceAPI.CREATE_STANDARD, { content:title, memberId, itemIds })
 }
+
+export const fetchIntroduceStandardDetail = async (id) => {
+  const response = await apiClient.get(IntroduceAPI.GET_STANDARD_BY_ID(id))
+  return response.data
+}

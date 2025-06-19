@@ -390,6 +390,12 @@ export const employmentRoutes = [
             requiresAuth: true,
             requiredRoles: ['ROLE_HR_ACCESS']
         }
+    },
+    {
+        path: '/employment/introduce-standard/:id',
+        name: 'IntroduceStandardDetail',
+        component: () => import('@/views/employment/IntroduceStandardDetailPage.vue'),
+        meta: { requiresAuth: true }
     }
 
 ];
