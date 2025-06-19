@@ -47,7 +47,7 @@
                         <span class="value">{{ remainingTimeRange }}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="label">남은 {{ month }} 근무시간:</span>
+                        <span class="label">할당된 {{ month }} 근무시간:</span>
                         <span class="value">{{ targetHours.hours }}h {{ targetHours.minutes }}m</span>
                     </div>
                     <div class="stat-item">

@@ -371,30 +371,32 @@ export const useAttendanceStore = defineStore('attendance', () => {
         const lastDay = new Date(year, month, 0);
         let workDays = 0;
 
-        for (let day = firstDay; day <= lastDay; day.setDate(day.getDate() + 1)) {
+        for (let day = new Date(firstDay); day <= lastDay; day.setDate(day.getDate() + 1)) {
             const dayOfWeek = day.getDay();
             if (!WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayOfWeek)) { // 설정된 주말 제외
                 workDays++;
             }
         }
-
         return workDays;
     };
 
-    // 남은 근무일 계산
+    // 남은 근무일 계산 (오늘 제외)
     const getWorkDaysRemaining = async (year, month) => {
         const { WORK_TIME_CONFIG } = await import('@/config/attendance');
         const today = new Date();
         const lastDay = new Date(year, month, 0);
         let workDays = 0;
 
-        for (let day = new Date(today); day <= lastDay; day.setDate(day.getDate() + 1)) {
+        // 내일부터 월말까지 계산 (오늘은 제외)
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        for (let day = new Date(tomorrow); day <= lastDay; day.setDate(day.getDate() + 1)) {
             const dayOfWeek = day.getDay();
             if (!WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayOfWeek)) { // 설정된 주말 제외
                 workDays++;
             }
         }
-
         return workDays;
     };
 
@@ -411,6 +413,8 @@ export const useAttendanceStore = defineStore('attendance', () => {
         const targetMinutes = workDaysInMonth * WORK_TIME_CONFIG.STANDARD_WORK_MINUTES;
         const hours = Math.floor(targetMinutes / WORK_TIME_CONFIG.MINUTES_PER_HOUR);
         const minutes = targetMinutes % WORK_TIME_CONFIG.MINUTES_PER_HOUR;
+
+
 
         return { hours, minutes };
     };
