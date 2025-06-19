@@ -73,6 +73,12 @@
         <!-- 확인 모달 -->
         <AlertModal v-if="showConfirmDialog" message="입력하신 내용이 모두 삭제됩니다. 정말로 나가시겠습니까?" @confirm="confirmLeave"
             @cancel="cancelLeave" />
+
+        <!-- 로딩 오버레이 -->
+        <CircleLoading :visible="regStore.loading" :message="loadingMessage" :sub-message="loadingSubMessage"
+            color="#2196F3" :size="90" :width="4" />
+
+
     </v-container>
 </template>
 
@@ -88,6 +94,7 @@ import { useFileUpload } from '@/composables/useFileUpload'
 import AlertModal from '@/components/common/AlertModal.vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import RegistrationAlert from '@/components/common/RegistrationAlert.vue'
+import CircleLoading from '@/components/common/CircleLoading.vue'
 import ApplicantInfoCard from '@/components/orgstructure/ApplicantInfoCard.vue'
 import MemberRegistrationForm from '@/components/orgstructure/MemberRegistrationForm.vue'
 import ApplicantNavigation from '@/components/orgstructure/ApplicantNavigation.vue'
@@ -102,6 +109,10 @@ const router = useRouter()
 const route = useRoute()
 const showConfirmDialog = ref(false)
 const pendingNavigation = ref(null)
+
+// 로딩 상태용 메시지
+const loadingMessage = ref('')
+const loadingSubMessage = ref('')
 
 // Composables 사용
 const {
@@ -269,6 +280,10 @@ const onBulkRegister = async () => {
         return
     }
 
+    // 일괄 등록 로딩 메시지 설정
+    loadingMessage.value = '일괄 사원 등록 중...'
+    loadingSubMessage.value = `${selectedForRegistration.value.length}명의 지원자를 사원으로 등록하고 있습니다.`
+
     // 현재 폼 데이터 저장
     saveCurrentFormData(getCurrentFormData())
 
@@ -285,6 +300,9 @@ const onBulkRegister = async () => {
 
         try {
             console.log(`📝 등록 중 (${i + 1}/${selectedForRegistration.value.length}):`, applicant.name)
+
+            // 현재 등록 중인 지원자 정보 업데이트
+            loadingSubMessage.value = `${applicant.name}님 등록 중... (${i + 1}/${selectedForRegistration.value.length})`
 
             // 진행 상황 업데이트: 처리 시작
             setRegistrationProgress(applicant.applicantId, 'processing', 10, '등록 준비 중...')
@@ -405,6 +423,11 @@ const onProfileImageChange = (event) => {
 
 const onRegister = async () => {
     try {
+        // 로딩 메시지 설정
+        const currentName = currentApplicant.value?.name || '지원자'
+        loadingMessage.value = '사원 등록 중...'
+        loadingSubMessage.value = `${currentName}님의 정보를 등록하고 있습니다.`
+
         // 현재 폼 데이터 저장
         saveCurrentFormData(getCurrentFormData())
 
@@ -434,6 +457,10 @@ const onRegister = async () => {
         }
     } catch (error) {
         toast.error(error.message || '사원 등록에 실패했습니다.')
+    } finally {
+        // 로딩 메시지 초기화
+        loadingMessage.value = ''
+        loadingSubMessage.value = ''
     }
 }
 
@@ -466,6 +493,8 @@ const cancelLeave = () => {
         pendingNavigation.value = null
     }
 }
+
+
 </script>
 
 <style scoped>

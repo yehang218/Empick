@@ -29,6 +29,9 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
         employeeNumber: '',
         profileImageFile: null,
         profileImageUrl: '',
+        loading: false,
+        registerError: null,
+        registerResult: null,
     }),
     getters: {
         isFormValid(state) {
@@ -80,6 +83,9 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             this.employeeNumber = ''
             this.profileImageFile = null
             this.profileImageUrl = ''
+            this.loading = false
+            this.registerError = null
+            this.registerResult = null
         },
 
         // 📝 사원 등록 (프로필 이미지 포함)
