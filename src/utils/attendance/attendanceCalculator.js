@@ -180,17 +180,34 @@ export const groupAttendanceByWeek = (year, month, records) => {
                 const dayData = dailyData[dateStr];
 
                 if (dayData && (dayData.checkIn || dayData.checkOut)) {
-                    const startTime = dayData.checkIn?.time || '00:00:00';
-                    const endTime = dayData.checkOut?.time || '00:00:00';
-                    const workHours = categorizeWorkHours(startTime, endTime);
+                    const startTime = dayData.checkIn?.time || '';
+                    const endTime = dayData.checkOut?.time || '';
+
+                    // 출근만 있고 퇴근이 없는 경우 처리
+                    let workHours;
+                    let totalMinutes = 0;
+
+                    if (startTime && endTime) {
+                        // 출근과 퇴근이 모두 있는 경우
+                        workHours = categorizeWorkHours(startTime, endTime);
+                        totalMinutes = calculateTimeDifferenceInMinutes(startTime, endTime);
+                    } else {
+                        // 출근만 있거나 퇴근만 있는 경우
+                        workHours = {
+                            total: '0h 0m',
+                            regular: '0h 0m',
+                            overtime: '0h 0m',
+                            night: '0h 0m'
+                        };
+                    }
 
                     // 타임존 문제 해결: dateStr에서 직접 날짜 추출
                     const dayOfMonth = dateStr.split('-')[2]; // "2024-12-18" -> "18"
 
                     const dayInfo = {
                         date: dayOfMonth,
-                        startTime: startTime,
-                        endTime: endTime,
+                        startTime: startTime || '-',
+                        endTime: endTime || '-',
                         totalDuration: workHours.total,
                         regularHours: workHours.regular,
                         overtimeHours: workHours.overtime,
@@ -203,8 +220,7 @@ export const groupAttendanceByWeek = (year, month, records) => {
 
                     weekDays.push(dayInfo);
 
-                    // 주차별 총 근무시간 계산
-                    const totalMinutes = calculateTimeDifferenceInMinutes(startTime, endTime);
+                    // 주차별 총 근무시간 계산 (출근과 퇴근이 모두 있는 경우만)
                     weekTotalMinutes += totalMinutes;
                 }
             }

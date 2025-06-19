@@ -54,10 +54,15 @@
 
             <div class="timeline-content">
                 <div v-for="(day, index) in weekData" :key="index" class="timeline-row">
-                    <!-- 근무시간 바 -->
-                    <div class="work-bar" :style="getWorkBarStyle(day)">
+                    <!-- 근무시간 바 (출근과 퇴근이 모두 있는 경우만 표시) -->
+                    <div v-if="day.startTime !== '-' && day.endTime !== '-'" class="work-bar"
+                        :style="getWorkBarStyle(day)">
                         <span class="work-label start-label">출근</span>
                         <span class="work-label end-label">퇴근</span>
+                    </div>
+                    <!-- 출근만 있는 경우 점으로 표시 -->
+                    <div v-else-if="day.startTime !== '-'" class="work-point" :style="getWorkPointStyle(day)">
+                        <span class="work-label start-label">출근</span>
                     </div>
 
                     <!-- 점심시간 구분선 -->
@@ -93,6 +98,11 @@ defineProps({
 
 // 근무시간 바 스타일 계산
 const getWorkBarStyle = (day) => {
+    // 시간 형식이 올바른지 확인
+    if (!day.startTime || !day.endTime || day.startTime === '-' || day.endTime === '-') {
+        return { left: '0%', width: '0%' }
+    }
+
     const startHour = parseFloat(day.startTime.split(':')[0]) + parseFloat(day.startTime.split(':')[1]) / 60
     const endHour = parseFloat(day.endTime.split(':')[0]) + parseFloat(day.endTime.split(':')[1]) / 60
 
@@ -102,6 +112,20 @@ const getWorkBarStyle = (day) => {
     return {
         left: `${left}%`,
         width: `${width}%`
+    }
+}
+
+// 출근만 있는 경우 점 스타일 계산
+const getWorkPointStyle = (day) => {
+    if (!day.startTime || day.startTime === '-') {
+        return { left: '0%' }
+    }
+
+    const startHour = parseFloat(day.startTime.split(':')[0]) + parseFloat(day.startTime.split(':')[1]) / 60
+    const left = (startHour / 24) * 100
+
+    return {
+        left: `${left}%`
     }
 }
 
@@ -282,34 +306,55 @@ defineEmits(['requestApproval', 'editTime'])
                 align-items: center;
                 justify-content: space-between;
                 padding: 0 8px;
+            }
+
+            .work-point {
+                position: absolute;
+                top: 20px;
+                width: 20px;
+                height: 20px;
+                background: #ff9800;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transform: translateX(-50%);
 
                 .work-label {
-                    color: white;
-                    font-size: 12px;
-                    font-weight: 500;
-                    display: flex;
-                    align-items: center;
-                    height: 100%;
-
-                    &.start-label {
-                        justify-content: flex-start;
-                    }
-
-                    &.end-label {
-                        justify-content: flex-end;
-                    }
+                    position: absolute;
+                    top: -25px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    white-space: nowrap;
                 }
             }
 
-            .lunch-break-line,
-            .end-break-line {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                width: 1px;
-                background: #f44336;
-                opacity: 0.6;
+            .work-label {
+                color: white;
+                font-size: 12px;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                height: 100%;
+
+                &.start-label {
+                    justify-content: flex-start;
+                }
+
+                &.end-label {
+                    justify-content: flex-end;
+                }
             }
+        }
+
+        .lunch-break-line,
+        .end-break-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: #f44336;
+            opacity: 0.6;
         }
     }
 }
