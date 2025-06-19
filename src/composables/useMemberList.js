@@ -1,86 +1,37 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useMemberStore } from '@/stores/memberStore'
-import { useDepartmentStore } from '@/stores/departmentStore'
 import { useAttendanceStore } from '@/stores/attendanceStore'
 import { useToast } from '@/composables/useToast'
 
 export const useMemberList = () => {
     const memberStore = useMemberStore()
-    const departmentStore = useDepartmentStore()
     const attendanceStore = useAttendanceStore()
     const { showToast } = useToast()
 
     // 상태
     const members = ref([])
     const loading = ref(false)
+    const loadingMessage = ref('')
     const error = ref(null)
 
-    // 페이징 상태
+    // 클라이언트 사이드 페이지네이션 상태
     const currentPage = ref(1)
-    const pageSize = ref(10)
-    const totalMembers = ref(0)
-    const totalPages = ref(0)
-    const hasNextPage = ref(false)
-    const hasPrevPage = ref(false)
+    const itemsPerPage = ref(10)
 
-    // 비즈니스 로직: 페이징된 사원 목록 로드
-    const loadMembers = async (page = 1, forceRefresh = false) => {
-        loading.value = true
-        error.value = null
+    // 검색 및 필터 상태
+    const searchQuery = ref('')
+    const selectedDepartment = ref(null)
+    const selectedStatus = ref('전체')
 
-        try {
-            console.log('페이징된 사원 목록 로드 시작:', { page, pageSize: pageSize.value, forceRefresh })
-            // eslint-disable-next-line no-undef
-            const startTime = performance.now()
+    // UI 상태
+    const expanded = ref([])
 
-            // 페이징된 사원 목록 가져오기
-            const result = await memberStore.findMembersPaginated(page, pageSize.value, forceRefresh)
-            // eslint-disable-next-line no-undef
-            console.log('페이징 API 호출 완료:', performance.now() - startTime, 'ms')
-
-            // 페이징 상태 업데이트
-            currentPage.value = result.pagination.currentPage
-            totalMembers.value = result.pagination.totalMembers
-            totalPages.value = result.pagination.totalPages
-            hasNextPage.value = result.pagination.hasNextPage
-            hasPrevPage.value = result.pagination.hasPrevPage
-
-            // 병렬 처리로 성능 개선
-            const [membersWithAttendance] = await Promise.all([
-                enrichMembersWithAttendance(result.members),
-                departmentStore.loadDepartmentList()
-            ])
-            // eslint-disable-next-line no-undef
-            console.log('병렬 처리 완료:', performance.now() - startTime, 'ms')
-
-            const membersWithImages = await loadMemberProfileImages(membersWithAttendance)
-            // eslint-disable-next-line no-undef
-            console.log('이미지 로드 완료:', performance.now() - startTime, 'ms')
-
-            members.value = membersWithImages
-
-            const loadType = forceRefresh ? '새로고침' : '페이징'
-            showToast(`${membersWithImages.length}명의 사원 정보를 불러왔습니다. (${loadType}, ${currentPage.value}/${totalPages.value} 페이지)`, 'success')
-            // eslint-disable-next-line no-undef
-            console.log('전체 로드 완료:', performance.now() - startTime, 'ms')
-
-            return membersWithImages
-        } catch (err) {
-            error.value = err
-            showToast('사원 목록을 불러오는데 실패했습니다.', 'error')
-            members.value = []
-            throw err
-        } finally {
-            loading.value = false
-        }
-    }
-
-    // 비즈니스 로직: 출근 상태 계산 (배치 처리로 최적화)
+    // 비즈니스 로직: 사원별 실제 근태 상태 조회 (배치 처리)
     const enrichMembersWithAttendance = async (memberList) => {
         console.log('근태 정보 로드 시작:', memberList.length, '명')
 
         // 배치 크기 설정 (동시에 처리할 사원 수)
-        const batchSize = 10
+        const batchSize = 5
         const batches = []
 
         for (let i = 0; i < memberList.length; i += batchSize) {
@@ -93,22 +44,23 @@ export const useMemberList = () => {
         const allResults = []
         for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
             const batch = batches[batchIndex]
+            loadingMessage.value = `근태 정보 조회 중... (${batchIndex + 1}/${batches.length})`
             console.log(`배치 ${batchIndex + 1}/${batches.length} 처리 중...`)
 
             const batchResults = await Promise.all(
                 batch.map(async (member) => {
                     try {
-                        // 각 사원의 오늘 출근 기록 조회
-                        const todayAttendance = await attendanceStore.fetchMemberAttendanceRecords(member.id, {
+                        // 각 사원의 근태 기록 조회
+                        const attendanceRecords = await attendanceStore.fetchMemberAttendanceRecords(member.id, {
                             silent: true // 에러 시 토스트 표시 안함
                         })
 
                         let status = -1 // 기본값: 기록없음
 
-                        if (todayAttendance && todayAttendance.length > 0) {
+                        if (attendanceRecords && attendanceRecords.length > 0) {
                             // 오늘 날짜 기준으로 출근 기록 확인
                             const today = new Date().toISOString().split('T')[0]
-                            const todayRecord = todayAttendance.find(record => {
+                            const todayRecord = attendanceRecords.find(record => {
                                 const recordDate = new Date(record.checkInTime || record.createdAt).toISOString().split('T')[0]
                                 return recordDate === today
                             })
@@ -121,6 +73,8 @@ export const useMemberList = () => {
                                 status = 0
                             }
                         }
+
+                        console.log(`사원 ${member.name}: 상태 ${status} (${status === 1 ? '출근' : status === 0 ? '미출근' : '기록없음'})`)
 
                         return {
                             ...member,
@@ -142,7 +96,7 @@ export const useMemberList = () => {
             // 배치 간 약간의 지연 (서버 부하 방지)
             if (batchIndex < batches.length - 1) {
                 // eslint-disable-next-line no-undef
-                await new Promise(resolve => setTimeout(resolve, 100))
+                await new Promise(resolve => setTimeout(resolve, 200))
             }
         }
 
@@ -150,20 +104,49 @@ export const useMemberList = () => {
         return allResults
     }
 
-    // 프로필 이미지 로딩
-    const loadMemberProfileImages = async (memberList) => {
-        return memberList.map((member) => {
-            console.log(`사원 ${member.name}의 pictureUrl:`, member.pictureUrl)
+    // 전체 사원 목록 로드 (클라이언트 사이드 페이지네이션용)
+    const loadAllMembers = async () => {
+        loading.value = true
+        loadingMessage.value = '사원 데이터를 불러오는 중...'
 
-            // pictureUrl이 있으면 그대로 사용, 없으면 API로 이미지 로드
-            if (member.pictureUrl) {
-                member.profileImageUrl = member.pictureUrl
-            } else {
-                // 개별 이미지 로드는 필요시에만 (성능 고려)
-                member.profileImageUrl = ''
+        try {
+            // 전체 사원 데이터 로드
+            console.log('사원 데이터 로딩 시작...')
+            const allMembers = await memberStore.findMembers()
+            console.log('기본 사원 데이터 로드 완료:', allMembers.length, '명')
+
+            // 실제 근태 정보와 함께 사원 데이터 보강
+            loadingMessage.value = '근태 정보를 조회하는 중...'
+            console.log('근태 정보 조회 시작...')
+            const membersWithAttendance = await enrichMembersWithAttendance(allMembers)
+
+            members.value = membersWithAttendance
+            console.log('전체 데이터 로드 완료:', membersWithAttendance.length, '명')
+            console.log('첫 번째 사원 샘플:', membersWithAttendance[0])
+
+            // 상태별 통계
+            const stats = {
+                출근: membersWithAttendance.filter(m => m.status === 1).length,
+                미출근: membersWithAttendance.filter(m => m.status === 0).length,
+                기록없음: membersWithAttendance.filter(m => m.status === -1).length
             }
-            return member
-        })
+            console.log('사원 상태 통계:', stats)
+
+            showToast(`${membersWithAttendance.length}명의 사원 정보를 불러왔습니다.`, 'success')
+
+        } catch (error) {
+            console.error('사원 데이터 로드 실패:', error)
+            members.value = []
+            showToast('사원 목록을 불러오는데 실패했습니다.', 'error')
+        } finally {
+            loading.value = false
+            loadingMessage.value = ''
+        }
+    }
+
+    // 새로고침
+    const refreshCurrentPage = () => {
+        loadAllMembers()
     }
 
     // 개별 사원의 프로필 이미지 로드 (필요시 호출)
@@ -178,130 +161,164 @@ export const useMemberList = () => {
     }
 
     // 검색 및 필터링 로직
-    const createMemberFilter = (searchQuery, selectedDepartment, selectedStatus) => {
-        return computed(() => {
-            let result = [...members.value]
+    const filteredMembers = computed(() => {
+        let result = [...members.value]
 
-            // 검색 필터
-            if (searchQuery.value) {
-                result = filterBySearch(result, searchQuery.value)
-            }
-
-            // 부서 필터
-            if (selectedDepartment.value) {
-                result = filterByDepartment(result, selectedDepartment.value)
-            }
-
-            // 상태 필터
-            if (selectedStatus.value && selectedStatus.value !== '전체') {
-                result = filterByStatus(result, selectedStatus.value)
-            }
-            return result
+        console.log('필터링 시작:', {
+            전체사원수: result.length,
+            검색어: searchQuery.value,
+            선택부서: selectedDepartment.value,
+            선택상태: selectedStatus.value
         })
-    }
 
-    // 검색 필터 로직
-    const filterBySearch = (members, query) => {
-        const searchTerm = query.toLowerCase()
-        return members.filter(member =>
-            member.name?.toLowerCase().includes(searchTerm) ||
-            member.employeeNumber?.toString().includes(searchTerm) ||
-            member.email?.toLowerCase().includes(searchTerm)
-        )
-    }
+        // 검색 필터
+        if (searchQuery.value && searchQuery.value.trim()) {
+            const searchTerm = searchQuery.value.toLowerCase().trim()
+            result = result.filter(member =>
+                member.name?.toLowerCase().includes(searchTerm) ||
+                member.employeeNumber?.toString().includes(searchTerm) ||
+                member.email?.toLowerCase().includes(searchTerm)
+            )
+            console.log('검색 필터 후:', result.length, '명')
+        }
 
-    // 부서 필터 로직
-    const filterByDepartment = (members, department) => {
-        return members.filter(member => member.departmentName === department)
-    }
+        // 부서 필터
+        if (selectedDepartment.value) {
+            result = result.filter(member => member.departmentName === selectedDepartment.value)
+            console.log('부서 필터 후:', result.length, '명')
+        }
 
-    // 상태 필터 로직
-    const filterByStatus = (members, status) => {
-        return members.filter(member => {
-            // 타입 변환을 통한 안전한 비교
-            const memberStatus = Number(member.status)
-            const filterStatus = Number(status)
-            return memberStatus === filterStatus
-        })
-    }
+        // 상태 필터
+        if (selectedStatus.value && selectedStatus.value !== '전체') {
+            const filterStatus = selectedStatus.value
+            console.log('상태 필터 조건:', { filterStatus, 타입: typeof filterStatus })
 
-    // 부서 옵션 생성
+            result = result.filter(member => {
+                const memberStatus = member.status
+                console.log('사원 상태 비교:', {
+                    사원명: member.name,
+                    사원상태: memberStatus,
+                    사원상태타입: typeof memberStatus,
+                    필터상태: filterStatus,
+                    필터상태타입: typeof filterStatus,
+                    비교결과: memberStatus == filterStatus
+                })
+                return memberStatus == filterStatus // == 사용 (느슨한 비교)
+            })
+            console.log('상태 필터 후:', result.length, '명')
+        }
+
+        console.log('최종 필터링 결과:', result.length, '명')
+        return result
+    })
+
+    // 클라이언트 사이드 페이지네이션 계산
+    const totalFilteredMembers = computed(() => filteredMembers.value.length)
+    const totalPages = computed(() => Math.ceil(totalFilteredMembers.value / itemsPerPage.value))
+
+    const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value)
+    const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage.value, totalFilteredMembers.value))
+
+    const paginatedMembers = computed(() => {
+        const start = startIndex.value
+        const end = endIndex.value
+        return filteredMembers.value.slice(start, end)
+    })
+
+    // 부서 옵션
     const createDepartmentOptions = () => {
         return computed(() => {
-            // departmentStore에서 부서 목록 가져오기
-            if (departmentStore.departmentList.length > 0) {
-                return departmentStore.departmentList.map(dept => ({
-                    title: dept.name || dept.departmentName,
-                    value: dept.name || dept.departmentName
-                }))
-            }
-
-            // fallback: 현재 사원들의 부서명으로 생성
             const uniqueDepartments = [...new Set(members.value.map(m => m.departmentName).filter(Boolean))]
             return uniqueDepartments.map(dept => ({ title: dept, value: dept }))
         })
     }
 
-    // 페이징 관련 함수들
-    const goToPage = async (page) => {
-        if (page >= 1 && page <= totalPages.value && page !== currentPage.value) {
-            await loadMembers(page)
+    // 이벤트 핸들러
+    const handleSearch = () => {
+        console.log('검색어 변경:', searchQuery.value)
+        // 검색 시 첫 페이지로 리셋
+        currentPage.value = 1
+    }
+
+    const handleDepartmentFilter = () => {
+        console.log('부서 필터 변경:', selectedDepartment.value)
+        // 필터 변경 시 첫 페이지로 리셋
+        currentPage.value = 1
+    }
+
+    const handleStatusFilter = () => {
+        console.log('상태 필터 변경:', selectedStatus.value)
+        // 필터 변경 시 첫 페이지로 리셋
+        currentPage.value = 1
+    }
+
+    const handleItemsPerPageChange = (newSize) => {
+        console.log('페이지 크기 변경됨:', newSize)
+        itemsPerPage.value = newSize
+        // 페이지 크기 변경 시 첫 페이지로 리셋
+        currentPage.value = 1
+    }
+
+    // 프로필 이미지 에러 처리
+    const handleImageError = async (member) => {
+        console.log('프로필 이미지 로드 실패, API로 재시도:', member.name)
+        try {
+            const imageUrl = await loadSingleProfileImage(member.id)
+            if (imageUrl) {
+                member.profileImageUrl = imageUrl
+            }
+        } catch (error) {
+            console.warn('프로필 이미지 API 로드도 실패:', error)
         }
     }
 
-    const goToNextPage = async () => {
-        if (hasNextPage.value) {
-            await goToPage(currentPage.value + 1)
-        }
-    }
-
-    const goToPrevPage = async () => {
-        if (hasPrevPage.value) {
-            await goToPage(currentPage.value - 1)
-        }
-    }
-
-    const changePageSize = async (newPageSize) => {
-        if (newPageSize !== pageSize.value) {
-            pageSize.value = newPageSize
-            memberStore.setPageSize(newPageSize)
-            // 첫 페이지로 이동
-            await loadMembers(1)
-        }
-    }
-
-    const refreshCurrentPage = async () => {
-        await loadMembers(currentPage.value, true)
+    // 검색어 변경 감지 (디바운싱)
+    const setupSearchWatcher = () => {
+        return watch(searchQuery, () => {
+            handleSearch()
+        }, { debounce: 300 })
     }
 
     return {
         // 상태
         members,
         loading,
+        loadingMessage,
         error,
+        expanded,
 
-        // 페이징 상태
+        // 페이지네이션 상태
         currentPage,
-        pageSize,
-        totalMembers,
+        itemsPerPage,
         totalPages,
-        hasNextPage,
-        hasPrevPage,
+        totalFilteredMembers,
+        startIndex,
+        endIndex,
 
-        // 메서드
-        loadMembers,
-        goToPage,
-        goToNextPage,
-        goToPrevPage,
-        changePageSize,
+        // 검색 및 필터 상태
+        searchQuery,
+        selectedDepartment,
+        selectedStatus,
+
+        // 계산된 속성
+        filteredMembers,
+        paginatedMembers,
+
+        // 비즈니스 로직
+        loadAllMembers,
         refreshCurrentPage,
-        createMemberFilter,
-        createDepartmentOptions,
+        enrichMembersWithAttendance,
         loadSingleProfileImage,
+        createDepartmentOptions,
+
+        // 이벤트 핸들러
+        handleSearch,
+        handleDepartmentFilter,
+        handleStatusFilter,
+        handleItemsPerPageChange,
+        handleImageError,
 
         // 유틸리티
-        filterBySearch,
-        filterByDepartment,
-        filterByStatus
+        setupSearchWatcher
     }
 } 
