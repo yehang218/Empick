@@ -40,10 +40,9 @@ const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
 const router = useRouter();
 
-// 요청한 결재 목록
-const requestedList = computed(() => approvalStore.requestedList);
-const loading = computed(() => approvalStore.loadingRequested);
-const error = computed(() => approvalStore.errorRequested);
+const requestedList = approvalStore.requestedList;
+const loading = approvalStore.loadingRequested;
+const error = approvalStore.errorRequested;
 
 const headers = [
     { key: 'approvalId', label: '문서번호' },
@@ -57,11 +56,11 @@ const page = ref(1);
 const selectedStatus = ref('ALL');
 
 const statusSummary = computed(() => {
-    const all = requestedList.value.length;
-    const canceled = requestedList.value.filter(i => i.status === 'CANCELED').length;
-    const rejected = requestedList.value.filter(i => i.status === 'REJECTED').length;
-    const inProgress = requestedList.value.filter(i => i.status === 'IN_PROGRESS').length;
-    const approved = requestedList.value.filter(i => i.status === 'APPROVED').length;
+    const all = requestedList.length;
+    const canceled = requestedList.filter(i => i.status === 'CANCELED').length;
+    const rejected = requestedList.filter(i => i.status === 'REJECTED').length;
+    const inProgress = requestedList.filter(i => i.status === 'IN_PROGRESS').length;
+    const approved = requestedList.filter(i => i.status === 'APPROVED').length;
     return {
         all,
         canceled,
@@ -80,8 +79,8 @@ const statusOptions = computed(() => [
 ]);
 
 const filteredList = computed(() => {
-    if (selectedStatus.value === 'ALL') return requestedList.value;
-    return requestedList.value.filter(item => item.status === selectedStatus.value);
+    if (selectedStatus.value === 'ALL') return requestedList;
+    return requestedList.filter(item => item.status === selectedStatus.value);
 });
 
 const pagedList = computed(() => {

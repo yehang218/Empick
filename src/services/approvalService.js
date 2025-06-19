@@ -68,29 +68,17 @@ export const approveApproval = async (approvalId) => {  };
 export const rejectApproval = async (approvalId, rejectReason) => {  };
 
 // 자신이 결재자인 결재문서 목록 조회
-export const getReceivedApprovals = async (memberId, options = {}) => {
+export const getReceivedApprovals = async (memberId) => {
     return withErrorHandling(async () => {
         const response = await api.get(ApprovalAPI.RECEIVED_DOCUMENTS_LIST(memberId));
-        const apiResponse = ApiResponseDTO.fromJSON(response.data);
-
-        if (!apiResponse.success) {
-            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        }
-
-        return (apiResponse.data || []).map(item => new ApprovalReceivedListDTO(item));
-    }, options);
+        return (response.data.data || []).map(item => new ApprovalReceivedListDTO(item));
+    });
 };
 
 // 자신이 요청한 결재문서 목록 조회
-export const getRequestedApprovals = async (memberId, options = {}) => {
+export const getRequestedApprovals = async (memberId) => {
     return withErrorHandling(async () => {
         const response = await api.get(ApprovalAPI.REQUESTED_DOCUMENTS_LIST(memberId));
-        const apiResponse = ApiResponseDTO.fromJSON(response.data);
-
-        if (!apiResponse.success) {
-            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        }
-
-        return (apiResponse.data || []).map(item => new ApprovalRequestedListDTO(item));
-    }, options);
+        return (response.data.data || []).map(item => new ApprovalRequestedListDTO(item));
+    });
 };

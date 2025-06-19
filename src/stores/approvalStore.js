@@ -2,56 +2,69 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getReceivedApprovals, getApprovalsByWriterId, getRequestedApprovals } from '@/services/approvalService';
 
-export const useApprovalStore = defineStore('approval', {
-    state: () => ({
-        receivedList: ref([]),
-        loadingReceived: false,
-        errorReceived: null,
+export const useApprovalStore = defineStore('approval', () => {
+    // State
+    const receivedList = ref([]);
+    const loadingReceived = ref(false);
+    const errorReceived = ref(null);
 
-        sentList: ref([]),
-        loadingSent: false,
-        errorSent: null,
+    const sentList = ref([]);
+    const loadingSent = ref(false);
+    const errorSent = ref(null);
 
-        // 요청한 결재 목록
-        requestedList: ref([]),
-        loadingRequested: false,
-        errorRequested: null,
-    }),
-    actions: {
-        async loadReceivedApprovals(memberId) {
-            this.loadingReceived = true;
-            this.errorReceived = null;
-            try {
-                this.receivedList.value = await getReceivedApprovals(memberId);
-            } catch (e) {
-                this.errorReceived = e;
-            } finally {
-                this.loadingReceived = false;
-            }
-        },
-        
-        async loadSentApprovals(writerId) {
-            this.loadingSent = true;
-            this.errorSent = null;
-            try {
-                this.sentList.value = await getApprovalsByWriterId(writerId);
-            } catch (e) {
-                this.errorSent = e;
-            } finally {
-                this.loadingSent = false;
-            }
-        },
+    const requestedList = ref([]);
+    const loadingRequested = ref(false);
+    const errorRequested = ref(null);
 
-        async loadRequestedApprovals(memberId) {
-            this.loadingRequested = true;
-            this.errorRequested = null;
-            try {
-                this.requestedList.value = await getRequestedApprovals(memberId);
-            } catch (e) {
-                this.errorRequested = e;
-            } finally {
-                this.loadingRequested = false;
-            }
+    // Actions
+    const loadReceivedApprovals = async (memberId) => {
+        loadingReceived.value = true;
+        errorReceived.value = null;
+        try {
+            receivedList.value = await getReceivedApprovals(memberId);
+        } catch (e) {
+            errorReceived.value = e;
+        } finally {
+            loadingReceived.value = false;
         }
-    }
+    };
+
+    const loadSentApprovals = async (writerId) => {
+        loadingSent.value = true;
+        errorSent.value = null;
+        try {
+            sentList.value = await getApprovalsByWriterId(writerId);
+        } catch (e) {
+            errorSent.value = e;
+        } finally {
+            loadingSent.value = false;
+        }
+    };
+
+    const loadRequestedApprovals = async (memberId) => {
+        loadingRequested.value = true;
+        errorRequested.value = null;
+        try {
+            requestedList.value = await getRequestedApprovals(memberId);
+        } catch (e) {
+            errorRequested.value = e;
+        } finally {
+            loadingRequested.value = false;
+        }
+    };
+
+    return {
+        receivedList,
+        loadingReceived,
+        errorReceived,
+        sentList,
+        loadingSent,
+        errorSent,
+        requestedList,
+        loadingRequested,
+        errorRequested,
+        loadReceivedApprovals,
+        loadSentApprovals,
+        loadRequestedApprovals
+    };
 });
