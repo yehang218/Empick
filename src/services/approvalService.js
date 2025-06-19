@@ -3,6 +3,8 @@ import { ApprovalAPI } from '@/apis/routes/approval';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 import ApprovalReceivedListDTO from '@/dto/approval/approval/approvalReceivedListDTO';
+import ApprovalRequestedListDTO from '@/dto/approval/approval/approvalRequestedListDTO';
+import ApprovalSentListDTO from '@/dto/approval/approval/approvalSentListDTO';
 
 import ApprovalCategoryDTO from '@/dto/approval/approvalCategory/approvalCategoryDTO';
 import ApprovalCategoryItemDTO from '@/dto/approval/approvalCategoryItem/approvalCategoryItemDTO';
@@ -37,7 +39,6 @@ export const getApprovalCategoryItems = async (categoryId, options = {}) => {
     }, options);
 };
 
-
 // 결재 문서 목록 조회 (작성자 기준)
 export const getApprovalsByWriterId = async (writerId) => { };
 
@@ -69,8 +70,18 @@ export const rejectApproval = async (approvalId, rejectReason) => { };
 
 // 자신이 결재자인 결재문서 목록 조회
 export const getReceivedApprovals = async (memberId) => {
-    const res = await api.get(ApprovalAPI.RECEIVED_DOCUMENTS(memberId));
-    return res.data.data.map(item => new ApprovalReceivedListDTO(item));
+    return withErrorHandling(async () => {
+        const response = await api.get(ApprovalAPI.RECEIVED_DOCUMENTS_LIST(memberId));
+        return (response.data.data || []).map(item => new ApprovalReceivedListDTO(item));
+    });
+};
+
+// 자신이 요청한 결재문서 목록 조회
+export const getRequestedApprovals = async (memberId) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(ApprovalAPI.REQUESTED_DOCUMENTS_LIST(memberId));
+        return (response.data.data || []).map(item => new ApprovalRequestedListDTO(item));
+    });
 };
 
 // 결재 라인 조회

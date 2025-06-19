@@ -37,7 +37,6 @@
                 </v-card>
             </v-col>
         </v-row>
-        <TemplateYNModal v-if="showModal" @confirm="goToTemplateSelect" @no="goToEditor" @close="closeModal" />
     </v-container>
 </template>
 
@@ -46,37 +45,19 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
 import dayjs from 'dayjs';
-import TemplateYNModal from '@/components/employment/TemplateYNModal.vue';
 
 const route = useRoute();
 const router = useRouter();
 const store = useRecruitmentRequestStore();
 
 const id = route.params.id;
-const showModal = ref(false);
 
 onMounted(() => {
     store.loadRecruitmentRequestDetail(id);
 });
+
 const handleClick = () => {
-    showModal.value = true;
-};
-
-// '예' → 템플릿 선택 페이지
-const goToTemplateSelect = () => {
-    showModal.value = false;
-    router.push(`/employment/recruitments/template-select?id=${id}`);
-};
-
-// '아니오' → 에디터가 있는 공고 작성 페이지
-const goToEditor = () => {
-    showModal.value = false;
     router.push(`/employment/recruitments/create?id=${id}`);
-};
-
-// 'X' → 모달 닫기
-const closeModal = () => {
-    showModal.value = false;
 };
 
 const detail = computed(() => store.recruitmentRequestDetail);

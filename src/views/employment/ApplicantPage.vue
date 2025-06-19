@@ -21,7 +21,8 @@
           </v-btn>
 
           <!-- ➕ 지원자 추가 버튼 (새로 추가) -->
-          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px" @click="goToApplicantRegistration">
+          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px"
+            @click="goToApplicantRegistration">
             지원자 추가
           </v-btn>
 
@@ -459,6 +460,7 @@ const handleRegisterClick = () => {
     phone: applicant.phone,
     birth: applicant.birth,
     address: applicant.address,
+    status: applicant.status, // 상태 정보 추가
     // 필요한 다른 필드들 추가
   }));
 

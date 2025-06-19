@@ -60,26 +60,27 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { fetchTemplateDetail } from '@/services/introduceTemplateService'
+import { ref, onMounted, computed } from 'vue'
+import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-const template = ref(null)
+const introduceTemplateStore = useIntroduceTemplateStore()
+const template = computed(() => introduceTemplateStore.selectedTemplate)
 
 onMounted(async () => {
   try {
-    template.value = await fetchTemplateDetail(route.params.id)
-    console.log('Fetched template detail:', template.value)
+    await introduceTemplateStore.loadTemplateDetail(route.params.id)
+    // console.log('Fetched template detail:', introduceTemplateStore.selectedTemplate)
   } catch (error) {
     console.error('템플릿 상세 로드 실패:', error)
     alert('템플릿 상세 정보를 불러오는 데 실패했습니다.')
-    router.push('/employment/recruitments/introduce-templates')
+    router.push('/employment/introduce-templates')
   }
 })
 
-const goList = () => router.push('/employment/recruitments/introduce-templates')
+const goList = () => router.push('/employment/introduce-templates')
 
 // const goToEdit = () => {
 //   alert('수정 페이지로 이동 (기능 미구현)');

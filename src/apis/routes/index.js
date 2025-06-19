@@ -7,7 +7,7 @@ import { MailAPI } from './mail';
 import { RecruitmentAPI } from './recruitment';
 import { ApplicantAPI, ApplicantBookmarkAPI, ApplicationAPI, ApplicationResponseAPI } from './application';
 import { ApprovalAPI } from './approval';
-
+import { AttendanceAPI } from './attendance';
 
 export const API = {
     AUTH: AuthAPI,
@@ -22,5 +22,6 @@ export const API = {
     APPLICATION: ApplicationAPI,
     APPLICATIONRESPONSE: ApplicationResponseAPI,
     APPROVAL: ApprovalAPI,
+    ATTENDANCE: AttendanceAPI,
 };
 
