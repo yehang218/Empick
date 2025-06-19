@@ -70,6 +70,7 @@ const nextApplicant = () => {
     margin-bottom: 1rem;
     display: flex;
     justify-content: flex-start;
+    flex: 1;
 }
 
 .nav-card {
@@ -83,7 +84,7 @@ const nextApplicant = () => {
     align-items: center;
     justify-content: space-between;
     gap: 1.5rem;
-    max-width: 500px;
+    flex: 1;
     width: 100%;
 }
 

@@ -51,10 +51,14 @@
 
             <!-- 네비게이션 및 폼 -->
             <v-col cols="12" md="9" class="form-section">
-                <!-- 네비게이션 (기본정보와 수직 정렬) -->
-                <ApplicantNavigation v-if="selectedApplicants.length > 1" :selectedApplicants="selectedApplicants"
-                    :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
-                    @previousApplicant="handlePreviousApplicant" @nextApplicant="handleNextApplicant" />
+                <!-- 네비게이션과 상태 표시 -->
+                <div v-if="selectedApplicants.length > 1" class="navigation-section">
+                    <ApplicantNavigation :selectedApplicants="selectedApplicants"
+                        :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
+                        @previousApplicant="handlePreviousApplicant" @nextApplicant="handleNextApplicant" />
+
+                    <ApplicantStatusIndicator :currentApplicant="currentApplicant" />
+                </div>
 
                 <!-- 폼 섹션들 -->
                 <MemberRegistrationForm :form="regStore.form" :profileImageUrl="regStore.profileImageUrl"
@@ -87,6 +91,7 @@ import RegistrationAlert from '@/components/common/RegistrationAlert.vue'
 import ApplicantInfoCard from '@/components/orgstructure/ApplicantInfoCard.vue'
 import MemberRegistrationForm from '@/components/orgstructure/MemberRegistrationForm.vue'
 import ApplicantNavigation from '@/components/orgstructure/ApplicantNavigation.vue'
+import ApplicantStatusIndicator from '@/components/orgstructure/ApplicantStatusIndicator.vue'
 import ProfileImageUpload from '@/components/orgstructure/ProfileImageUpload.vue'
 
 const regStore = useMemberRegisterStore()
@@ -665,6 +670,15 @@ const cancelLeave = () => {
     padding: 1rem;
 }
 
+/* 네비게이션 섹션 */
+.navigation-section {
+    display: flex;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
 /* 프로필 이미지 관련 스타일은 ProfileImageUpload 컴포넌트로 이동됨 */
 
 /* 등록 섹션 */
@@ -727,6 +741,11 @@ const cancelLeave = () => {
     .profile-section {
         order: 2;
         margin-top: 1rem;
+    }
+
+    .navigation-section {
+        flex-direction: column;
+        gap: 1.5rem;
     }
 
     .register-btn {
