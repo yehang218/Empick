@@ -95,7 +95,6 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
     public void finishExam(int applicationJobTestId) {
         ApplicationJobtestEntity applicationJobtest = applicationJobtestRepository.findById(applicationJobTestId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_APPLICATION_JOBTEST));
-        applicationJobtest.destroyEntryCode();
         applicationJobtest.updateSubittedAt();
     }
 

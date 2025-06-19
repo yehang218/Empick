@@ -9,4 +9,6 @@ import java.util.List;
 public interface ApplicationJobtestQueryService {
     List<ApplicationJobtestQueryDTO> getAllApplicationJobTests();
     int verifyEntryCode(int jobtestId, JobtestEntryRequestDTO requestDTO);
+
+    void checkSubmittedAt(int applicationJobtestId);
 }

@@ -4,6 +4,8 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.Applicat
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -13,4 +15,6 @@ public interface ApplicationJobtestMapper {
             @Param("jobtestId") int jobtestId,
             @Param("entryCode") String entryCode
     );
+
+    Date selectSubmittedAtById(@Param("applicationJobtestId") int applicationJobtestId);
 }

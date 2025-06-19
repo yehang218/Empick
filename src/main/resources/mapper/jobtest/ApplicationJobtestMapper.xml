@@ -44,4 +44,10 @@
           AND entry_code = #{entryCode}
         LIMIT 1
     </select>
+
+    <select id="selectSubmittedAtById" resultType="java.util.Date">
+        SELECT submitted_at
+        FROM application_job_test
+        WHERE id = #{applicationJobtestId}
+    </select>
 </mapper>

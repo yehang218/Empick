@@ -10,7 +10,6 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicatio
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.ApplicationJobtestCommandService;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.JobtestCommandService;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.JobtestQuestionCommandService;
-import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.ApplicationJobtestEntity;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.JobtestEntity;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestExamQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.service.ApplicationJobtestQueryService;
@@ -57,7 +56,7 @@ public class JobtestFacade {
 
     // 실무테스트 채점
     public List<UpdateAnswerCommandDTO> gradeApplicationJobTest(int applicationJobTestId) {
-        // 입장 코드 파기(재시험 불가)
+        // submittedAt 업데이트(재시험 불가)
         applicationJobtestCommandService.finishExam(applicationJobTestId);
 
         List<AnswerEntity> answers = answerCommandService.findByApplicationJobtestId(applicationJobTestId);
@@ -95,6 +94,9 @@ public class JobtestFacade {
 
         // 시험시간인지 확인
         jobtestQueryService.checkJobtestTime(jobtestId);
+        
+        // 기존에 제출한 내역 있는지 확인
+        applicationJobtestQueryService.checkSubmittedAt(applicationJobtestId);
 
         // 입장했다면 시험 정보 반환
         JobtestExamQueryDTO examDTO = jobtestQueryService.enterJobtestExam(jobtestId, applicationJobtestId);
