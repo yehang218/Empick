@@ -22,6 +22,7 @@ create table applicant
 )
     comment '지원자 테이블';
 
+
 -- auto-generated definition
 create table application
 (
