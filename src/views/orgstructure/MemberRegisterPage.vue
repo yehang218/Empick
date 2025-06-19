@@ -1,8 +1,16 @@
 <template>
-    <v-container class="py-8" style="max-width: 1100px;">
+    <v-container class="py-8 modern-container" style="max-width: 1200px;">
         <v-row>
             <v-col cols="12">
-                <h2 class="text-h5 font-weight-bold mb-6">신규 사원 정보 등록</h2>
+                <div class="page-header-modern">
+                    <div class="header-icon-wrapper">
+                        <v-icon size="32" class="header-icon">mdi-account-plus-outline</v-icon>
+                    </div>
+                    <div class="header-content">
+                        <h1 class="page-title-modern">신규 사원 정보 등록</h1>
+                        <p class="page-subtitle-modern">지원자 정보를 기반으로 새로운 사원을 등록합니다</p>
+                    </div>
+                </div>
             </v-col>
         </v-row>
 
@@ -21,26 +29,26 @@
 
         <v-row>
             <v-col cols="12">
-                <v-alert v-if="regStore.alertVisible" type="warning" class="mb-4" border="start" variant="tonal"
-                    style="position:fixed;top:24px;right:32px;left:auto;transform:none;z-index:2000;min-width:320px;max-width:90vw;">
+                <v-alert v-if="regStore.alertVisible" type="warning" class="mb-4 modern-alert" border="start"
+                    variant="tonal"
+                    style="position:fixed;top:24px;right:32px;left:auto;transform:none;z-index:2000;min-width:320px;max-width:90vw;backdrop-filter:blur(10px);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.1);">
                     {{ regStore.alertMessage }}
                 </v-alert>
             </v-col>
         </v-row>
 
+        <!-- 네비게이션 (상단으로 이동) -->
+        <ApplicantNavigation v-if="selectedApplicants.length > 1" :selectedApplicants="selectedApplicants"
+            :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
+            @previousApplicant="handlePreviousApplicant" @nextApplicant="handleNextApplicant" />
+
         <!-- 사원 등록 폼 -->
         <MemberRegistrationForm :form="regStore.form" :profileImageUrl="regStore.profileImageUrl"
             :profileImageFile="regStore.profileImageFile" :photoButtonText="regStore.photoButtonText"
             :departments="orgStore.departments" :positions="orgStore.positions" :jobs="orgStore.jobs"
-            :ranks="orgStore.ranks" @profileImageChange="onProfileImageChange" />
-
-        <!-- 네비게이션 -->
-        <ApplicantNavigation :selectedApplicants="selectedApplicants" :currentApplicantIndex="currentApplicantIndex"
-            @previousApplicant="handlePreviousApplicant" @nextApplicant="handleNextApplicant" />
-
-        <!-- 등록 액션 -->
-        <MemberRegisterActions :selectedApplicants="selectedApplicants" :currentApplicantIndex="currentApplicantIndex"
-            :currentApplicant="currentApplicant" @register="onRegister" />
+            :ranks="orgStore.ranks" :selectedApplicants="selectedApplicants"
+            :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
+            @profileImageChange="onProfileImageChange" @register="onRegister" />
 
         <!-- 확인 모달 -->
         <AlertModal v-if="showConfirmDialog" message="입력하신 내용이 모두 삭제됩니다. 정말로 나가시겠습니까?" @confirm="confirmLeave"
@@ -61,7 +69,6 @@ import AlertModal from '@/components/common/AlertModal.vue'
 import ApplicantInfoCard from '@/components/orgstructure/ApplicantInfoCard.vue'
 import MemberRegistrationForm from '@/components/orgstructure/MemberRegistrationForm.vue'
 import ApplicantNavigation from '@/components/orgstructure/ApplicantNavigation.vue'
-import MemberRegisterActions from '@/components/orgstructure/MemberRegisterActions.vue'
 
 const regStore = useMemberRegisterStore()
 const orgStore = useOrganizationStore()
@@ -434,27 +441,269 @@ const cancelLeave = () => {
 </script>
 
 <style scoped>
+/* 모던 컨테이너 */
+.modern-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* 페이지 헤더 - 입체감 줄임 */
+.page-header-modern {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%);
+}
+
+.header-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.header-icon {
+    color: #64748b;
+}
+
+.header-content {
+    flex: 1;
+}
+
+.page-title-modern {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+}
+
+.page-subtitle-modern {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/* 모던 알림 */
+.modern-alert {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #64748b !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 스크롤 영역 개선 */
 .selected-applicants-scroll {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fafafa;
+    border: 1px solid rgba(226, 232, 240, 0.5);
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
 }
 
 .selected-applicant {
-    background-color: #e3f2fd !important;
-    border-left: 4px solid #1976d2;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+    border-left: 4px solid #94a3b8;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 8px;
 }
 
 .selected-applicant:hover {
-    background-color: #bbdefb !important;
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
 .v-list-item {
-    border-radius: 6px;
-    margin-bottom: 4px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(5px);
 }
 
 .v-list-item:hover {
-    background-color: #f5f5f5;
+    background: rgba(248, 250, 252, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 글로벌 카드 스타일 개선 - 입체감 줄임 */
+:deep(.v-card) {
+    border-radius: 16px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    backdrop-filter: blur(10px) !important;
+    overflow: hidden !important;
+}
+
+:deep(.v-card-title) {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.3) !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+    padding: 1.5rem !important;
+}
+
+:deep(.v-card-text) {
+    padding: 1.5rem !important;
+}
+
+/* 버튼 스타일 개선 - 입체감 줄임 */
+:deep(.v-btn) {
+    border-radius: 10px !important;
+    text-transform: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease !important;
+}
+
+:deep(.v-btn:hover) {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+:deep(.v-btn--variant-tonal) {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    color: #64748b !important;
+    border: 1px solid rgba(226, 232, 240, 0.5) !important;
+}
+
+:deep(.v-btn--variant-outlined) {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(226, 232, 240, 0.5) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+/* 칩 스타일 개선 */
+:deep(.v-chip) {
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+    color: #64748b !important;
+    border: 1px solid rgba(226, 232, 240, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+:deep(.v-chip--variant-tonal) {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+}
+
+/* 입력 필드 스타일 개선 */
+:deep(.v-field) {
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.5) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.3s ease !important;
+}
+
+:deep(.v-field:hover) {
+    border-color: rgba(148, 163, 184, 0.5) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+:deep(.v-field--focused) {
+    border-color: #94a3b8 !important;
+    box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.1) !important;
+}
+
+/* 아바타 스타일 개선 */
+:deep(.v-avatar) {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+}
+
+/* 진행 바 스타일 개선 */
+:deep(.v-progress-linear) {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    background: rgba(226, 232, 240, 0.3) !important;
+}
+
+/* 구분선 스타일 개선 */
+:deep(.v-divider) {
+    border-color: rgba(226, 232, 240, 0.3) !important;
+}
+
+/* 리스트 스타일 개선 */
+:deep(.v-list) {
+    background: transparent !important;
+}
+
+/* 체크박스 스타일 개선 */
+:deep(.v-checkbox .v-selection-control__wrapper) {
+    border-radius: 6px !important;
+}
+
+/* 셀렉트 메뉴 스타일 개선 */
+:deep(.v-overlay__content) {
+    border-radius: 16px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(20px) !important;
+}
+
+/* 애니메이션 추가 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.v-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .modern-container {
+        padding: 1rem;
+    }
+
+    .page-header-modern {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .page-title-modern {
+        font-size: 1.5rem;
+    }
 }
 </style>
