@@ -54,14 +54,15 @@
 
             <div class="timeline-content">
                 <div v-for="(day, index) in weekData" :key="index" class="timeline-row">
-                    <!-- 근무시간 바 (출근과 퇴근이 모두 있는 경우만 표시) -->
+                    <!-- 근무시간 바 (출근과 퇴근이 모두 있는 경우) -->
                     <div v-if="day.startTime !== '-' && day.endTime !== '-'" class="work-bar"
                         :style="getWorkBarStyle(day)">
                         <span class="work-label start-label">출근</span>
                         <span class="work-label end-label">퇴근</span>
                     </div>
-                    <!-- 출근만 있는 경우 점으로 표시 -->
-                    <div v-else-if="day.startTime !== '-'" class="work-point" :style="getWorkPointStyle(day)">
+                    <!-- 출근만 있는 경우 현재 시간까지 진행 바로 표시 -->
+                    <div v-else-if="day.startTime !== '-'" class="work-bar ongoing"
+                        :style="getOngoingWorkBarStyle(day)">
                         <span class="work-label start-label">출근</span>
                     </div>
 
@@ -75,6 +76,8 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
 // Props
 defineProps({
     weekData: {
@@ -93,6 +96,27 @@ defineProps({
                 breakTime: true
             }
         ]
+    }
+})
+
+// 현재 시간을 주기적으로 업데이트하기 위한 reactive 변수
+const currentTime = ref(new Date())
+let timeUpdateInterval = null
+
+// 1분마다 현재 시간 업데이트
+onMounted(() => {
+    const updateTime = () => {
+        currentTime.value = new Date()
+    }
+
+    // eslint-disable-next-line no-undef
+    timeUpdateInterval = setInterval(updateTime, 60000) // 1분마다 업데이트
+})
+
+onUnmounted(() => {
+    if (timeUpdateInterval) {
+        // eslint-disable-next-line no-undef
+        clearInterval(timeUpdateInterval)
     }
 })
 
@@ -115,17 +139,36 @@ const getWorkBarStyle = (day) => {
     }
 }
 
-// 출근만 있는 경우 점 스타일 계산
-const getWorkPointStyle = (day) => {
+// 출근만 있는 경우 현재 시간까지 진행 바 스타일 계산
+const getOngoingWorkBarStyle = (day) => {
     if (!day.startTime || day.startTime === '-') {
-        return { left: '0%' }
+        return { left: '0%', width: '0%' }
     }
 
     const startHour = parseFloat(day.startTime.split(':')[0]) + parseFloat(day.startTime.split(':')[1]) / 60
+
+    // 현재 시간 계산 (reactive 변수 사용)
+    const now = currentTime.value
+    const currentHour = now.getHours() + now.getMinutes() / 60
+
+    // 오늘 날짜인지 확인 (진행중인 근무는 오늘만 해당)
+    const today = new Date()
+    const dayNumber = parseInt(day.date)
+    const isToday = today.getDate() === dayNumber
+
+    let endHour = currentHour
+
+    // 오늘이 아니거나 출근 시간이 현재 시간보다 늦으면 출근 시간만 표시
+    if (!isToday || startHour > currentHour) {
+        endHour = startHour + 0.1 // 최소한의 너비로 점처럼 표시
+    }
+
     const left = (startHour / 24) * 100
+    const width = ((endHour - startHour) / 24) * 100
 
     return {
-        left: `${left}%`
+        left: `${left}%`,
+        width: `${Math.max(width, 1)}%` // 최소 1% 너비 보장
     }
 }
 
@@ -306,6 +349,17 @@ defineEmits(['requestApproval', 'editTime'])
                 align-items: center;
                 justify-content: space-between;
                 padding: 0 8px;
+
+                &.ongoing {
+                    background: linear-gradient(90deg, #ff9800 0%, #ffcc80 100%);
+                    animation: pulse 2s ease-in-out infinite alternate;
+
+                    .ongoing-label {
+                        font-size: 11px;
+                        color: white;
+                        font-weight: 600;
+                    }
+                }
             }
 
             .work-point {
@@ -356,6 +410,18 @@ defineEmits(['requestApproval', 'editTime'])
             background: #f44336;
             opacity: 0.6;
         }
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0.8;
+        transform: scaleY(1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scaleY(1.05);
     }
 }
 </style>
