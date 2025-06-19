@@ -74,9 +74,9 @@
         <AlertModal v-if="showConfirmDialog" message="입력하신 내용이 모두 삭제됩니다. 정말로 나가시겠습니까?" @confirm="confirmLeave"
             @cancel="cancelLeave" />
 
-        <!-- 로딩 오버레이 -->
-        <CircleLoading :visible="regStore.loading" :message="loadingMessage" :sub-message="loadingSubMessage"
-            color="#2196F3" :size="90" :width="4" />
+        <!-- 로딩 오버레이 (일괄 등록 중이 아닐 때만 표시) -->
+        <CircleLoading :visible="regStore.loading && !isBulkRegistering" :message="loadingMessage"
+            :sub-message="loadingSubMessage" color="#2196F3" :size="90" :width="4" />
 
 
     </v-container>
@@ -113,6 +113,7 @@ const pendingNavigation = ref(null)
 // 로딩 상태용 메시지
 const loadingMessage = ref('')
 const loadingSubMessage = ref('')
+const isBulkRegistering = ref(false) // 일괄 등록 중인지 확인하는 플래그
 
 // Composables 사용
 const {
@@ -280,9 +281,8 @@ const onBulkRegister = async () => {
         return
     }
 
-    // 일괄 등록 로딩 메시지 설정
-    loadingMessage.value = '일괄 사원 등록 중...'
-    loadingSubMessage.value = `${selectedForRegistration.value.length}명의 지원자를 사원으로 등록하고 있습니다.`
+    // 일괄 등록 모드 활성화 (로딩 UI 비활성화)
+    isBulkRegistering.value = true
 
     // 현재 폼 데이터 저장
     saveCurrentFormData(getCurrentFormData())
@@ -301,8 +301,7 @@ const onBulkRegister = async () => {
         try {
             console.log(`📝 등록 중 (${i + 1}/${selectedForRegistration.value.length}):`, applicant.name)
 
-            // 현재 등록 중인 지원자 정보 업데이트
-            loadingSubMessage.value = `${applicant.name}님 등록 중... (${i + 1}/${selectedForRegistration.value.length})`
+
 
             // 진행 상황 업데이트: 처리 시작
             setRegistrationProgress(applicant.applicantId, 'processing', 10, '등록 준비 중...')
@@ -389,6 +388,11 @@ const onBulkRegister = async () => {
     } else {
         toast.error(`모든 등록이 실패했습니다.\n실패: ${failedApplicants.join(', ')}`)
     }
+
+    // 일괄 등록 완료 후 정리
+    isBulkRegistering.value = false
+    loadingMessage.value = ''
+    loadingSubMessage.value = ''
 
     // 성공한 경우 지원자 목록으로 이동
     if (successCount > 0) {
