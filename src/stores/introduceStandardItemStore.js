@@ -23,9 +23,7 @@ export const useIntroduceStandardItemStore = defineStore('introduceStandardItem'
     async addItem(content) {
       try {
         const memberStore = useMemberStore()
-        console.log('memberStore.user:', memberStore.user)
-        console.log('memberStore.memberId:', memberStore.memberId)
-        const memberId = memberStore.user?.id || memberStore.memberId // 실제 구조에 맞게 조정
+        const memberId = memberStore.user?.id || memberStore.memberId || memberStore.form.id
         if (!memberId) {
           alert('로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.')
           return

@@ -38,13 +38,18 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
+import { useMemberStore } from '@/stores/memberStore'
 
 const store = useIntroduceStandardItemStore()
+const memberStore = useMemberStore()
 const newCriteria = ref('')
 const router = useRouter()
 
-onMounted(() => {
-  store.fetchItems()
+onMounted(async () => {
+  await Promise.all([
+    memberStore.getMyInfo(),
+    store.fetchItems()
+  ])
 })
 
 const items = computed(() => store.items)
