@@ -53,9 +53,10 @@
 
             <!-- 사원 목록 테이블 -->
             <v-card class="mb-4 member-list-card" elevation="0">
-                <v-data-table :headers="tableHeaders" :items="paginatedMembers" :loading="loading" item-key="id"
-                    class="member-table" show-expand v-model:expanded="expanded" @update:sort-by="handleSort"
-                    @click:row="handleRowClick" :items-per-page="-1" hide-default-footer>
+                <v-data-table :headers="tableHeaders" :items="paginatedMembers" :loading="loading"
+                    :loading-text="loadingMessage || '데이터를 불러오는 중...'" item-key="id" class="member-table" show-expand
+                    v-model:expanded="expanded" @update:sort-by="handleSort" @click:row="handleRowClick"
+                    :items-per-page="-1" hide-default-footer>
 
                     <!-- 아바타 + 이름 컬럼 -->
                     <template #item.name="{ item }">
@@ -150,6 +151,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useMemberStore } from '@/stores/memberStore'
+import { useAttendanceStore } from '@/stores/attendanceStore'
 import { useMemberList } from '@/composables/useMemberList'
 import { RoleCode } from '@/constants/common/RoleCode'
 import { TABLE_HEADERS, STATUS_OPTIONS, getStatusClass, getStatusLabel, formatDate } from '@/utils/memberUtils'
@@ -166,30 +168,122 @@ const hasHRAccess = computed(() =>
 
 // 클라이언트 사이드 페이지네이션을 위한 간단한 데이터 로딩
 const memberStore = useMemberStore()
+const attendanceStore = useAttendanceStore()
 const members = ref([])
 const loading = ref(false)
+
+// 사원별 실제 근태 상태 조회
+const enrichMembersWithAttendance = async (memberList) => {
+    console.log('근태 정보 로드 시작:', memberList.length, '명')
+
+    // 배치 크기 설정 (동시에 처리할 사원 수)
+    const batchSize = 5 // 서버 부하를 고려해서 5명씩 처리
+    const batches = []
+
+    for (let i = 0; i < memberList.length; i += batchSize) {
+        batches.push(memberList.slice(i, i + batchSize))
+    }
+
+    console.log('배치 처리:', batches.length, '개 배치')
+
+    // 배치별로 순차 처리 (서버 부하 방지)
+    const allResults = []
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batch = batches[batchIndex]
+        loadingMessage.value = `근태 정보 조회 중... (${batchIndex + 1}/${batches.length})`
+        console.log(`배치 ${batchIndex + 1}/${batches.length} 처리 중...`)
+
+        const batchResults = await Promise.all(
+            batch.map(async (member) => {
+                try {
+                    // 각 사원의 근태 기록 조회
+                    const attendanceRecords = await attendanceStore.fetchMemberAttendanceRecords(member.id, {
+                        silent: true // 에러 시 토스트 표시 안함
+                    })
+
+                    let status = -1 // 기본값: 기록없음
+
+                    if (attendanceRecords && attendanceRecords.length > 0) {
+                        // 오늘 날짜 기준으로 출근 기록 확인
+                        const today = new Date().toISOString().split('T')[0]
+                        const todayRecord = attendanceRecords.find(record => {
+                            const recordDate = new Date(record.checkInTime || record.createdAt).toISOString().split('T')[0]
+                            return recordDate === today
+                        })
+
+                        if (todayRecord) {
+                            // 출근 기록이 있으면 출근 상태
+                            status = 1
+                        } else {
+                            // 기록은 있지만 오늘 출근 기록이 없으면 미출근
+                            status = 0
+                        }
+                    }
+
+                    console.log(`사원 ${member.name}: 상태 ${status} (${status === 1 ? '출근' : status === 0 ? '미출근' : '기록없음'})`)
+
+                    return {
+                        ...member,
+                        status: status
+                    }
+                } catch (error) {
+                    console.warn(`사원 ${member.name}의 근태 정보 조회 실패:`, error)
+                    // API 실패 시 기본값으로 설정 (기록없음)
+                    return {
+                        ...member,
+                        status: -1
+                    }
+                }
+            })
+        )
+
+        allResults.push(...batchResults)
+
+        // 배치 간 약간의 지연 (서버 부하 방지)
+        if (batchIndex < batches.length - 1) {
+            // eslint-disable-next-line no-undef
+            await new Promise(resolve => setTimeout(resolve, 200))
+        }
+    }
+
+    console.log('근태 정보 로드 완료:', allResults.length, '명')
+    return allResults
+}
 
 // 전체 사원 목록 로드
 const loadAllMembers = async () => {
     loading.value = true
+    loadingMessage.value = '사원 데이터를 불러오는 중...'
+
     try {
         // 전체 사원 데이터 로드
+        console.log('사원 데이터 로딩 시작...')
         const allMembers = await memberStore.findMembers()
+        console.log('기본 사원 데이터 로드 완료:', allMembers.length, '명')
 
-        // 사원별로 기본 상태 설정 (근태 정보는 간단하게 처리)
-        const membersWithStatus = allMembers.map(member => ({
-            ...member,
-            status: Math.random() > 0.5 ? 1 : 0 // 임시로 랜덤 상태 설정 (1: 출근, 0: 미출근)
-        }))
+        // 실제 근태 정보와 함께 사원 데이터 보강
+        loadingMessage.value = '근태 정보를 조회하는 중...'
+        console.log('근태 정보 조회 시작...')
+        const membersWithAttendance = await enrichMembersWithAttendance(allMembers)
 
-        members.value = membersWithStatus
-        console.log('전체 사원 데이터 로드 완료:', membersWithStatus.length, '명')
-        console.log('첫 번째 사원 샘플:', membersWithStatus[0])
+        members.value = membersWithAttendance
+        console.log('전체 데이터 로드 완료:', membersWithAttendance.length, '명')
+        console.log('첫 번째 사원 샘플:', membersWithAttendance[0])
+
+        // 상태별 통계
+        const stats = {
+            출근: membersWithAttendance.filter(m => m.status === 1).length,
+            미출근: membersWithAttendance.filter(m => m.status === 0).length,
+            기록없음: membersWithAttendance.filter(m => m.status === -1).length
+        }
+        console.log('사원 상태 통계:', stats)
+
     } catch (error) {
         console.error('사원 데이터 로드 실패:', error)
         members.value = []
     } finally {
         loading.value = false
+        loadingMessage.value = ''
     }
 }
 
@@ -210,6 +304,7 @@ const selectedStatus = ref('전체')
 const expanded = ref([])
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
+const loadingMessage = ref('')
 
 // 상수
 const tableHeaders = TABLE_HEADERS
