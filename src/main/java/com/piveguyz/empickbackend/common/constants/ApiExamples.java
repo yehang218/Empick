@@ -30,12 +30,24 @@ public class ApiExamples {
               "code": 401,
               "message": "인증이 필요합니다.",
             """;
+
+    public static final String ERROR_403_EXAMPLE =
+            """
+            {
+              "success": false,
+              "code": 403,
+              "message": "접근 권한이 없습니다.",
+              "data": null
+            }
+            """;
+
     public static final String ERROR_404_EXAMPLE =
             """
             {
               "success": false,
               "code": 404,
             """;
+
     public static final String ERROR_500_EXAMPLE =
             """
             {
@@ -45,6 +57,7 @@ public class ApiExamples {
               "data": null
             }
             """;
+
     public static final String ERROR_503_EXAMPLE =
             """
             {
@@ -84,5 +97,6 @@ public class ApiExamples {
               "success": false,
               "code": 1001,
               "message": "삭제된 사원 정보입니다."
+            }
             """;
 }
