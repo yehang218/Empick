@@ -19,6 +19,11 @@
         <template v-for="(item, index) in items || []" :key="item.id">
           <v-list-item>
             <v-list-item-title class="item-title-text">{{ item.content }}</v-list-item-title>
+            <template v-slot:append>
+              <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeItem(item.id)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </template>
           </v-list-item>
           <v-divider v-if="index < items.length - 1" inset></v-divider>
         </template>
@@ -62,6 +67,12 @@ const addCriteria = async () => {
 
 const goToCreateStandard = () => {
   router.push('/employment/introduce-standard/create')
+}
+
+const removeItem = async (id) => {
+  if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
+    await store.removeItem(id)
+  }
 }
 </script>
 
