@@ -415,12 +415,24 @@ export const useAttendanceStore = defineStore('attendance', () => {
         return { hours, minutes };
     };
 
+    // 한국 시간(KST)으로 ISO 문자열 생성
+    const getKSTISOString = () => {
+        const now = new Date();
+        // 한국 시간대(UTC+9)로 변환
+        const kstOffset = 9 * 60; // 9시간을 분으로 변환
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000); // UTC 시간
+        const kst = new Date(utc + (kstOffset * 60000)); // KST 시간
+
+        // ISO 형식으로 변환 (타임존 정보 제거)
+        return kst.toISOString().slice(0, 19); // "2024-12-18T10:06:48"
+    };
+
     // 출근 기록 생성
     const createCheckInRecord = async () => {
         const { ATTENDANCE_CONSTANTS } = await import('@/config/attendance');
         const checkInData = {
             attendanceCategoryId: ATTENDANCE_CONSTANTS.CATEGORY_IDS.CHECK_IN,
-            recordTime: new Date().toISOString()
+            recordTime: getKSTISOString()
         };
 
         return await createAttendanceRecord(checkInData);
@@ -431,7 +443,7 @@ export const useAttendanceStore = defineStore('attendance', () => {
         const { ATTENDANCE_CONSTANTS } = await import('@/config/attendance');
         const checkOutData = {
             attendanceCategoryId: ATTENDANCE_CONSTANTS.CATEGORY_IDS.CHECK_OUT,
-            recordTime: new Date().toISOString()
+            recordTime: getKSTISOString()
         };
 
         return await createAttendanceRecord(checkOutData);
