@@ -8,21 +8,11 @@
 
     <v-card>
       <v-list lines="two">
-        <template v-for="(standard, index) in standards" :key="standard.id">
+        <template v-for="(standard, index) in standards || []" :key="standard.id">
           <v-list-item>
             <v-list-item-title class="item-title-text">
-              {{ standard.title }}
-              <span class="text-caption text-grey"> (항목 {{ standard.items.length }}개)</span>
+              {{ standard.content }}
             </v-list-item-title>
-            <v-list-item-subtitle class="text-caption">{{ standard.description }}</v-list-item-subtitle>
-            <template v-slot:append>
-              <v-btn icon size="small" color="info" variant="text" @click="viewDetail(standard.id)">
-                <v-icon>mdi-eye</v-icon>
-              </v-btn>
-              <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeStandard(standard.id)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </template>
           </v-list-item>
           <v-divider v-if="index < standards.length - 1" inset></v-divider>
         </template>
@@ -35,31 +25,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
 
 const router = useRouter()
-const standards = ref([
-  {
-    id: 1,
-    title: '기본 자기소개서 기준표',
-    description: '신입 지원자용 기본 기준표',
-    items: [
-      { id: 1, title: '지원동기' },
-      { id: 2, title: '성장과정' }
-    ]
-  },
-  {
-    id: 2,
-    title: '경력직 기준표',
-    description: '경력직 지원자 평가용',
-    items: [
-      { id: 1, title: '지원동기' },
-      { id: 3, title: '장단점' },
-      { id: 4, title: '입사 후 포부' }
-    ]
-  }
-])
+const store = useIntroduceStandardStore()
+
+onMounted(() => {
+  store.fetchStandards()
+})
+
+const standards = computed(() => store.standards)
 
 function goToCreate() {
   router.push('/employment/introduce-standard/create')
@@ -72,7 +49,8 @@ function viewDetail(id) {
 
 function removeStandard(id) {
   if (confirm('정말로 이 기준표를 삭제하시겠습니까?')) {
-    standards.value = standards.value.filter(s => s.id !== id)
+    // 실제 삭제 API 연동 필요. 임시로 프론트에서만 제거
+    store.standards = store.standards.filter(s => s.id !== id)
   }
 }
 </script>

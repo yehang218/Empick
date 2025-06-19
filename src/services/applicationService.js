@@ -1,4 +1,4 @@
-import api from '@/apis/apiClient';
+
 import { ApplicationAPI } from '@/apis/routes/application';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import ApplicationResponseDTO from '@/dto/employment/application/applicationResponeDTO';
