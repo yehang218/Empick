@@ -23,7 +23,10 @@
         </v-row>
 
         <!-- 지원자 테이블 -->
-        <jobtest-applicant-table :applications="jobtest.applications" />
+        <jobtest-applicant-table
+            :applications="jobtest.applications"
+            @select="goToJobtestAnswers"
+        />
     </v-container>
 
     <!-- 에러 발생 시 -->
@@ -59,5 +62,12 @@ const error = computed(() => jobtestDetailStore.error)
 
 const goJobtestList = () => {
     router.push({ name: 'JobtestList' });
+}
+
+const goToJobtestAnswers = (applicationJobtestId) => {
+    router.push({ 
+        name: 'JobtestAnswerDetail',
+        params: { applicationJobtestId }
+    });
 }
 </script>
