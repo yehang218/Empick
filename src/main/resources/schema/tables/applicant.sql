@@ -30,7 +30,7 @@ create table application
         primary key,
     recruitment_id             int      not null comment '채용 공고 id',
     created_at                 datetime not null comment '작성일자',
-    status                     tinyint  not null comment '처리상태: 0(서류제외대기중), 1(서류합격), 2(실무합격), 3(1차면접합격), 4(2차면접합격), 5(최종합격), 6(불합격)',
+    status                     tinyint  not null comment '처리상태: 0(확인전), 1(서류합격), 2(실무합격), 3(면접합격), 4(최종합격), 5(불합격)',
     applicant_id               int      not null comment '지원자 id',
     introduce_rating_result_id int      null comment '자기소개서 평가 결과 id',
     updated_at                 datetime null on update current_timestamp() comment '수정시각',
