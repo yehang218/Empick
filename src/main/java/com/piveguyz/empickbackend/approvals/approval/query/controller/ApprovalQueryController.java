@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.approvals.approval.query.controller;
 
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.service.ApprovalQueryService;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
@@ -57,10 +58,10 @@ public class ApprovalQueryController {
 
 	// 자신이 결재자인 결재문서 목록
 	@GetMapping("/received")
-	public ResponseEntity<CustomApiResponse<List<ApprovalQueryDTO>>> findReceivedApprovals(
+	public ResponseEntity<CustomApiResponse<List<ApprovalReceivedQueryDTO>>> findReceivedApprovals(
 		@RequestParam("memberId") Integer memberId) {
 
-		List<ApprovalQueryDTO> dtoList = service.findReceivedApprovals(memberId);
+		List<ApprovalReceivedQueryDTO> dtoList = service.findReceivedApprovals(memberId);
 		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
 			.body(CustomApiResponse.of(ResponseCode.SUCCESS, dtoList));
 	}
