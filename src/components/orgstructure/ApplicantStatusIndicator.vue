@@ -27,16 +27,14 @@ defineProps({
 
 // 상태 관련 메서드들
 const getStatusClass = (applicant) => {
-    const status = applicant.status || applicant.recruitmentStatus
+    const status = applicant?.status || applicant?.recruitmentStatus
 
     switch (status) {
-        case '서류합격':
-        case 'DOCUMENT_PASS':
+        case 'PASSED_DOCS':
             return 'status-document-pass'
-        case '2차합격':
-        case 'SECOND_PASS':
+        case 'PASSED_INTERVIEW_2':
+        case 'PASSED_FINAL':
             return 'status-second-pass'
-        case '대기중':
         case 'WAITING':
             return 'status-waiting'
         default:
@@ -45,16 +43,14 @@ const getStatusClass = (applicant) => {
 }
 
 const getStatusIcon = (applicant) => {
-    const status = applicant.status || applicant.recruitmentStatus
+    const status = applicant?.status || applicant?.recruitmentStatus
 
     switch (status) {
-        case '서류합격':
-        case 'DOCUMENT_PASS':
+        case 'PASSED_DOCS':
             return 'mdi-file-check'
-        case '2차합격':
-        case 'SECOND_PASS':
+        case 'PASSED_INTERVIEW_2':
+        case 'PASSED_FINAL':
             return 'mdi-check-all'
-        case '대기중':
         case 'WAITING':
             return 'mdi-clock-outline'
         default:
@@ -63,16 +59,15 @@ const getStatusIcon = (applicant) => {
 }
 
 const getStatusText = (applicant) => {
-    const status = applicant.status || applicant.recruitmentStatus
+    const status = applicant?.status || applicant?.recruitmentStatus
 
     switch (status) {
-        case '서류합격':
-        case 'DOCUMENT_PASS':
+        case 'PASSED_DOCS':
             return '서류합격'
-        case '2차합격':
-        case 'SECOND_PASS':
+        case 'PASSED_INTERVIEW_2':
             return '2차합격'
-        case '대기중':
+        case 'PASSED_FINAL':
+            return '최종합격'
         case 'WAITING':
             return '대기중'
         default:
