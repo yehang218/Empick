@@ -20,15 +20,17 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Header from '@/components/common/Header.vue';
 import Sidebar from '@/components/common/MainSidebar.vue';
 import { useAuthStore } from '@/stores/authStore';
+import { useMemberStore } from '@/stores/memberStore';
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const memberStore = useMemberStore()
 const isReady = ref(false);
 
 const showHeader = computed(() => !route.meta.hideHeader);
@@ -39,12 +41,29 @@ onMounted(async () => {
   await router.isReady();
   isReady.value = true;
 });
+
+watch(
+  () => authStore.isAuthenticated,
+  async (isAuth) => {
+    if (isAuth) {
+      try {
+        await memberStore.getMyInfo();
+      } catch (e) {
+        console.error('멤버 정보 조회 실패', e);
+      }
+    } else {
+      memberStore.reset();
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
 .layout-wrapper {
   display: flex;
-  margin-top: 70px; /* 헤더 높이만큼 */
+  margin-top: 70px;
+  /* 헤더 높이만큼 */
 }
 
 .custom-sidebar {

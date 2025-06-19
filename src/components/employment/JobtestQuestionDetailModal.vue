@@ -36,14 +36,15 @@
 
 
       <!-- 선지 -->
-      <v-card v-if="question.options?.length" class="mb-4" variant="tonal">
+      <v-card v-if="question.type === 'MULTIPLE' && question.questionOptions?.length" class="mb-4" variant="tonal">
         <v-card-title>선택지</v-card-title>
         <v-list>
-          <v-list-item v-for="(opt, i) in question.options" :key="i">
+          <v-list-item v-for="(opt, i) in question.questionOptions" :key="i">
             <v-list-item-title>
               {{ opt.optionNumber ? `${opt.optionNumber}. ` : '' }}{{ opt.content }}
-              <span v-if="question.answer === opt.content" class="text-success font-weight-bold">
-                <v-icon v-if="question.answer === opt.content" color="green" size="small" class="ml-1">mdi-check-circle</v-icon>
+              <span v-if="question.answer?.trim() === opt.content?.trim()" class="text-success font-weight-bold">
+                <v-icon v-if="question.answer === opt.content" color="green" size="small"
+                  class="ml-1">mdi-check-circle</v-icon>
               </span>
             </v-list-item-title>
           </v-list-item>
@@ -84,45 +85,84 @@
 
       <v-card-actions class="justify-end">
         <v-btn text @click="closeModal">닫기</v-btn>
+        <v-btn color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteConfirm">
+          삭제하기
+        </v-btn>
+        <v-btn color="primary" variant="tonal" @click="goEditPage" prepend-icon="mdi-pencil">
+          수정하기
+        </v-btn>
       </v-card-actions>
     </v-card>
+    <AlertModal v-if="showDeleteConfirm" :message="'정말 이 문제를 삭제하시겠습니까? 복구할 수 없습니다.'" @confirm="confirmDelete"
+      @cancel="showDeleteConfirm = false" />
   </v-dialog>
+
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { useRouter } from 'vue-router'
+import { ref, defineProps, defineEmits } from 'vue'
+import { useToast } from 'vue-toastification'
+
+import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
+
+import { getQuestionTypeLabel } from '@/constants/employment/questionTypes'
+import { getDifficultyLabel } from '@/constants/employment/difficulty'
+import AlertModal from '@/components/common/AlertModal.vue'
+
+const jobtestQuestionStore = useJobtestQuestionStore()
+
+const toast = useToast()
+const showDeleteConfirm = ref(false)
 
 const props = defineProps({
   modelValue: Boolean,
   question: Object
 })
+const router = useRouter()
 const emit = defineEmits(['update:modelValue'])
 
 function closeModal() {
-  emit('update:modelValue', false)
+  emit('update:modelValue', false);
 }
 
-function getQuestionTypeLabel(type) {
-  return {
-    MULTIPLE: '선택형',
-    SUBJECTIVE: '단답형',
-    DESCRIPTIVE: '서술형'
-  }[type] || type
+function handleDeleteConfirm() {
+  showDeleteConfirm.value = true
 }
 
-function getDifficultyLabel(difficulty) {
-  return {
-    EASY: '쉬움',
-    MEDIUM: '보통',
-    HARD: '어려움'
-  }[difficulty] || difficulty
+async function confirmDelete() {
+  try {
+    if (!props.question?.id) return;
+
+    await jobtestQuestionStore.deleteQuestion(props.question.id, props.question.type);
+
+    toast.success('문제가 성공적으로 삭제되었습니다.');
+    closeModal();
+  } catch (err) {
+
+  } finally {
+    showDeleteConfirm.value = false;
+  }
+}
+
+function goEditPage() {
+  if (props.question?.id) {
+    emit('update:modelValue', false);
+    router.push({ name: 'JobtestQuestionEdit', params: { id: props.question.id } })
+  }
 }
 
 function formatDate(dateStr) {
   if (!dateStr) return '-'
   const date = new Date(dateStr)
-  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+  const yyyy = date.getFullYear()
+  const MM = String(date.getMonth() + 1).padStart(2, '0')
+  const dd = String(date.getDate()).padStart(2, '0')
+  const HH = String(date.getHours()).padStart(2, '0')
+  const mm = String(date.getMinutes()).padStart(2, '0')
+  return `${yyyy}-${MM}-${dd} ${HH}:${mm}`
 }
+
 </script>
 
 <style scoped>

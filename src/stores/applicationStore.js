@@ -88,6 +88,6 @@ export const useApplicationStore = defineStore('application', () => {
     createApplication,
     updateApplicationStatus,
     deleteApplication,
-    createApplicationResponse
+    createApplicationResponse,
   };
 });

@@ -33,6 +33,7 @@ export const fetchRecruitmentDetail = async (id, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400)
         }
         
+
         return RecruitmentDetailResponseDTO.fromJSON(apiResponse.data)
     }, options) ?? {};
 }

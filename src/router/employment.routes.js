@@ -14,7 +14,16 @@ export const employmentRoutes = [
     {
         path: '/employment/jobtest-questions/create',
         name: 'JobtestQuestionCreate',
-        component: () => import('@/views/employment/JobtestQuestionCreatePage.vue'),
+        component: () => import('@/views/employment/JobtestQuestionFormPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    // 실무테스트 문제 수정 페이지
+    {
+        path: '/employment/jobtest-questions/:id/edit',
+        name: 'JobtestQuestionEdit',
+        component: () => import('@/views/employment/JobtestQuestionFormPage.vue'),
         meta: {
             requiresAuth: true
         }
@@ -217,4 +226,71 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
-]; 
+
+    // 채용공고별 지원자 목록 페이지
+    {
+        path: '/employment/applicant/recruitments/:recruitmentId',
+        name: 'ApplicantRecruitmentPage',
+        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
+
+    },
+
+    // 채용공고별 지원자 목록 페이지
+    {
+        path: '/employment/applicant/recruitments/:recruitmentId',
+        name: 'ApplicantRecruitmentPage',
+        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+
+        // 지원자 인적사항 등록 페이지
+        {
+            path: '/applicants/register',
+            name: 'ApplicantRegistrationPage',
+            component: () => import('@/views/employment/ApplicantRegistrationPage.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        // 자기소개서 템플릿
+        {
+            path: '/employment/introduce-standard-items/:templateId',
+            name: 'IntroduceStandardItemPage',
+            component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
+            props: true
+        },
+
+        {
+            path: '/employment/introduce-templates',
+            name: 'IntroduceTemplateListPage',
+            component: () => import('@/views/employment/IntroduceTemplateListPage.vue')
+        },
+        {
+            path: '/employment/introduce-templates/create',
+            name: 'IntroduceTemplateCreatePage',
+            component: () => import('@/views/employment/IntroduceTemplateCreatePage.vue')
+        },
+        {
+            path: '/employment/introduce-templates/:id',
+            name: 'IntroduceTemplateDetailPage',
+            component: () => import('@/views/employment/IntroduceTemplateDetailPage.vue')
+        },
+        {
+            path: '/employment/introduce-items/manage',
+            name: 'IntroduceStandardItemManagePage',
+            component: () => import('@/views/employment/IntroduceStandardItemManagePage.vue')
+        },
+
+
+    // 채용공고별 지원자 목록 페이지
+    {
+        path: '/employment/applicant/recruitments/:recruitmentId',
+        name: 'ApplicantRecruitmentPage',
+        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    }
+];

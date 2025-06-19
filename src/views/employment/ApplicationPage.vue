@@ -37,6 +37,7 @@
               <v-avatar size="80" class="mr-4">
                 <v-img :src="applicant.profileUrl" alt="프로필 사진" />
               </v-avatar>
+
               <div class="flex-grow-1">
                 <h2 class="text-h5 font-weight-bold mb-1">{{ applicant.name }}</h2>
                 <p class="text-body-2 text-grey mb-2">{{ applicant.jobName || '백엔드 개발자' }}</p>
@@ -197,6 +198,10 @@
         </v-card>
       </v-col>
 
+
+      // <!-- 우측: 평가 컴포넌트 -->
+      // <v-col cols="12" md="6">
+      // <component :is="evaluationComponent" :evaluationData="introduceEvaluationData" />
       <!-- 우측: 평가 상세 -->
       <v-col cols="12" lg="7">
         <v-card class="modern-card evaluation-detail-card">
@@ -281,15 +286,23 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+
 import { useRoute, useRouter } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
-// import InterviewResult from '@/components/employment/InterviewResult.vue'
-// import TestResult from '@/components/employment/TestResult.vue'
+import { useApplicationStore } from '@/stores/applicationStore'
+import { useToast } from 'vue-toastification'
+import apiClient from '@/apis/apiClient' // 직접 axios 호출을 위해 임포트
+
+const route = useRoute()
+const applicationStore = useApplicationStore()
+const toast = useToast()
+const applicationId = Number(route.params.id)
 
 const route = useRoute()
 const router = useRouter()
 
 const evaluationComponent = ref(IntroduceResult)
+
 const selectedEvaluation = ref('자기소개서')
 const viewMode = ref('detail')
 
@@ -425,6 +438,14 @@ const selectEvaluation = (type) => {
     case '자기소개서':
       evaluationComponent.value = IntroduceResult
       break
+
+    // case '실무 테스트':
+    //   evaluationComponent.value = () => import('@/components/employment/TestResult.vue')
+    //   break
+    // case '면접':
+    //   evaluationComponent.value = () => import('@/components/employment/InterviewResult.vue')
+    //   break
+
     case '실무 테스트':
       // evaluationComponent.value = TestResult
       break
@@ -436,6 +457,7 @@ const selectEvaluation = (type) => {
   }
 }
 
+
 const getCurrentEvaluation = () => {
   return applicant.value.evaluationStats.find(evaluation => evaluation.type === selectedEvaluation.value)
 }
@@ -444,6 +466,7 @@ const getSkillsArray = () => {
   if (!applicant.value.skills) return ['정보 없음']
   return applicant.value.skills.split(/[,،、]\s*/).filter(skill => skill.trim())
 }
+
 
 const getExperiencePreview = () => {
   if (!applicant.value.experience) return '경력 정보 없음'
@@ -493,6 +516,12 @@ const updateStatus = () => {
 
 const goBack = () => {
   // 뒤로가기 또는 목록으로 이동
-  router.push('/employment/applicant')
+  const from = route.query.from;
+  const page = route.query.page;
+  if (from) {
+    router.push(page ? { path: from, query: { page } } : { path: from });
+  } else {
+    router.push('/employment/applicant');
+  }
 }
 </script>

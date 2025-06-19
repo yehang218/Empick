@@ -2,8 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { authRoutes } from './auth.routes';
 import { employmentRoutes } from './employment.routes';
 import { orgstructureRoutes } from './orgstructure.routes';
-import { approvalRoutes } from './approval.routes';
 import { testRoutes } from './test.routes';
+import { approvalRoutes } from './approval.routes';
 import { authGuard } from './middleware/auth.guard';
 import { careerRoutes } from './career.routes';
 
@@ -36,8 +36,7 @@ const routes = [
             requiresAuth: true
         }
     },
-    ...allRouteModules,
-    ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
+    ...allRouteModules
 ];
 
 const router = createRouter({
