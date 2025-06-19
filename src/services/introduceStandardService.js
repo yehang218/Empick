@@ -7,3 +7,7 @@ export const fetchIntroduceStandards = async () => {
   if (Array.isArray(response.data?.data)) return response.data.data
   return []
 }
+
+export const deleteIntroduceStandard = async (id) => {
+  return apiClient.delete(IntroduceAPI.DELETE_STANDARD(id))
+}

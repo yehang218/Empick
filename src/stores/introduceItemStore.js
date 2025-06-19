@@ -9,8 +9,9 @@ export const useIntroduceItemStore = defineStore('introduceItem', {
     async loadItems() {
       this.items = await fetchItems()
     },
-    async addItem(content, memberId) {
-      const newItem = await createItem({ content, memberId })
+    async addItem(content) {
+      const memberId = 1
+      const newItem = await createItem(content, memberId)
       this.items.push(newItem)
     },
     async removeItem(id) {

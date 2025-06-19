@@ -16,18 +16,13 @@
 
     <v-card>
       <v-list lines="two">
-        <template v-for="(item, index) in criteriaList" :key="item.id">
+        <template v-for="(item, index) in items || []" :key="item.id">
           <v-list-item>
-            <v-list-item-title class="item-title-text">{{ item.title }}</v-list-item-title>
-            <template v-slot:append>
-              <v-btn icon @click="removeCriteria(item.id)" size="small" color="red-darken-2" variant="text">
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-            </template>
+            <v-list-item-title class="item-title-text">{{ item.content }}</v-list-item-title>
           </v-list-item>
-          <v-divider v-if="index < criteriaList.length - 1" inset></v-divider>
+          <v-divider v-if="index < items.length - 1" inset></v-divider>
         </template>
-        <v-list-item v-if="criteriaList.length === 0">
+        <v-list-item v-if="items.length === 0">
           <v-list-item-title>등록된 기준표 항목이 없습니다.</v-list-item-title>
         </v-list-item>
       </v-list>
@@ -40,38 +35,28 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-// 실제로는 기준표 항목용 store를 만들어야 함. 임시로 itemStore 구조 복사
-// import { useIntroduceCriteriaStore } from '@/stores/introduceCriteriaStore'
+import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 
-// 임시 데이터 및 함수
-const criteriaList = ref([])
+const store = useIntroduceStandardItemStore()
 const newCriteria = ref('')
 const router = useRouter()
 
-const loadCriteria = async () => {
-  // 실제로는 store에서 불러와야 함
-  // await introduceCriteriaStore.loadCriteria()
-  // criteriaList.value = introduceCriteriaStore.items
-}
-onMounted(loadCriteria)
+onMounted(() => {
+  store.fetchItems()
+})
+
+const items = computed(() => store.items)
 
 const addCriteria = async () => {
   if (!newCriteria.value.trim()) return
-  // 실제로는 store에 추가
-  // await introduceCriteriaStore.addCriteria(newCriteria.value, 1)
-  criteriaList.value.push({ id: Date.now(), title: newCriteria.value })
+  await store.addItem(newCriteria.value)
   newCriteria.value = ''
 }
 
 const goToCreateStandard = () => {
   router.push('/employment/introduce-standard/create')
-}
-
-const removeCriteria = async (id) => {
-  // 실제로는 store에서 삭제
-  criteriaList.value = criteriaList.value.filter(item => item.id !== id)
 }
 </script>
 

@@ -34,9 +34,15 @@ export const useMemberStore = defineStore('member', {
         loading: false,
         error: '',
         profileImageUrl: '',
-        defaultProfileImageUrl: '/images/default-profile.png'
+        defaultProfileImageUrl: '/images/default-profile.png',
+        user: null,
+        memberId: null,
     }),
     actions: {
+        setUser(user) {
+            this.user = user;
+            this.memberId = user?.id || null;
+        },
         reset() {
             this.form = {
                 id: null,

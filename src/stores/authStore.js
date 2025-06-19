@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 
 export const useAuthStore = defineStore('auth', () => {
     const router = useRouter();
+    const memberStore = useMemberStore();
 
     // 상태 정의
     const isAuthenticated = ref(false);
@@ -45,16 +46,18 @@ export const useAuthStore = defineStore('auth', () => {
 
             console.log("roles : " + roles);
             console.log('response.user', response.user);
-console.log('decoded.roles', decoded.roles);
-console.log('userInfo.value (최종)', userInfo.value);
+            console.log('decoded.roles', decoded.roles);
+            console.log('userInfo.value (최종)', userInfo.value);
 
             if (response.user) {
                 userInfo.value = {
                     ...response.user, // ...user 뒤에
                     roles             // roles를 마지막에 덮어쓰기!
                 };
+                memberStore.setUser(response.user);
             } else {
                 userInfo.value = { roles };
+                memberStore.setUser(null);
             }
 
             console.log('로그인 성공, 토큰 저장 완료');
@@ -68,6 +71,7 @@ console.log('userInfo.value (최종)', userInfo.value);
             accessToken.value = '';
             refreshToken.value = '';
             userInfo.value = null;
+            memberStore.setUser(null);
         } finally {
             loading.value = false;
         }

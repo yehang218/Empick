@@ -13,6 +13,11 @@
             <v-list-item-title class="item-title-text">
               {{ standard.content }}
             </v-list-item-title>
+            <template v-slot:append>
+              <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeStandard(standard.id)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </template>
           </v-list-item>
           <v-divider v-if="index < standards.length - 1" inset></v-divider>
         </template>
@@ -28,6 +33,7 @@
 import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
+import { deleteIntroduceStandard } from '@/services/introduceStandardService'
 
 const router = useRouter()
 const store = useIntroduceStandardStore()
@@ -42,15 +48,14 @@ function goToCreate() {
   router.push('/employment/introduce-standard/create')
 }
 
-function viewDetail(id) {
-  // 상세 페이지로 이동 (추후 구현)
-  alert('상세보기: ' + id)
-}
-
-function removeStandard(id) {
+async function removeStandard(id) {
   if (confirm('정말로 이 기준표를 삭제하시겠습니까?')) {
-    // 실제 삭제 API 연동 필요. 임시로 프론트에서만 제거
-    store.standards = store.standards.filter(s => s.id !== id)
+    try {
+      await deleteIntroduceStandard(id)
+      await store.fetchStandards()
+    } catch (e) {
+      alert('삭제에 실패했습니다.')
+    }
   }
 }
 </script>

@@ -27,7 +27,7 @@
               <template v-slot:prepend>
                 <v-checkbox v-model="selectedItemIds" :value="item.id" hide-details density="compact" />
               </template>
-              <v-list-item-title class="item-title-text">{{ item.title }}</v-list-item-title>
+              <v-list-item-title class="item-title-text">{{ item.content }}</v-list-item-title>
             </v-list-item>
             <v-divider v-if="index < items.length - 1" inset></v-divider>
           </template>
@@ -49,16 +49,13 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-// 실제로는 기준표 store와 항목 store를 만들어야 함. 임시로 itemStore 구조 복사
-// import { useStandardCriteriaStore } from '@/stores/standardCriteriaStore'
-// import { useStandardItemStore } from '@/stores/standardItemStore'
+import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 
 const router = useRouter()
-// const standardCriteriaStore = useStandardCriteriaStore()
-// const standardItemStore = useStandardItemStore()
+const standardItemStore = useIntroduceStandardItemStore()
 
 const title = ref('')
-const items = ref([]) // 실제로는 computed(() => standardItemStore.items)
+const items = computed(() => standardItemStore.items)
 const selectedItemIds = ref([])
 
 function goToManage() {
@@ -70,16 +67,7 @@ function goToCriteriaList() {
 }
 
 onMounted(async () => {
-  // 실제로는 store에서 불러와야 함
-  // await standardItemStore.loadItems()
-  // items.value = standardItemStore.items
-  // 임시 데이터
-  items.value = [
-    { id: 1, title: '지원동기' },
-    { id: 2, title: '성장과정' },
-    { id: 3, title: '장단점' },
-    { id: 4, title: '입사 후 포부' }
-  ]
+  await standardItemStore.fetchItems()
 })
 
 const submit = async () => {
