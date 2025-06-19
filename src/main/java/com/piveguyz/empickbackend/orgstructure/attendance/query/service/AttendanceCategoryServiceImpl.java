@@ -1,4 +1,4 @@
-package com.piveguyz.empickbackend.orgstructure.attendance.query.service.impl;
+package com.piveguyz.empickbackend.orgstructure.attendance.query.service;
 
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;

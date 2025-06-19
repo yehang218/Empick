@@ -6,6 +6,8 @@ import com.piveguyz.empickbackend.employment.interviews.interviewer.command.appl
 public interface InterviewerCommandService {
     InterviewerCommandDTO createInterviewer(InterviewerCommandDTO dto);
 
+    InterviewerCommandDTO updateInterviewerScore(Integer id, Double score);
+
     InterviewerCommandDTO updateInterviewerReview(Integer id, String review);
 
     InterviewerCommandDTO deleteInterviewer(Integer id);

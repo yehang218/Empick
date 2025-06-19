@@ -59,7 +59,7 @@ public class InterviewCommandController {
     @PatchMapping("/{id}")
     public ResponseEntity<CustomApiResponse<InterviewCommandDTO>> update(@PathVariable("id") Integer id,
                                                                          @RequestBody InterviewCommandDTO dto) {
-        InterviewCommandDTO updatedDTO = service.update(id, dto);
+        InterviewCommandDTO updatedDTO = facade.updateInterview(id, dto);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, updatedDTO));
@@ -70,7 +70,7 @@ public class InterviewCommandController {
                                                                                  @RequestParam("datetime")
                                                                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
                                                                                  LocalDateTime datetime){
-        InterviewCommandDTO updatedDTO = service.updateDateTime(id, datetime);
+        InterviewCommandDTO updatedDTO = facade.updateDateTime(id, datetime);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, updatedDTO));

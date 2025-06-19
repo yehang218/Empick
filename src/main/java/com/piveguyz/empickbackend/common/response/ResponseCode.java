@@ -217,24 +217,31 @@ public enum ResponseCode {
 
     //  면접 - 2500 ~ 2599
     EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2500, "존재하지 않는 면접 기준입니다."),
+
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2510, "내용을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_DETAIL_CONTENT(false, HttpStatus.BAD_REQUEST, 2511, "상세 내용을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_DUPLICATE_CONTENT(false, HttpStatus.BAD_REQUEST, 2512, "이미 존재하는 내용입니다."),
+
     EMPLOYMENT_INTERVIEW_SHEET_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2520, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SHEET_NO_NAME(false, HttpStatus.BAD_REQUEST, 2521, "이름을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SHEET_DUPLICATE_NAME(false, HttpStatus.CONFLICT, 2522, "중복된 이름이 존재합니다."),
+
     EMPLOYMENT_INTERVIEW_SHEET_ITEM_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2530, "존재하지 않는 항목입니다."),
     EMPLOYMENT_INTERVIEW_SHEET_ITEM_DUPLICATE(false, HttpStatus.BAD_REQUEST, 2531, "이미 존재하는 항목입니다."),
+
     EMPLOYMENT_INTERVIEW_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2540, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_NO_SHEET(false, HttpStatus.BAD_REQUEST, 2541, "평가표가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_DATE(false, HttpStatus.BAD_REQUEST, 2542, "날짜가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_ADDRESS(false, HttpStatus.BAD_REQUEST, 2543, "주소가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_IMPOSSIBLE_TIME(false, HttpStatus.BAD_REQUEST, 2544, "불가능한 시간입니다."),
+    EMPLOYMENT_INTERVIEW_AlREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2545, "이미 면접 정보가 존재합니다."),
+
     EMPLOYMENT_INTERVIEW_SCORE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2550, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE(false, HttpStatus.BAD_REQUEST, 2551, "점수를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_REVIEW(false, HttpStatus.BAD_REQUEST, 2552, "평가를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_ITEM(false, HttpStatus.BAD_REQUEST, 2553, "해당하는 평가 항목이 존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2554, "이미 평가 점수가 등록되어 있습니다."),
+
     EMPLOYMENT_INTERVIEWER_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2560, "이미 해당 면접 담당자가 존재합니다."),
     EMPLOYMENT_INTERVIEWER_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2561, "해당 면접 담당자가 존재하지 않습니다."),
     EMPLOYMENT_INTERVIEWER_ALREADY_SCORE_INPUT(false, HttpStatus.BAD_REQUEST, 2562, "면접 담당자가 이미 점수를 입력하였습니다."),
@@ -270,8 +277,10 @@ public enum ResponseCode {
     APPROVAL_ALREADY_CANCELED(false, HttpStatus.BAD_REQUEST, 3010, "이미 결재 취소된 문서입니다."),
     APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3011, "결재 차례가 아닙니다."),
     APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3012, "반려 사유가 필요합니다."),
-    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다.");
-
+    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다."),
+    APPROVAL_LINE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 3014, "결재 라인이 존재하지 않습니다.\n관리자에게 문의하세요."),
+    APPROVAL_CATEGORY_MISSING(false, HttpStatus.BAD_REQUEST, 3015, "결재 유형이 존재하지 않습니다."),
+    APPROVAL_WRITER_MISSING(false, HttpStatus.BAD_REQUEST, 3016, "결재 요청자가 존재하지 않습니다.");
 
 
     private final boolean success;
