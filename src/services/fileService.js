@@ -1,6 +1,6 @@
 import { FileAPI } from '@/apis/routes/file';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
-import { throwCustomApiError } from '@/utils/errorHandler';
+import { throwCustomApiError, withErrorHandling } from '@/utils/errorHandler';
 
 /**
  * 파일 업로드 서비스
@@ -10,7 +10,7 @@ import { throwCustomApiError } from '@/utils/errorHandler';
  * @returns {Promise<Object>} 업로드 결과 (url 등)
  */
 export const uploadFileService = async (file, prefix = '', fileName = 'profile.png') => {
-    try {
+    return withErrorHandling(async () => {
         const formData = new FormData();
         formData.append('file', file);
         if (prefix) formData.append('prefix', prefix);
@@ -19,29 +19,23 @@ export const uploadFileService = async (file, prefix = '', fileName = 'profile.p
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         return apiResponse.data;
-    } catch (error) {
-        throw error;
-    }
+    });
 };
 
 export const getFileUrl = async (fileId) => {
-    try {
+    return withErrorHandling(async () => {
         const response = await FileAPI.getFileUrl(fileId);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         return apiResponse.data;
-    } catch (error) {
-        throw error;
-    }
+    });
 };
 
 export const deleteFile = async (fileId) => {
-    try {
+    return withErrorHandling(async () => {
         const response = await FileAPI.deleteFile(fileId);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         return apiResponse.data;
-    } catch (error) {
-        throw error;
-    }
+    });
 }; 

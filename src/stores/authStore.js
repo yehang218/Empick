@@ -3,6 +3,8 @@ import { ref } from 'vue';
 import { loginService, logoutService } from '@/services/authService';
 import { useRouter } from 'vue-router';
 import { useMemberStore } from '@/stores/memberStore'
+import { useAttendanceStore } from '@/stores/attendanceStore'
+import { setLoggingOut } from '@/utils/errorHandler';
 
 import { jwtDecode } from 'jwt-decode';
 
@@ -45,8 +47,8 @@ export const useAuthStore = defineStore('auth', () => {
 
             console.log("roles : " + roles);
             console.log('response.user', response.user);
-console.log('decoded.roles', decoded.roles);
-console.log('userInfo.value (최종)', userInfo.value);
+            console.log('decoded.roles', decoded.roles);
+            console.log('userInfo.value (최종)', userInfo.value);
 
             if (response.user) {
                 userInfo.value = {
@@ -58,6 +60,9 @@ console.log('userInfo.value (최종)', userInfo.value);
             }
 
             console.log('로그인 성공, 토큰 저장 완료');
+
+            // 새 사용자 로그인 시 이전 데이터 초기화
+            useAttendanceStore().resetAllData();
 
             // 로그인 성공 후 대시보드로 이동
             router.push('/dashboard');
@@ -75,6 +80,9 @@ console.log('userInfo.value (최종)', userInfo.value);
 
     // 로그아웃 액션
     const logout = async () => {
+        // 로그아웃 시작 플래그 설정
+        setLoggingOut(true);
+
         loading.value = true;
         error.value = null;
 
@@ -87,7 +95,9 @@ console.log('userInfo.value (최종)', userInfo.value);
             refreshToken.value = '';
             userInfo.value = null;
 
+            // 모든 스토어 초기화
             useMemberStore().reset();
+            useAttendanceStore().resetAllData();
 
             // 로그아웃 후 로그인 페이지로 이동
             router.push('/login');
@@ -95,6 +105,8 @@ console.log('userInfo.value (최종)', userInfo.value);
             error.value = err?.response?.data?.message || '로그아웃 중 오류가 발생했습니다.';
         } finally {
             loading.value = false;
+            // 로그아웃 완료 플래그 해제
+            setLoggingOut(false);
         }
     };
 

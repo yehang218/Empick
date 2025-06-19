@@ -62,9 +62,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useAuthStore } from '@/stores/authStore';
-
-const authStore = useAuthStore();
 
 // 임시 데이터
 const attendanceStatus = ref('정상 출근');

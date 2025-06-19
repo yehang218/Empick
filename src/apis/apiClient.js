@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
+import { setLoggingOut } from '@/utils/errorHandler';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -64,13 +65,21 @@ api.interceptors.response.use(
                 const { accessToken, refreshToken } = response.data;
 
                 // 새 토큰 저장
-                authStore.setTokens(accessToken, refreshToken);
+                authStore.accessToken = accessToken;
+                authStore.refreshToken = refreshToken;
+
+                // 로컬 스토리지에도 저장
+                localStorage.setItem('auth_tokens', JSON.stringify({
+                    accessToken,
+                    refreshToken
+                }));
 
                 // 원래 요청 재시도
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                // 토큰 갱신 실패 시 로그아웃
+                // 토큰 갱신 실패 시 로그아웃 (플래그 설정)
+                setLoggingOut(true);
                 authStore.logout();
                 return Promise.reject(refreshError);
             }
