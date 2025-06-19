@@ -19,6 +19,7 @@ CREATE TABLE `approval_category_item` (
     `id`          INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `category_id` INT          NOT NULL,
     `name`        VARCHAR(255) NOT NULL COMMENT '항목 이름',
+    input_type  tinyint      not null comment '입력 타입 (0: TEXT, 1: TEXTAREA, 2: FILE 등)',
 
     FOREIGN KEY (`category_id`) REFERENCES `approval_category` (`id`) ON DELETE CASCADE
 );
@@ -57,4 +58,15 @@ CREATE TABLE `approval_content` (
 
     FOREIGN KEY (`approval_id`) REFERENCES `approval` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`item_id`) REFERENCES `approval_category_item` (`id`) ON DELETE CASCADE
+);
+
+-- 결재 라인
+CREATE TABLE `approval_line` (
+    `id`                   INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `step_order`           INT NOT NULL COMMENT '결재 순서',
+    `approval_category_id` INT NOT NULL COMMENT '결재 유형 id',
+    `position_id`          INT NOT NULL COMMENT '직책 id',
+    FOREIGN KEY (`approval_category_id`) REFERENCES `approval_category` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`position_id`) REFERENCES `position` (`id`) ON DELETE CASCADE,
+    UNIQUE KEY `uk_category_step` (`approval_category_id`, `step_order`)
 );

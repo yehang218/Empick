@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface GradingCriteriaRepository extends JpaRepository<GradingCriteriaEntity, Integer> {
     List<GradingCriteriaEntity> findByQuestionId(int id);
+
+    void deleteByQuestionId(int id);
 }

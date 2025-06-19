@@ -1,6 +1,6 @@
 package com.piveguyz.empickbackend.common.handler;
 
-import com.piveguyz.empickbackend.employment.applicationItem.query.dto.InputType;
+import com.piveguyz.empickbackend.common.enums.InputType;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;

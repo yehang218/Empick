@@ -145,6 +145,8 @@ public enum ResponseCode {
     DUPLICATE_STANDARD_ITEM_CONTENT_TITLE(false, HttpStatus.CONFLICT, 2115, "이미 존재하는 자기소개서 기준표 항목명입니다."),
     INTRODUCE_STANDARD_NOT_FOUND(false, HttpStatus.NOT_FOUND , 2116 ,"자기소개서 기준표 id를 찾을 수 없습니다" ),
     DUPLICATE_STANDARD_CONTENT(false,HttpStatus.CONFLICT ,2117 ,"중복된 내용입니다" ),
+    INTRODUCE_RATING_RESULT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2113, "요청한 자기소개서 평가 결과 ID가 존재하지 않습니다."),
+
 
 
     //  지원서 - 2200 ~ 2299
@@ -167,10 +169,11 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_QUESTION_TYPE(false, HttpStatus.BAD_REQUEST, 2412, "유효하지 않은 실무테스트 문제 유형입니다."),
     EMPLOYMENT_INVALID_QUESTION(false, HttpStatus.NOT_FOUND, 2413, "요청한 문제를 찾을 수 없습니다."),
     EMPLOYMENT_QUESTION_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2414, "이 문제는 다른 곳에서 사용 중이므로 삭제할 수 없습니다."),
-
+    EMPLOYMENT_QUESTION_USED_IN_ANSWER(false, HttpStatus.BAD_REQUEST,2415, "해당 문제는 제출된 답변이 있어 삭제할 수 없습니다."),
     EMPLOYMENT_OPTION_COUNT_EXCEEDED(false, HttpStatus.BAD_REQUEST, 2416, "선택지는 최대 5개까지만 등록할 수 있습니다."),
     EMPLOYMENT_QUESTION_OPTION_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2417, "선택지를 찾을 수 없습니다."),
     EMPLOYMENT_QUESTION_OPTION_MAX_NUMBER(false, HttpStatus.BAD_REQUEST, 2418, "선택지는 5번을 초과할 수 없습니다."),
+    EMPLOYMENT_QUESTION_USED_IN_JOBTEST(false, HttpStatus.BAD_REQUEST, 2419, "해당 문제는 실무 테스트에서 사용 중입니다."),
 
     //   2) 실무테스트
     EMPLOYMENT_JOBTEST_DELETE_CONFLICT(false, HttpStatus.CONFLICT, 2420, "이 실무테스트는 다른 곳에서 사용중이므로 수정하거나 삭제할 수 없습니다."),
@@ -213,24 +216,31 @@ public enum ResponseCode {
 
     //  면접 - 2500 ~ 2599
     EMPLOYMENT_INTERVIEW_CRITERIA_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2500, "존재하지 않는 면접 기준입니다."),
+
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_CONTENT(false, HttpStatus.BAD_REQUEST, 2510, "내용을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_NO_DETAIL_CONTENT(false, HttpStatus.BAD_REQUEST, 2511, "상세 내용을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_CRITERIA_DUPLICATE_CONTENT(false, HttpStatus.BAD_REQUEST, 2512, "이미 존재하는 내용입니다."),
+
     EMPLOYMENT_INTERVIEW_SHEET_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2520, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SHEET_NO_NAME(false, HttpStatus.BAD_REQUEST, 2521, "이름을 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SHEET_DUPLICATE_NAME(false, HttpStatus.CONFLICT, 2522, "중복된 이름이 존재합니다."),
+
     EMPLOYMENT_INTERVIEW_SHEET_ITEM_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2530, "존재하지 않는 항목입니다."),
     EMPLOYMENT_INTERVIEW_SHEET_ITEM_DUPLICATE(false, HttpStatus.BAD_REQUEST, 2531, "이미 존재하는 항목입니다."),
+
     EMPLOYMENT_INTERVIEW_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2540, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_NO_SHEET(false, HttpStatus.BAD_REQUEST, 2541, "평가표가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_DATE(false, HttpStatus.BAD_REQUEST, 2542, "날짜가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_NO_ADDRESS(false, HttpStatus.BAD_REQUEST, 2543, "주소가 등록되지 않았습니다."),
     EMPLOYMENT_INTERVIEW_IMPOSSIBLE_TIME(false, HttpStatus.BAD_REQUEST, 2544, "불가능한 시간입니다."),
+    EMPLOYMENT_INTERVIEW_AlREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2545, "이미 면접 정보가 존재합니다."),
+
     EMPLOYMENT_INTERVIEW_SCORE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2550, "존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_SCORE(false, HttpStatus.BAD_REQUEST, 2551, "점수를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_REVIEW(false, HttpStatus.BAD_REQUEST, 2552, "평가를 입력하지 않았습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_NO_ITEM(false, HttpStatus.BAD_REQUEST, 2553, "해당하는 평가 항목이 존재하지 않습니다."),
     EMPLOYMENT_INTERVIEW_SCORE_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2554, "이미 평가 점수가 등록되어 있습니다."),
+
     EMPLOYMENT_INTERVIEWER_ALREADY_EXIST(false, HttpStatus.BAD_REQUEST, 2560, "이미 해당 면접 담당자가 존재합니다."),
     EMPLOYMENT_INTERVIEWER_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 2561, "해당 면접 담당자가 존재하지 않습니다."),
     EMPLOYMENT_INTERVIEWER_ALREADY_SCORE_INPUT(false, HttpStatus.BAD_REQUEST, 2562, "면접 담당자가 이미 점수를 입력하였습니다."),
@@ -266,8 +276,10 @@ public enum ResponseCode {
     APPROVAL_ALREADY_CANCELED(false, HttpStatus.BAD_REQUEST, 3010, "이미 결재 취소된 문서입니다."),
     APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3011, "결재 차례가 아닙니다."),
     APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3012, "반려 사유가 필요합니다."),
-    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다.");
-
+    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다."),
+    APPROVAL_LINE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 3014, "결재 라인이 존재하지 않습니다.\n관리자에게 문의하세요."),
+    APPROVAL_CATEGORY_MISSING(false, HttpStatus.BAD_REQUEST, 3015, "결재 유형이 존재하지 않습니다."),
+    APPROVAL_WRITER_MISSING(false, HttpStatus.BAD_REQUEST, 3016, "결재 요청자가 존재하지 않습니다.");
 
 
     private final boolean success;

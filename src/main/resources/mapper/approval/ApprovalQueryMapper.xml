@@ -31,6 +31,16 @@
         <result column="my_approval_step" property="myApprovalStep" />
     </resultMap>
 
+<!--    결재 라인 조회-->
+    <resultMap id="ApprovalLinePreviewMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineQueryDTO">
+        <result property="order"          column="order" />
+        <result property="positionId"     column="positionId" />
+        <result property="positionName"   column="positionName" />
+        <result property="memberId"       column="memberId" />
+        <result property="memberName"     column="memberName" />
+        <result property="departmentName" column="departmentName" />
+    </resultMap>
+
     <select id="findAll" resultMap="ApprovalResultMap">
         SELECT
             id,
@@ -143,5 +153,25 @@
            OR a.fourth_approver_id = #{memberId}
         ORDER BY a.created_at DESC
     </select>
+
+    <!--    결재라인 조회-->
+    <select id="selectApprovalLinePreview"
+            resultMap="ApprovalLinePreviewMap">
+        SELECT al.step_order  AS `order`,
+               al.position_id AS positionId,
+               p.name         AS positionName,
+               m.id           AS memberId,
+               m.name         AS memberName,
+               d.name         AS departmentName
+        FROM approval_line al
+                 JOIN position p ON al.position_id = p.id
+                 JOIN member writer ON writer.id = #{writerId}
+                 LEFT JOIN member m
+                           ON m.department_id = writer.department_id AND m.position_id = al.position_id
+                 LEFT JOIN department d ON d.id = m.department_id
+        WHERE al.approval_category_id = #{categoryId}
+        ORDER BY al.step_order ASC
+    </select>
+
 
 </mapper>
