@@ -50,9 +50,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
+import { useMemberStore } from '@/stores/memberStore'
 
 const router = useRouter()
 const standardItemStore = useIntroduceStandardItemStore()
+const standardStore = useIntroduceStandardStore()
+const memberStore = useMemberStore()
 
 const title = ref('')
 const items = computed(() => standardItemStore.items)
@@ -67,7 +71,10 @@ function goToCriteriaList() {
 }
 
 onMounted(async () => {
-  await standardItemStore.fetchItems()
+  await Promise.all([
+    memberStore.getMyInfo(),
+    standardItemStore.fetchItems()
+  ])
 })
 
 const submit = async () => {
@@ -80,7 +87,7 @@ const submit = async () => {
     return
   }
   try {
-    // await standardCriteriaStore.addCriteria(title.value, 1, selectedItemIds.value)
+    await standardStore.addStandard(title.value, selectedItemIds.value)
     alert('기준표가 성공적으로 등록되었습니다.')
     router.push('/employment/introduce-standard/list')
   } catch (error) {
