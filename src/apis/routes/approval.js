@@ -27,5 +27,7 @@ export const ApprovalAPI = {
     DOCUMENTS_BY_APPROVER: (approverId) => `/api/v1/approval/documents?approverId=${approverId}`,
     
     // 자신이 결재자인 결재문서 목록 조회
-    RECEIVED_DOCUMENTS: (memberId) => `/api/v1/approval/received?memberId=${memberId}`,
+    RECEIVED_DOCUMENTS_LIST: (memberId) => `/api/v1/approval/documents/received?memberId=${memberId}`,
+    // 자신이 요청한 결재문서 목록 조회
+    REQUESTED_DOCUMENTS_LIST: (memberId) => `/api/v1/approval/documents/requested?memberId=${memberId}`,
 };

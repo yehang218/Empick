@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { getReceivedApprovals, getApprovalsByWriterId } from '@/services/approvalService';
+import { getReceivedApprovals, getApprovalsByWriterId, getRequestedApprovals } from '@/services/approvalService';
 
 export const useApprovalStore = defineStore('approval', {
     state: () => ({
@@ -10,6 +10,11 @@ export const useApprovalStore = defineStore('approval', {
         sentList: [],
         loadingSent: false,
         errorSent: null,
+
+        // 요청한 결재 목록
+        requestedList: [],
+        loadingRequested: false,
+        errorRequested: null,
     }),
     actions: {
         async loadReceivedApprovals(memberId) {
@@ -33,6 +38,18 @@ export const useApprovalStore = defineStore('approval', {
                 this.errorSent = e;
             } finally {
                 this.loadingSent = false;
+            }
+        },
+
+        async loadRequestedApprovals(memberId) {
+            this.loadingRequested = true;
+            this.errorRequested = null;
+            try {
+                this.requestedList = await getRequestedApprovals(memberId);
+            } catch (e) {
+                this.errorRequested = e;
+            } finally {
+                this.loadingRequested = false;
             }
         }
     }
