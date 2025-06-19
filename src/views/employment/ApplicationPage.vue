@@ -288,17 +288,17 @@ import { useRoute, useRouter } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useToast } from 'vue-toastification'
-import apiClient from '@/apis/apiClient' // 직접 axios 호출을 위해 임포트
+
 
 const route = useRoute()
 const applicationStore = useApplicationStore()
 const toast = useToast()
 const applicationId = Number(route.params.id)
 
-const route = useRoute()
 const router = useRouter()
 
 const evaluationComponent = ref(IntroduceResult)
+
 const selectedEvaluation = ref('자기소개서')
 const viewMode = ref('detail')
 
@@ -382,18 +382,54 @@ onMounted(() => {
       result: parseFloat(query.interviewScore) >= 70 ? '합격' : '불합격'
     })
   }
-}, { immediate: true })
 
-onMounted(async () => {
-  try {
-    await applicationStore.fetchApplicationById(applicationId)
-  } catch (error) {
-    toast.error('지원서 정보를 불러오지 못했습니다.')
+  applicant.value = {
+    // 기본 ID 필드들
+    applicantId: query.applicantId || '',
+    applicationId: query.applicationId || '',
+
+    // 기본 정보
+    name: query.name || '정보 없음',
+    phone: query.phone || '정보 없음',
+    email: query.email || '정보 없음',
+    profileUrl: query.profileUrl || '',
+    birth: query.birth || '정보 없음',
+    address: query.address || '정보 없음',
+
+    // 채용 관련 정보
+    recruitmentId: query.recruitmentId || '',
+    introduceRatingResultId: query.introduceRatingResultId || '',
+    jobId: query.jobId || '',
+    jobName: query.jobName || '정보 없음',
+    createdAt: query.createdAt || '정보 없음',
+    status: query.status || 'WAITING',
+    updatedAt: query.updatedAt || '',
+    updatedBy: query.updatedBy || '',
+
+    // 추가된 필드들
+    introduceEvaluationContent: query.introduceEvaluationContent || '',
+    introduceScore: query.introduceScore ? parseInt(query.introduceScore) : null,
+    introduceStatus: query.introduceStatus || '',
+    motivation: query.motivation || '정보 없음',
+    experience: query.experience || '정보 없음',
+    skills: query.skills || '정보 없음',
+    education: query.education || '정보 없음',
+    portfolioUrl: query.portfolioUrl || '',
+    coverLetter: query.coverLetter || '정보 없음',
+    jobtestTotalScore: query.jobtestTotalScore ? parseFloat(query.jobtestTotalScore) : null,
+    jobtestEvaluationScore: query.jobtestEvaluationScore ? parseFloat(query.jobtestEvaluationScore) : null,
+    jobtestStatus: query.jobtestStatus || '',
+    interviewScore: query.interviewScore ? parseFloat(query.interviewScore) : null,
+    interviewAddress: query.interviewAddress || '정보 없음',
+    interviewDatetime: query.interviewDatetime || '정보 없음',
+
+    evaluationStats: evaluationStats
   }
 })
 
 const selectEvaluation = (type) => {
   selectedEvaluation.value = type
+
   switch (type) {
     case '자기소개서':
       evaluationComponent.value = IntroduceResult
@@ -411,18 +447,20 @@ const selectEvaluation = (type) => {
   }
 }
 
+
 const getCurrentEvaluation = () => {
-  return applicant.value.evaluationStats?.find(evaluation => evaluation.type === selectedEvaluation.value)
+  return applicant.value.evaluationStats.find(evaluation => evaluation.type === selectedEvaluation.value)
 }
 
 const getSkillsArray = () => {
   if (!applicant.value.skills) return ['정보 없음']
-  return applicant.value.skills.split(/[,،،]\s*/).filter(skill => skill.trim())
+  return applicant.value.skills.split(/[,،、]\s*/).filter(skill => skill.trim())
 }
+
 
 const getExperiencePreview = () => {
   if (!applicant.value.experience) return '경력 정보 없음'
-  const preview = applicant.value.experience.split(/[,،،]/)[0]
+  const preview = applicant.value.experience.split(/[,،、]/)[0]
   return preview ? preview.trim() : '경력 정보 없음'
 }
 
@@ -467,8 +505,9 @@ const updateStatus = () => {
 }
 
 const goBack = () => {
-  const from = route.query.from;
-  const page = route.query.page;
+  // 뒤로가기 또는 목록으로 이동
+  const from = route.query.from
+  const page = route.query.page
   if (from) {
     router.push(page ? { path: from, query: { page } } : { path: from })
   } else {
