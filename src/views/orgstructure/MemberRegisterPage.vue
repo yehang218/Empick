@@ -37,18 +37,68 @@
             </v-col>
         </v-row>
 
-        <!-- 네비게이션 (상단으로 이동) -->
-        <ApplicantNavigation v-if="selectedApplicants.length > 1" :selectedApplicants="selectedApplicants"
-            :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
-            @previousApplicant="handlePreviousApplicant" @nextApplicant="handleNextApplicant" />
-
         <!-- 사원 등록 폼 -->
-        <MemberRegistrationForm :form="regStore.form" :profileImageUrl="regStore.profileImageUrl"
-            :profileImageFile="regStore.profileImageFile" :photoButtonText="regStore.photoButtonText"
-            :departments="orgStore.departments" :positions="orgStore.positions" :jobs="orgStore.jobs"
-            :ranks="orgStore.ranks" :selectedApplicants="selectedApplicants"
-            :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
-            @profileImageChange="onProfileImageChange" @register="onRegister" />
+        <v-row class="main-content-row">
+            <!-- 프로필 이미지 및 등록 버튼 -->
+            <v-col cols="12" md="3" class="profile-section">
+                <div class="profile-container">
+                    <div class="profile-image-wrapper" @click="triggerFileInput">
+                        <template v-if="regStore.profileImageUrl">
+                            <v-img :src="regStore.profileImageUrl" class="profile-image" cover />
+                        </template>
+                        <template v-else>
+                            <div class="profile-placeholder">
+                                <v-icon size="48" class="placeholder-icon">mdi-camera-plus</v-icon>
+                                <p class="placeholder-text">사진 업로드</p>
+                            </div>
+                        </template>
+                        <div class="image-overlay">
+                            <v-icon color="white" size="24">mdi-camera-plus</v-icon>
+                        </div>
+                        <input ref="fileInputRef" type="file" accept="image/jpeg,image/png,image/webp"
+                            style="display: none;" @change="onProfileImageChange" />
+                    </div>
+                    <v-btn class="upload-btn" :variant="regStore.profileImageFile ? 'tonal' : 'outlined'"
+                        :color="regStore.profileImageFile ? 'success' : 'primary'" @click="triggerFileInput"
+                        size="small">
+                        <v-icon size="16" class="mr-1">{{ regStore.profileImageFile ? 'mdi-check' : 'mdi-upload'
+                            }}</v-icon>
+                        {{ regStore.photoButtonText }}
+                    </v-btn>
+
+                    <!-- 등록 버튼 -->
+                    <div class="register-section">
+                        <v-btn class="register-btn" color="success" size="large" variant="flat" @click="onRegister">
+                            <v-icon size="18" class="mr-2">mdi-check-circle</v-icon>
+                            {{ currentApplicant?.name || '지원자' }} 등록
+                        </v-btn>
+
+                        <div v-if="selectedApplicants.length > 1" class="progress-info">
+                            <div class="progress-text">
+                                <v-icon size="14" class="mr-1">mdi-information-outline</v-icon>
+                                현재 편집 중 ({{ currentApplicantIndex + 1 }}/{{ selectedApplicants.length }})
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </v-col>
+
+            <!-- 네비게이션 및 폼 -->
+            <v-col cols="12" md="9" class="form-section">
+                <!-- 네비게이션 (기본정보와 수직 정렬) -->
+                <ApplicantNavigation v-if="selectedApplicants.length > 1" :selectedApplicants="selectedApplicants"
+                    :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
+                    @previousApplicant="handlePreviousApplicant" @nextApplicant="handleNextApplicant" />
+
+                <!-- 폼 섹션들 -->
+                <MemberRegistrationForm :form="regStore.form" :profileImageUrl="regStore.profileImageUrl"
+                    :profileImageFile="regStore.profileImageFile" :photoButtonText="regStore.photoButtonText"
+                    :departments="orgStore.departments" :positions="orgStore.positions" :jobs="orgStore.jobs"
+                    :ranks="orgStore.ranks" :selectedApplicants="selectedApplicants"
+                    :currentApplicantIndex="currentApplicantIndex" :currentApplicant="currentApplicant"
+                    @profileImageChange="onProfileImageChange" @register="onRegister" />
+            </v-col>
+        </v-row>
 
         <!-- 확인 모달 -->
         <AlertModal v-if="showConfirmDialog" message="입력하신 내용이 모두 삭제됩니다. 정말로 나가시겠습니까?" @confirm="confirmLeave"
@@ -105,6 +155,9 @@ const {
 } = useRegistrationProgress()
 
 const { handleImageUpload } = useFileUpload()
+
+// 파일 입력 ref
+const fileInputRef = ref(null)
 
 // 현재 폼 데이터를 composable 형태로 변환하는 헬퍼 함수
 const getCurrentFormData = () => {
@@ -373,6 +426,11 @@ const onProfileImageChange = (event) => {
             }
         }
     )
+}
+
+// 파일 입력 트리거 함수
+const triggerFileInput = () => {
+    fileInputRef.value?.click()
 }
 
 const onRegister = async () => {
@@ -690,6 +748,152 @@ const cancelLeave = () => {
     animation: fadeInUp 0.6s ease-out;
 }
 
+/* 메인 콘텐츠 레이아웃 */
+.main-content-row {
+    align-items: flex-start;
+    margin: 0;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* 프로필 이미지 스타일 */
+.profile-image-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s ease;
+}
+
+.profile-image-wrapper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.profile-image-wrapper:hover .image-overlay {
+    opacity: 1;
+}
+
+.profile-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.placeholder-icon {
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+}
+
+.placeholder-text {
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.upload-btn {
+    min-width: 140px;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+}
+
+/* 등록 섹션 */
+.register-section {
+    margin-top: 1.5rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.register-btn {
+    width: 180px;
+    height: 44px;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    text-transform: none !important;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25) !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.register-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
+}
+
+.progress-info {
+    padding: 0.5rem 0.75rem;
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 8px;
+    border: 1px solid rgba(226, 232, 240, 0.3);
+    text-align: center;
+}
+
+.progress-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* 폼 섹션 */
+.form-section {
+    padding: 1rem;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .modern-container {
@@ -704,6 +908,47 @@ const cancelLeave = () => {
 
     .page-title-modern {
         font-size: 1.5rem;
+    }
+
+    .main-content-row {
+        flex-direction: column;
+    }
+
+    .profile-section {
+        order: 2;
+        margin-top: 1rem;
+    }
+
+    .form-section {
+        order: 1;
+    }
+
+    .profile-image-wrapper {
+        width: 140px;
+        height: 140px;
+    }
+
+    .register-btn {
+        width: 160px;
+        height: 40px;
+        font-size: 0.875rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-image-wrapper {
+        width: 120px;
+        height: 120px;
+    }
+
+    .upload-btn {
+        min-width: 120px;
+        font-size: 0.875rem;
+    }
+
+    .register-btn {
+        width: 140px;
+        font-size: 0.8rem !important;
     }
 }
 </style>

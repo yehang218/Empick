@@ -1,135 +1,91 @@
 <template>
-    <v-row class="form-main-row">
-        <!-- 프로필 이미지 업로드 영역 -->
-        <v-col cols="12" md="3" class="profile-column">
-            <div class="profile-image-container">
-                <div class="profile-image-wrapper" @click="triggerFileInput">
-                    <template v-if="profileImageUrl">
-                        <v-img :src="profileImageUrl" class="profile-image" cover />
-                    </template>
-                    <template v-else>
-                        <div class="profile-placeholder">
-                            <v-icon size="48" class="placeholder-icon">mdi-camera-plus</v-icon>
-                            <p class="placeholder-text">사진 업로드</p>
-                        </div>
-                    </template>
-                    <div class="image-overlay">
-                        <v-icon color="white" size="24">mdi-camera-plus</v-icon>
-                    </div>
-                    <input ref="fileInputRef" type="file" accept="image/jpeg,image/png,image/webp"
-                        style="display: none;" @change="onProfileImageChange" />
+    <!-- 폼 섹션들만 남김 -->
+    <div class="form-content">
+        <!-- 기본 정보 섹션 -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon-wrapper">
+                    <v-icon class="section-icon">mdi-account</v-icon>
                 </div>
-                <v-btn class="upload-btn" :variant="profileImageFile ? 'tonal' : 'outlined'"
-                    :color="profileImageFile ? 'success' : 'primary'" @click="triggerFileInput" size="small">
-                    <v-icon size="16" class="mr-1">{{ profileImageFile ? 'mdi-check' : 'mdi-upload' }}</v-icon>
-                    {{ photoButtonText }}
-                </v-btn>
-
-                <!-- 등록 버튼 (사진 업로드 바로 아래) -->
-                <div class="register-section">
-                    <v-btn class="register-btn" color="success" size="large" variant="flat" @click="onRegister">
-                        <v-icon size="18" class="mr-2">mdi-check-circle</v-icon>
-                        {{ currentApplicant?.name || '지원자' }} 등록
-                    </v-btn>
-
-                    <div v-if="selectedApplicants.length > 1" class="progress-info">
-                        <div class="progress-text">
-                            <v-icon size="14" class="mr-1">mdi-information-outline</v-icon>
-                            현재 편집 중 ({{ currentApplicantIndex + 1 }}/{{ selectedApplicants.length }})
-                        </div>
-                    </div>
+                <div class="section-title">
+                    <h4 class="section-main">기본 정보</h4>
+                    <p class="section-sub">사원의 기본적인 개인 정보를 입력하세요</p>
                 </div>
             </div>
-        </v-col>
+            <v-row class="form-fields">
+                <v-col cols="12" sm="6">
+                    <v-text-field label="이름" v-model="form.name" required prepend-inner-icon="mdi-account-outline"
+                        variant="outlined" />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-text-field label="생년월일" v-model="form.birth" type="date" required
+                        prepend-inner-icon="mdi-calendar" variant="outlined" />
+                </v-col>
+            </v-row>
+        </div>
 
-        <!-- 입력 폼 -->
-        <v-col cols="12" md="9">
-            <!-- 기본 정보 섹션 -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon-wrapper">
-                        <v-icon class="section-icon">mdi-account</v-icon>
-                    </div>
-                    <div class="section-title">
-                        <h4 class="section-main">기본 정보</h4>
-                        <p class="section-sub">사원의 기본적인 개인 정보를 입력하세요</p>
-                    </div>
+        <!-- 연락처 정보 섹션 -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon-wrapper">
+                    <v-icon class="section-icon">mdi-phone</v-icon>
                 </div>
-                <v-row class="form-fields">
-                    <v-col cols="12" sm="6">
-                        <v-text-field label="이름" v-model="form.name" required prepend-inner-icon="mdi-account-outline"
-                            variant="outlined" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                        <v-text-field label="생년월일" v-model="form.birth" type="date" required
-                            prepend-inner-icon="mdi-calendar" variant="outlined" />
-                    </v-col>
-                </v-row>
+                <div class="section-title">
+                    <h4 class="section-main">연락처 정보</h4>
+                    <p class="section-sub">연락 가능한 정보를 입력하세요</p>
+                </div>
             </div>
+            <v-row class="form-fields">
+                <v-col cols="12" sm="6">
+                    <v-text-field label="연락처" v-model="form.phone" required placeholder="010-1234-5678"
+                        prepend-inner-icon="mdi-phone-outline" variant="outlined" />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-text-field label="이메일" v-model="form.email" required prepend-inner-icon="mdi-email-outline"
+                        variant="outlined" />
+                </v-col>
+                <v-col cols="12">
+                    <v-text-field label="주소" v-model="form.address" prepend-inner-icon="mdi-map-marker-outline"
+                        variant="outlined" />
+                </v-col>
+            </v-row>
+        </div>
 
-            <!-- 연락처 정보 섹션 -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon-wrapper">
-                        <v-icon class="section-icon">mdi-phone</v-icon>
-                    </div>
-                    <div class="section-title">
-                        <h4 class="section-main">연락처 정보</h4>
-                        <p class="section-sub">연락 가능한 정보를 입력하세요</p>
-                    </div>
+        <!-- 조직 정보 섹션 -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon-wrapper">
+                    <v-icon class="section-icon">mdi-office-building</v-icon>
                 </div>
-                <v-row class="form-fields">
-                    <v-col cols="12" sm="6">
-                        <v-text-field label="연락처" v-model="form.phone" required placeholder="010-1234-5678"
-                            prepend-inner-icon="mdi-phone-outline" variant="outlined" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                        <v-text-field label="이메일" v-model="form.email" required prepend-inner-icon="mdi-email-outline"
-                            variant="outlined" />
-                    </v-col>
-                    <v-col cols="12">
-                        <v-text-field label="주소" v-model="form.address" prepend-inner-icon="mdi-map-marker-outline"
-                            variant="outlined" />
-                    </v-col>
-                </v-row>
-            </div>
-
-            <!-- 조직 정보 섹션 -->
-            <div class="form-section">
-                <div class="section-header">
-                    <div class="section-icon-wrapper">
-                        <v-icon class="section-icon">mdi-office-building</v-icon>
-                    </div>
-                    <div class="section-title">
-                        <h4 class="section-main">조직 정보</h4>
-                        <p class="section-sub">소속 부서와 직책 정보를 선택하세요</p>
-                    </div>
+                <div class="section-title">
+                    <h4 class="section-main">조직 정보</h4>
+                    <p class="section-sub">소속 부서와 직책 정보를 선택하세요</p>
                 </div>
-                <v-row class="form-fields">
-                    <v-col cols="12" sm="6">
-                        <v-select label="부서" :items="departments" v-model="form.departmentId" item-title="label"
-                            item-value="value" required prepend-inner-icon="mdi-domain" variant="outlined" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                        <v-select label="직책" :items="positions" v-model="form.positionId" item-title="label"
-                            item-value="value" required prepend-inner-icon="mdi-account-tie" variant="outlined" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                        <v-select label="직무" :items="jobs" v-model="form.jobId" item-title="label" item-value="value"
-                            required prepend-inner-icon="mdi-briefcase-outline" variant="outlined" />
-                    </v-col>
-                    <v-col cols="12" sm="6">
-                        <v-select label="직급" :items="ranks" v-model="form.rankId" item-title="label" item-value="value"
-                            required prepend-inner-icon="mdi-star-outline" variant="outlined" />
-                    </v-col>
-                </v-row>
             </div>
-        </v-col>
-    </v-row>
+            <v-row class="form-fields">
+                <v-col cols="12" sm="6">
+                    <v-select label="부서" :items="departments" v-model="form.departmentId" item-title="label"
+                        item-value="value" required prepend-inner-icon="mdi-domain" variant="outlined" />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-select label="직책" :items="positions" v-model="form.positionId" item-title="label"
+                        item-value="value" required prepend-inner-icon="mdi-account-tie" variant="outlined" />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-select label="직무" :items="jobs" v-model="form.jobId" item-title="label" item-value="value"
+                        required prepend-inner-icon="mdi-briefcase-outline" variant="outlined" />
+                </v-col>
+                <v-col cols="12" sm="6">
+                    <v-select label="직급" :items="ranks" v-model="form.rankId" item-title="label" item-value="value"
+                        required prepend-inner-icon="mdi-star-outline" variant="outlined" />
+                </v-col>
+            </v-row>
+        </div>
+    </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+// Vue 3 Composition API - ref 제거
 
 // Props
 defineProps({
@@ -179,28 +135,7 @@ defineProps({
     }
 })
 
-// Emits
-const emit = defineEmits([
-    'update:form',
-    'profileImageChange',
-    'register'
-])
-
-// Refs
-const fileInputRef = ref(null)
-
-// Methods
-const triggerFileInput = () => {
-    fileInputRef.value?.click()
-}
-
-const onProfileImageChange = (event) => {
-    emit('profileImageChange', event)
-}
-
-const onRegister = () => {
-    emit('register')
-}
+// 더 이상 사용하지 않는 코드 제거
 </script>
 
 <style scoped>

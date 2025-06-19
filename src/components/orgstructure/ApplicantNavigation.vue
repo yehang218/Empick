@@ -67,9 +67,9 @@ const nextApplicant = () => {
 <style scoped>
 /* 네비게이션 컨테이너 */
 .navigation-container {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .nav-card {
