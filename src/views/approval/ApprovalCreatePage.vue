@@ -104,7 +104,6 @@ import { useApprovalWriteStore } from '@/stores/approvalWriteStore';
 import { useMemberStore } from '@/stores/memberStore';
 import { InputTypeEnum } from '@/constants/common/inputType.js';
 import { useRouter } from 'vue-router';
-import { ApprovalContentDTO } from '@/dto/approval/approval/createApprovalDTO';
 import { useToast } from "vue-toastification";
 const toast = useToast();
 
@@ -128,27 +127,25 @@ onMounted(async () => {
 
 const onCategoryChange = async (categoryId) => {
     if (!categoryId) {
-        // 카테고리 선택 해제 시 폼 초기화
         form.value.categoryId = null;
         form.value.contents = [];
         form.value.approvers = [];
         categoryItems.value = [];
-        approvalStore.approvalLine = [];
+        approvalStore.approvalLine.value = [];
         return;
     }
     await approvalStore.fetchCategoryItems(categoryId);
 
-    // 항목 동적폼 초기화(파일은 null, 나머지는 빈 문자열)
-    form.value.contents = categoryItems.value.map(item => {
-        let content = '';
-        if (item.inputType === InputTypeEnum.FILE) content = null;
-        return new ApprovalContentDTO({ itemId: item.id, content });
-    });
+    // 안전하게 contents 길이 동기화
+    if (!form.value.contents || form.value.contents.length !== categoryItems.value.length) {
+        form.value.contents = categoryItems.value.map(item => ({
+            itemId: item.id,
+            content: ''
+        }));
+    }
 
     if (memberId.value != null) {
         try {
-            console.log('memberId:', memberId.value);
-            console.log('categoryId:', categoryId);
             await approvalStore.fetchApprovalLine(categoryId, memberId.value);
             if (Array.isArray(approvalStore.approvalLine) && approvalStore.approvalLine.length > 0) {
                 form.value.approvers = approvalStore.approvalLine.map(line => ({
@@ -166,6 +163,7 @@ const onCategoryChange = async (categoryId) => {
         }
     }
 };
+
 
 const handleSubmit = async () => {
     try {
