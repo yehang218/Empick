@@ -12,6 +12,9 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicatio
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.JobtestQuestionCommandService;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.ApplicationJobtestEntity;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.domain.aggregate.JobtestEntity;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestExamQueryDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.service.ApplicationJobtestQueryService;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.service.JobtestQueryService;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.application.service.QuestionCommandService;
 import com.piveguyz.empickbackend.employment.jobtests.question.command.domain.aggregate.QuestionEntity;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +28,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JobtestFacade {
     private final JobtestCommandService jobtestCommandService;
+    private final JobtestQueryService jobtestQueryService;
+
     private final JobtestQuestionCommandService jobtestQuestionCommandService;
 
     private final AnswerCommandService answerCommandService;
     private final QuestionCommandService questionCommandService;
     private final ApplicationJobtestCommandService applicationJobtestCommandService;
 
+    private final ApplicationJobtestQueryService applicationJobtestQueryService;
 
 
     // 실무테스트 등록
@@ -80,12 +86,16 @@ public class JobtestFacade {
         return updateAnswers;
     }
 
-    public void verifyJobtestEnter(int jobtestId, JobtestEntryRequestDTO requestDTO) {
+    public JobtestExamQueryDTO enterJobtestExam(int jobtestId, JobtestEntryRequestDTO requestDTO) {
         // 유효한 코드인지 확인
-        applicationJobtestCommandService.verifyEntryCode(jobtestId, requestDTO);
-
+        int applicationJobtestId = applicationJobtestQueryService.verifyEntryCode(jobtestId, requestDTO);
 
         // 시험시간인지 확인
-        jobtestCommandService.checkJobtestTime(jobtestId);
+        jobtestQueryService.checkJobtestTime(jobtestId);
+
+        // 입장했다면 시험 정보 반환
+        JobtestExamQueryDTO examDTO = jobtestQueryService.enterJobtestExam(jobtestId, applicationJobtestId);
+
+        return examDTO;
     }
 }

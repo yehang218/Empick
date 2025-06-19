@@ -13,6 +13,4 @@ public interface ApplicationJobtestCommandService {
     int deleteApplicationJobtest(int id);
 
     void updateGradingStatusAndScore(int applicationJobTestId, double totalScore);
-
-    void verifyEntryCode(int jobtestId, JobtestEntryRequestDTO requestDTO);
 }
