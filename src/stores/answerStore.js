@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, onMounted } from 'vue';
-import { getAnswersByApplicationJobtestId, fetchAnswers } from '@/services/answerService';
+import { getAnswersByApplicationJobtestId } from '@/services/answerService';
 
 export const useAnswerStore = defineStore('answer', () => {
     const answers = ref([]);
