@@ -88,3 +88,14 @@ create table introduce_rating_result
         foreign key (introduce_standard_id) references introduce_standard (id),
     constraint introduce_rating_result_ibfk_3
         foreign key (updated_by) references member (id)
+);
+
+CREATE TABLE introduce_template_item_response (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '응답 ID',
+    introduce_id INT NOT NULL COMMENT '자기소개서 ID',
+    introduce_template_item_id INT NOT NULL COMMENT '자기소개서 템플릿 항목 ID',
+    content LONGTEXT NOT NULL COMMENT '지원자 응답 내용',
+    FOREIGN KEY (introduce_id) REFERENCES introduce(id),
+    FOREIGN KEY (introduce_template_item_id) REFERENCES introduce_template_item(id)
+);
+
