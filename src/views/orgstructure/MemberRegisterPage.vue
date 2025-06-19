@@ -62,7 +62,7 @@
                         :color="regStore.profileImageFile ? 'success' : 'primary'" @click="triggerFileInput"
                         size="small">
                         <v-icon size="16" class="mr-1">{{ regStore.profileImageFile ? 'mdi-check' : 'mdi-upload'
-                            }}</v-icon>
+                        }}</v-icon>
                         {{ regStore.photoButtonText }}
                     </v-btn>
 
@@ -887,11 +887,6 @@ const cancelLeave = () => {
     color: #64748b;
     font-size: 0.75rem;
     font-weight: 500;
-}
-
-/* 폼 섹션 */
-.form-section {
-    padding: 1rem;
 }
 
 /* 반응형 디자인 */

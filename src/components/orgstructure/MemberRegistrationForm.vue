@@ -139,98 +139,9 @@ defineProps({
 </script>
 
 <style scoped>
-/* 레이아웃 정렬 */
-.form-main-row {
-    align-items: flex-start;
-    margin: 0;
-}
-
-.profile-column {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-}
-
-/* 프로필 이미지 컨테이너 */
-.profile-image-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+/* 폼 콘텐츠 */
+.form-content {
     width: 100%;
-}
-
-.profile-image-wrapper {
-    position: relative;
-    width: 180px;
-    height: 180px;
-    border-radius: 20px;
-    overflow: hidden;
-    cursor: pointer;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border: 3px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    transition: all 0.3s ease;
-}
-
-.profile-image-wrapper:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-}
-
-.profile-image-wrapper:hover .image-overlay {
-    opacity: 1;
-}
-
-.profile-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-}
-
-.placeholder-icon {
-    color: #94a3b8;
-    margin-bottom: 0.5rem;
-}
-
-.placeholder-text {
-    color: #64748b;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin: 0;
-}
-
-.image-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(2px);
-}
-
-.upload-btn {
-    min-width: 140px;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    text-transform: none !important;
 }
 
 /* 폼 섹션 */
@@ -347,60 +258,10 @@ defineProps({
     transform: translateX(4px) !important;
 }
 
-/* 등록 섹션 (사진 업로드 바로 아래) */
-.register-section {
-    margin-top: 1.5rem;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.register-btn {
-    width: 180px;
-    height: 44px;
-    border-radius: 12px !important;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    color: white !important;
-    font-weight: 600 !important;
-    font-size: 0.9rem !important;
-    text-transform: none !important;
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25) !important;
-    border: none !important;
-    transition: all 0.3s ease !important;
-}
-
-.register-btn:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
-}
-
-.progress-info {
-    padding: 0.5rem 0.75rem;
-    background: rgba(248, 250, 252, 0.8);
-    border-radius: 8px;
-    border: 1px solid rgba(226, 232, 240, 0.3);
-    text-align: center;
-}
-
-.progress-text {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #64748b;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
+/* 등록 관련 스타일 제거됨 (메인 페이지에서 처리) */
 
 /* 반응형 디자인 */
 @media (max-width: 960px) {
-    .profile-image-wrapper {
-        width: 140px;
-        height: 140px;
-    }
-
     .form-section {
         padding: 1rem;
     }
@@ -409,29 +270,6 @@ defineProps({
         flex-direction: column;
         align-items: flex-start;
         text-align: left;
-    }
-
-    .register-btn {
-        width: 160px;
-        height: 40px;
-        font-size: 0.875rem !important;
-    }
-}
-
-@media (max-width: 600px) {
-    .profile-image-wrapper {
-        width: 120px;
-        height: 120px;
-    }
-
-    .upload-btn {
-        min-width: 120px;
-        font-size: 0.875rem;
-    }
-
-    .register-btn {
-        width: 140px;
-        font-size: 0.8rem !important;
     }
 }
 </style>
