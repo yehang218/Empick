@@ -75,7 +75,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import { useJobtestStore } from '@/stores/jobtestQuestionStore'
+import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 import { createJobtestService } from '@/services/jobtestService'
 import CreateJobtestRequestDTO from '@/dto/employment/jobtest/createJobtestRequestDTO'
 import QuestionCreateModal from '@/components/employment/QuestionCreateModal.vue'
