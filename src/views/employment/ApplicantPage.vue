@@ -466,7 +466,7 @@ const handleRegisterClick = () => {
 
   // 라우터를 통해 MemberRegisterPage로 데이터 전달
   router.push({
-    path: '/orgstructure/member-register',
+    path: '//member-register',
     query: {
       applicants: JSON.stringify(selectedApplicantsData)
     }
@@ -525,7 +525,7 @@ const toggleSelectAll = (selectAll) => {
 
 // 지원자 등록 페이지로 이동
 const goToApplicantRegistration = () => {
-  router.push('/employment/applicants/register');
+  router.push({name: 'ApplicantRegistrationPage'});
 };
 
 </script>
