@@ -10,6 +10,16 @@ const ERROR_MESSAGES = {
     EMPTY_DATA: '데이터가 존재하지 않습니다.',
 };
 
+// 로그아웃 진행 중인지 추적하는 플래그
+let isLoggingOut = false;
+
+/**
+ * 로그아웃 상태 설정
+ */
+export const setLoggingOut = (status) => {
+    isLoggingOut = status;
+};
+
 /**
  * API 에러를 처리하는 공통 핸들러
  */
@@ -19,7 +29,7 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
     let apiResponse;
     try {
         apiResponse = ApiResponseDTO.fromJSON(error.response?.data || {});
-    } catch (_) {
+    } catch {
         apiResponse = new ApiResponseDTO(false, 'UNKNOWN', ERROR_MESSAGES.UNKNOWN, null);
     }
 
@@ -30,11 +40,18 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
         message: apiResponse.message,
     });
 
+    // 현재 경로가 로그인 페이지인지 확인
+    const currentPath = router.currentRoute.value.path;
+    const isLoginPage = currentPath === '/login';
+
     if (redirect && error.response) {
         switch (error.response.status) {
             case 401:
-                import('@/stores/authStore').then(({ useAuthStore }) => useAuthStore().logout());
-                router.push('/login');
+                // 로그아웃 중이거나 이미 로그인 페이지에 있을 때는 추가 처리하지 않음
+                if (!isLoggingOut && !isLoginPage) {
+                    import('@/stores/authStore').then(({ useAuthStore }) => useAuthStore().logout());
+                    router.push('/login');
+                }
                 break;
             case 403:
                 router.push('/access-denied');      // 🚩 TODO : 권한이 필요하다고 뜨는 페이지
@@ -45,7 +62,8 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
         }
     }
 
-    if (showToast) {
+    // 로그아웃 중이거나 401 에러이거나 로그인 페이지에 있을 때는 토스트 메시지 표시하지 않음
+    if (showToast && !isLoggingOut && !(error.response?.status === 401) && !isLoginPage) {
         toast.error(apiResponse.message);
     }
 };

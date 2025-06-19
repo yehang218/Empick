@@ -4,6 +4,7 @@ import { employmentRoutes } from './employment.routes';
 import { orgstructureRoutes } from './orgstructure.routes';
 import { testRoutes } from './test.routes';
 import { approvalRoutes } from './approval.routes';
+import { attendanceRoutes } from './attendance.routes';
 import { authGuard } from './middleware/auth.guard';
 import { careerRoutes } from './career.routes';
 
@@ -12,6 +13,7 @@ const allRouteModules = [
     ...employmentRoutes,
     ...orgstructureRoutes,
     ...approvalRoutes,
+    ...attendanceRoutes,
     ...careerRoutes,
     ...(process.env.NODE_ENV === 'development' ? testRoutes : [])
 ];
@@ -26,14 +28,11 @@ export const routeMap = Object.fromEntries(
 const routes = [
     {
         path: '/',
-        redirect: '/dashboard'
-    },
-    {
-        path: '/dashboard',
-        name: 'DashboardPage',
-        component: () => import('@/views/DashboardPage.vue'),
+        name: 'MainPage',
+        component: () => import('@/views/MainPage.vue'),
         meta: {
-            requiresAuth: true
+            requiresAuth: true,
+            requiredRoles: ['ROLE_USER', 'ROLE_HR_ACCESS']
         }
     },
     ...allRouteModules

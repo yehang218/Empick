@@ -269,11 +269,61 @@ export const employmentRoutes = [
             requiredRoles: ['ROLE_HR_ACCESS']
         }
     },
+
     // 채용공고별 지원자 목록 페이지
     {
         path: '/employment/applicant/recruitments/:recruitmentId',
         name: 'ApplicantRecruitmentPage',
         component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+    // 지원자 인적사항 등록 페이지
+    {
+        path: '/employment/applicants/register',
+        name: 'ApplicantRegistrationPage',
+        component: () => import('@/views/employment/ApplicantRegistrationPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+
+    {
+        path: '/employment/introduce-standard-items/:templateId',
+        name: 'IntroduceStandardItemPage',
+        component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+
+    // 채용공고별 지원자 목록 페이지
+    {
+        path: '/employment/recruitments/introduce-templates',
+        name: 'IntroduceTemplateListPage',
+        component: () => import('@/views/employment/IntroduceTemplateListPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+    {
+        path: '/employment/recruitments/introduce-templates/create',
+        name: 'IntroduceTemplateCreatePage',
+        component: () => import('@/views/employment/IntroduceTemplateCreatePage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+    {
+        path: '/employment/recruitments/introduce-templates/:id',
+        component: () => import('@/views/employment/IntroduceTemplateDetailPage.vue'),
         meta: {
             requiresAuth: true,
             requiredRoles: ['ROLE_HR_ACCESS']
@@ -302,7 +352,7 @@ export const employmentRoutes = [
     },
 
     {
-        path: '/employment/recruitments/introduce-templates',
+        path: '/employment/introduce-templates',
         name: 'IntroduceTemplateListPage',
         component: () => import('@/views/employment/IntroduceTemplateListPage.vue'),
         meta: {
@@ -311,7 +361,7 @@ export const employmentRoutes = [
         }
     },
     {
-        path: '/employment/recruitments/introduce-templates/create',
+        path: '/employment/introduce-templates/create',
         name: 'IntroduceTemplateCreatePage',
         component: () => import('@/views/employment/IntroduceTemplateCreatePage.vue'),
         meta: {
@@ -320,64 +370,49 @@ export const employmentRoutes = [
         }
     },
     {
-        path: '/employment/recruitments/introduce-templates/:id',
+        path: '/employment/introduce-templates/:id',
+        name: 'IntroduceTemplateDetailPage',
         component: () => import('@/views/employment/IntroduceTemplateDetailPage.vue'),
         meta: {
             requiresAuth: true,
             requiredRoles: ['ROLE_HR_ACCESS']
         }
     },
-     // 지원자 인적사항 등록 페이지
-    {
-        path: '/applicants/register',
-        name: 'ApplicantRegistrationPage',
-        component: () => import('@/views/employment/ApplicantRegistrationPage.vue'),
-        meta: {
-            requiresAuth: true
-        }
-    },
-    // 자기소개서 
-    {
-        path: '/employment/introduce-standard-items/:templateId',
-        name: 'IntroduceStandardItemPage',
-        component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
-        props: true
-    },
-
-    {
-        path: '/employment/introduce-templates',
-        name: 'IntroduceTemplateListPage',
-        component: () => import('@/views/employment/IntroduceTemplateListPage.vue')
-    },
-    {
-        path: '/employment/introduce-templates/create',
-        name: 'IntroduceTemplateCreatePage',
-        component: () => import('@/views/employment/IntroduceTemplateCreatePage.vue')
-    },
-    {
-        path: '/employment/introduce-templates/:id',
-        name: 'IntroduceTemplateDetailPage',
-        component: () => import('@/views/employment/IntroduceTemplateDetailPage.vue')
-    },
     {
         path: '/employment/introduce-standard-items/manage',
         name: 'IntroduceStandardItemCreatePage',
-        component: () => import('@/views/employment/IntroduceStandardItemCreatePage.vue')
+        component: () => import('@/views/employment/IntroduceStandardItemCreatePage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
     },
     {
         path: '/employment/introduce-standard/create',
         name: 'IntroduceStandardCreatePage',
-        component: () => import('@/views/employment/IntroduceStandardCreatePage.vue')
+        component: () => import('@/views/employment/IntroduceStandardCreatePage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
     },
     {
         path: '/employment/introduce-standard/list',
         name: 'IntroduceStandardListPage',
-        component: () => import('@/views/employment/IntroduceStandardListPage.vue')
+        component: () => import('@/views/employment/IntroduceStandardListPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
     },
     {
         path: '/employment/introduce-items/manage',
         name: 'IntroduceTemplateItemManagePage',
-        component: () => import('@/views/employment/IntroduceTemplateItemManagePage.vue')
+        component: () => import('@/views/employment/IntroduceTemplateItemManagePage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
     }
 
 ];
