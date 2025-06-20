@@ -13,10 +13,10 @@
         <div class="header">
             <h1 class="page-title">결재 문서 조회</h1>
             <div class="action-buttons">
-                <button class="btn approve" @click="handleApprove" :disabled="!approvalDetail.isMyTurn">
+                <button class="btn approve" @click="handleApprove" :disabled="!canApprove">
                     승인
                 </button>
-                <button class="btn reject" @click="handleReject" :disabled="!approvalDetail.isMyTurn">
+                <button class="btn reject" @click="handleReject" :disabled="!canApprove">
                     반려
                 </button>
             </div>
@@ -86,18 +86,12 @@
                     <p>※ 해당 문서는 결재 완료 후 수정이 불가능하니, 내용을 정확히 입력해 주세요.</p>
                 </div>
             </div>
-
-            <!-- 결재 버튼 (내 차례일 때만 표시) -->
-            <div v-if="approvalDetail.isMyTurn" class="approval-actions">
-                <button class="btn btn-approve" @click="handleApprove">승인</button>
-                <button class="btn btn-reject" @click="handleReject">반려</button>
-            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '../../stores/approvalStore';
@@ -113,6 +107,12 @@ const memberStore = useMemberStore();
 
 const { approvalDetail, loading, error } = storeToRefs(approvalStore);
 const { fetchReceivedApprovalDetail, clearApprovalDetail } = approvalStore;
+
+const canApprove = computed(() => {
+    if (!approvalDetail.value) return false;
+    const isMyTurn = approvalDetail.value.isMyTurn == 1 || approvalDetail.value.isMyTurn === true;
+    return isMyTurn && approvalDetail.value.status === 'IN_PROGRESS';
+});
 
 const formatDate = (dateString, format = 'full') => {
     if (!dateString) return '';
@@ -204,7 +204,19 @@ onMounted(async () => {
 
     if (approvalId && memberId) {
         await fetchReceivedApprovalDetail(approvalId, memberId);
+        
+        // isMyTurn 직접 계산
+        if (approvalDetail.value && approvalDetail.value.approvers) {
+            const firstPendingApprover = approvalDetail.value.approvers
+                .filter(a => !a.approvedAt)
+                .sort((a, b) => a.stepOrder - b.stepOrder)[0];
+            
+            approvalDetail.value.isMyTurn = firstPendingApprover && firstPendingApprover.memberId === memberId;
+        }
+
         console.log('✅[ApprovalReceivedDetailPage] 스토어에 저장된 DTO:', approvalDetail.value);
+        console.log('isMyTurn 값:', approvalDetail.value?.isMyTurn, '타입:', typeof approvalDetail.value?.isMyTurn);
+        console.log('status 값:', approvalDetail.value?.status);
     }
 });
 
