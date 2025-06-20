@@ -12,11 +12,6 @@
     <div v-else class="page-container">
         <div class="header">
             <h1 class="page-title">요청한 결재 문서 조회</h1>
-            <div class="action-buttons">
-                <button class="btn cancel" @click="handleCancel" :disabled="approvalDetail.status !== 'IN_PROGRESS'">
-                    상신 취소
-                </button>
-            </div>
         </div>
 
         <div class="content-section">
@@ -146,11 +141,6 @@ const getApproverStatusClass = (approver) => {
     return 'pending';
 };
 
-const handleCancel = () => {
-    console.log('상신 취소 처리');
-    // TODO: 상신 취소 API 호출
-};
-
 onMounted(async () => {
     const approvalId = parseInt(route.params.id);
     if (approvalId) {
@@ -182,28 +172,6 @@ onUnmounted(() => {
 .page-title {
     font-size: 1.8rem;
     font-weight: 600;
-}
-.action-buttons .btn {
-    padding: 0.6rem 1.2rem;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background-color: #fff;
-    cursor: pointer;
-    font-weight: 500;
-    margin-left: 0.5rem;
-    transition: all 0.2s ease;
-}
-.action-buttons .btn.cancel {
-    color: #e74c3c;
-    border-color: #e74c3c;
-}
-.action-buttons .btn.cancel:hover:not(:disabled) {
-    background-color: #e74c3c;
-    color: #fff;
-}
-.action-buttons .btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
 }
 .content-section {
     background-color: #fff;

@@ -28,9 +28,15 @@ export const useApprovalStore = defineStore('approval', () => {
         errorReceived.value = null;
         try {
             const response = await getReceivedApprovals(memberId);
-            receivedList.value = response;
+            receivedList.value = response || [];
         } catch (e) {
-            errorReceived.value = e;
+            // 404 Not Found는 에러가 아닌 빈 목록으로 처리
+            if (e.response && e.response.status === 404) {
+                receivedList.value = [];
+            } else {
+                console.error('받은 결재 목록 조회 실패:', e);
+                errorReceived.value = e;
+            }
         } finally {
             loadingReceived.value = false;
         }

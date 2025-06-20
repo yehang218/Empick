@@ -12,8 +12,12 @@
                 <div class="text-caption">{{ option.label }}</div>
             </v-col>
         </v-row>
-        <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
+        <v-alert v-if="error" type="error" class="mb-4">{{ error.message || error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
+        
+        <div v-if="!loading && receivedList.length === 0 && !error" class="text-center pa-8" style="background-color: #f9f9f9; border-radius: 8px;">
+            <p class="text-h6">받은 결재 문서가 없습니다.</p>
+        </div>
         
         <ListView
             :headers="headers"
@@ -48,15 +52,14 @@ import { useAuthStore } from '@/stores/authStore';
 import ListView from '@/components/common/ListView.vue';
 import dayjs from 'dayjs';
 import { getApprovalStatusLabel } from '@/constants/approval/approvalStatus.js';
+import { storeToRefs } from 'pinia';
 
 const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
 const authStore = useAuthStore();
 const router = useRouter();
 
-const receivedList = approvalStore.receivedList;
-const loading = approvalStore.loadingReceived;
-const error = approvalStore.errorReceived;
+const { receivedList, loadingReceived: loading, errorReceived: error } = storeToRefs(approvalStore);
 
 const headers = [
     { key: 'approvalId', label: '문서번호' },
@@ -74,11 +77,11 @@ const selectedStatus = ref('ALL');
 const selectedMyStatus = ref('ALL');
 
 const statusSummary = computed(() => {
-    const all = receivedList.length;
-    const canceled = receivedList.filter(i => i.status === 'CANCELED').length;
-    const rejected = receivedList.filter(i => i.status === 'REJECTED').length;
-    const inProgress = receivedList.filter(i => i.status === 'IN_PROGRESS').length;
-    const approved = receivedList.filter(i => i.status === 'APPROVED').length;
+    const all = receivedList.value.length;
+    const canceled = receivedList.value.filter(i => i.status === 'CANCELED').length;
+    const rejected = receivedList.value.filter(i => i.status === 'REJECTED').length;
+    const inProgress = receivedList.value.filter(i => i.status === 'IN_PROGRESS').length;
+    const approved = receivedList.value.filter(i => i.status === 'APPROVED').length;
     return {
         all,
         canceled,
@@ -97,8 +100,8 @@ const statusOptions = computed(() => [
 ]);
 
 const filteredList = computed(() => {
-    if (selectedStatus.value === 'ALL') return receivedList;
-    return receivedList.filter(item => item.status === selectedStatus.value);
+    if (selectedStatus.value === 'ALL') return receivedList.value;
+    return receivedList.value.filter(item => item.status === selectedStatus.value);
 });
 
 const pagedList = computed(() => {
