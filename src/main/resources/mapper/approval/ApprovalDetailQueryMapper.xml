@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.approvals.approval.query.mapper.ApprovalQueryMapper">
+
+    <resultMap id="ApprovalDetailResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedDetailQueryDTO">
+        <id property="approvalId" column="approval_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="writerName" column="writer_name"/>
+        <result property="writerDepartment" column="writer_department"/>
+        <result property="writerPosition" column="writer_position"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+    </resultMap>
+
+    <!-- 결재 기본 정보 -->
+    <select id="findApprovalBasicDetail" resultMap="ApprovalDetailResultMap">
+        SELECT
+            a.id AS approval_id,
+            ac.id AS category_id,
+            ac.name AS category_name,
+            m.name AS writer_name,
+            d.name AS writer_department,
+            p.name AS writer_position,
+            a.created_at,
+            a.status
+        FROM approval a
+                 JOIN approval_category ac ON a.category_id = ac.id
+                 JOIN member m ON a.writer_id = m.id
+                 JOIN department d ON m.department_id = d.id
+                 JOIN position p ON m.position_id = p.id
+        WHERE a.id = #{approvalId}
+    </select>
+
+    <!-- 결재자 상세 정보 -->
+    <select id="findApproverDetails" resultType="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineDetailDTO">
+        SELECT 1 AS stepOrder, m1.id AS memberId, m1.name AS memberName, p1.name AS positionName, d1.name AS departmentName,
+               a.first_approved_at IS NOT NULL AS approved, a.first_approved_at AS approvedAt
+        FROM approval a
+                 JOIN member m1 ON a.first_approver_id = m1.id
+                 JOIN department d1 ON m1.department_id = d1.id
+                 JOIN position p1 ON m1.position_id = p1.id
+        WHERE a.id = #{approvalId}
+
+        UNION ALL
+
+        SELECT 2, m2.id, m2.name, p2.name, d2.name,
+               a.second_approved_at IS NOT NULL, a.second_approved_at
+        FROM approval a
+                 JOIN member m2 ON a.second_approver_id = m2.id
+                 JOIN department d2 ON m2.department_id = d2.id
+                 JOIN position p2 ON m2.position_id = p2.id
+        WHERE a.id = #{approvalId} AND a.second_approver_id IS NOT NULL
+
+        UNION ALL
+
+        SELECT 3, m3.id, m3.name, p3.name, d3.name,
+               a.third_approved_at IS NOT NULL, a.third_approved_at
+        FROM approval a
+                 JOIN member m3 ON a.third_approver_id = m3.id
+                 JOIN department d3 ON m3.department_id = d3.id
+                 JOIN position p3 ON m3.position_id = p3.id
+        WHERE a.id = #{approvalId} AND a.third_approver_id IS NOT NULL
+
+        UNION ALL
+
+        SELECT 4, m4.id, m4.name, p4.name, d4.name,
+               a.fourth_approved_at IS NOT NULL, a.fourth_approved_at
+        FROM approval a
+                 JOIN member m4 ON a.fourth_approver_id = m4.id
+                 JOIN department d4 ON m4.department_id = d4.id
+                 JOIN position p4 ON m4.position_id = p4.id
+        WHERE a.id = #{approvalId} AND a.fourth_approver_id IS NOT NULL
+
+        ORDER BY stepOrder
+    </select>
+
+    <!-- 내가 결재할 차례인지 확인 -->
+    <select id="isMyTurn" resultType="boolean">
+        SELECT CASE
+                   WHEN a.first_approver_id = #{memberId} AND a.first_approved_at IS NULL THEN TRUE
+                   WHEN a.second_approver_id = #{memberId} AND a.first_approved_at IS NOT NULL AND a.second_approved_at IS NULL THEN TRUE
+                   WHEN a.third_approver_id = #{memberId} AND a.second_approved_at IS NOT NULL AND a.third_approved_at IS NULL THEN TRUE
+                   WHEN a.fourth_approver_id = #{memberId} AND a.third_approved_at IS NOT NULL AND a.fourth_approved_at IS NULL THEN TRUE
+                   ELSE FALSE
+                   END
+        FROM approval a
+        WHERE a.id = #{approvalId}
+    </select>
+
+</mapper>

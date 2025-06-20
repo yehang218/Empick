@@ -1,6 +1,7 @@
 package com.piveguyz.empickbackend.approvals.approval.query.service;
 
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedDetailQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO;
 
