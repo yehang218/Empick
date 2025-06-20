@@ -6,9 +6,14 @@
 
     <!-- 로딩 완료 후 jobtest가 있을 때 -->
     <v-container v-else-if="jobtest" fluid>
-        <v-btn prepend-icon="mdi-arrow-left" variant="tonal" class="mb-4" @click="goJobtestList">
-            목록으로
-        </v-btn>
+        <div class="d-flex justify-space-between align-center mb-4">
+            <v-btn prepend-icon="mdi-arrow-left" variant="tonal" @click="goJobtestList">
+                목록으로
+            </v-btn>
+            <v-btn color="primary" variant="tonal" prepend-icon="mdi-pencil" @click="goEditJobtest">
+                수정하기
+            </v-btn>
+        </div>
 
         <!-- 요약 카드 -->
         <jobtest-summary-card :jobtest="jobtest" class="mb-6" />
@@ -59,5 +64,9 @@ const error = computed(() => jobtestDetailStore.error)
 
 const goJobtestList = () => {
     router.push({ name: 'JobtestList' });
+}
+
+const goEditJobtest = () => {
+    router.push({ name: 'JobtestCreate', query: { jobtestId: jobtest.value.id } });
 }
 </script>

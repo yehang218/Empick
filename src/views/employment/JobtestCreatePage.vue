@@ -35,13 +35,8 @@
             <v-row class="align-center" no-gutters>
                 <v-col cols="12" md="6" class="d-flex align-center">
                     <h6 class="text-h6 font-weight-bold mb-4 ml-8 mr-4">문제 선택하기</h6>
-                    <Search
-                        v-model="search"
-                        placeholder="문제 검색"
-                        @clear="clearSearch"
-                        @search="handleSearch"
-                        class="search-bar"
-                    />
+                    <Search v-model="search" placeholder="문제 검색" @clear="clearSearch" @search="handleSearch"
+                        class="search-bar" />
                 </v-col>
                 <v-col cols="12" md="6" class="d-flex justify-end">
                     <v-btn color="primary" variant="tonal" prepend-icon="mdi-plus" @click="dialog = true">
@@ -77,7 +72,8 @@
             <!-- 점수 입력 -->
             <template #item.score="{ item }">
                 <v-text-field :model-value="item.score" @update:model-value="val => item.score = Number(val)"
-                    type="number" variant="underlined" density="compact" hide-details style="width: 80px;" @click.stop />
+                    type="number" variant="underlined" density="compact" hide-details style="width: 80px;"
+                    @click.stop />
             </template>
             <!-- 문제 내용 -->
             <template #item.content="{ item }">
@@ -93,7 +89,7 @@
 
         <div class="d-flex justify-end mt-4">
             <v-btn variant="tonal" color="grey" class="mr-2" @click="cancel">취소하기</v-btn>
-            <v-btn color="primary" @click="register">등록하기</v-btn>
+            <v-btn color="primary" @click="register">{{ isEdit ? '수정하기' : '등록하기' }}</v-btn>
         </div>
 
         <v-dialog v-model="dialog" max-width="800">
@@ -105,19 +101,21 @@
         <SuccessModal v-if="showSuccessModal" message="실무 테스트가 등록되었습니다." @confirm="handleSuccessConfirm"
             @cancel="showSuccessModal = false" />
 
-        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="handleCancelClose" />
+        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm"
+            @cancel="handleCancelClose" />
 
-        <JobtestQuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail" :showDelete="false" :showEdit="false" />
+        <JobtestQuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail" :showDelete="false"
+            :showEdit="false" />
     </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
-import { createJobtestService } from '@/services/jobtestService'
-import CreateJobtestRequestDTO from '@/dto/employment/jobtest/createJobtestRequestDTO'
+import { createJobtestService, getJobtestService, updateJobtestService } from '@/services/jobtestService'
+import { CreateJobtestRequestDTO, UpdateJobtestRequestDTO } from '@/dto/employment/jobtest/jobtestRequestDTO'
 import QuestionCreateModal from '@/components/employment/QuestionCreateModal.vue'
 import SuccessModal from '@/components/common/AlertModal.vue'
 import { useMemberStore } from '@/stores/memberStore'
@@ -126,6 +124,7 @@ import JobtestQuestionDetailModal from '@/components/employment/JobtestQuestionD
 import Search from '@/components/common/Search.vue'
 
 const router = useRouter();
+const route = useRoute()
 const jobtestQuestionStore = useJobtestQuestionStore()
 const memberStore = useMemberStore()
 
@@ -144,6 +143,8 @@ const endedAt = ref('');
 const detailDialogVisible = ref(false)
 const selectedQuestionDetail = ref(null)
 const search = ref('')
+const isEdit = ref(false)
+const editingJobtestId = ref(null)
 
 // v-data-table 헤더 정의
 const questionTableHeaders = [
@@ -166,6 +167,26 @@ onMounted(async () => {
         ...q,
         id: Number(q.id)
     }))
+
+    // Edit mode: pre-fill if jobtestId is present
+    const jobtestId = route.query.jobtestId
+    if (jobtestId) {
+        isEdit.value = true
+        editingJobtestId.value = Number(jobtestId)
+        const jobtest = await getJobtestService(editingJobtestId.value)
+        jobtestTitle.value = jobtest.title
+        testTime.value = jobtest.testTime
+        difficulty.value = jobtest.difficulty
+        startedAt.value = jobtest.startedAt ? new Date(jobtest.startedAt).toISOString().slice(0, 16) : ''
+        endedAt.value = jobtest.endedAt ? new Date(jobtest.endedAt).toISOString().slice(0, 16) : ''
+        // Set selected questions and scores
+        selectedIds.value = jobtest.questions.map(q => q.questionId)
+        // Set score for each question in localQuestions
+        localQuestions.value = localQuestions.value.map(q => {
+            const found = jobtest.questions.find(jq => jq.questionId === q.id)
+            return found ? { ...q, score: found.score } : q
+        })
+    }
 })
 
 // v-data-table 선택 관련 로직
@@ -250,8 +271,27 @@ const register = async () => {
             score: Number(q.score ?? 0)
         }))
     );
+
+    const updateDto = new UpdateJobtestRequestDTO(
+        jobtestTitle.value,
+        difficulty.value,
+        testTime.value,
+        new Date(startedAt.value),
+        new Date(endedAt.value),
+        memberStore.form.id,
+        selected.map(q => ({
+            questionId: q.id,
+            score: Number(q.score ?? 0)
+        }))
+    )
     try {
-        await createJobtestService(dto)
+        if (isEdit.value && editingJobtestId.value) {
+            await updateJobtestService(editingJobtestId.value, updateDto)
+            toast.success('실무 테스트가 수정되었습니다.')
+        } else {
+            await createJobtestService(dto)
+            showSuccessModal.value = true
+        }
         showSuccessModal.value = true
     } catch (e) {
         toast.error('등록 중 오류가 발생했습니다.')
