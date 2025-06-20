@@ -22,6 +22,17 @@
         FROM interviewer
     </select>
 
+    <select id="findById" resultMap="InterviewerResultMap">
+        SELECT
+            id,
+            interview_id,
+            interviewer_id,
+            score,
+            review
+        FROM interviewer
+        WHERE id = #{id}
+    </select>
+
     <select id="findByInterviewId" resultMap="InterviewerResultMap">
         SELECT
             id,
