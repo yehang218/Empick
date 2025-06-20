@@ -12,7 +12,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in data" :key="index" @click="$emit('item-click', item)"
+                <tr v-for="(item, index) in pagedData" :key="index" @click="$emit('item-click', item)"
                     style="cursor: pointer;">
                     <td v-if="showCheckbox" @click.stop>
                         <v-btn size="small" icon :color="item.selected ? 'primary' : 'grey-lighten-1'" variant="tonal"
@@ -58,29 +58,54 @@
                 </tr>
             </tbody>
         </v-table>
+        <Pagination v-if="showPagination" v-model="pageProxy" :length="totalPages" />
     </v-container>
 </template>
 
-<script>
-export default {
-    name: 'DynamicTable',
-    props: {
-        headers: {
-            type: Array,
-            required: true,
-            default: () => []
-        },
-        data: {
-            type: Array,
-            required: true,
-            default: () => []
-        },
-        showCheckbox: {
-            type: Boolean,
-            default: false
-        }
+<script setup>
+import { computed, ref, watch } from 'vue';
+import Pagination from './Pagination.vue';
+
+const props = defineProps({
+    headers: {
+        type: Array,
+        required: true,
+        default: () => []
+    },
+    data: {
+        type: Array,
+        required: true,
+        default: () => []
+    },
+    showCheckbox: {
+        type: Boolean,
+        default: false
+    },
+    itemsPerPage: {
+        type: Number,
+        default: 10
+    },
+    page: {
+        type: Number,
+        default: 1
+    },
+    showPagination: {
+        type: Boolean,
+        default: true
     }
-}
+});
+const emit = defineEmits(['update:page', 'item-click', 'toggle-select']);
+
+const pageProxy = ref(props.page);
+watch(() => props.page, val => { pageProxy.value = val; });
+watch(pageProxy, val => { emit('update:page', val); });
+
+const totalPages = computed(() => Math.ceil(props.data.length / props.itemsPerPage));
+const pagedData = computed(() => {
+    const start = (pageProxy.value - 1) * props.itemsPerPage;
+    const end = start + props.itemsPerPage;
+    return props.data.slice(start, end);
+});
 </script>
 
 <style scoped>

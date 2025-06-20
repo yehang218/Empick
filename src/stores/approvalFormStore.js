@@ -1,4 +1,3 @@
-// stores/approvalFormStore.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { CreateApprovalDTO } from '@/dto/approval/approval/createApprovalDTO';

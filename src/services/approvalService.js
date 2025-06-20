@@ -8,7 +8,8 @@ import ApprovalSentListDTO from '@/dto/approval/approval/approvalSentListDTO';
 
 import ApprovalCategoryDTO from '@/dto/approval/approvalCategory/approvalCategoryDTO';
 import ApprovalCategoryItemDTO from '@/dto/approval/approvalCategoryItem/approvalCategoryItemDTO';
-import { CreateApprovalDTO } from '@/dto/approval/approval/createApprovalDTO';
+import { ApprovalContentDTO, CreateApprovalDTO } from '@/dto/approval/approval/createApprovalDTO';
+import { InputTypeEnum } from '@/constants/common/inputType';
 
 // 결재 카테고리 목록 조회
 export const getApprovalCategories = async (options = {}) => {
@@ -39,10 +40,10 @@ export const getApprovalCategoryItems = async (categoryId, options = {}) => {
 };
 
 // 결재 문서 목록 조회 (작성자 기준)
-export const getApprovalsByWriterId = async (writerId) => {  };
+export const getApprovalsByWriterId = async (writerId) => { };
 
 // 결재 문서 목록 조회 (결재자 기준)
-export const getApprovalsByApproverId = async (approverId) => {  };
+export const getApprovalsByApproverId = async (approverId) => { };
 
 // 단건 결재 조회
 export const getApprovalById = async (approvalId) => { };
@@ -62,10 +63,10 @@ export const createApprovalService = async (dto, options = {}) => {
 };
 
 // 승인 처리
-export const approveApproval = async (approvalId) => {  };
+export const approveApproval = async (approvalId) => { };
 
 // 반려 처리
-export const rejectApproval = async (approvalId, rejectReason) => {  };
+export const rejectApproval = async (approvalId, rejectReason) => { };
 
 // 자신이 결재자인 결재문서 목록 조회
 export const getReceivedApprovals = async (memberId) => {
@@ -81,4 +82,59 @@ export const getRequestedApprovals = async (memberId) => {
         const response = await api.get(ApprovalAPI.REQUESTED_DOCUMENTS_LIST(memberId));
         return (response.data.data || []).map(item => new ApprovalRequestedListDTO(item));
     });
+};
+
+// 결재 라인 조회
+export const getApprovalLine = async (categoryId, writerId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(
+            ApprovalAPI.APPROVAL_LINE(categoryId) + `?writerId=${writerId}`
+        );
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.data;
+    }, options);
+};
+
+// 결재 항목 DTO 생성 함수
+export const createApprovalContentDTOs = (categoryItems) => {
+    return categoryItems.map(item => {
+        let content = '';
+        if (item.inputType === InputTypeEnum.FILE) content = null;
+        return new ApprovalContentDTO({ itemId: item.id, content });
+    });
+};
+
+// CreateApprovalDTO 생성 함수
+export const createApprovalDTO = () => {
+    return new CreateApprovalDTO();
+};
+
+// JSON으로부터 CreateApprovalDTO 생성 함수
+export const createApprovalDTOFromJson = (json) => {
+    return CreateApprovalDTO.fromJSON(json);
+};
+
+// 폼 데이터 정제 함수
+export const sanitizeApprovalForm = (form, memberId) => {
+    // 데이터 정제
+    const sanitizedData = {
+        categoryId: form.categoryId,
+        writerId: Number(memberId),
+        approvers: form.approvers.map((approver, index) => ({
+            order: index + 1,
+            memberId: Number(approver.memberId)
+        })),
+        contents: form.contents.map(content => ({
+            itemId: Number(content.itemId),
+            content: String(content.content ?? '').trim()
+        }))
+    };
+
+    // DTO 인스턴스로 반환
+    return CreateApprovalDTO.fromJSON(sanitizedData);
 };

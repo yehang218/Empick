@@ -47,7 +47,9 @@
                     <div class="menu-columns">
                         <div v-for="section in filteredMenuObject[selectedMenu]" :key="section.label"
                             class="menu-section">
-                            <h3 class="menu-title">{{ section.label }}</h3>
+                            <h3 class="menu-title" @click="goToFirstChild(section)" style="cursor:pointer">
+                                {{ section.label }}
+                            </h3>
                             <ul v-if="section.children.length" class="submenu-list">
                                 <li v-for="child in section.children" :key="child.label" class="submenu-item"
                                     @click="goTo(child.path)">
@@ -117,6 +119,15 @@ function goTo(path) {
 
 function goToMain() {
     router.push('/');
+}
+
+function goToFirstChild(section) {
+    if (section.children && section.children.length > 0) {
+        const first = section.children.find(child => child.path);
+        if (first?.path) goTo(first.path);
+    } else if (section.path) {
+        goTo(section.path);
+    }
 }
 </script>
 

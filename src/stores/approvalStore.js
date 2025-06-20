@@ -21,7 +21,8 @@ export const useApprovalStore = defineStore('approval', () => {
         loadingReceived.value = true;
         errorReceived.value = null;
         try {
-            receivedList.value = await getReceivedApprovals(memberId);
+            const response = await getReceivedApprovals(memberId);
+            receivedList.value = response;
         } catch (e) {
             errorReceived.value = e;
         } finally {
@@ -33,7 +34,8 @@ export const useApprovalStore = defineStore('approval', () => {
         loadingSent.value = true;
         errorSent.value = null;
         try {
-            sentList.value = await getApprovalsByWriterId(writerId);
+            const response = await getApprovalsByWriterId(writerId);
+            sentList.value = response;
         } catch (e) {
             errorSent.value = e;
         } finally {
@@ -45,12 +47,29 @@ export const useApprovalStore = defineStore('approval', () => {
         loadingRequested.value = true;
         errorRequested.value = null;
         try {
-            requestedList.value = await getRequestedApprovals(memberId);
+            const response = await getRequestedApprovals(memberId);
+            requestedList.value = response;
         } catch (e) {
             errorRequested.value = e;
         } finally {
             loadingRequested.value = false;
         }
+    };
+
+    // 데이터 초기화
+    const reset = () => {
+        receivedList.value = [];
+        loadingReceived.value = false;
+        errorReceived.value = null;
+        
+        sentList.value = [];
+        loadingSent.value = false;
+        errorSent.value = null;
+        
+        requestedList.value = [];
+        loadingRequested.value = false;
+        errorRequested.value = null;
+        localStorage.removeItem('approval-store');
     };
 
     return {
@@ -65,6 +84,13 @@ export const useApprovalStore = defineStore('approval', () => {
         errorRequested,
         loadReceivedApprovals,
         loadSentApprovals,
-        loadRequestedApprovals
+        loadRequestedApprovals,
+        reset
     };
+}, {
+    persist: {
+        key: 'approval-store',
+        storage: localStorage,
+        paths: ['receivedList', 'sentList', 'requestedList']
+    }
 });

@@ -14,7 +14,8 @@
         </v-row>
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
-        <ListView v-else :headers="headers" :data="pagedList" @item-click="goToDetail">
+        <ListView v-else :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
+            @update:page="page = $event" @item-click="goToDetail">
             <template #item.myApprovalStatus="{ item }">
                 <v-chip :color="getMyApprovalStatusColor(item.myApprovalStatus)" text-color="white" small
                     class="font-weight-bold" outlined>
@@ -22,14 +23,12 @@
                 </v-chip>
             </template>
             <template #item.status="{ item }">
-                <v-chip :color="getStatusColor(item.statusLabel)" text-color="white" small
-                    class="font-weight-bold" outlined>
-                    {{ item.statusLabel }}
+                <v-chip :color="getStatusColor(item.status)" text-color="white" small class="font-weight-bold"
+                    outlined>
+                    {{ item.status }}
                 </v-chip>
             </template>
         </ListView>
-
-        <Pagination v-model="page" :length="totalPages" />
     </v-container>
 </template>
 
@@ -38,13 +37,14 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useMemberStore } from '@/stores/memberStore';
+import { useAuthStore } from '@/stores/authStore';
 import ListView from '@/components/common/ListView.vue';
-import Pagination from '@/components/common/Pagination.vue';
 import dayjs from 'dayjs';
 import { getApprovalStatusLabel } from '@/constants/approval/approvalStatus.js';
 
 const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
+const authStore = useAuthStore();
 const router = useRouter();
 
 const receivedList = approvalStore.receivedList;
@@ -110,12 +110,14 @@ const pagedList = computed(() => {
         } else if (item.status === 'CANCELED') {
             myApprovalStatus = '취소됨';
         }
-        return Object.assign({}, item, {
+
+        return {
+            ...item,
             myApprovalStatus,
-            canApproveChip: item.status === 'IN_PROGRESS' && isMyTurn, // 핵심!
+            canApproveChip: item.status === 'IN_PROGRESS' && isMyTurn,
             createdAt: item.createdAt ? dayjs(item.createdAt).format('YYYY-MM-DD HH:mm') : '',
-            statusLabel: getApprovalStatusLabel(item.status)
-        });
+            status: getApprovalStatusLabel(item.status)
+        };
     });
 });
 
@@ -163,8 +165,8 @@ function getMyApprovalStatusColor(status) {
     }
 }
 
-function getStatusColor(statusLabel) {
-    switch (statusLabel) {
+function getStatusColor(status) {
+    switch (status) {
         case '결재 취소':
             return 'grey'
         case '반려':
@@ -179,13 +181,26 @@ function getStatusColor(statusLabel) {
 }
 
 onMounted(async () => {
-    // 내 정보가 없으면 먼저 불러오기
-    if (!memberStore.form.id) {
-        await memberStore.getMyInfo();
-    }
-    if (memberStore.form.id) {
-        approvalStore.loadReceivedApprovals(memberStore.form.id);
-        // console.log('받은 결재 데이터:', approvalStore.receivedList);
+    try {
+        // 인증 상태 확인
+        if (!authStore.isAuthenticated) {
+            console.log('인증되지 않은 상태, 로그인 페이지로 이동');
+            router.push('/login');
+            return;
+        }
+
+        // 내 정보가 없으면 먼저 불러오기
+        if (!memberStore.form.id) {
+            await memberStore.getMyInfo();
+        }
+        if (memberStore.form.id) {
+            await approvalStore.loadReceivedApprovals(memberStore.form.id);
+        } else {
+            throw new Error('멤버 정보 조회 실패(아이디 없음)');
+        }
+    } catch (err) {
+        console.error('결재 목록 불러오기 실패:', err);
+        approvalStore.errorReceived = '결재 목록을 불러오지 못했습니다.';
     }
 
     setTimeout(() => {
