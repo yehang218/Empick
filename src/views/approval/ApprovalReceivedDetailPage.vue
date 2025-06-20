@@ -52,8 +52,8 @@
                         :class="getApproverStatusClass(approver)"
                     >
                         <div class="signature-box">
-                            <span v-if="approver.approvedAt && approver.approved" class="stamp approved">승인</span>
-                            <span v-else-if="approver.approvedAt && !approver.approved" class="stamp rejected">반려</span>
+                            <span v-if="approver.approved === true" class="stamp approved">승인</span>
+                            <span v-else-if="approver.approved === false" class="stamp rejected">반려</span>
                         </div>
                         <div class="approver-name">{{ approver.memberName }} {{ approver.positionName }}</div>
                         <div v-if="approver.approvedAt" class="approval-date">
@@ -172,14 +172,22 @@ const getStatusClass = (status) => {
 };
 
 const getApproverStatusClass = (approver) => {
-    if (approver.approvedAt) {
-        return approver.approved ? 'approved' : 'rejected';
+    if (approver.approved === true) {
+        return 'approved';
     }
-    // 현재 결재 차례인 사람을 식별하는 로직
-    const firstPending = approvalDetail.value.approvers.find(a => !a.approvedAt);
-    if (firstPending && firstPending.memberId === approver.memberId && approvalDetail.value.isMyTurn) {
-        return 'current-turn';
+    if (approver.approved === false) {
+        return 'rejected';
     }
+
+    // 'approved'가 null이면 아직 미결재 상태.
+    if (approvalDetail.value.status === 'IN_PROGRESS') {
+        // 미결재자 중 첫 번째 사람을 찾아 현재 차례인지 확인
+        const firstPending = approvalDetail.value.approvers.find(a => a.approved !== true && a.approved !== false);
+        if (firstPending && firstPending.memberId === approver.memberId && approvalDetail.value.isMyTurn) {
+            return 'current-turn';
+        }
+    }
+
     return 'pending';
 }
 
