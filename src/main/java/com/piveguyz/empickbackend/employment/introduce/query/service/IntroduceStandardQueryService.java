@@ -11,4 +11,6 @@ public interface IntroduceStandardQueryService {
     List<IntroduceStandardItemQueryDTO> findAllIntroduceStandardItem();
 
     IntroduceStandardQueryDTO getIntroduceStandardById(int id);
+
+    List<IntroduceStandardItemQueryDTO> getIntroduceStandardItemById(int standardId);
 }
