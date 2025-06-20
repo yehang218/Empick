@@ -2,7 +2,7 @@
   <div class="modal-overlay">
     <div class="modal-box">
       <p class="modal-message">
-        <strong><u>{{ message }}</u></strong>
+        <strong><u><span v-html="message" /></u></strong>
       </p>
       <div class="modal-buttons">
         <button class="yes" @click="$emit('confirm')">확인</button>

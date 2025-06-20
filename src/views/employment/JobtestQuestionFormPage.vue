@@ -25,7 +25,7 @@
         <SuccessModal v-if="showSuccessModal" :message="isEdit ? '문제 수정이 완료되었습니다.' : '문제 등록이 완료되었습니다.'"
             @confirm="handleSuccessConfirm" />
 
-        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까? 입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="handleCancelClose" />
+        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="handleCancelClose" />
     </v-container>
 </template>
 

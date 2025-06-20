@@ -32,17 +32,28 @@
             </v-row>
         </v-card>
         <div class="table-header-actions">
-            <v-row>
-                <h6 class="text-h6 font-weight-bold mb-4 ml-8">문제 선택하기</h6>
+            <v-row class="align-center" no-gutters>
+                <v-col cols="12" md="6" class="d-flex align-center">
+                    <h6 class="text-h6 font-weight-bold mb-4 ml-8 mr-4">문제 선택하기</h6>
+                    <Search
+                        v-model="search"
+                        placeholder="문제 검색"
+                        @clear="clearSearch"
+                        @search="handleSearch"
+                        class="search-bar"
+                    />
+                </v-col>
+                <v-col cols="12" md="6" class="d-flex justify-end">
+                    <v-btn color="primary" variant="tonal" prepend-icon="mdi-plus" @click="dialog = true">
+                        문제 등록하기
+                    </v-btn>
+                </v-col>
             </v-row>
-            <v-btn color="primary" variant="tonal" prepend-icon="mdi-plus" @click="dialog = true">
-                문제 등록하기
-            </v-btn>
         </div>
 
         <!-- 문제 리스트 v-data-table로 교체 -->
-        <v-data-table :headers="questionTableHeaders" :items="localQuestions" item-key="id" class="elevation-1 mb-4"
-            :items-per-page="10" return-object>
+        <v-data-table :headers="questionTableHeaders" :items="filteredQuestions" item-key="id" class="elevation-1 mb-4"
+            :items-per-page="10" return-object @click:row="handleQuestionRowClick">
             <!-- 선택 체크박스 헤더 -->
             <template #header.select>
                 <v-checkbox :model-value="isAllSelected" :indeterminate="isIndeterminate"
@@ -66,7 +77,11 @@
             <!-- 점수 입력 -->
             <template #item.score="{ item }">
                 <v-text-field :model-value="item.score" @update:model-value="val => item.score = Number(val)"
-                    type="number" variant="underlined" density="compact" hide-details style="width: 80px;" />
+                    type="number" variant="underlined" density="compact" hide-details style="width: 80px;" @click.stop />
+            </template>
+            <!-- 문제 내용 -->
+            <template #item.content="{ item }">
+                <span class="truncate-text">{{ item.content }}</span>
             </template>
         </v-data-table>
 
@@ -90,7 +105,9 @@
         <SuccessModal v-if="showSuccessModal" message="실무 테스트가 등록되었습니다." @confirm="handleSuccessConfirm"
             @cancel="showSuccessModal = false" />
 
-        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까? 입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="handleCancelClose" />
+        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="handleCancelClose" />
+
+        <JobtestQuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail" :showDelete="false" :showEdit="false" />
     </v-container>
 </template>
 
@@ -105,6 +122,8 @@ import QuestionCreateModal from '@/components/employment/QuestionCreateModal.vue
 import SuccessModal from '@/components/common/AlertModal.vue'
 import { useMemberStore } from '@/stores/memberStore'
 import Modal from '@/components/common/Modal.vue'
+import JobtestQuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
+import Search from '@/components/common/Search.vue'
 
 const router = useRouter();
 const jobtestQuestionStore = useJobtestQuestionStore()
@@ -122,14 +141,17 @@ const dialog = ref(false)
 const selectedIds = ref([])
 const startedAt = ref('');
 const endedAt = ref('');
+const detailDialogVisible = ref(false)
+const selectedQuestionDetail = ref(null)
+const search = ref('')
 
 // v-data-table 헤더 정의
 const questionTableHeaders = [
     { title: '', key: 'select', sortable: false, width: '50px' },
-    { title: '문제', key: 'content', sortable: false },
-    { title: '유형', key: 'type', sortable: false },
-    { title: '난이도', key: 'difficulty', sortable: false },
-    { title: '점수', key: 'score', sortable: false }
+    { title: '문제', key: 'content', sortable: true },
+    { title: '유형', key: 'type', sortable: true },
+    { title: '난이도', key: 'difficulty', sortable: true },
+    { title: '점수', key: 'score', sortable: true }
 ];
 
 const difficultyOptions = [
@@ -268,6 +290,33 @@ const handleNewQuestion = async () => {
     }));
 };
 
+const handleQuestionRowClick = async (event, { item }) => {
+    try {
+        await jobtestQuestionStore.loadQuestion(item.id)
+        selectedQuestionDetail.value = { ...jobtestQuestionStore.form }
+        detailDialogVisible.value = true
+    } catch (err) {
+        toast.error('문제 상세 정보를 불러오는 중 오류가 발생했습니다.')
+    }
+}
+
+const filteredQuestions = computed(() => {
+    if (!search.value) return localQuestions.value
+    const keyword = search.value.toLowerCase()
+    return localQuestions.value.filter(q =>
+        (q.content && q.content.toLowerCase().includes(keyword)) ||
+        (q.type && q.type.toLowerCase().includes(keyword)) ||
+        (q.difficulty && q.difficulty.toLowerCase().includes(keyword))
+    )
+})
+
+const clearSearch = () => {
+    search.value = ''
+}
+const handleSearch = (value) => {
+    search.value = value
+}
+
 onMounted(async () => {
     await memberStore.getMyInfo();
 })
@@ -290,6 +339,15 @@ onMounted(async () => {
     color: #555;
 }
 
+.truncate-text {
+    max-width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 @media (max-width: 960px) {
     .form-label {
         margin-bottom: 2px;
@@ -302,5 +360,10 @@ onMounted(async () => {
         align-items: stretch;
         gap: 4px;
     }
+}
+
+.search-bar {
+    margin-bottom: 0;
+    margin-left: 16px;
 }
 </style>
