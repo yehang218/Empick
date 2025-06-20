@@ -40,8 +40,8 @@
                     <div v-for="approver in approvalDetail.approvers" :key="approver.memberId" class="approver-item"
                         :class="getApproverStatusClass(approver)">
                         <div class="signature-box">
-                            <span v-if="approver.approvedAt && approver.approved" class="stamp approved">승인</span>
-                            <span v-else-if="approver.approvedAt && !approver.approved" class="stamp rejected">반려</span>
+                            <span v-if="approver.approved === true" class="stamp approved">승인</span>
+                            <span v-else-if="approver.approved === false" class="stamp rejected">반려</span>
                         </div>
                         <div class="approver-name">{{ approver.memberName }} {{ approver.positionName }}</div>
                         <div v-if="approver.approvedAt" class="approval-date">
@@ -135,8 +135,11 @@ const getStatusClass = (status) => {
 };
 
 const getApproverStatusClass = (approver) => {
-    if (approver.approvedAt) {
-        return approver.approved ? 'approved' : 'rejected';
+    if (approver.approved === true) {
+        return 'approved';
+    }
+    if (approver.approved === false) {
+        return 'rejected';
     }
     return 'pending';
 };
