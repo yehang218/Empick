@@ -64,7 +64,6 @@ export const useAuthStore = defineStore('auth', () => {
             }
 
             // 멤버 정보 및 결재문서 자동 로딩
-            const memberStore = useMemberStore();
             await memberStore.getMyInfo();
             const approvalStore = useApprovalStore();
             if (memberStore.form.id) {

@@ -198,6 +198,7 @@
         </v-card>
       </v-col>
 
+
       <!-- 우측: 평가 상세 -->
       <v-col cols="12" lg="7">
         <v-card class="modern-card evaluation-detail-card">
@@ -213,7 +214,7 @@
           <v-divider class="mb-4" />
           <v-card-text>
             <div v-if="viewMode === 'detail'">
-              <component :is="evaluationComponent" :applicant="applicant" :standard-title="selectedStandard?.content" :standard-items="selectedStandard?.items" />
+              <component :is="evaluationComponent" :applicant="applicant" />
             </div>
             <div v-else class="score-analysis">
               <h4 class="text-h6 mb-4">점수 분석</h4>
@@ -281,164 +282,50 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, defineAsyncComponent, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useToast } from 'vue-toastification'
-import IntroduceStandardSelectModal from '@/components/employment/IntroduceStandardSelectModal.vue'
-import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
-import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 
 const route = useRoute()
+const router = useRouter()
 const applicationStore = useApplicationStore()
 const toast = useToast()
-const applicationId = Number(route.params.id)
+const applicationId = Number(route.params.applicationId)
+const query = route.query
 
-const router = useRouter()
+const IntroduceResult = defineAsyncComponent(() => import('@/components/employment/IntroduceEvaluationInput.vue'))
+// const TestResult = defineAsyncComponent(() => import('@/components/employment/TestResult.vue'))
+// const InterviewResult = defineAsyncComponent(() => import('@/components/employment/InterviewResult.vue'))
 
 const evaluationComponent = ref(IntroduceResult)
-
 const selectedEvaluation = ref('자기소개서')
 const viewMode = ref('detail')
 
-const selectedStandard = ref(null)
-const showStandardModal = ref(false)
+const applicant = ref({})
 
-const standardStore = useIntroduceStandardStore()
-const standardItemStore = useIntroduceStandardItemStore()
-
-// query parameter에서 받은 기본 정보로 applicant 객체 구성
-const applicant = ref({
-  // 기본 ID 필드들
-  applicantId: '',
-  applicationId: '',
-
-  // 기본 정보
-  name: '',
-  phone: '',
-  email: '',
-  profileUrl: '',
-  birth: '',
-  address: '',
-
-  // 채용 관련 정보
-  recruitmentId: '',
-  introduceRatingResultId: '',
-  jobId: '',
-  jobName: '',
-  createdAt: '',
-  status: '',
-  updatedAt: '',
-  updatedBy: '',
-
-  // 추가된 필드들
-  introduceEvaluationContent: '',
-  introduceScore: null,
-  introduceStatus: '',
-  motivation: '',
-  experience: '',
-  skills: '',
-  education: '',
-  portfolioUrl: '',
-  coverLetter: '',
-  jobtestTotalScore: null,
-  jobtestEvaluationScore: null,
-  jobtestStatus: '',
-  interviewScore: null,
-  interviewAddress: '',
-  interviewDatetime: '',
-
-  evaluationStats: []
-})
-
-// 컴포넌트 마운트 시 query parameter에서 데이터 로드
 onMounted(async () => {
-  await standardStore.fetchStandards()
-  await standardItemStore.fetchItems()
-
-  const query = route.query
-
-  // 받은 데이터로 실제 평가 통계 구성
-  const evaluationStats = []
-
-  // 자기소개서 평가
-  if (query.introduceScore) {
-    evaluationStats.push({
-      type: '자기소개서',
-      score: parseInt(query.introduceScore),
-      average: null,
-      result: query.introduceStatus === 'PASSED' ? '합격' : '불합격'
-    })
-  }
-
-  // 실무테스트 평가
-  if (query.jobtestEvaluationScore) {
-    evaluationStats.push({
-      type: '실무 테스트',
-      score: parseFloat(query.jobtestEvaluationScore),
-      average: null,
-      result: query.jobtestStatus === 'PASSED' ? '합격' : '불합격'
-    })
-  }
-
-  // 면접 평가
-  if (query.interviewScore) {
-    evaluationStats.push({
-      type: '면접',
-      score: parseFloat(query.interviewScore),
-      average: null,
-      result: parseFloat(query.interviewScore) >= 70 ? '합격' : '불합격'
-    })
-  }
-
-  applicant.value = {
-    // 기본 ID 필드들
-    applicantId: query.applicantId || '',
-    applicationId: query.applicationId || '',
-
-    // 기본 정보
-    name: query.name || '정보 없음',
-    phone: query.phone || '정보 없음',
-    email: query.email || '정보 없음',
-    profileUrl: query.profileUrl || '',
-    birth: query.birth || '정보 없음',
-    address: query.address || '정보 없음',
-
-    // 채용 관련 정보
-    recruitmentId: query.recruitmentId || '',
-    introduceRatingResultId: query.introduceRatingResultId || '',
-    jobId: query.jobId || '',
-    jobName: query.jobName || '정보 없음',
-    createdAt: query.createdAt || '정보 없음',
-    status: query.status || 'WAITING',
-    updatedAt: query.updatedAt || '',
-    updatedBy: query.updatedBy || '',
-
-    // 추가된 필드들
-    introduceEvaluationContent: query.introduceEvaluationContent || '',
-    introduceScore: query.introduceScore ? parseInt(query.introduceScore) : null,
-    introduceStatus: query.introduceStatus || '',
-    motivation: query.motivation || '정보 없음',
-    experience: query.experience || '정보 없음',
-    skills: query.skills || '정보 없음',
-    education: query.education || '정보 없음',
-    portfolioUrl: query.portfolioUrl || '',
-    coverLetter: query.coverLetter || '정보 없음',
-    jobtestTotalScore: query.jobtestTotalScore ? parseFloat(query.jobtestTotalScore) : null,
-    jobtestEvaluationScore: query.jobtestEvaluationScore ? parseFloat(query.jobtestEvaluationScore) : null,
-    jobtestStatus: query.jobtestStatus || '',
-    interviewScore: query.interviewScore ? parseFloat(query.interviewScore) : null,
-    interviewAddress: query.interviewAddress || '정보 없음',
-    interviewDatetime: query.interviewDatetime || '정보 없음',
-
-    evaluationStats: evaluationStats
+  if (applicationId) {
+    await applicationStore.fetchApplicationById(applicationId)
+    if (applicationStore.selectedApplication) {
+      applicant.value = { ...applicationStore.selectedApplication }
+    }
+  } else {
+    // 쿼리스트링 기반 fallback
+    applicant.value = { ...query }
   }
 })
+
+// applicationStore.selectedApplication을 감시하여 applicant에 반영
+watch(() => applicationStore.selectedApplication, (val) => {
+  if (val) {
+    applicant.value = { ...val }
+    // 평가 통계 등 추가 가공 필요시 여기에
+  }
+}, { immediate: true })
 
 const selectEvaluation = (type) => {
   selectedEvaluation.value = type
-
   switch (type) {
     case '자기소개서':
       evaluationComponent.value = IntroduceResult
@@ -457,17 +344,17 @@ const selectEvaluation = (type) => {
 }
 
 const getCurrentEvaluation = () => {
-  return applicant.value.evaluationStats.find(evaluation => evaluation.type === selectedEvaluation.value)
+  return applicant.value.evaluationStats?.find(evaluation => evaluation.type === selectedEvaluation.value)
 }
 
 const getSkillsArray = () => {
   if (!applicant.value.skills) return ['정보 없음']
-  return applicant.value.skills.split(/[,،、]\s*/).filter(skill => skill.trim())
+  return applicant.value.skills.split(/[,،،]\s*/).filter(skill => skill.trim())
 }
 
 const getExperiencePreview = () => {
   if (!applicant.value.experience) return '경력 정보 없음'
-  const preview = applicant.value.experience.split(/[,،、]/)[0]
+  const preview = applicant.value.experience.split(/[,،،]/)[0]
   return preview ? preview.trim() : '경력 정보 없음'
 }
 
@@ -520,20 +407,6 @@ const goBack = () => {
   } else {
     router.push('/employment/applicant')
   }
-}
-
-function handleStandardSelect(standard) {
-  selectedStandard.value = standard
-}
-
-// 평가에 사용할 임시 기준표/항목 예시
-const exampleStandard = {
-  content: '예시 기준표 제목',
-  items: [
-    { id: 1, content: '성실성' },
-    { id: 2, content: '책임감' },
-    { id: 3, content: '협업능력' }
-  ]
 }
 </script>
 
