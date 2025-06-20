@@ -52,7 +52,7 @@ create table introduce_standard_item
         primary key,
     content               varchar(255) not null,
     member_id             int          not null,
-    introduce_standard_id int          not null,
+    introduce_standard_id int          null,
     constraint introduce_standard_item_ibfk_1
         foreign key (member_id) references member (id),
     foreign key (introduce_standard_id) references  introduce_standard(id)
