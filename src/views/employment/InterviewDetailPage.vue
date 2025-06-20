@@ -1,26 +1,26 @@
 <template>
-    <div>
-        <h2 class="mb-4">면접 상세 정보</h2>
+    <div class="detail-root">
+        <h2 class="mb-4 font-weight-bold">면접 상세 정보</h2>
 
         <v-alert v-if="loading" type="info">로딩 중...</v-alert>
         <v-alert v-else-if="!selectedInterview" type="warning">면접 정보가 없습니다. 면접을 배정해주세요.</v-alert>
 
-        <!-- 상단 좌우 정보 카드 -->
-        <v-row dense>
+        <!-- 상단 정보 카드 -->
+        <v-row dense class="mb-4" align="stretch">
             <!-- 지원자 정보 -->
             <v-col cols="12" md="6">
-                <v-card v-if="selectedApplicant" class="pa-4" elevation="1">
-                    <h3>지원자 정보</h3>
+                <v-card class="pa-4 mb-2 info-card h-100 d-flex flex-column" elevation="2" rounded="lg">
+                    <h3 class="font-weight-bold mb-3">지원자 정보</h3>
                     <v-row>
                         <v-col cols="12" md="3">
                             <!-- <v-img :src="selectedApplicant.profileUrl" aspect-ratio="1" class="rounded" contain /> -->
                         </v-col>
                         <v-col cols="12" md="9">
-                            <p><strong>이름:</strong> {{ selectedApplicant.name }}</p>
-                            <p><strong>연락처:</strong> {{ selectedApplicant.phone }}</p>
-                            <p><strong>이메일:</strong> {{ selectedApplicant.email }}</p>
-                            <p><strong>주소:</strong> {{ selectedApplicant.address }}</p>
-                            <p><strong>생년월일:</strong> {{ formatDate(selectedApplicant.birth, 'date') }}</p>
+                            <p><strong>이름:</strong> {{ selectedApplicant?.name }}</p>
+                            <p><strong>연락처:</strong> {{ selectedApplicant?.phone }}</p>
+                            <p><strong>이메일:</strong> {{ selectedApplicant?.email }}</p>
+                            <p><strong>주소:</strong> {{ selectedApplicant?.address }}</p>
+                            <p><strong>생년월일:</strong> {{ formatDate(selectedApplicant?.birth, 'date') }}</p>
                         </v-col>
                     </v-row>
                 </v-card>
@@ -28,39 +28,38 @@
 
             <!-- 면접 정보 -->
             <v-col cols="12" md="6">
-                <v-card v-if="selectedInterview" class="pa-4" elevation="1">
-                    <v-card-title class="d-flex align-center justify-space-between">
-                        <span>면접 정보</span>
-                        <v-btn icon size="small" @click="startEditing" title="면접 정보 수정">
-                            <v-icon>mdi-pencil</v-icon>
-                        </v-btn>
-                    </v-card-title>
+                <v-card class="pa-4 mb-2 info-card h-100 d-flex flex-column" elevation="2" rounded="lg">
+                    <v-card-title class="font-weight-bold mb-2">면접 정보</v-card-title>
                     <v-card-text>
-                        <div><strong>면접 ID:</strong> {{ selectedInterview.id }}</div>
-                        <div><strong>지원서 ID:</strong> {{ selectedInterview.applicationId }}</div>
-                        <div><strong>평가표 ID:</strong> {{ selectedInterview.sheetId }}</div>
-                        <div><strong>면접 일시:</strong> {{ formatDate(selectedInterview.datetime) }}</div>
-                        <div><strong>면접 장소:</strong>
-                            <template v-if="isZoomUrl(selectedInterview.address)">
+                        <div><strong>면접 ID:</strong> {{ selectedInterview?.id }}</div>
+                        <div><strong>지원서 ID:</strong> {{ selectedInterview?.applicationId }}</div>
+                        <div><strong>평가표 ID:</strong> {{ selectedInterview?.sheetId }}</div>
+                        <div><strong>면접 일시:</strong> {{ formatDate(selectedInterview?.datetime) }}</div>
+                        <div><strong>면접 줌 링크:</strong>
+                            <template v-if="isZoomUrl(selectedInterview?.address)">
                                 <a :href="selectedInterview.address" target="_blank"
                                     class="text-primary text-decoration-underline">
                                     {{ selectedInterview.address }}
                                 </a>
                             </template>
                             <template v-else>
-                                {{ selectedInterview.address }}
+                                {{ selectedInterview?.address }}
                             </template>
                         </div>
-
-                        <div><strong>점수:</strong> {{ selectedInterview.score }}</div>
+                        <div><strong>점수:</strong> {{ selectedInterview?.score }}</div>
                     </v-card-text>
+                    <v-card-actions class="justify-end mt-auto">
+                        <v-btn color="primary" variant="outlined" @click="startEditing" class="edit-btn">
+                            <v-icon left>mdi-pencil</v-icon> 면접 정보 수정
+                        </v-btn>
+                    </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>
 
         <!-- 평가 기준 목록 -->
-        <v-card class="pa-4 mt-4" outlined>
-            <v-card-title>평가 기준 목록</v-card-title>
+        <v-card class="pa-4 mb-4 criteria-card" outlined>
+            <v-card-title class="font-weight-bold">평가 기준 목록</v-card-title>
             <v-divider />
             <v-list>
                 <v-list-item v-for="(criteria, index) in criteriaList" :key="criteria.id"
@@ -70,15 +69,15 @@
         </v-card>
 
         <!-- 면접관 평가 점수 카드 -->
-        <v-card class="pa-4 mt-6" outlined>
-            <v-card-title class="d-flex justify-space-between align-center">
+        <v-card class="pa-4 mb-6 score-card" outlined>
+            <v-card-title class="d-flex justify-space-between align-center font-weight-bold">
                 <span>면접관 평가 보기</span>
                 <div>
                     <v-btn icon @click="prevInterviewer" :disabled="currentIndex === 0">
                         <v-icon>mdi-chevron-left</v-icon>
                     </v-btn>
                     <span class="mx-4">익명 {{ currentIndex + 1 }}</span>
-                    <v-btn icon @click="nextInterviewer" :disabled="currentIndex === allScores.length - 1">
+                    <v-btn icon @click="nextInterviewer" :disabled="allScores.length === 0 || currentIndex === allScores.length - 1">
                         <v-icon>mdi-chevron-right</v-icon>
                     </v-btn>
                 </div>
@@ -86,66 +85,96 @@
             <v-divider />
 
             <v-container fluid class="pa-0">
-                <v-row v-for="(item, index) in evaluationItems" :key="index" class="py-4">
-                    <v-col cols="12">
-                        <div class="d-flex justify-space-between align-center mb-1">
-                            <div>
-                                <h4 class="text-subtitle-1 font-weight-bold">
-                                    {{ index + 1 }}. {{ item.title }}
-                                </h4>
+                <template v-if="allScores.length === 0 || !hasAnyScore">
+                    <div class="text-center py-8 text-grey font-weight-bold">입력된 평가 점수가 없습니다.</div>
+                </template>
+                <template v-else>
+                    <v-row v-for="(item, index) in evaluationItems" :key="index" class="py-4">
+                        <v-col cols="12">
+                            <div class="d-flex justify-space-between align-center mb-1">
+                                <div>
+                                    <h4 class="text-subtitle-1 font-weight-bold">
+                                        {{ index + 1 }}. {{ item.title }}
+                                    </h4>
+                                </div>
+                                <span class="text-body-1 font-weight-bold">
+                                    {{ item.score }}/100
+                                    <span class="text-caption grey--text ml-2">({{ item.weight }}%)</span>
+                                </span>
                             </div>
-                            <span class="text-body-1 font-weight-bold">
-                                {{ item.score }}/100
-                                <span class="text-caption grey--text ml-2">({{ item.weight }}%)</span>
-                            </span>
-                        </div>
-                        <p class="mb-1 grey--text text--darken-1">{{ item.criteria }}</p>
-                        <v-card class="pa-3 mt-2" outlined>
-                            <p class="mb-0">{{ item.evaluation }}</p>
-                        </v-card>
-                    </v-col>
-                    <v-divider v-if="index < evaluationItems.length - 1"></v-divider>
-                </v-row>
+                            <p class="mb-1 grey--text text--darken-1">{{ item.criteria }}</p>
+                            <v-card class="pa-3 mt-2" outlined>
+                                <p class="mb-0">{{ item.evaluation }}</p>
+                            </v-card>
+                        </v-col>
+                        <v-divider v-if="index < evaluationItems.length - 1"></v-divider>
+                    </v-row>
+                </template>
             </v-container>
         </v-card>
 
-        <!-- 평가 입력 버튼 -->
-        <v-btn color="primary" class="mt-6" @click="goToInputInterviewScorePage">
-            평가 입력하기
-        </v-btn>
+        <!-- 하단 버튼: 평가 입력/뒤로 가기 -->
+        <v-row class="mt-6 mb-2">
+            <v-col cols="12" md="6" class="d-flex justify-start">
+                <v-btn color="primary" class="action-btn" @click="goToInputInterviewScorePage">
+                    <v-icon left>mdi-pencil-box-outline</v-icon> 평가 입력하기
+                </v-btn>
+            </v-col>
+            <v-col cols="12" md="6" class="d-flex justify-end">
+                <v-btn color="grey lighten-1" class="action-btn" @click="goToInterviewPage">
+                    <v-icon left>mdi-arrow-left</v-icon> 뒤로 가기
+                </v-btn>
+            </v-col>
+        </v-row>
 
         <!-- 면접 수정 다이얼로그 -->
-        <v-dialog v-model="dialog" max-width="500px">
-            <v-card>
-                <v-card-title>면접 정보 수정</v-card-title>
+        <v-dialog v-model="dialog" max-width="420px">
+            <v-card class="edit-modal-card">
+                <v-card-title class="font-weight-bold">면접 정보 수정</v-card-title>
                 <v-card-text>
-                    <v-date-picker v-model="editDatetime" label="날짜 선택" />
+                    <v-date-picker v-model="editDatetime" locale="ko" color="primary" header-color="primary" class="mb-4 rounded-picker" />
 
-                    <v-row>
+                    <v-row class="mb-3">
                         <v-col cols="6">
-                            <v-select v-model="selectedHour" :items="hourOptions" label="시간" dense />
+                            <v-select
+                                v-model="selectedHour"
+                                :items="hourOptions"
+                                label="시"
+                                dense
+                                variant="outlined"
+                                class="rounded-select"
+                            />
                         </v-col>
                         <v-col cols="6">
-                            <v-select v-model="selectedMinute" :items="minuteOptions" label="분" dense />
+                            <v-select
+                                v-model="selectedMinute"
+                                :items="minuteOptions"
+                                label="분"
+                                dense
+                                variant="outlined"
+                                class="rounded-select"
+                            />
                         </v-col>
                     </v-row>
 
-                    <v-text-field v-model="editAddress" label="면접 장소" />
+                    <v-text-field
+                        v-model="editAddress"
+                        label="면접 장소"
+                        placeholder="Zoom 링크 입력"
+                        variant="outlined"
+                        class="rounded-input"
+                        dense
+                    />
                 </v-card-text>
-                <v-card-actions>
-                    <v-spacer />
-                    <v-btn text @click="dialog = false">취소</v-btn>
-                    <v-btn color="primary" @click="saveChanges">수정</v-btn>
+                <v-card-actions class="justify-end">
+                    <v-btn text class="modal-btn-cancel" @click="dialog = false">취소</v-btn>
+                    <v-btn color="primary" class="modal-btn-confirm" @click="saveChanges">수정</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
 
-        <!-- 하단 버튼 -->
         <v-btn v-if="!selectedInterview && !loading" color="primary" class="mt-4">
             면접 배정하기
-        </v-btn>
-        <v-btn color="primary" class="mt-4" @click="goToInterviewPage">
-            뒤로 가기
         </v-btn>
     </div>
 </template>
@@ -153,6 +182,9 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+dayjs.locale('ko');
 
 import { useInterviewStore } from '@/stores/interviewStore';
 import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore';
@@ -350,4 +382,83 @@ const nextInterviewer = () => {
     if (currentIndex.value < allScores.value.length - 1) currentIndex.value++
 }
 
+// 평가 점수 중 하나라도 입력된 게 있는지 체크
+const hasAnyScore = computed(() => {
+    if (!allScores.value.length) return false;
+    // 현재 면접관의 점수 데이터
+    const scoreData = allScores.value[currentIndex.value]?.scores || [];
+    // 점수/리뷰가 하나라도 있으면 true
+    return scoreData.some(s => s.score > 0 || (s.review && s.review !== '평가 없음'));
+});
+
 </script>
+
+<style scoped>
+.detail-root {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 0 64px 0;
+}
+.info-card {
+    background: #f8fafc;
+    border-radius: 18px;
+    border: 1.5px solid #e0e0e0;
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+}
+.criteria-card {
+    background: #f6f8f7;
+    border-radius: 18px;
+    border: 1.5px solid #e0e0e0;
+}
+.score-card {
+    background: #f6f8f7;
+    border-radius: 18px;
+    border: 1.5px solid #e0e0e0;
+    min-height: 220px;
+}
+.text-grey {
+    color: #888 !important;
+}
+.action-btn {
+    min-width: 160px;
+    border-radius: 24px;
+    font-weight: bold;
+    font-size: 1.05rem;
+    letter-spacing: -0.5px;
+    box-shadow: 0 2px 8px #e0e0e033;
+}
+.edit-btn {
+    min-width: 140px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.98rem;
+}
+/* 모달 관련 스타일 */
+.edit-modal-card {
+    padding: 8px 0 16px 0;
+    border-radius: 18px;
+}
+.rounded-picker {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px #e0e0e022;
+}
+.rounded-select {
+    border-radius: 16px !important;
+}
+.rounded-input {
+    border-radius: 16px !important;
+}
+.modal-btn-cancel {
+    min-width: 80px;
+    font-weight: 500;
+    color: #888 !important;
+}
+.modal-btn-confirm {
+    min-width: 80px;
+    font-weight: bold;
+    border-radius: 20px;
+}
+</style>

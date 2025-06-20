@@ -10,7 +10,8 @@ import {
     deleteInterviewerService,
     getAllInterviewers,
     getInterviewerByIdService,
-    getInterviewersByInterviewIdService
+    getInterviewersByInterviewIdService,
+    getInterviewerByInterviewIdAndMemberIdService
 } from '@/services/interviewerService';
 
 export const useInterviewerStore = defineStore('interviewer', () => {
@@ -64,6 +65,21 @@ export const useInterviewerStore = defineStore('interviewer', () => {
         }
     };
 
+    const fetchInterviewerByInterviewIdAndMemberId = async (interviewId, memberId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const result = await getInterviewerByInterviewIdAndMemberIdService(interviewId, memberId);
+            selectedInterviewer.value = result;
+            return result;
+        } catch (err) {
+            error.value = err.message;
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
     // ✍️ 생성/수정/삭제 함수
 
     const createInterviewer = async (dto) => {
@@ -101,6 +117,7 @@ export const useInterviewerStore = defineStore('interviewer', () => {
         fetchAllInterviewers,
         fetchInterviewerById,
         fetchInterviewersByInterviewId,
+        fetchInterviewerByInterviewIdAndMemberId,
         createInterviewer,
         updateInterviewerScore,
         updateInterviewerReview,

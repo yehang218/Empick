@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Calendar from '@/components/common/Calendar.vue'
 import { useInterviewStore } from '@/stores/interviewStore'
 import { useApplicationStore } from '@/stores/applicationStore'
@@ -50,7 +50,6 @@ const goToCreateInterview = () => {
     })
 }
 
-
 const interviewStore = useInterviewStore()
 const applicationStore = useApplicationStore()
 const applicantStore = useApplicantStore()
@@ -69,30 +68,21 @@ const onDateSelected = async (date) => {
     // interviews.value 초기화
     interviews.value = []
 
-    // 각 인터뷰에 대해 applicantName 추가
+    // 각 인터뷰에 대해 applicantName 추가 (중복 없이 한 번씩만 추가)
     for (const interview of rawInterviews) {
         try {
-            selectedInterview.value = interview 
-            const applicationId = selectedInterview.value.applicationId
-            const interviewTime = selectedInterview.value.datetime
-            console.log('applicationId : ', applicationId)
-            console.log('interviewTime : ', interviewTime)
+            const applicationId = interview.applicationId
             await applicationStore.fetchApplicationById(applicationId)
-            
-            selectedApplication.value = await applicationStore.selectedApplication
-            console.log('selectedApplication : ', selectedApplication)
-            const applicantId = selectedApplication.value.applicantId
-            console.log('applicantId : ', applicantId)
-
-            selectedApplicant.value = await applicantStore.fetchApplicantById(applicantId)
-            console.log('selectedApplicant : ', selectedApplicant)
+            const application = applicationStore.selectedApplication
+            const applicantId = application.applicantId
+            await applicantStore.fetchApplicantById(applicantId)
+            const applicant = applicantStore.selectedApplicant
 
             let applicantName = '이름 없음'
-            if(selectedApplicant.value){
-                applicantName = selectedApplicant.value.name
+            if (applicant) {
+                applicantName = applicant.name
             }
-            console.log('applicantName : ', applicantName)
-            
+
             interviews.value.push({
                 ...interview,
                 applicantName,

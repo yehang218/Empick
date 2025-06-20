@@ -21,8 +21,7 @@ import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
 import { useInterviewScoreStore } from '@/stores/interviewScoreStore'
 import { useInterviewerStore } from '@/stores/interviewerStore'
 import { useAuthStore } from '@/stores/authStore'
-
-
+import { useMemberStore } from '@/stores/memberStore'
 
 const router = useRouter()
 const route = useRoute()
@@ -34,11 +33,13 @@ const criteriaStore = useInterviewCriteriaStore()
 const scoreStore = useInterviewScoreStore()
 const interviewerStore = useInterviewerStore()
 const authStore = useAuthStore()
+const memberStore = useMemberStore()
 
+const myId = computed(() => memberStore.form.id)
 
 const selectedInterview = ref(null)
-
 const criteriaItems = ref([])
+const totalReview = ref('')
 
 const goToInterviewDetailPage = () => {
     const applicationId = selectedInterview.value?.applicationId;
@@ -46,11 +47,8 @@ const goToInterviewDetailPage = () => {
         alert('면접 정보가 없습니다.');
         return;
     }
-
     router.push({ name: 'InterviewDetailPage', params: { applicationId } });
 };
-
-const totalReview = ref('')
 
 const fetchAll = async () => {
     try {
@@ -61,14 +59,16 @@ const fetchAll = async () => {
         await criteriaStore.fetchCriteriaBySheetId(sheetId)
         const criteriaList = criteriaStore.criteriaList
 
-        const interviewerId = authStore.user?.id || 2001
-        console.log('interviewerId', interviewerId)
-        await interviewerStore.fetchInterviewerById(interviewerId)
-        const interviewer = interviewerStore.selectedInterviewer
-        console.log('📌 selectedInterviewer:', interviewer)
+        // 내 id와 interviewId로 interviewer 불러오기, 없으면 생성
+        let interviewer = await interviewerStore.fetchInterviewerByInterviewIdAndMemberId(interviewId, myId.value)
+        if (!interviewer) {
+            await interviewerStore.createInterviewer({ interviewId, memberId: myId.value })
+            interviewer = await interviewerStore.fetchInterviewerByInterviewIdAndMemberId(interviewId, myId.value)
+        }
         totalReview.value = interviewer?.review || ''
 
-        await scoreStore.fetchScoresByInterviewerId(interviewerId)
+        // interviewer의 PK(id)로 점수 조회
+        await scoreStore.fetchScoresByInterviewerId(interviewer.id)
         const scoreList = scoreStore.scoreList
 
         criteriaItems.value = criteriaList.map(c => {
@@ -80,30 +80,31 @@ const fetchAll = async () => {
                 existingScoreId: matchedScore?.id ?? null
             }
         })
-
     } catch (err) {
         console.error('로딩 중 오류:', err)
         alert('평가 데이터를 불러오는 데 실패했습니다.')
     }
 }
 
-// ✅ 첫 진입 및 경로 변경 시 다시 fetch
 onMounted(fetchAll)
-
 watch(() => route.fullPath, fetchAll)
 
 const handleEvaluationSubmit = async ({ criteria, totalReview }) => {
-    const interviewerId = authStore.user?.id || 2001
-
+    // interviewer의 PK(id)를 사용
+    let interviewer = await interviewerStore.fetchInterviewerByInterviewIdAndMemberId(interviewId, myId.value)
+    if (!interviewer) {
+        await interviewerStore.createInterviewer({ interviewId, memberId: myId.value })
+        interviewer = await interviewerStore.fetchInterviewerByInterviewIdAndMemberId(interviewId, myId.value)
+    }
+    const interviewerPk = interviewer.id
     for (const item of criteria) {
         const dto = {
             interviewId,
             criteriaId: item.id,
-            interviewerId,
+            interviewerId: interviewerPk,
             score: item.score,
             review: item.review
         }
-
         try {
             if (item.existingScoreId) {
                 await scoreStore.updateScore(item.existingScoreId, dto)
@@ -114,10 +115,9 @@ const handleEvaluationSubmit = async ({ criteria, totalReview }) => {
             console.error('점수 저장 실패:', err)
         }
     }
-
     // 면접 총평 저장
     try {
-        await interviewerStore.updateInterviewerReview(interviewerId, totalReview);
+        await interviewerStore.updateInterviewerReview(interviewerPk, totalReview);
         if (!totalReview || totalReview.trim() === '') {
             alert('총평을 입력해 주세요.');
             return;
