@@ -15,7 +15,6 @@ import * as directives from 'vuetify/directives'
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
-
 const app = createApp(App);
 
 const vuetify = createVuetify({

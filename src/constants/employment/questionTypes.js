@@ -1,10 +1,17 @@
 /**
  * 실무테스트 문제 유형 매핑
  */
+
 export const QUESTION_TYPE_MAP = {
     'MULTIPLE': '선택형',
     'SUBJECTIVE': '단답형',
     'DESCRIPTIVE': '서술형'
+};
+
+export const QUESTION_TYPES = {
+    'MULTIPLE': '0',
+    'SUBJECTIVE': '1',
+    'DESCRIPTIVE': '2'
 };
 
 /**
