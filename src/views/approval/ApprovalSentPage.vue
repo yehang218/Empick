@@ -15,7 +15,7 @@
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
         <ListView v-else :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
-            @update:page="page = $event" @item-click="goToDetail">
+            @update:page="page = $event" @row-click="goToDetail">
             <template #item.status="{ item }">
                 <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small class="font-weight-bold"
                     outlined>
@@ -100,7 +100,7 @@ const totalPages = computed(() => {
 
 function goToDetail(item) {
     if (item && item.approvalId) {
-        router.push(`/approval/${item.approvalId}`);
+        router.push(`/approval/sent/${item.approvalId}`);
     }
 }
 

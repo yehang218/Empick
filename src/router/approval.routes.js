@@ -48,6 +48,18 @@ export const approvalRoutes = [
         }
     },
 
+    // 요청한 결재문서 상세 조회 페이지
+    {
+        path: '/approval/sent/:id',
+        name: 'ApprovalRequestedDetail',
+        component: () => import('@/views/approval/ApprovaRequestedDetailPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_USER', 'ROLE_HR_ACCESS', 'ROLE_APPROVAL_PROCESSOR']
+        }
+    },
+
     // 결재 문서 작성 페이지
     {
         path: '/approval/create',
