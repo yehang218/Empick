@@ -63,7 +63,11 @@ onMounted(loadItems)
 const addItem = async () => {
   if (!newContent.value.trim()) return
   try {
-    await introduceItemStore.addItem(newContent.value, 1) // memberId는 실제 로그인 유저로
+    await introduceItemStore.addItem({
+      title: newContent.value,
+      memberId: 1, // 실제 로그인 유저 ID로 교체 필요
+      introduceTemplateId: null // 필요시 실제 템플릿 ID로 교체
+    })
     newContent.value = ''
     await loadItems()
   } catch (error) {
