@@ -102,38 +102,49 @@ public class InterviewFacade {
 
     public Double calculateInterviewerScore(Integer interviewerId){
         List<InterviewScoreQueryDTO> dtoList = interviewScoreQueryService.findByInterviewerId(interviewerId);
-        Integer count = dtoList.size();
-        Double sum = (double)0;
+
+        Double weightSum = 0.0;
+        Double sum = 0.0;
         for(InterviewScoreQueryDTO dto : dtoList){
             Integer score = dto.getScore();
             Integer criteriaId = dto.getCriteriaId();
             InterviewCriteriaQueryDTO criteriaDTO = interviewCriteriaQueryService.findById(criteriaId);
             Double weight = criteriaDTO.getWeight();
-            sum += weight * score;
+            if(score != null && weight != null){
+                sum += weight * score;
+                weightSum += weight;
+            }
         }
-        return sum / count;
+        return sum / weightSum;
     }
 
     public Double calculateInterviewScore(Integer interviewId){
         List<InterviewerQueryDTO> dtoList = interviewerQueryService.findByInterviewId(interviewId);
-        Integer count = dtoList.size();
+        Integer count = 0;
         Double sum = (double)0;
         for(InterviewerQueryDTO dto : dtoList){
             Double score = dto.getScore();
-            sum += score;
+            if(score != null){
+                sum += score;
+                count++;
+            }
         }
-        return sum / count;
+        if(count > 0){
+            return sum / count;
+        } else {
+            return null;
+        }
     }
 
     public InterviewScoreCommandDTO createInterviewScore(InterviewScoreCommandDTO dto) {
         InterviewScoreCommandDTO createdDTO = interviewScoreCommandService.create(dto);
-        Integer interviewerId = dto.getInterviewerId();
+        Integer interviewerId = createdDTO.getInterviewerId();
         Double newInterviewerScore = calculateInterviewerScore(interviewerId);
 
-        interviewerCommandService.updateInterviewerScore(interviewerId, newInterviewerScore);
+        InterviewerCommandDTO interviewerCommandDTO =
+                interviewerCommandService.updateInterviewerScore(interviewerId, newInterviewerScore);
 
-        InterviewerQueryDTO interviewerQueryDTO = interviewerQueryService.findById(interviewerId);
-        Integer interviewId = interviewerQueryDTO.getInterviewId();
+        Integer interviewId = interviewerCommandDTO.getInterviewId();
         Double newInterviewScore = calculateInterviewScore(interviewId);
 
         interviewCommandService.updateScore(interviewId, newInterviewScore);
@@ -143,13 +154,13 @@ public class InterviewFacade {
 
     public InterviewScoreCommandDTO updateInterviewScore(Integer id, InterviewScoreCommandDTO dto) {
         InterviewScoreCommandDTO updatedDTO = interviewScoreCommandService.update(id, dto);
-        Integer interviewerId = dto.getInterviewerId();
+        Integer interviewerId = updatedDTO.getInterviewerId();
         Double newInterviewerScore = calculateInterviewerScore(interviewerId);
 
-        interviewerCommandService.updateInterviewerScore(interviewerId, newInterviewerScore);
+        InterviewerCommandDTO interviewerCommandDTO =
+                interviewerCommandService.updateInterviewerScore(interviewerId, newInterviewerScore);
 
-        InterviewerQueryDTO interviewerQueryDTO = interviewerQueryService.findById(interviewerId);
-        Integer interviewId = interviewerQueryDTO.getInterviewId();
+        Integer interviewId = interviewerCommandDTO.getInterviewId();
         Double newInterviewScore = calculateInterviewScore(interviewId);
 
         interviewCommandService.updateScore(interviewId, newInterviewScore);
