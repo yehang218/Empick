@@ -10,4 +10,6 @@ public interface InterviewerQueryService {
     InterviewerQueryDTO findById(Integer id);
 
     List<InterviewerQueryDTO> findByInterviewId(Integer interviewId);
+
+    InterviewerQueryDTO findByInterviewInterviewerId(Integer interviewId, Integer interviewerId);
 }

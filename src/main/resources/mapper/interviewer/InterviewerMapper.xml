@@ -44,6 +44,17 @@
         WHERE interview_id = #{interviewId}
     </select>
 
+    <select id="findByInterviewInterviewerId" resultMap="InterviewerResultMap">
+        SELECT
+            id,
+            interview_id,
+            interviewer_id,
+            score,
+            review
+        FROM interviewer
+        WHERE interview_id = #{interviewId}
+        AND interviewer_id = #{interviewerId}
+    </select>
 
 
 </mapper>
