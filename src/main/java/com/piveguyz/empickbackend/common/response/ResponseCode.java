@@ -190,6 +190,7 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_APPLICATION_JOBTEST(false, HttpStatus.NOT_FOUND, 2304, "존재하지 않는 지원서별 실무테스트입니다."),
     EMPLOYMENT_INVALID_TIME(false, HttpStatus.BAD_REQUEST, 2305, "시험 시간이 아닙니다."),
     EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2306, "해당 지원서에 이미 실무테스트가 할당되어 있습니다."),
+    EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_COMPLETE(false, HttpStatus.BAD_REQUEST, 2307, "이미 제출된 테스트입니다."),
 
     //   4) 실무테스트 답안
     EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2440, "요청한 답안을 찾을 수 없습니다."),

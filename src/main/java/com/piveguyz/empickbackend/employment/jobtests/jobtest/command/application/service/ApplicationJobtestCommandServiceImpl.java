@@ -92,20 +92,10 @@ public class ApplicationJobtestCommandServiceImpl implements ApplicationJobtestC
     }
 
     @Override
-    public void verifyEntryCode(int jobtestId, JobtestEntryRequestDTO requestDTO) {
-        List<ApplicationJobtestEntity> applicationJobtest = applicationJobtestRepository.findByJobTestId(jobtestId);
-
-        boolean flag = false;
-        for(ApplicationJobtestEntity applicationJobtestEntity : applicationJobtest) {
-            if(applicationJobtestEntity.getEntryCode().equals(requestDTO.getEntryCode())) {
-                flag = true;
-                break;
-            }
-        }
-        if(!flag) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_JOBTEST_INVALID_ENTRY_CODE);
-        }
-
+    public void finishExam(int applicationJobTestId) {
+        ApplicationJobtestEntity applicationJobtest = applicationJobtestRepository.findById(applicationJobTestId)
+                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_APPLICATION_JOBTEST));
+        applicationJobtest.updateSubittedAt();
     }
 
 

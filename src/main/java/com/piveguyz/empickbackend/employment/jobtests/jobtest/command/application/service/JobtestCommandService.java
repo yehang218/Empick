@@ -15,6 +15,4 @@ public interface JobtestCommandService {
     Integer deleteJobtest(int id);
 
     Optional<JobtestEntity> findById(int jobtestId);
-
-    void checkJobtestTime(int jobtestId);
 }

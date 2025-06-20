@@ -88,4 +88,12 @@ public class ApplicationJobtestEntity {
         this.gradingTotalScore = totalScore;
         this.gradingStatus = JobtestStatus.COMPLETED;
     }
+
+    public void destroyEntryCode() {
+        this.entryCode = null;
+    }
+
+    public void updateSubittedAt() {
+        this.submittedAt = LocalDateTime.now();
+    }
 }
