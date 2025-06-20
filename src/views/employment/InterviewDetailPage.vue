@@ -2,6 +2,11 @@
     <div class="detail-root">
         <h2 class="mb-4 font-weight-bold">면접 상세 정보</h2>
 
+        <!-- 면접 총점(평균) 상단 고정 -->
+        <div class="mb-4 text-h5 font-weight-bold text-center">
+            면접 총점(평균): {{ selectedInterview?.score ?? '-' }}
+        </div>
+
         <v-alert v-if="loading" type="info">로딩 중...</v-alert>
         <v-alert v-else-if="!selectedInterview" type="warning">면접 정보가 없습니다. 면접을 배정해주세요.</v-alert>
 
@@ -72,6 +77,9 @@
         <v-card class="pa-4 mb-6 score-card" outlined>
             <v-card-title class="d-flex justify-space-between align-center font-weight-bold">
                 <span>면접관 평가 보기</span>
+                <span class="text-primary font-weight-bold">
+                    합산 점수: {{ currentInterviewerScore }}
+                </span>
                 <div>
                     <v-btn icon @click="prevInterviewer" :disabled="currentIndex === 0">
                         <v-icon>mdi-chevron-left</v-icon>
@@ -390,6 +398,17 @@ const hasAnyScore = computed(() => {
     // 점수/리뷰가 하나라도 있으면 true
     return scoreData.some(s => s.score > 0 || (s.review && s.review !== '평가 없음'));
 });
+
+// 면접관별 합산 점수(화살표 이동 시 바뀜)
+const currentInterviewerScore = computed(() => {
+    const current = allScores.value[currentIndex.value]
+    if (!current) return '-'
+    // interviewerId 또는 memberId로 interviewerList에서 score 찾기
+    const found = interviewerStore.interviewerList.find(
+        i => i.id === current.interviewerId || i.memberId === current.memberId
+    )
+    return found?.score ?? '-'
+})
 
 </script>
 

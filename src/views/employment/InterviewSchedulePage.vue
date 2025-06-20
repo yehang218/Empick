@@ -65,8 +65,8 @@ const onDateSelected = async (date) => {
     await interviewStore.fetchInterviewsByDate(date)
     const rawInterviews = interviewStore.interviewList
 
-    // interviews.value 초기화
-    interviews.value = []
+    // interviews.value 완전 초기화
+    interviews.value.splice(0)
 
     // 각 인터뷰에 대해 applicantName 추가 (중복 없이 한 번씩만 추가)
     for (const interview of rawInterviews) {
@@ -83,16 +83,21 @@ const onDateSelected = async (date) => {
                 applicantName = applicant.name
             }
 
-            interviews.value.push({
-                ...interview,
-                applicantName,
-            })
+            // 중복 방지
+            if (!interviews.value.some(i => i.applicationId === interview.applicationId)) {
+                interviews.value.push({
+                    ...interview,
+                    applicantName,
+                })
+            }
         } catch (err) {
             console.error('Error fetching applicant name:', err)
-            interviews.value.push({
-                ...interview,
-                applicantName: '오류',
-            })
+            if (!interviews.value.some(i => i.applicationId === interview.applicationId)) {
+                interviews.value.push({
+                    ...interview,
+                    applicantName: '오류',
+                })
+            }
         }
     }
 }
