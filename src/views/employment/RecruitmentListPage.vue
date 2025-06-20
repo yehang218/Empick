@@ -33,8 +33,7 @@
 
         <!-- 채용 공고 목록 테이블 -->
         <div @click="handleRowClick">
-            <ListView :headers="headers" :data="pagedRecruitments" />
-            <Pagination v-model="page" :length="totalPages" />
+            <ListView :headers="headers" :data="recruitmentsForDisplay" :showPagination="true" />
         </div>
     </v-container>
 </template>
@@ -47,7 +46,6 @@ import ListView from '@/components/common/ListView.vue'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
-import Pagination from '@/components/common/Pagination.vue'
 
 const router = useRouter()
 const route = useRoute()

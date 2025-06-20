@@ -100,6 +100,8 @@ export const useMemberStore = defineStore('member', {
             this.loading = false;
             this.error = '';
             this.profileImageUrl = '';
+
+            localStorage.removeItem('member-store');
         },
 
         // 📝 사원 등록
@@ -351,5 +353,11 @@ export const useMemberStore = defineStore('member', {
             this.membersCache = [];
             this.membersCacheTimestamp = null;
         }
+    },
+}, {
+    persist: {
+        key: 'member-store',
+        storage: localStorage,
+        paths: ['form']
     }
-}); 
+});
