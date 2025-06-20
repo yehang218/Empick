@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { getJobtestListService } from '@/services/jobtestService';
+import { getJobtestListService, deleteJobtestService } from '@/services/jobtestService';
 import { getDifficultyLabel } from '@/constants/employment/difficulty';
 
 export const useJobtestListStore = defineStore('jobtestList', () => {
@@ -36,6 +36,22 @@ export const useJobtestListStore = defineStore('jobtestList', () => {
 
     const clearSelection = () => selectedIds.value.splice(0);
 
+    const deleteJobtestsByIds = async (ids) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            // 일괄 삭제 요청
+            await Promise.all(ids.map(id => deleteJobtestService(id)));
+            await fetchJobtests();
+        } catch (e) {
+            error.value = e.message || '실무 테스트 삭제 실패';
+            await fetchJobtests();
+            throw e;
+        } finally {
+            loading.value = false;
+        }
+    };
+
     return {
         jobtests,
         selectedIds,
@@ -44,6 +60,7 @@ export const useJobtestListStore = defineStore('jobtestList', () => {
         hasSelectedJobtests,
         fetchJobtests,
         toggleSelection,
-        clearSelection
+        clearSelection,
+        deleteJobtestsByIds
     };
 });

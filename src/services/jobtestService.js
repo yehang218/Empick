@@ -81,3 +81,17 @@ export const verifyJobtestEntryService = async (jobtestId, dto, options = {}) =>
         return apiResponse.message;
     }, options);
 };
+
+// 실무테스트 삭제 서비스
+export const deleteJobtestService = async (jobtestId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.delete(JobtestAPI.JOBTEST_DETAIL(jobtestId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return apiResponse.message;
+    }, options);
+};
