@@ -49,6 +49,10 @@
                         </a>
                     </template>
 
+                    <template #footer="{ page, pageCount, setPage }">
+                        <Pagination :model-value="page" :length="pageCount" :total-visible="5" @update:modelValue="setPage" />
+                    </template>
+
                 </v-data-table>
 
                 <v-card-text v-if="selectedJobtests.length > 0" class="text-caption pa-2">
@@ -67,6 +71,7 @@ import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { useJobtestListStore } from '@/stores/jobtestListStore';
+import Pagination from '@/components/common/Pagination.vue'
 
 const router = useRouter();
 const store = useJobtestListStore();
