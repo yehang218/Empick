@@ -11,5 +11,5 @@ public interface InterviewerQueryService {
 
     List<InterviewerQueryDTO> findByInterviewId(Integer interviewId);
 
-    InterviewerQueryDTO findByInterviewInterviewerId(Integer interviewId, Integer interviewerId);
+    InterviewerQueryDTO findByInterviewMemberId(Integer interviewId, Integer memberId);
 }
