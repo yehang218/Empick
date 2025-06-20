@@ -14,8 +14,15 @@
         </v-row>
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
-        <ListView v-else :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
-            @update:page="page = $event" @item-click="goToDetail">
+        
+        <ListView
+            :headers="headers"
+            :data="pagedList"
+            :itemsPerPage="itemsPerPage"
+            :page="page"
+            @update:page="page = $event"
+            @row-click="handleRowClick"
+        >
             <template #item.myApprovalStatus="{ item }">
                 <v-chip :color="getMyApprovalStatusColor(item.myApprovalStatus)" text-color="white" small
                     class="font-weight-bold" outlined>
@@ -142,11 +149,11 @@ const myApprovalStatusOptions = computed(() => [
     { key: '취소됨', label: '취소됨', count: myApprovalStatusSummary.value.canceled, color: 'grey' }
 ]);
 
-function goToDetail(item) {
-    if (item && item.approvalId) {
-        router.push(`/approval/${item.approvalId}`);
+const handleRowClick = (item) => {
+    if (item?.approvalId) {
+        router.push(`/approval/inbox/${item.approvalId}`);
     }
-}
+};
 
 function getMyApprovalStatusColor(status) {
     switch (status) {
