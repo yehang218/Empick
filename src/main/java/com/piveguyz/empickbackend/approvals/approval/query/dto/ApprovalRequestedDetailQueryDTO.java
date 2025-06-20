@@ -14,18 +14,21 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApprovalReceivedDetailQueryDTO {
+public class ApprovalRequestedDetailQueryDTO {
 	private Integer approvalId;
 	private Integer categoryId;
-	private String categoryName;        // 연차, 반차 등
+	private String categoryName;
 	private String writerName;
 	private String writerDepartment;
 	private String writerPosition;
 	private LocalDateTime createdAt;
-	private ApprovalStatus status;      // -2: 취소, -1: 반려, 0: 진행중, 1: 완료
+	private ApprovalStatus status;
 
-	private List<ApprovalContentItemDTO> items;    // 결재 문서 내용 (항목명 + 내용)
-	private List<ApprovalLineDetailDTO> approvers;  // 결재자들 (결재 순서, 이름, 부서, 직책, 상태)
+	private List<ApprovalContentItemDTO> items;
+	private List<ApprovalLineDetailDTO> approvers;
 
-	private boolean isMyTurn;           // 현재 사용자 차례 여부
+	private Integer targetApprovalId;            // 취소 대상 문서 ID
+	private String targetCategoryName;           // 취소 대상 문서 유형
+	private String targetWriterName;             // 취소 대상 작성자 이름
+	private ApprovalStatus targetApprovalStatus; // 취소 대상 상태
 }

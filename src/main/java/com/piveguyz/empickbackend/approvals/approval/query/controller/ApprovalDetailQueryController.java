@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedDetailQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedDetailQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.service.ApprovalDetailQueryService;
 import com.piveguyz.empickbackend.approvals.approval.query.service.ApprovalQueryService;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
@@ -36,4 +37,12 @@ public class ApprovalDetailQueryController {
 	}
 
 	// 요청한 결재문서 상세조회
+	@GetMapping("/requested/{id}")
+	public ResponseEntity<CustomApiResponse<ApprovalRequestedDetailQueryDTO>> getRequestedApprovalDetail(
+		@PathVariable("id") Integer approvalId
+	) {
+		ApprovalRequestedDetailQueryDTO dto = approvalDetailQueryService.getRequestedApprovalDetail(approvalId);
+		return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+			.body(CustomApiResponse.of(ResponseCode.SUCCESS, dto));
+	}
 }

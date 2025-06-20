@@ -5,6 +5,7 @@
 
 <mapper namespace="com.piveguyz.empickbackend.approvals.approval.query.mapper.ApprovalQueryMapper">
 
+    <!-- 요청받은 결재문서 상세 조회용 -->
     <resultMap id="ApprovalDetailResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedDetailQueryDTO">
         <id property="approvalId" column="approval_id"/>
         <result property="categoryId" column="category_id"/>
@@ -16,6 +17,25 @@
         <result property="status" column="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
     </resultMap>
 
+    <!-- 요청한 결재문서 상세 조회용 -->
+    <resultMap id="ApprovalRequestedDetailMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedDetailQueryDTO">
+        <id property="approvalId" column="approval_id"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="writerName" column="writer_name"/>
+        <result property="writerDepartment" column="writer_department"/>
+        <result property="writerPosition" column="writer_position"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="status" column="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+
+        <!-- 취소 대상 문서 정보 -->
+        <result property="targetApprovalId" column="target_approval_id"/>
+        <result property="targetCategoryName" column="target_category_name"/>
+        <result property="targetWriterName" column="target_writer_name"/>
+        <result property="targetApprovalStatus" column="target_status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+    </resultMap>
+
+    <!-- 요청받은 결재문서 상세 조회 -->
     <!-- 결재 기본 정보 -->
     <select id="findApprovalBasicDetail" resultMap="ApprovalDetailResultMap">
         SELECT
@@ -91,4 +111,32 @@
         WHERE a.id = #{approvalId}
     </select>
 
+    <!-- 내가 요청한 결재문서 기본 정보 + 취소 대상 정보까지 조회 -->
+    <select id="findRequestedApprovalBasicDetail" resultMap="ApprovalRequestedDetailMap">
+        SELECT
+            a.id AS approval_id,
+            ac.id AS category_id,
+            ac.name AS category_name,
+            m.name AS writer_name,
+            d.name AS writer_department,
+            p.name AS writer_position,
+            a.created_at,
+            a.status,
+
+        <!-- 취소 대상 문서 정보 -->
+            a.approval_id AS target_approval_id,
+            CASE WHEN a.approval_id IS NOT NULL THEN ac2.name ELSE NULL END AS target_category_name,
+            CASE WHEN a.approval_id IS NOT NULL THEN m2.name ELSE NULL END AS target_writer_name,
+            CASE WHEN a.approval_id IS NOT NULL THEN a2.status ELSE NULL END AS target_status
+
+        FROM approval a
+                 JOIN approval_category ac ON a.category_id = ac.id
+                 JOIN member m ON a.writer_id = m.id
+                 JOIN department d ON m.department_id = d.id
+                 JOIN position p ON m.position_id = p.id
+                 LEFT JOIN approval a2 ON a.approval_id = a2.id
+                 LEFT JOIN approval_category ac2 ON a2.category_id = ac2.id
+                 LEFT JOIN member m2 ON a2.writer_id = m2.id
+        WHERE a.id = #{approvalId}
+    </select>
 </mapper>

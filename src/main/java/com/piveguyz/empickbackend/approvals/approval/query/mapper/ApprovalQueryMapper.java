@@ -5,6 +5,7 @@ import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineQuery
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedDetailQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedDetailQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -31,4 +32,6 @@ public interface ApprovalQueryMapper {
     ApprovalReceivedDetailQueryDTO findApprovalBasicDetail(Integer approvalId);
     List<ApprovalLineDetailDTO> findApproverDetails(Integer approvalId);
     boolean isMyTurn(Integer approvalId, Integer memberId);
+
+    ApprovalRequestedDetailQueryDTO findRequestedApprovalBasicDetail(Integer approvalId);
 }
