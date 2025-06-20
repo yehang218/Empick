@@ -90,24 +90,6 @@
                     <div class="no-data-message">근무 데이터가 없습니다</div>
                 </div>
 
-                <!-- 근무시간 바 툴팁 -->
-                <div v-if="workBarTooltip.show" class="work-bar-tooltip"
-                    :style="{ left: workBarTooltip.x + 'px', top: workBarTooltip.y + 'px' }">
-                    <div class="tooltip-content">
-                        <div class="tooltip-item">
-                            <span class="tooltip-label">출근:</span>
-                            <span class="tooltip-value">{{ workBarTooltip.startTime }}</span>
-                        </div>
-                        <div v-if="workBarTooltip.endTime !== '-'" class="tooltip-item">
-                            <span class="tooltip-label">퇴근:</span>
-                            <span class="tooltip-value">{{ workBarTooltip.endTime }}</span>
-                        </div>
-                        <div class="tooltip-item">
-                            <span class="tooltip-label">근무시간:</span>
-                            <span class="tooltip-value">{{ workBarTooltip.duration }}</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -117,6 +99,27 @@
         <div v-if="hoverTime.show" class="timeline-tooltip-global"
             :style="{ left: hoverTime.x + 'px', top: hoverTime.y + 'px' }">
             {{ hoverTime.time }}
+        </div>
+    </Teleport>
+
+    <!-- 근무시간 바 툴팁 (body에 직접 렌더링) -->
+    <Teleport to="body">
+        <div v-if="workBarTooltip.show" class="work-bar-tooltip-global"
+            :style="{ left: workBarTooltip.x + 'px', top: workBarTooltip.y + 'px' }">
+            <div class="tooltip-content">
+                <div class="tooltip-item">
+                    <span class="tooltip-label">출근:</span>
+                    <span class="tooltip-value">{{ workBarTooltip.startTime }}</span>
+                </div>
+                <div v-if="workBarTooltip.endTime !== '-'" class="tooltip-item">
+                    <span class="tooltip-label">퇴근:</span>
+                    <span class="tooltip-value">{{ workBarTooltip.endTime }}</span>
+                </div>
+                <div class="tooltip-item">
+                    <span class="tooltip-label">근무시간:</span>
+                    <span class="tooltip-value">{{ workBarTooltip.duration }}</span>
+                </div>
+            </div>
         </div>
     </Teleport>
 </template>
@@ -254,13 +257,13 @@ const getOngoingWorkBarStyle = (day) => {
 
 
 
-// 타임라인 마우스 이동 처리
+// 타임라인 마우스 이동 처리 (배경 - 실시간 시간 표시)
 const onTimelineMouseMove = (event) => {
     const rect = event.currentTarget.getBoundingClientRect()
     const x = event.clientX - rect.left
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100))
 
-    // 24시간 기준으로 시간 계산
+    // 24시간 기준으로 시간 계산 (실시간)
     const totalMinutes = (percentage / 100) * 24 * 60
     const hours = Math.floor(totalMinutes / 60)
     const minutes = Math.floor(totalMinutes % 60)
@@ -284,12 +287,15 @@ const hideTimelineTooltip = () => {
 const showWorkBarTooltip = (day, event) => {
     const rect = event.currentTarget.getBoundingClientRect()
 
+    // 타임라인 배경 툴팁 숨기기
+    hoverTime.value.show = false
+
     workBarTooltip.value = {
         show: true,
         x: rect.left + rect.width / 2,
         y: rect.top - 10,
-        startTime: day.startTime,
-        endTime: day.endTime || '-',
+        startTime: day.startTime ? day.startTime.substring(0, 5) : '-',
+        endTime: day.endTime && day.endTime !== '-' ? day.endTime.substring(0, 5) : '-',
         duration: day.totalDuration
     }
 }
@@ -737,6 +743,57 @@ defineEmits(['requestApproval', 'editTime'])
         transform: translateX(-50%);
         border: 6px solid transparent;
         border-top-color: rgba(255, 255, 255, 0.2);
+    }
+}
+
+// Global 근무시간 바 툴팁 스타일
+.work-bar-tooltip-global {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    font-size: 13px;
+    z-index: 99999;
+    transform: translate(-50%, -100%);
+    margin-top: -8px;
+    pointer-events: none;
+
+    .tooltip-content {
+        padding: 12px;
+    }
+
+    .tooltip-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            color: #666;
+            margin-right: 12px;
+            font-weight: 500;
+        }
+
+        .tooltip-value {
+            color: #333;
+            font-weight: 600;
+        }
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: white;
     }
 }
 </style>
