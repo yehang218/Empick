@@ -92,7 +92,7 @@
 
 <script setup>
 import { onMounted, onUnmounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '../../stores/approvalStore';
 import { useMemberStore } from '../../stores/memberStore';
@@ -102,11 +102,12 @@ defineProps({
 });
 
 const route = useRoute();
+const router = useRouter();
 const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
 
 const { approvalDetail, loading, error } = storeToRefs(approvalStore);
-const { fetchReceivedApprovalDetail, clearApprovalDetail } = approvalStore;
+const { fetchReceivedApprovalDetail, clearApprovalDetail, approveDocument, rejectDocument } = approvalStore;
 
 const canApprove = computed(() => {
     if (!approvalDetail.value) return false;
@@ -188,14 +189,29 @@ const getInitials = (name) => {
     return name.substring(1, 3).toUpperCase();
 };
 
-const handleApprove = () => {
-    console.log('승인 처리');
-    // TODO: 승인 API 호출
+const handleApprove = async () => {
+    if (confirm('정말 승인하시겠습니까?')) {
+        try {
+            await approveDocument(approvalDetail.value.approvalId);
+            alert('성공적으로 승인 처리되었습니다.');
+            router.push('/approval/inbox');
+        } catch (err) {
+            alert('승인 처리 중 오류가 발생했습니다.');
+        }
+    }
 };
 
-const handleReject = () => {
-    console.log('반려 처리');
-    // TODO: 반려 API 호출
+const handleReject = async () => {
+    const reason = prompt('반려 사유를 입력해주세요.');
+    if (reason) {
+        try {
+            await rejectDocument(approvalDetail.value.approvalId, reason);
+            alert('성공적으로 반려 처리되었습니다.');
+            router.push('/approval/inbox');
+        } catch (err) {
+            alert('반려 처리 중 오류가 발생했습니다.');
+        }
+    }
 };
 
 onMounted(async () => {

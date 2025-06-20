@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { getReceivedApprovals, getApprovalsByWriterId, getRequestedApprovals, getReceivedApprovalDetail, getRequestedApprovalDetail } from '@/services/approvalService';
+import { getReceivedApprovals, getApprovalsByWriterId, getRequestedApprovals, getReceivedApprovalDetail, getRequestedApprovalDetail, approve, reject } from '@/services/approvalService';
 import { useMemberStore } from '@/stores/memberStore';
 
 export const useApprovalStore = defineStore('approval', () => {
@@ -96,6 +96,40 @@ export const useApprovalStore = defineStore('approval', () => {
         }
     };
 
+    const approveDocument = async (approvalId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const memberStore = useMemberStore();
+            const memberId = memberStore.form.id;
+            await approve(approvalId, memberId);
+            await loadReceivedApprovals(memberId); // 목록 새로고침
+        } catch(err) {
+            error.value = err;
+            console.error('승인 처리 실패:', err);
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const rejectDocument = async (approvalId, reason) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const memberStore = useMemberStore();
+            const memberId = memberStore.form.id;
+            await reject(approvalId, memberId, reason);
+            await loadReceivedApprovals(memberId); // 목록 새로고침
+        } catch(err) {
+            error.value = err;
+            console.error('반려 처리 실패:', err);
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
     const clearApprovalDetail = () => {
         approvalDetail.value = null;
     };
@@ -137,6 +171,8 @@ export const useApprovalStore = defineStore('approval', () => {
         // Detail actions
         fetchReceivedApprovalDetail,
         fetchRequestedApprovalDetail,
+        approveDocument,
+        rejectDocument,
         clearApprovalDetail,
 
         // General actions

@@ -99,10 +99,33 @@ export const createApprovalService = async (dto, options = {}) => {
 };
 
 // 승인 처리
-export const approveApproval = async (approvalId) => { };
+export const approve = async (approvalId, memberId) => {
+    return withErrorHandling(async () => {
+        const payload = { approverId: memberId };
+        const response = await api.post(`/api/v1/approval/documents/${approvalId}/approve`, payload);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return apiResponse;
+    });
+};
 
 // 반려 처리
-export const rejectApproval = async (approvalId, rejectReason) => { };
+export const reject = async (approvalId, memberId, reason) => {
+    return withErrorHandling(async () => {
+        const payload = {
+            approverId: memberId,
+            rejectReason: reason
+        };
+        const response = await api.post(`/api/v1/approval/documents/${approvalId}/reject`, payload);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return apiResponse;
+    });
+};
 
 // 자신이 결재자인 결재문서 목록 조회
 export const getReceivedApprovals = async (memberId) => {
