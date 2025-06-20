@@ -14,6 +14,5 @@ public class IntroduceStandardQueryDTO {
     private Integer id;
     private String content;
     private Integer memberId;
-    private Integer introduceId;
     private List<IntroduceStandardItemQueryDTO> items;
 }
