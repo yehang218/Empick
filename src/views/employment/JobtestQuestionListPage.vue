@@ -74,6 +74,8 @@
                         detailDialogVisible = val;
                         if (!val) refreshList();
                     }" />
+
+                <Modal v-if="showDeleteModal" message="정말 삭제하시겠습니까?<br>선택한 문제는 복구할 수 없습니다." @confirm="confirmDelete" @cancel="cancelDelete" />
             </v-container>
         </v-main>
     </v-app>
@@ -87,6 +89,7 @@ import { useToast } from 'vue-toastification'
 import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 import Pagination from '@/components/common/Pagination.vue'
+import Modal from '@/components/common/Modal.vue'
 
 const router = useRouter()
 const toast = useToast()
@@ -95,6 +98,8 @@ const questionStore = useJobtestQuestionStore()
 const detailDialogVisible = ref(false)
 const selectedQuestionDetail = ref(null)
 const selectedQuestions = ref([])
+const showDeleteModal = ref(false)
+let pendingDelete = []
 
 const tableHeaders = [
     { title: '', key: 'select', sortable: false, align: 'center', width: '50px' },
@@ -111,26 +116,37 @@ const handleItemClick = async (item) => {
         selectedQuestionDetail.value = { ...questionStore.form }
         detailDialogVisible.value = true
     } catch (err) {
-        toast.error('문제 상세 정보를 불러오는 중 오류가 발생했습니다.')
+        // toast.error('문제 상세 정보를 불러오는 중 오류가 발생했습니다.')
     }
 }
 
-const handleDelete = async () => {
+const handleDelete = () => {
     if (selectedQuestions.value.length === 0) {
         toast.warning('삭제할 문제를 선택해주세요.');
         return;
     }
-    if (!confirm(`선택된 ${selectedQuestions.value.length}개의 문제를 삭제하시겠습니까?`)) return
+    pendingDelete = [...selectedQuestions.value]
+    showDeleteModal.value = true
+}
 
+const confirmDelete = async () => {
     try {
-        const questionIds = selectedQuestions.value.map(q => q.id);
-        const questionTypes = selectedQuestions.value.map(q => q.type);
+        const questionIds = pendingDelete.map(q => q.id);
+        const questionTypes = pendingDelete.map(q => q.type);
         await questionStore.deleteQuestionsByIds(questionIds, questionTypes);
         toast.success('선택된 문제가 성공적으로 삭제되었습니다.');
         selectedQuestions.value = [] // 선택 초기화
     } catch (err) {
-        toast.error('문제 삭제 중 오류가 발생했습니다.');
+        // toast.error('문제 삭제 중 오류가 발생했습니다.');
+    } finally {
+        showDeleteModal.value = false
+        pendingDelete = []
     }
+}
+
+const cancelDelete = () => {
+    showDeleteModal.value = false
+    pendingDelete = []
 }
 
 const handleCreate = () => {
