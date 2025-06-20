@@ -1,6 +1,8 @@
 package com.piveguyz.empickbackend.approvals.approval.query.service;
 
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO;
 
 import java.util.List;
 
@@ -14,5 +16,7 @@ public interface ApprovalQueryService {
 
 	List<ApprovalQueryDTO> findByWriterId(Integer writerId);
 
-	List<ApprovalQueryDTO> findReceivedApprovals(Integer memberId);
+	List<ApprovalReceivedQueryDTO> findReceivedApprovals(Integer memberId);
+
+	List<ApprovalRequestedListQueryDTO> findRequestedApprovals(Integer memberId);
 }
