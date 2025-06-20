@@ -6,7 +6,7 @@
             <v-app-bar app height="70" flat
                 style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background-color: #5F8D4E;">
                 <div class="d-flex align-center pl-16">
-                    <img :src="logo" alt="로고" style="height: 32px;" class="mr-6" />
+                    <img :src="logo" alt="로고" style="height: 32px; cursor: pointer;" class="mr-6" @click="goToMain" />
                     <div class="d-flex align-center menu-bar">
                         <div v-for="menu in filteredMenu" :key="menu" class="menu-item"
                             @mouseenter="selectedMenu = menu" :class="{ active: selectedMenu === menu }">
@@ -24,16 +24,17 @@
                     style="max-width: 200px; background-color: white; border-radius: 20px;"
                     @update:modelValue="onSearchSelect" @update:search="searchInput = $event" />
 
-
-                <!-- TODO: 로그인 후 받아온 프로필 이미지로 교체 예정 -->
+                <!-- 프로필 사진 -->
                 <v-avatar size="36" class="mr-2" color="grey-lighten-2">
-                    <v-icon color="grey">mdi-account</v-icon>
+                    <template v-if="memberStore.form.pictureUrl">
+                        <img :src="memberStore.form.pictureUrl" alt="프로필"
+                            style="width: 100%; height: 100%; object-fit: cover;" />
+                    </template>
                 </v-avatar>
 
-                <!-- TODO: 로그인 후 받아온 사원이름, 부서로 교체 예정 -->
                 <div class="text-white text-caption mr-4">
-                    <div>박우석 사원</div>
-                    <div class="text-subtitle-2">인사팀</div>
+                    <div>{{ memberStore.form.name || '이름 없음' }}</div>
+                    <div class="text-subtitle-2">{{ memberStore.form.departmentName || '부서 없음' }}</div>
                 </div>
 
                 <v-btn icon variant="text">
@@ -41,7 +42,6 @@
                 </v-btn>
             </v-app-bar>
 
-            <!-- ✅ 고정형 2단 메뉴 패널 -->
             <teleport to="body">
                 <v-container v-if="selectedMenu" class="menu-panel" fluid @mouseleave="selectedMenu = ''">
                     <div class="menu-columns">
@@ -69,6 +69,7 @@ import { useRouter } from 'vue-router'
 import logo from '@/assets/logo.png'
 import { fullMenu } from '@/constants/common/fullMenu.js'
 import { filterMenuByRoles } from '@/utils/menuAccess'
+import { useMemberStore } from '@/stores/memberStore'
 
 const router = useRouter()
 const selectedMenu = ref('')
@@ -77,6 +78,8 @@ const selectedPath = ref('')
 
 const authStore = useAuthStore()
 const userRoles = computed(() => authStore.userInfo?.roles || [])
+
+const memberStore = useMemberStore()
 
 const filteredMenuObject = computed(() => filterMenuByRoles(fullMenu, userRoles.value))
 const filteredMenu = computed(() => Object.keys(filteredMenuObject.value))
@@ -110,6 +113,10 @@ function onSearchSelect(path) {
 
 function goTo(path) {
     if (path) router.push(path)
+}
+
+function goToMain() {
+    router.push('/');
 }
 </script>
 

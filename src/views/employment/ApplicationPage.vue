@@ -199,9 +199,6 @@
       </v-col>
 
 
-      // <!-- 우측: 평가 컴포넌트 -->
-      // <v-col cols="12" md="6">
-      // <component :is="evaluationComponent" :evaluationData="introduceEvaluationData" />
       <!-- 우측: 평가 상세 -->
       <v-col cols="12" lg="7">
         <v-card class="modern-card evaluation-detail-card">
@@ -286,17 +283,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-
 import { useRoute, useRouter } from 'vue-router'
 import IntroduceResult from '@/components/employment/IntroduceEvaluationInput.vue'
-import { useApplicationStore } from '@/stores/applicationStore'
-import { useToast } from 'vue-toastification'
-import apiClient from '@/apis/apiClient' // 직접 axios 호출을 위해 임포트
-
-const route = useRoute()
-const applicationStore = useApplicationStore()
-const toast = useToast()
-const applicationId = Number(route.params.id)
 
 const route = useRoute()
 const router = useRouter()
@@ -438,19 +426,13 @@ const selectEvaluation = (type) => {
     case '자기소개서':
       evaluationComponent.value = IntroduceResult
       break
-
-    // case '실무 테스트':
-    //   evaluationComponent.value = () => import('@/components/employment/TestResult.vue')
-    //   break
-    // case '면접':
-    //   evaluationComponent.value = () => import('@/components/employment/InterviewResult.vue')
-    //   break
-
     case '실무 테스트':
-      // evaluationComponent.value = TestResult
+      // TODO: TestResult 컴포넌트 구현 필요
+      evaluationComponent.value = IntroduceResult
       break
     case '면접':
-      // evaluationComponent.value = InterviewResult
+      // TODO: InterviewResult 컴포넌트 구현 필요
+      evaluationComponent.value = IntroduceResult
       break
     default:
       evaluationComponent.value = IntroduceResult
@@ -516,12 +498,121 @@ const updateStatus = () => {
 
 const goBack = () => {
   // 뒤로가기 또는 목록으로 이동
-  const from = route.query.from;
-  const page = route.query.page;
+  const from = route.query.from
+  const page = route.query.page
   if (from) {
-    router.push(page ? { path: from, query: { page } } : { path: from });
+    router.push(page ? { path: from, query: { page } } : { path: from })
   } else {
-    router.push('/employment/applicant');
+    router.push('/employment/applicant')
   }
 }
 </script>
+
+<style scoped>
+.modern-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.page-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.resume-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.resume-section:last-child {
+  border-bottom: none;
+}
+
+.line-height-1-6 {
+  line-height: 1.6;
+}
+
+.evaluation-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.evaluation-card {
+  padding: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.evaluation-card:hover {
+  border-color: rgba(25, 118, 210, 0.3);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.1);
+  transform: translateY(-2px);
+}
+
+.score-section {
+  background: rgba(0, 0, 0, 0.02);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.evaluation-detail-card {
+  min-height: 600px;
+}
+
+.score-analysis {
+  padding: 1rem 0;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 500;
+}
+
+.action-section {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1rem;
+  }
+
+  .d-flex.gap-3 {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .d-flex.gap-4 {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .evaluation-detail-card {
+    min-height: auto;
+  }
+}
+</style>
