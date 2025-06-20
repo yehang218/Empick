@@ -53,16 +53,22 @@
             </div>
 
             <div class="timeline-content">
-                <div v-for="(day, index) in weekData" :key="index" class="timeline-row">
+                <!-- 주차의 마지막 날(최신일)만 표시 -->
+                <div v-if="latestDay" class="timeline-row">
+                    <!-- 날짜 표시 -->
+                    <div class="timeline-date-label">
+                        {{ latestDay.date }}일 (최신)
+                    </div>
+
                     <!-- 근무시간 바 (출근과 퇴근이 모두 있는 경우) -->
-                    <div v-if="day.startTime !== '-' && day.endTime !== '-'" class="work-bar"
-                        :style="getWorkBarStyle(day)">
+                    <div v-if="latestDay.startTime !== '-' && latestDay.endTime !== '-'" class="work-bar"
+                        :style="getWorkBarStyle(latestDay)">
                         <span class="work-label start-label">출근</span>
                         <span class="work-label end-label">퇴근</span>
                     </div>
                     <!-- 출근만 있는 경우 현재 시간까지 진행 바로 표시 -->
-                    <div v-else-if="day.startTime !== '-'" class="work-bar ongoing"
-                        :style="getOngoingWorkBarStyle(day)">
+                    <div v-else-if="latestDay.startTime !== '-'" class="work-bar ongoing"
+                        :style="getOngoingWorkBarStyle(latestDay)">
                         <span class="work-label start-label">출근</span>
                     </div>
 
@@ -70,16 +76,20 @@
                     <!-- <div class="lunch-break-line" :style="{ left: '50%' }"></div>
                     <div class="end-break-line" :style="{ left: '75%' }"></div> -->
                 </div>
+                <!-- 데이터가 없는 경우 빈 타임라인 표시 -->
+                <div v-else class="timeline-row">
+                    <div class="no-data-message">근무 데이터가 없습니다</div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 // Props
-defineProps({
+const props = defineProps({
     weekData: {
         type: Array,
         default: () => [
@@ -97,6 +107,22 @@ defineProps({
             }
         ]
     }
+})
+
+// 주차의 마지막 날(최신일) 계산
+const latestDay = computed(() => {
+    if (!props.weekData || props.weekData.length === 0) {
+        return null
+    }
+
+    // 날짜 기준으로 정렬하여 마지막 날 찾기
+    const sortedDays = [...props.weekData].sort((a, b) => {
+        const dateA = parseInt(a.date)
+        const dateB = parseInt(b.date)
+        return dateB - dateA // 내림차순 정렬 (최신일이 먼저)
+    })
+
+    return sortedDays[0] // 가장 최신일 반환
 })
 
 // 현재 시간을 주기적으로 업데이트하기 위한 reactive 변수
@@ -398,6 +424,30 @@ defineEmits(['requestApproval', 'editTime'])
                 &.end-label {
                     justify-content: flex-end;
                 }
+            }
+
+            .no-data-message {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #999;
+                font-size: 14px;
+                font-style: italic;
+            }
+
+            .timeline-date-label {
+                position: absolute;
+                top: -20px;
+                left: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #1976d2;
+                background: white;
+                padding: 2px 6px;
+                border-radius: 4px;
+                border: 1px solid #e0e0e0;
+                z-index: 10;
             }
         }
 
