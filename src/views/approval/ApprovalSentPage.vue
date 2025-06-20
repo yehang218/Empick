@@ -14,15 +14,15 @@
         </v-row>
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
-        <ListView v-else :headers="headers" :data="pagedList" @item-click="goToDetail">
+        <ListView v-else :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
+            @update:page="page = $event" @item-click="goToDetail">
             <template #item.status="{ item }">
-                <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small
-                    class="font-weight-bold" outlined>
+                <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small class="font-weight-bold"
+                    outlined>
                     {{ item.status }}
                 </v-chip>
             </template>
         </ListView>
-        <Pagination v-model="page" :length="totalPages" />
     </v-container>
 </template>
 
@@ -31,13 +31,14 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useMemberStore } from '@/stores/memberStore';
+import { useAuthStore } from '@/stores/authStore';
 import ListView from '@/components/common/ListView.vue';
-import Pagination from '@/components/common/Pagination.vue';
 import dayjs from 'dayjs';
 import { getApprovalStatusLabel } from '@/constants/approval/approvalStatus.js';
 
 const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
+const authStore = useAuthStore();
 const router = useRouter();
 
 const requestedList = approvalStore.requestedList;
@@ -119,11 +120,25 @@ function getApprovalStatusColor(status) {
 }
 
 onMounted(async () => {
-    if (!memberStore.form.id) {
-        await memberStore.getMyInfo();
-    }
-    if (memberStore.form.id) {
-        await approvalStore.loadRequestedApprovals(memberStore.form.id);
+    try {
+        // 인증 상태 확인
+        if (!authStore.isAuthenticated) {
+            console.log('인증되지 않은 상태, 로그인 페이지로 이동');
+            router.push('/login');
+            return;
+        }
+
+        if (!memberStore.form.id) {
+            await memberStore.getMyInfo();
+        }
+        if (memberStore.form.id) {
+            await approvalStore.loadRequestedApprovals(memberStore.form.id);
+        } else {
+            throw new Error('멤버 정보 조회 실패(아이디 없음)');
+        }
+    } catch (err) {
+        console.error('결재 목록 불러오기 실패:', err);
+        approvalStore.errorRequested = '결재 목록을 불러오지 못했습니다.';
     }
 });
 </script>

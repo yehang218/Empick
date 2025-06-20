@@ -30,4 +30,7 @@ export const ApprovalAPI = {
     RECEIVED_DOCUMENTS_LIST: (memberId) => `/api/v1/approval/documents/received?memberId=${memberId}`,
     // 자신이 요청한 결재문서 목록 조회
     REQUESTED_DOCUMENTS_LIST: (memberId) => `/api/v1/approval/documents/requested?memberId=${memberId}`,
+
+    // 카테고리별 결재 라인
+    APPROVAL_LINE: (categoryId) => `/api/v1/approval/categories/${categoryId}/lines`
 };
