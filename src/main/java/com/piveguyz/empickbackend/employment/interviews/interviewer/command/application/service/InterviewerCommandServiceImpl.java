@@ -22,14 +22,14 @@ public class InterviewerCommandServiceImpl implements InterviewerCommandService 
     @Override
     public InterviewerCommandDTO createInterviewer(InterviewerCommandDTO dto) {
         Integer interviewId = dto.getInterviewId();
-        Integer interviewerId = dto.getInterviewerId();
-        if(repository.existsByInterviewIdAndInterviewerId(interviewId, interviewerId)){
+        Integer memberId = dto.getMemberId();
+        if(repository.existsByInterviewIdAndMemberId(interviewId, memberId)){
             throw new BusinessException(ResponseCode.EMPLOYMENT_INTERVIEWER_ALREADY_EXIST);
         }
         InterviewerEntity entity = new InterviewerEntity();
         entity.setId(dto.getId());
         entity.setInterviewId(dto.getInterviewId());
-        entity.setInterviewerId(dto.getInterviewerId());
+        entity.setMemberId(dto.getMemberId());
         InterviewerEntity savedEntity = repository.save(entity);
         return mapper.toDTO(savedEntity);
     }

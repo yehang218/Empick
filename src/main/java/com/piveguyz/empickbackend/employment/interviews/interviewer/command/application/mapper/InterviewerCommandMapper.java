@@ -10,7 +10,7 @@ public class InterviewerCommandMapper {
         InterviewerCommandDTO dto = new InterviewerCommandDTO();
         dto.setId(entity.getId());
         dto.setInterviewId(entity.getInterviewId());
-        dto.setInterviewerId(entity.getInterviewerId());
+        dto.setMemberId(entity.getMemberId());
         dto.setScore(entity.getScore());
         dto.setReview(entity.getReview());
         return dto;
@@ -20,7 +20,7 @@ public class InterviewerCommandMapper {
         InterviewerEntity entity = new InterviewerEntity();
         entity.setId(dto.getId());
         entity.setInterviewId(dto.getInterviewId());
-        entity.setInterviewerId(dto.getInterviewerId());
+        entity.setMemberId(dto.getMemberId());
         entity.setScore(dto.getScore());
         entity.setReview(dto.getReview());
         return entity;
