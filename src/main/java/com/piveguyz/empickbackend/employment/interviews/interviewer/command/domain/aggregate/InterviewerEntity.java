@@ -23,8 +23,8 @@ public class InterviewerEntity {
     @Column(name = "interview_id")
     private Integer interviewId;
 
-    @Column(name = "interviewer_id")
-    private Integer interviewerId;
+    @Column(name = "member_id")
+    private Integer memberId;
 
     @Column(name = "score")
     private Double score;

@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -42,13 +43,19 @@ public class AnswerCommandServiceImpl implements AnswerCommandService {
         int questionId = createAnswerCommandDTO.getQuestionId();
 
         Optional<AnswerEntity> existing = answerRepository.findByApplicationJobTestIdAndQuestionId(jobTestId, questionId);
-
         AnswerEntity entity;
-
         if (existing.isPresent()) {
-            // 기존 답안 덮어쓰기 (update)
+            // 기존 답안
             entity = existing.get();
-            entity.updateAnswerEntity(createAnswerCommandDTO, entity.getAttempt() + 1);
+
+            // 답안이 동일한지 비교 (answer 필드가 String 기준이라면)
+            boolean isSameAnswer = Objects.equals(entity.getContent(), createAnswerCommandDTO.getContent());
+
+            // 새 답변도 null이어도 증가 x
+            boolean noNewAnswer = createAnswerCommandDTO.getContent() == null;
+
+            int nextAttempt = (isSameAnswer || noNewAnswer) ? entity.getAttempt() : entity.getAttempt() + 1;
+            entity.updateAnswerEntity(createAnswerCommandDTO, nextAttempt);
         } else {
             // 처음 시도라면
             entity = AnswerMapper.toEntity(createAnswerCommandDTO, 1);

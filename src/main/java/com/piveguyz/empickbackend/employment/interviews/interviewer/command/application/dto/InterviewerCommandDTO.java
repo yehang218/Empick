@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class InterviewerCommandDTO {
     private Integer id;
     private Integer interviewId;
-    private Integer interviewerId;
+    private Integer memberId;
     private Double score;
     private String review;
 }

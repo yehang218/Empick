@@ -2,28 +2,28 @@ package com.piveguyz.empickbackend.employment.jobtests.jobtest.query.controller;
 
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.JobtestEntryRequestDTO;
+import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestExamQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestQuestionListQueryDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.query.service.JobtestQueryService;
+import com.piveguyz.empickbackend.facade.JobtestFacade;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
-@RequestMapping("/api/v1/employment/jobtests")
+@RequiredArgsConstructor
+    @RequestMapping("/api/v1/employment/jobtests")
 public class JobtestQueryController {
     private final JobtestQueryService jobtestQueryService;
-
-    JobtestQueryController(JobtestQueryService jobtestQueryService) {
-        this.jobtestQueryService = jobtestQueryService;
-    }
+    private final JobtestFacade jobtestFacade;
 
     // 전체 실무테스트 조회
     @Operation(
@@ -51,5 +51,23 @@ public class JobtestQueryController {
         JobtestQueryDTO result = jobtestQueryService.findJobTestWithApplications(id);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, result));
+    }
+
+    @Operation(
+            summary = "실무테스트 입장 & 시험 정보 반환",
+            description = """
+                    실무테스트 입장 검증 후 입장 / 시험 정보 반환
+                    """
+    )
+    @ApiResponses(value = {
+    })
+    @PostMapping("/exam/enter/{jobtestId}")
+    public ResponseEntity<CustomApiResponse<JobtestExamQueryDTO>> verifyEntry(
+            @PathVariable int jobtestId,
+            @RequestBody JobtestEntryRequestDTO request
+    ) {
+        JobtestExamQueryDTO jobtestExamQueryDTO = jobtestFacade.enterJobtestExam(jobtestId, request);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body((CustomApiResponse.of(ResponseCode.SUCCESS, jobtestExamQueryDTO)));
     }
 }
