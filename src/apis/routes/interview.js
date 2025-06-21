@@ -13,6 +13,7 @@ export const InterviewAPI = {
     // 🔹 조회 (Query)
     GET_ALL_INTERVIEWS: '/api/v1/employment/interview',
     GET_INTERVIEW_BY_ID: (id) => `/api/v1/employment/interview/${id}`,
+    GET_INTERVIEW_BY_APPLICATION_ID: (applicationId) => `/api/v1/employment/interview/application/${applicationId}`,
     GET_INTERVIEWS_BY_DATE: (date) =>
         `/api/v1/employment/interview/date?date=${encodeURIComponent(date)}`,
     CHECK_AVAILABLE_DATETIME: (datetime) =>
@@ -21,14 +22,15 @@ export const InterviewAPI = {
 
     // interview_criteria
     // 🔹 생성/수정/삭제 (Command)
-    CREATE_CRITERIA: '/api/v1/employment/interviewCriteria',
-    UPDATE_CRITERIA: (id) => `/api/v1/employment/interviewCriteria/${id}`,
-    DELETE_CRITERIA: (id) => `/api/v1/employment/interviewCriteria/${id}`,
+    CREATE_CRITERIA: '/api/v1/employment/interview-criteria',
+    UPDATE_CRITERIA: (id) => `/api/v1/employment/interview-criteria/${id}`,
+    DELETE_CRITERIA: (id) => `/api/v1/employment/interview-criteria/${id}`,
 
     // 🔹 조회 (Query)
-    GET_ALL_CRITERIA: '/api/v1/employment/interviewCriteria',
-    GET_CRITERIA_BY_ID: (id) => `/api/v1/employment/interviewCriteria/${id}`,
-    SEARCH_CRITERIA_BY_CONTENT: (content) => `/api/v1/employment/interviewCriteria/content?content=${encodeURIComponent(content)}`,
+    GET_ALL_CRITERIA: '/api/v1/employment/interview-criteria',
+    GET_CRITERIA_BY_ID: (id) => `/api/v1/employment/interview-criteria/${id}`,
+    GET_CRITERIA_BY_SHEET_ID: (sheetId) => `/api/v1/employment/interview-criteria/sheet/${sheetId}`,
+    SEARCH_CRITERIA_BY_TITLE: (title) => `/api/v1/employment/interview-criteria/title?title=${encodeURIComponent(title)}`,
 
     
     // interviewer
@@ -45,36 +47,24 @@ export const InterviewAPI = {
 
     // interview_sheet
     // 🔹 생성/수정/삭제 (Command)
-    CREATE_SHEET: '/api/v1/employment/interviewSheet',
-    UPDATE_SHEET: (id) => `/api/v1/employment/interviewSheet/${id}`,
-    DELETE_SHEET: (id) => `/api/v1/employment/interviewSheet/${id}`,
+    CREATE_SHEET: '/api/v1/employment/interview-sheet',
+    UPDATE_SHEET: (id) => `/api/v1/employment/interview-sheet/${id}`,
+    DELETE_SHEET: (id) => `/api/v1/employment/interview-sheet/${id}`,
 
     // 🔹 조회 (Query)
-    GET_ALL_SHEETS: '/api/v1/employment/interviewSheet',
-    GET_SHEET_BY_ID: (id) => `/api/v1/employment/interviewSheet/${id}`,
-    SEARCH_SHEET_BY_NAME: (name) => `/api/v1/employment/interviewSheet/name?name=${encodeURIComponent(name)}`,
-
-
-    // interview_sheet_item
-    // 🔹 생성/수정/삭제 (Command)
-    CREATE_SHEET_ITEM: '/api/v1/employment/interviewSheetItem',
-    DELETE_SHEET_ITEM: (id) => `/api/v1/employment/interviewSheetItem/${id}`,
-
-    // 🔹 조회 (Query)
-    FIND_ALL_SHEET_ITEM: '/api/v1/employment/interviewSheetItem',
-    FIND_SHEET_ITEM_BY_ID: (id) => `/api/v1/employment/interviewSheetItem/${id}`,
-    FIND_SHEET_ITEM_BY_SHEET_ID: (sheetId) => `/api/v1/employment/interviewSheetItem/sheet/${sheetId}`,
-    FIND_SHEET_ITEM_BY_CRITERIA_ID: (criteriaId) => `/api/v1/employment/interviewSheetItem/criteria/${criteriaId}`,
+    GET_ALL_SHEETS: '/api/v1/employment/interview-sheet',
+    GET_SHEET_BY_ID: (id) => `/api/v1/employment/interview-sheet/${id}`,
+    SEARCH_SHEET_BY_NAME: (name) => `/api/v1/employment/interview-sheet/name?name=${encodeURIComponent(name)}`,
 
 
     // interview_score
     // 🔹 생성/수정/삭제 (Command)
-    CREATE_INTERVIEW_SCORE: '/api/v1/employment/interviewScore',
-    UPDATE_INTERVIEW_SCORE: (id) => `/api/v1/employment/interviewScore/${id}`,
-    DELETE_INTERVIEW_SCORE: (id) => `/api/v1/employment/interviewScore/${id}`,
+    CREATE_INTERVIEW_SCORE: '/api/v1/employment/interview-score',
+    UPDATE_INTERVIEW_SCORE: (id) => `/api/v1/employment/interview-score/${id}`,
+    DELETE_INTERVIEW_SCORE: (id) => `/api/v1/employment/interview-score/${id}`,
 
     // 🔹 조회 (Query)
-    FIND_ALL_INTERVIEW_SCORE: '/api/v1/employment/interviewScore',
-    FIND_INTERVIEW_SCORE_BY_ID: (id) => `/api/v1/employment/interviewScore/${id}`,
-    FIND_INTERVIEW_SCORE_BY_INTERVIEWER_ID: (interviewerId) => `/api/v1/employment/interviewScore/interview/${interviewerId}`,
+    FIND_ALL_INTERVIEW_SCORE: '/api/v1/employment/interview-score',
+    FIND_INTERVIEW_SCORE_BY_ID: (id) => `/api/v1/employment/interview-score/${id}`,
+    FIND_INTERVIEW_SCORE_BY_INTERVIEWER_ID: (interviewerId) => `/api/v1/employment/interview-score/interview/${interviewerId}`,
 };

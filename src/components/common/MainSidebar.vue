@@ -1,5 +1,5 @@
 <template>
-    <v-navigation-drawer app permanent class="sidebar">
+    <v-navigation-drawer app permanent width="260" class="sidebar">
         <div class="logo-area">
             <img src="@/assets/empick_logo.png" alt="EMPICK Logo" class="logo" />
         </div>
@@ -24,7 +24,7 @@
                         </template>
 
                         <v-list-item v-for="(subItem, j) in section.children" :key="j" :title="subItem.label"
-                            :to="subItem.path" link :active="route.path === subItem.path" class="menu-item"
+                            :to="subItem.path" link :active="route.path === subItem.path || route.path.startsWith(subItem.path)" class="menu-item"
                             active-class="active-item" />
                     </v-list-group>
                 </template>
@@ -63,15 +63,15 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { fullMenu } from '@/json/fullMenu.js'
+import { fullMenu } from '@/constants/common/fullMenu.js'
 import { useAuthStore } from '@/stores/authStore'
+import { filterMenuByRoles } from '@/utils/menuAccess'
 
 const route = useRoute()
 const darkMode = ref(true)
 const authStore = useAuthStore()
 
-// 우선 인사팀으로 설정
-const userRole = ref('인사팀')
+const userRoles = computed(() => authStore.userInfo?.roles || [])
 
 // 현재 경로에 따라 헤더 메뉴 결정
 const headerTitle = computed(() => {
@@ -91,15 +91,7 @@ function isGroupOpen(section) {
     )
 }
 
-const menu = computed(() => {
-    const filtered = {}
-    for (const [category, sections] of Object.entries(fullMenu)) {
-        filtered[category] = sections.filter(section =>
-            !section.role || section.role.includes(userRole.value)
-        )
-    }
-    return filtered
-})
+const menu = computed(() => filterMenuByRoles(fullMenu, userRoles.value))
 
 </script>
 
@@ -112,6 +104,10 @@ const menu = computed(() => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+}
+
+.v-navigation-drawer {
+    z-index: 100 !important;
 }
 
 .logo-area {

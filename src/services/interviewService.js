@@ -3,7 +3,7 @@ import api from '@/apis/apiClient';
 import { InterviewAPI } from '../apis/routes/interview';
 
 import InterviewResponseDTO from '@/dto/employment/interview/interviewResponseDTO';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
@@ -103,6 +103,20 @@ export const getAllInterviewsService = async (options = {}) => {
 export const getInterviewByIdService = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(InterviewAPI.GET_INTERVIEW_BY_ID(id));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        return InterviewResponseDTO.fromJSON(apiResponse.data);
+    }, options);
+};
+
+// 면접을 지원서id로 조회하는 서비스
+export const getInterviewByApplicationIdService = async (applicationId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(InterviewAPI.GET_INTERVIEW_BY_APPLICATION_ID(applicationId));
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if (!apiResponse.success) {

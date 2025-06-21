@@ -11,7 +11,7 @@ import {
     getAllInterviewers,
     getInterviewerByIdService,
     getInterviewersByInterviewIdService
-} from '@/services/interview/interviewerService';
+} from '@/services/interviewerService';
 
 export const useInterviewerStore = defineStore('interviewer', () => {
     // 상태

@@ -7,11 +7,21 @@
         <v-btn color="primary" @click="goMessageInputBoxTest" class="mb-4">메세지 입력 테스트</v-btn>
         <v-btn color="primary" @click="goOneColumnListTest" class="mb-4">단일 컬럼 리스트 테스트</v-btn>
     </div>
+
+      <SendMailModal ref="mailModal" />
+  <v-btn @click="openModal">메일 보내기</v-btn>
 </template>
 
 <script setup>
 
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
+import SendMailModal from '@/components/mail/SendMailModal.vue'
+const mailModal = ref()
+
+const openModal = () => {
+  mailModal.value.open()
+}
 
 const router = useRouter()
 

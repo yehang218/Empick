@@ -11,9 +11,10 @@ import {
   deleteInterviewService,
   getAllInterviewsService,
   getInterviewByIdService,
+  getInterviewByApplicationIdService,
   getInterviewsByDateService,
   checkAvailableDatetimeService
-} from '@/services/interview/interviewService';
+} from '@/services/interviewService';
 
 export const useInterviewStore = defineStore('interview', () => {
   // 상태
@@ -44,6 +45,21 @@ export const useInterviewStore = defineStore('interview', () => {
     error.value = null;
     try {
       const data = await getInterviewByIdService(id);
+      selectedInterview.value = data;
+      return data;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const fetchInterviewByApplicationId = async (applicationId) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await getInterviewByApplicationIdService(applicationId);
       selectedInterview.value = data;
     } catch (err) {
       error.value = err.message;
@@ -125,6 +141,7 @@ export const useInterviewStore = defineStore('interview', () => {
     // 액션
     fetchAllInterviews,
     fetchInterviewById,
+    fetchInterviewByApplicationId,
     fetchInterviewsByDate,
     checkDatetimeAvailability,
 

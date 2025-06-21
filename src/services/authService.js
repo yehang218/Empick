@@ -122,3 +122,5 @@ export const getCurrentUserService = async () => {
         throw error;
     }
 };
+
+// 중복된 함수들 제거됨 - 위의 기본 서비스 함수들을 사용

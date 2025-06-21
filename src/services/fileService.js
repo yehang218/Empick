@@ -1,5 +1,6 @@
-import api from '@/apis/apiClient';
-import { API } from '@/apis/routes';
+import { FileAPI } from '@/apis/routes/file';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
+import { throwCustomApiError, withErrorHandling } from '@/utils/errorHandler';
 
 /**
  * 파일 업로드 서비스
@@ -9,20 +10,32 @@ import { API } from '@/apis/routes';
  * @returns {Promise<Object>} 업로드 결과 (url 등)
  */
 export const uploadFileService = async (file, prefix = '', fileName = 'profile.png') => {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (prefix) formData.append('prefix', prefix);
-    if (fileName) formData.append('fileName', fileName);
+    return withErrorHandling(async () => {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (prefix) formData.append('prefix', prefix);
+        if (fileName) formData.append('fileName', fileName);
+        const response = await FileAPI.uploadFile(formData);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        return apiResponse.data;
+    });
+};
 
-    try {
-        const response = await api.post(API.FILE.UPLOAD, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        return response.data;
-    } catch (error) {
-        if (error.response) {
-            throw new Error(error.response.data?.message || '파일 업로드 중 오류가 발생했습니다.');
-        }
-        throw error;
-    }
+export const getFileUrl = async (fileId) => {
+    return withErrorHandling(async () => {
+        const response = await FileAPI.getFileUrl(fileId);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        return apiResponse.data;
+    });
+};
+
+export const deleteFile = async (fileId) => {
+    return withErrorHandling(async () => {
+        const response = await FileAPI.deleteFile(fileId);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        return apiResponse.data;
+    });
 }; 

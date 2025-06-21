@@ -7,8 +7,9 @@ import {
     deleteCriteriaService,
     getAllCriteriaService,
     getCriteriaByIdService,
-    searchCriteriaByContentService,
-} from '@/services/interview/interviewCriteriaService';
+    getCriteriaBySheetIdService,
+    searchCriteriaByTitleService,
+} from '@/services/interviewCriteriaService';
 
 export const useInterviewCriteriaStore = defineStore('interviewCriteria', () => {
     // 🔹 상태
@@ -50,11 +51,28 @@ export const useInterviewCriteriaStore = defineStore('interviewCriteria', () => 
         }
     };
 
-    const searchCriteriaByContent = async (content) => {
+    const fetchCriteriaBySheetId = async (sheetId) => {
+        loading.value = true
+        error.value = null
+        try {
+            const result = await getCriteriaBySheetIdService(sheetId)
+            criteriaList.value = result
+            selectedCriteria.value = null
+            return result
+        } catch (err) {
+            error.value = err.message
+            criteriaList.value = []
+            throw err
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const searchCriteriaByTitle = async (title) => {
         loading.value = true;
         error.value = null;
         try {
-            searchResults.value = await searchCriteriaByContentService(content);
+            searchResults.value = await searchCriteriaByTitleService(title);
         } catch (err) {
             error.value = err.message;
         } finally {
@@ -140,7 +158,8 @@ export const useInterviewCriteriaStore = defineStore('interviewCriteria', () => 
         // 액션
         fetchAllCriteria,
         fetchCriteriaById,
-        searchCriteriaByContent,
+        fetchCriteriaBySheetId,
+        searchCriteriaByTitle,
         createCriteria,
         updateCriteria,
         deleteCriteria,

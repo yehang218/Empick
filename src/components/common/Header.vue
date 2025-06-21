@@ -3,9 +3,10 @@
         <!-- ✅ 메뉴 + 하위메뉴 전체를 감싸는 wrapper -->
         <div class="menu-wrapper">
             <!-- 상단 고정 AppBar -->
-            <v-app-bar flat height="70" style="background-color: #5F8D4E;" app clipped-left>
+            <v-app-bar app height="70" flat
+                style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background-color: #5F8D4E;">
                 <div class="d-flex align-center pl-16">
-                    <img :src="logo" alt="로고" style="height: 32px;" class="mr-6" />
+                    <img :src="logo" alt="로고" style="height: 32px; cursor: pointer;" class="mr-6" @click="goToMain" />
                     <div class="d-flex align-center menu-bar">
                         <div v-for="menu in filteredMenu" :key="menu" class="menu-item"
                             @mouseenter="selectedMenu = menu" :class="{ active: selectedMenu === menu }">
@@ -23,16 +24,17 @@
                     style="max-width: 200px; background-color: white; border-radius: 20px;"
                     @update:modelValue="onSearchSelect" @update:search="searchInput = $event" />
 
-
-                <!-- TODO: 로그인 후 받아온 프로필 이미지로 교체 예정 -->
+                <!-- 프로필 사진 -->
                 <v-avatar size="36" class="mr-2" color="grey-lighten-2">
-                    <v-icon color="grey">mdi-account</v-icon>
+                    <template v-if="memberStore.form.pictureUrl">
+                        <img :src="memberStore.form.pictureUrl" alt="프로필"
+                            style="width: 100%; height: 100%; object-fit: cover;" />
+                    </template>
                 </v-avatar>
 
-                <!-- TODO: 로그인 후 받아온 사원이름, 부서로 교체 예정 -->
                 <div class="text-white text-caption mr-4">
-                    <div>박우석 사원</div>
-                    <div class="text-subtitle-2">인사팀</div>
+                    <div>{{ memberStore.form.name || '이름 없음' }}</div>
+                    <div class="text-subtitle-2">{{ memberStore.form.departmentName || '부서 없음' }}</div>
                 </div>
 
                 <v-btn icon variant="text">
@@ -40,57 +42,60 @@
                 </v-btn>
             </v-app-bar>
 
-            <!-- ✅ 고정형 2단 메뉴 패널 -->
-            <v-container v-if="selectedMenu" class="menu-panel" fluid @mouseleave="selectedMenu = ''">
-                <div class="menu-columns">
-                    <div v-for="section in fullMenu[selectedMenu]" :key="section.label" class="menu-section">
-                        <h3 class="menu-title">{{ section.label }}</h3>
-                        <ul v-if="section.children.length" class="submenu-list">
-                            <li v-for="child in section.children" :key="child.label" class="submenu-item"
-                                @click="goTo(child.path)">
-                                {{ child.label }}
-                            </li>
-                        </ul>
+            <teleport to="body">
+                <v-container v-if="selectedMenu" class="menu-panel" fluid @mouseleave="selectedMenu = ''">
+                    <div class="menu-columns">
+                        <div v-for="section in filteredMenuObject[selectedMenu]" :key="section.label"
+                            class="menu-section">
+                            <h3 class="menu-title" @click="goToFirstChild(section)" style="cursor:pointer">
+                                {{ section.label }}
+                            </h3>
+                            <ul v-if="section.children.length" class="submenu-list">
+                                <li v-for="child in section.children" :key="child.label" class="submenu-item"
+                                    @click="goTo(child.path)">
+                                    {{ child.label }}
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            </v-container>
+                </v-container>
+            </teleport>
         </div>
-
-        <!-- 본문 -->
-        <v-main class="main-content"></v-main>
     </v-app>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
 import { useRouter } from 'vue-router'
 import logo from '@/assets/logo.png'
-import { fullMenu } from '@/json/fullMenu.js'
+import { fullMenu } from '@/constants/common/fullMenu.js'
+import { filterMenuByRoles } from '@/utils/menuAccess'
+import { useMemberStore } from '@/stores/memberStore'
 
 const router = useRouter()
 const selectedMenu = ref('')
-const userRole = ref('인사팀') // 현재는 인사팀으로 설정
 const searchInput = ref('')
+const selectedPath = ref('')
 
-const filteredMenu = computed(() => {
-    const visibleMenus = []
-    for (const [key, sections] of Object.entries(fullMenu)) {
-        const hasVisibleSection = sections.some(section =>
-            !section.role || section.role.includes(userRole.value)
-        )
-        if (hasVisibleSection) visibleMenus.push(key)
-    }
-    return visibleMenus
-})
+const authStore = useAuthStore()
+const userRoles = computed(() => authStore.userInfo?.roles || [])
+
+const memberStore = useMemberStore()
+
+const filteredMenuObject = computed(() => filterMenuByRoles(fullMenu, userRoles.value))
+const filteredMenu = computed(() => Object.keys(filteredMenuObject.value))
+
+console.log('userInfo:', authStore.userInfo);
+console.log('userRoles:', userRoles.value);
 
 const searchableItems = computed(() => {
     const items = []
-    for (const sections of Object.values(fullMenu)) {
+    const filtered = filterMenuByRoles(fullMenu, userRoles.value)
+    for (const sections of Object.values(filtered)) {
         for (const section of sections) {
-            if (!section.role || section.role.includes(userRole.value)) {
-                for (const child of section.children || []) {
-                    items.push({ label: child.label, path: child.path })
-                }
+            for (const child of section.children || []) {
+                items.push({ label: child.label, path: child.path })
             }
         }
     }
@@ -110,6 +115,19 @@ function onSearchSelect(path) {
 
 function goTo(path) {
     if (path) router.push(path)
+}
+
+function goToMain() {
+    router.push('/');
+}
+
+function goToFirstChild(section) {
+    if (section.children && section.children.length > 0) {
+        const first = section.children.find(child => child.path);
+        if (first?.path) goTo(first.path);
+    } else if (section.path) {
+        goTo(section.path);
+    }
 }
 </script>
 
@@ -138,27 +156,33 @@ function goTo(path) {
 }
 
 .menu-panel {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
     background-color: white;
     border-top: 1px solid #eee;
     border-bottom: 1px solid #eee;
     padding: 24px 48px 36px;
-    margin-top: 70px;
-    position: absolute;
-    width: 100%;
-    left: 0;
+    z-index: 9999;
 }
 
 .menu-columns {
     display: flex;
-    gap: 60px;
+    gap: 30px;
     flex-wrap: wrap;
     max-width: 1200px;
-    margin: 0 auto;
+    margin-left: 115px;
+    margin-right: 0;
+    justify-content: flex-start;
 }
 
 .menu-section {
-    min-width: 160px;
+    min-width: 140px;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .menu-title {
@@ -166,12 +190,19 @@ function goTo(path) {
     font-weight: bold;
     margin-bottom: 8px;
     color: #333;
+    text-align: left;
+    width: 100%;
 }
 
 .submenu-list {
     list-style: none;
     padding: 0;
     margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
 }
 
 .submenu-item {
@@ -179,6 +210,8 @@ function goTo(path) {
     padding: 4px 0;
     color: #5F8D4E;
     cursor: pointer;
+    text-align: left;
+    width: 100%;
 }
 
 .submenu-item:hover {
@@ -192,6 +225,5 @@ function goTo(path) {
 .main-content {
     background-color: white;
     min-height: 100vh;
-    padding-top: 140px;
 }
 </style>

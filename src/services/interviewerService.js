@@ -3,7 +3,7 @@ import api from '@/apis/apiClient';
 import { InterviewAPI } from '@/apis/routes/interview';
 
 import InterviewerResponseDTO from '@/dto/employment/interview/interviewerResponseDTO';
-import ApiResponseDTO from '@/dto/common/ApiResponseDTO';
+import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
@@ -17,7 +17,7 @@ export const createInterviewerService = async (dto, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -29,7 +29,7 @@ export const updateInterviewerScoreService = async (id, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -41,7 +41,7 @@ export const updateInterviewerReviewService = async (id, review, options = {}) =
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -53,7 +53,7 @@ export const deleteInterviewerService = async (id, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
@@ -66,11 +66,9 @@ export const getAllInterviewers = async (options = {}) => {
         const response = await api.get(InterviewAPI.GET_ALL_INTERVIEWERS);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
-        // 성공 상태로 오지 않았다면 에러 처리
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-
         return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
     }, options);
 };
@@ -83,7 +81,7 @@ export const getInterviewerByIdService = async (id, options = {}) => {
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
-        return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 

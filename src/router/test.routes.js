@@ -51,5 +51,16 @@ export const testRoutes = [
         path: '/WSPage',
         name: 'WSPage',
         component: () => import('@/views/test/WSPage.vue')
+    },
+    {
+        path: '/employment/applications/test-assign',
+        name: 'ApplicationAssignTest',
+        component: () => import('@/views/test/ApplicationAssignTestPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_USER', 'ROLE_HR_ACCESS', 'ROLE_RECRUITMENT_PLAN_EDITOR', 'ROLE_APPROVAL_PROCESSOR', 'ROLE_RECRUITMENT_OPERATOR']
+        }
     }
+
+
 ]; 

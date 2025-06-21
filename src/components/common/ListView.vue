@@ -4,7 +4,7 @@
         <v-table class="mt-5">
             <thead>
                 <tr>
-                    <th v-if="showCheckbox" style="width: 48px;"></th>
+                    <th v-if="showCheckbox" style="width: 80px;">선택</th>
                     <th v-for="header in headers" :key="header.key">
                         {{ header.label }}
                     </th>
@@ -12,9 +12,15 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in data" :key="index">
-                    <td v-if="showCheckbox">
-                        <v-checkbox v-model="item.selected" :ripple="false" hide-details density="compact" />
+                <tr v-for="(item, index) in pagedData" :key="index" @click="$emit('item-click', item)"
+                    style="cursor: pointer;">
+                    <td v-if="showCheckbox" @click.stop>
+                        <v-btn size="small" icon :color="item.selected ? 'primary' : 'grey-lighten-1'" variant="tonal"
+                            @click.stop="$emit('toggle-select', item.id)">
+                            <v-icon>
+                                {{ item.selected ? 'mdi-checkbox-marked' : 'mdi-checkbox-blank-outline' }}
+                            </v-icon>
+                        </v-btn>
                     </td>
                     <td v-for="header in headers" :key="header.key">
                         <template v-if="header.key === 'avatarName' && item.avatar && item.name">
@@ -38,6 +44,10 @@
                                 {{ item.status }}
                             </v-chip>
                         </template>
+                        <template v-else-if="header.key === 'isMyTurn'">
+                            <v-chip v-if="item.canApproveChip" color="success" text-color="white" small>결재 가능</v-chip>
+                            <span v-else>{{ item.isMyTurn }}</span>
+                        </template>
                         <template v-else>
                             {{ item[header.key] }}
                         </template>
@@ -48,29 +58,54 @@
                 </tr>
             </tbody>
         </v-table>
+        <Pagination v-if="showPagination" v-model="pageProxy" :length="totalPages" />
     </v-container>
 </template>
 
-<script>
-export default {
-    name: 'DynamicTable',
-    props: {
-        headers: {
-            type: Array,
-            required: true,
-            default: () => []
-        },
-        data: {
-            type: Array,
-            required: true,
-            default: () => []
-        },
-        showCheckbox: {
-            type: Boolean,
-            default: false
-        }
+<script setup>
+import { computed, ref, watch } from 'vue';
+import Pagination from './Pagination.vue';
+
+const props = defineProps({
+    headers: {
+        type: Array,
+        required: true,
+        default: () => []
+    },
+    data: {
+        type: Array,
+        required: true,
+        default: () => []
+    },
+    showCheckbox: {
+        type: Boolean,
+        default: false
+    },
+    itemsPerPage: {
+        type: Number,
+        default: 10
+    },
+    page: {
+        type: Number,
+        default: 1
+    },
+    showPagination: {
+        type: Boolean,
+        default: true
     }
-}
+});
+const emit = defineEmits(['update:page', 'item-click', 'toggle-select']);
+
+const pageProxy = ref(props.page);
+watch(() => props.page, val => { pageProxy.value = val; });
+watch(pageProxy, val => { emit('update:page', val); });
+
+const totalPages = computed(() => Math.ceil(props.data.length / props.itemsPerPage));
+const pagedData = computed(() => {
+    const start = (pageProxy.value - 1) * props.itemsPerPage;
+    const end = start + props.itemsPerPage;
+    return props.data.slice(start, end);
+});
 </script>
 
 <style scoped>

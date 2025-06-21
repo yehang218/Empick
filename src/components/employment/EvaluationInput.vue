@@ -44,7 +44,7 @@
     <!-- 총점 평가 -->
     <div class="total-score">
       <div class="total-header">
-        <h3>테스트 / 면접 총 평가</h3>
+        <h3>{{ totalTitle }}</h3>
       </div>
       <div class="total-body">
         <div class="score-box total-align-right">
@@ -66,9 +66,15 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, defineProps } from 'vue'
 
-// ✅ 바뀌는 값들만 관리하면 됨
+const props = defineProps({
+  totalTitle: {
+    type: String,
+    default: '테스트 / 면접 총 평가'
+  }
+})
+
 const criteria = reactive([
   {
     title: '자신감',
@@ -230,7 +236,6 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 input[type="number"] {
   -moz-appearance: textfield;
 }

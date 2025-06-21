@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/authStore';
+import { setLoggingOut } from '@/utils/errorHandler';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     timeout: parseInt(import.meta.env.VITE_TIMEOUT) || 5000,
+    // responseType: 'json', // 기본값은 json, profile-image 등은 개별 요청에서 blob으로 지정
 });
 
 // 요청 인터셉터
@@ -13,12 +15,14 @@ api.interceptors.request.use(
             url: config.url,
             method: config.method,
             data: config.data,
-            headers: config.headers
+            headers: config.headers,
+            responseType: config.responseType // responseType이 blob인지 확인
         });
         const authStore = useAuthStore();
         if (authStore.accessToken) {
             config.headers.Authorization = `Bearer ${authStore.accessToken}`;
         }
+        // responseType은 개별 요청에서 지정된 값을 그대로 사용
         return config;
     },
     error => {
@@ -33,7 +37,8 @@ api.interceptors.response.use(
         console.log('API 응답 성공:', {
             url: response.config.url,
             status: response.status,
-            data: response.data
+            data: response.data,
+            responseType: response.config.responseType // responseType이 blob인지 확인
         });
         return response;
     },
@@ -60,13 +65,21 @@ api.interceptors.response.use(
                 const { accessToken, refreshToken } = response.data;
 
                 // 새 토큰 저장
-                authStore.setTokens(accessToken, refreshToken);
+                authStore.accessToken = accessToken;
+                authStore.refreshToken = refreshToken;
+
+                // 로컬 스토리지에도 저장
+                localStorage.setItem('auth_tokens', JSON.stringify({
+                    accessToken,
+                    refreshToken
+                }));
 
                 // 원래 요청 재시도
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
             } catch (refreshError) {
-                // 토큰 갱신 실패 시 로그아웃
+                // 토큰 갱신 실패 시 로그아웃 (플래그 설정)
+                setLoggingOut(true);
                 authStore.logout();
                 return Promise.reject(refreshError);
             }
