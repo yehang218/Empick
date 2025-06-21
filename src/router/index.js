@@ -35,6 +35,12 @@ const routes = [
             requiredRoles: ['ROLE_USER', 'ROLE_HR_ACCESS']
         }
     },
+    {
+        path: '/career/recruitments/:id/apply',
+        name: 'CareerApplicantRegister',
+        component: () => import('@/views/career/ApplicantRegisterPage.vue'),
+        meta: { requiresAuth: false, hideHeader: true, hideSidebar: true }
+    },
     ...allRouteModules
 ];
 

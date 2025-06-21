@@ -5,10 +5,28 @@
       <h2 class="page-title">지원서 작성하기</h2>
 
       <v-row>
-        <!-- 건드 이러서 -->
+        <!-- 이력서(지원서) 항목 동적 렌더링 -->
         <v-col cols="12" md="6">
-          <div class="resume-box">
-            <p class="resume-placeholder">이력서 자리<br />(최신)</p>
+          <div>
+            <h3 class="section-title">이력서</h3>
+            <div v-if="applicationItems.length > 0">
+              <v-card v-for="item in applicationItems" :key="item.id" class="mb-4 pa-4" elevation="2">
+                <div class="font-weight-medium mb-2">
+                  {{ item.categoryName }}
+                  <span class="text-caption text-grey-darken-1">
+                    ({{ item.inputType === 0 ? '텍스트' : '기타' }} / 필수: {{ item.isRequired ? 'O' : 'X' }})
+                  </span>
+                </div>
+                <v-text-field
+                  v-model="applicationAnswers[item.id]"
+                  :label="item.categoryName"
+                  :required="item.isRequired"
+                  variant="outlined"
+                  density="compact"
+                />
+              </v-card>
+            </div>
+            <div v-else class="text-grey">지원서 항목이 없습니다.</div>
           </div>
         </v-col>
 
@@ -60,6 +78,8 @@ import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
 import { createIntroduceTemplateItemResponse } from '@/services/introduceService'
 import { useIntroduceStore } from '@/stores/introduceStore'
+import { useApplicationItemStore } from '@/stores/applicationItemStore'
+import { useApplicationStore } from '@/stores/applicationStore'
 
 const route = useRoute()
 const id = Number(route.params.id)
@@ -67,15 +87,21 @@ const id = Number(route.params.id)
 const recruitmentStore = useRecruitmentStore()
 const introduceTemplateStore = useIntroduceTemplateStore()
 const introduceStore = useIntroduceStore()
+const applicationItemStore = useApplicationItemStore()
+const applicationStore = useApplicationStore()
 
 const template = computed(() => introduceTemplateStore.selectedTemplate)
 const templateItems = computed(() => template.value?.items || [])
+const applicationItems = computed(() => applicationItemStore.items)
+const applicationAnswers = ref({})
 
 // 항목별 입력값 관리
 const itemAnswers = ref({})
 
 onMounted(async () => {
   await recruitmentStore.loadRecruitmentDetail(id)
+  // 지원서 항목(application_item) 로딩
+  await applicationItemStore.loadApplicationItems(id)
   const introduceTemplateId = recruitmentStore.detail?.recruitment?.introduceTemplateId
   if (introduceTemplateId) {
     await introduceTemplateStore.loadTemplateDetail(introduceTemplateId)
@@ -102,7 +128,23 @@ const handleSubmit = async () => {
         content: itemContent
       })
     }
-    alert('자기소개서가 성공적으로 등록되었습니다.')
+
+    // 3. application_response(이력서) 등록
+    // (예시 dto: applicantId, recruitmentId, answers 등)
+    // 실제 applicationId, applicantId, recruitmentId는 실무에 맞게 교체 필요
+    const applicantId = 1 // 실제 지원자 id로 교체 필요
+    const recruitmentId = id
+    const answers = Object.entries(applicationAnswers.value).map(([itemId, value]) => ({
+      applicationItemId: Number(itemId),
+      content: value
+    }))
+    await applicationStore.createApplicationResponse({
+      applicantId,
+      recruitmentId,
+      answers
+    })
+
+    alert('자기소개서와 이력서가 성공적으로 등록되었습니다.')
   } catch (e) {
     alert('등록 실패: ' + e)
   }

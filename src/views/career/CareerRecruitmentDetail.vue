@@ -45,7 +45,7 @@
               <v-divider class="my-2" />
               <div><strong>근무지</strong><br />{{ request.workLocation }}</div>
             </div>
-            <v-btn block class="mt-4 apply-btn" color="success" @click="goToResumePage">
+            <v-btn block class="mt-4 apply-btn" color="success" @click="goToApplyPage">
               지원하기
             </v-btn>
           </v-card>
@@ -115,8 +115,8 @@ const getStepTypeLabel = (type) => {
   }
 }
 
-const goToResumePage = () => {
-  router.push(`/career/recruitments/resume/${id}`)
+const goToApplyPage = () => {
+  router.push(`/career/recruitments/${id}/apply`)
 }
 </script>
 
