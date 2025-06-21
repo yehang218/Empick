@@ -87,7 +87,16 @@ export const useApprovalStore = defineStore('approval', () => {
         loading.value = true;
         error.value = null;
         try {
-            approvalDetail.value = await getRequestedApprovalDetail(approvalId);
+            const data = await getRequestedApprovalDetail(approvalId);
+            if (data && data.status === 'PROCEED') {
+                data.approvers = data.approvers.map(approver => {
+                    if (approver.approved === false && !approver.approvedAt) {
+                        return { ...approver, approved: null };
+                    }
+                    return approver;
+                });
+            }
+            approvalDetail.value = data;
         } catch (err) {
             error.value = err;
             console.error('요청한 결재문서 상세 조회 실패:', err);

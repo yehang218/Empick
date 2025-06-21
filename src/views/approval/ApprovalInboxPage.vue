@@ -19,27 +19,49 @@
             <p class="text-h6">받은 결재 문서가 없습니다.</p>
         </div>
         
-        <ListView
-            :headers="headers"
-            :data="pagedList"
-            :itemsPerPage="itemsPerPage"
-            :page="page"
-            @update:page="page = $event"
-            @row-click="handleRowClick"
-        >
-            <template #item.myApprovalStatus="{ item }">
-                <v-chip :color="getMyApprovalStatusColor(item.myApprovalStatus)" text-color="white" small
-                    class="font-weight-bold" outlined>
-                    {{ item.myApprovalStatus }}
-                </v-chip>
-            </template>
-            <template #item.status="{ item }">
-                <v-chip :color="getStatusColor(item.status)" text-color="white" small class="font-weight-bold"
-                    outlined>
-                    {{ item.status }}
-                </v-chip>
-            </template>
-        </ListView>
+        <div v-else>
+            <v-data-table
+                :headers="headers"
+                :items="pagedList"
+                @click:row="handleRowClick"
+                class="elevation-1 list-item-hover"
+                item-value="approvalId"
+                hide-default-footer
+            >
+                <template #item.myApprovalStatus="{ item }">
+                    <v-chip :color="getMyApprovalStatusColor(item.myApprovalStatus)" text-color="white" small
+                        class="font-weight-bold" outlined>
+                        {{ item.myApprovalStatus }}
+                    </v-chip>
+                </template>
+                <template #item.status="{ item }">
+                    <v-chip :color="getStatusColor(item.status)" text-color="white" small class="font-weight-bold"
+                        outlined>
+                        {{ item.status }}
+                    </v-chip>
+                </template>
+            </v-data-table>
+            <div class="d-flex justify-end align-center mt-4 pa-2">
+                <span class="text-caption mr-4">Items per page:</span>
+                <div style="width: 80px;">
+                    <v-select
+                        v-model="itemsPerPage"
+                        :items="[10, 25, 50, 100]"
+                        dense
+                        hide-details
+                        variant="underlined"
+                    ></v-select>
+                </div>
+
+                <span class="text-caption mx-4">{{ pageText }}</span>
+
+                <Pagination
+                    :model-value="page"
+                    @update:model-value="page = $event"
+                    :length="totalPages"
+                />
+            </div>
+        </div>
     </v-container>
 </template>
 
@@ -49,7 +71,7 @@ import { useRouter } from 'vue-router';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useMemberStore } from '@/stores/memberStore';
 import { useAuthStore } from '@/stores/authStore';
-import ListView from '@/components/common/ListView.vue';
+import Pagination from '@/components/common/Pagination.vue';
 import dayjs from 'dayjs';
 import { getApprovalStatusLabel } from '@/constants/approval/approvalStatus.js';
 import { storeToRefs } from 'pinia';
@@ -62,13 +84,13 @@ const router = useRouter();
 const { receivedList, loadingReceived: loading, errorReceived: error } = storeToRefs(approvalStore);
 
 const headers = [
-    { key: 'approvalId', label: '문서번호' },
-    { key: 'categoryName', label: '카테고리' },
-    { key: 'writerName', label: '작성자' },
-    { key: 'status', label: '상태' },
-    { key: 'myApprovalStep', label: '결재순서' },
-    { key: 'myApprovalStatus', label: '내 결재 상태' }, // 변경!
-    { key: 'createdAt', label: '작성일' },
+    { title: '문서번호', key: 'approvalId' },
+    { title: '카테고리', key: 'categoryName' },
+    { title: '작성자', key: 'writerName' },
+    { title: '상태', key: 'status', align: 'center' },
+    { title: '결재순서', key: 'myApprovalStep', align: 'center' },
+    { title: '내 결재 상태', key: 'myApprovalStatus', align: 'center' },
+    { title: '작성일', key: 'createdAt', align: 'center' },
 ];
 
 const itemsPerPage = ref(10);
@@ -133,6 +155,14 @@ const pagedList = computed(() => {
 
 const totalPages = computed(() => Math.ceil(filteredList.value.length / itemsPerPage.value));
 
+const pageText = computed(() => {
+    const totalItems = filteredList.value.length;
+    if (totalItems === 0) return '0-0 of 0';
+    const start = (page.value - 1) * itemsPerPage.value + 1;
+    const end = Math.min(page.value * itemsPerPage.value, totalItems);
+    return `${start}-${end} of ${totalItems}`;
+});
+
 const myApprovalStatusSummary = computed(() => {
     const all = pagedList.value.length;
     const possible = pagedList.value.filter(i => i.myApprovalStatus === '결재 가능').length;
@@ -152,7 +182,7 @@ const myApprovalStatusOptions = computed(() => [
     { key: '취소됨', label: '취소됨', count: myApprovalStatusSummary.value.canceled, color: 'grey' }
 ]);
 
-const handleRowClick = (item) => {
+const handleRowClick = (event, { item }) => {
     if (item?.approvalId) {
         router.push(`/approval/inbox/${item.approvalId}`);
     }
