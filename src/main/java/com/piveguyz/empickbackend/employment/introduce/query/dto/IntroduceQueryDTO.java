@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
 public class IntroduceQueryDTO {
     private Integer id;
     private String content;
-    private Integer memberId;
+    private Integer applicantId;
     private Integer introduceTemplateId;
-    private LocalDateTime updatedAt;
-    private Integer updatedBy;
 }
