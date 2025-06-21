@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { getAnswersByApplicationJobtestId } from '@/services/answerService';
 
 export const useAnswerStore = defineStore('answer', () => {
@@ -19,6 +19,21 @@ export const useAnswerStore = defineStore('answer', () => {
             loading.value = false;
         }
     };
+
+    onMounted(async () => {
+        const savedAnswers = await fetchAnswers({ applicationJobTestId: examData.value.applicationJobTestId })
+        // savedAnswers를 answers.value에 맞게 매핑
+        answers.value = questions.value.map(q => {
+            const found = savedAnswers.find(a => a.questionId === q.questionId)
+            if (!found) return null
+            if (q.type === QUESTION_TYPES.MULTIPLE) {
+                // 옵션 index로 변환
+                return q.options.findIndex(opt => opt.content === found.content)
+            } else {
+                return found.content
+            }
+        })
+    })
 
     return {
         answers, loading, error, fetchAnswers

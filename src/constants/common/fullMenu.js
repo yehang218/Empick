@@ -89,9 +89,8 @@ export const fullMenu = {
             label: '실무테스트 관리',
             roles: [RoleCode.HR_ACCESS],
             children: [
-                { label: '실무테스트 문제', path: routeMap.JobtestQuestionList },
                 { label: '실무테스트', path: routeMap.JobtestList },
-                { label: '실무테스트 답안', path: routeMap.JobtestAnswerList }
+                { label: '실무테스트 문제', path: routeMap.JobtestQuestionList },
             ]
         },
         {

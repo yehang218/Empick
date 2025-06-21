@@ -64,14 +64,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useJobtestDetailStore } from '@/stores/jobtestDetailStore'
-import { useJobtestEntryStore } from '@/stores/jobtestEntryStore';
+import { useJobtestExamStore } from '@/stores/jobtestExamStore';
 import AlertModal from '@/components/common/AlertModal.vue'
 
 const router = useRouter()
 
 const props = defineProps(['jobtestId'])
 const jobtestDetailStore = useJobtestDetailStore()
-const jobtestEntryStore = useJobtestEntryStore()
+const jobtestExamStore = useJobtestExamStore()
 
 const entryCodeInput = ref('')
 const errorMessage = ref('')
@@ -92,10 +92,9 @@ const jobtest = computed(() => jobtestDetailStore.jobtest)
 const handleEntry = async () => {
     isSubmitting.value = true
     try {
-        const resultMessage = await jobtestEntryStore.verifyEntryCode(Number(props.jobtestId), entryCodeInput.value);
-        modalMessage.value = resultMessage
-        // router.push({ name: 'JobtestStart' });
-        window.location.href = 'https://school.programmers.co.kr/learn/courses/30/lessons/12932';
+        const data = await jobtestExamStore.verifyEntryCode(Number(props.jobtestId), entryCodeInput.value);
+        jobtestExamStore.examData = data;
+        router.push({ name: 'JobtestExam', params: { applicationJobTestId: data.applicationJobTestId } });
     } catch (err) {
 
     } finally {
