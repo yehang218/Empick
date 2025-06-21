@@ -1,6 +1,6 @@
 export const stepTypeOptions = [
-    { value: 'DOCUMENT', label: '서류' },
-    { value: 'PRACTICAL', label: '실무' },
+    { value: 'DOCUMENT', label: '서류전형' },
+    { value: 'PRACTICAL', label: '실무테스트' },
     { value: 'INTERVIEW', label: '면접' }
 ]
 
