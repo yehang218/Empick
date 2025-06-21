@@ -30,20 +30,34 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { onMounted, computed, ref, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
 import ListView from '@/components/common/ListView.vue';
 import dayjs from 'dayjs';
 
 const store = useRecruitmentRequestStore();
 const router = useRouter();
+const route = useRoute();
 
 const itemsPerPage = ref(10)
-const page = ref(1)
+const page = ref(Number(route.query.page) || 1)
 
 onMounted(() => {
     store.loadRecruitmentRequestList();
+});
+
+watch(
+    () => route.query.page,
+    (val) => {
+        page.value = Number(val) || 1;
+    }
+);
+
+watch(page, (val) => {
+    if (Number(route.query.page) !== val) {
+        router.replace({ query: { ...route.query, page: val } });
+    }
 });
 
 const goToCreate = () => {
@@ -56,9 +70,12 @@ const handleRowClick = (e) => {
     if (!tr || tr.rowIndex === 0) return; // 헤더 제외
 
     const index = tr.rowIndex - 1;
-    const item = formattedList.value[index];
+    const item = pagedList.value[index];
     if (item?.id) {
-        router.push(`/employment/recruitment-requests/${item.id}`);
+        router.push({
+            path: `/employment/recruitment-requests/${item.id}`,
+            query: { page: page.value }
+        });
     }
 };
 

@@ -104,7 +104,7 @@ export const fullMenu = {
             label: '면접 관리',
             roles: [RoleCode.HR_ACCESS],
             children: [
-                { label: '면접 평가', path: '/employment/interviews' },
+                { label: '면접 일정', path: '/employment/interviews' },
                 { label: '면접 평가 기준표', path: '/employment/interview-criteria' }
             ]
         },

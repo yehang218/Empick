@@ -10,7 +10,8 @@ import {
     deleteInterviewerService,
     getAllInterviewers,
     getInterviewerByIdService,
-    getInterviewersByInterviewIdService
+    getInterviewersByInterviewIdService,
+    getInterviewerByInterviewIdAndMemberIdService
 } from '@/services/interviewerService';
 
 export const useInterviewerStore = defineStore('interviewer', () => {
@@ -41,7 +42,7 @@ export const useInterviewerStore = defineStore('interviewer', () => {
         error.value = null;
         try {
             const result = await getInterviewerByIdService(id);
-            selectedInterviewer.value = result?.[0] ?? null;
+            selectedInterviewer.value = result
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -56,6 +57,21 @@ export const useInterviewerStore = defineStore('interviewer', () => {
         try {
             const result = await getInterviewersByInterviewIdService(interviewId);
             interviewerList.value = result;
+        } catch (err) {
+            error.value = err.message;
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const fetchInterviewerByInterviewIdAndMemberId = async (interviewId, memberId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const result = await getInterviewerByInterviewIdAndMemberIdService(interviewId, memberId);
+            selectedInterviewer.value = result;
+            return result;
         } catch (err) {
             error.value = err.message;
             throw err;
@@ -101,6 +117,7 @@ export const useInterviewerStore = defineStore('interviewer', () => {
         fetchAllInterviewers,
         fetchInterviewerById,
         fetchInterviewersByInterviewId,
+        fetchInterviewerByInterviewIdAndMemberId,
         createInterviewer,
         updateInterviewerScore,
         updateInterviewerReview,

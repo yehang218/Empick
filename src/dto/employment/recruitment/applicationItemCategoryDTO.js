@@ -1,3 +1,4 @@
+// 지원서 항목 카테고리 DTO
 export default class ApplicationItemCategoryDTO {
     constructor(id, name, inputType, displayOrder, applicationItemCategoryId) {
         this.id = id

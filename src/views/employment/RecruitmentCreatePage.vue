@@ -153,7 +153,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { recruitTypeOptions } from '@/constants/employment/recruitTypes'
 import { QuillEditor } from '@vueup/vue-quill'
@@ -191,9 +191,14 @@ const form = ref({
     recruitmentRequestId: route.query.id || null
 })
 
+// 폼 값이 바뀔 때마다 draftRecruitment에 저장
+watch(form, (val) => {
+    store.setDraftRecruitment(val)
+}, { deep: true })
+
 onMounted(async () => {
-    if (store.draftRecruitment?.value) {
-        Object.assign(form.value, store.draftRecruitment.value);
+    if (store.draftRecruitment) {
+        Object.assign(form.value, store.draftRecruitment)
     }
 
     const requestId = route.query.id

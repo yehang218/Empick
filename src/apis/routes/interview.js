@@ -43,6 +43,7 @@ export const InterviewAPI = {
     GET_ALL_INTERVIEWERS: '/api/v1/employment/interviewer',
     GET_INTERVIEWER_BY_ID: (id) => `/api/v1/employment/interviewer/${id}`,
     GET_INTERVIEWERS_BY_INTERVIEW_ID: (interviewId) => `/api/v1/employment/interviewer/interview/${interviewId}`,
+    GET_INTERVIEWERS_BY_INTERVIEW_ID_AND_MEMBER_ID: (interviewId, memberId) => `/api/v1/employment/interviewer/interview/${interviewId}/member/${memberId}`,
 
 
     // interview_sheet
