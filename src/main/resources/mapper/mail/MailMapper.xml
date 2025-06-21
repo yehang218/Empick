@@ -23,7 +23,8 @@
             content,
             sender_id,
             sended_at
-        FROM mail;
+        FROM mail
+        ORDER BY sended_at DESC;
     </select>
 
     <select id="findById" resultMap="MailResultMap">
@@ -91,7 +92,7 @@
          JOIN application_job_test ON application.id = application_job_test.application_id
          JOIN job_test ON application_job_test.job_test_id = job_test.id
          JOIN job_test_question ON job_test.id = job_test_question.job_test_id
-        WHERE application.id = #{id}
+        WHERE application.id = #{applicationId}
         GROUP BY
             application.id,
             application.recruitment_id,
@@ -135,7 +136,7 @@
         JOIN recruitment ON application.recruitment_id = recruitment.id
         JOIN applicant ON application.applicant_id = applicant.id
         JOIN interview ON interview.application_id = application.id
-        WHERE application_id = #{id};
+        WHERE application_id = #{applicationId};
     </select>
 
 </mapper>

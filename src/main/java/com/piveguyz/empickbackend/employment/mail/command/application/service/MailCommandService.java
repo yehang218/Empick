@@ -12,7 +12,7 @@ public interface MailCommandService {
 
     MailCommandDTO sendHTMLMail(MailCommandDTO createdMailCommandDTO);
 
-    MailCommandDTO sendJobtestMail(Integer id);
+    MailCommandDTO sendJobtestMail(Integer applicationId, Integer senderId);
 
-    MailCommandDTO sendInterviewMail(Integer id);
+    MailCommandDTO sendInterviewMail(Integer applicationId, Integer senderId);
 }
