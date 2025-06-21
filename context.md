@@ -1,10 +1,10 @@
-# Empick Frontend - 프로젝트 컨텍스트
+# Empick Frontend - 개발 가이드 & 아키텍처 문서
 
 ## 📋 프로젝트 개요
 
 **Empick Frontend**는 기업용 채용 관리 시스템의 프론트엔드 애플리케이션입니다.
 
-### 기술 스택
+### 🛠️ 기술 스택
 
 - **프레임워크**: Vue 3 (Composition API)
 - **UI 라이브러리**: Vuetify 3
@@ -17,307 +17,725 @@
 
 ---
 
-## 🏗️ 아키텍처 개요
+## 🏗️ 아키텍처 원칙
 
-### 레이어드 아키텍처 (Layered Architecture)
+### 레이어드 아키텍처 (5-Layer Architecture)
 
 ```
-Views (Vue Components)
-    ↓ (Store만 접근 허용)
-Stores (Pinia)
-    ↓ (Service만 접근 허용)
-Services (Business Logic)
-    ↓ (apiClient만 접근 허용)
-API Client (Axios Wrapper)
-    ↓
-Backend API
+┌─────────────────────────────────────────────┐
+│ Views Layer (Vue Components)               │ ← UI 렌더링 & 사용자 상호작용
+├─────────────────────────────────────────────┤
+│ Composables Layer (Vue Composition API)    │ ← 재사용 가능한 로직 캡슐화
+├─────────────────────────────────────────────┤
+│ Stores Layer (Pinia)                       │ ← 상태 관리 & 컴포넌트-서비스 중재
+├─────────────────────────────────────────────┤
+│ Services Layer (Business Logic)            │ ← 비즈니스 로직 & 데이터 변환
+├─────────────────────────────────────────────┤
+│ API Client Layer (Axios Wrapper)           │ ← HTTP 통신 & API 엔드포인트 관리
+└─────────────────────────────────────────────┘
+                        ↓
+                 Backend API
 ```
 
-### 핵심 설계 원칙
+### 🔒 핵심 아키텍처 규칙
 
-1. **단방향 의존성**: 상위 레이어는 하위 레이어만 참조
-2. **레이어 격리**: 각 레이어는 인접한 레이어와만 통신
-3. **axios 직접 사용 금지**: 모든 HTTP 요청은 apiClient를 통해서만
-4. **ESLint로 아키텍처 강제**: 잘못된 import 패턴을 컴파일 타임에 차단
+| 레이어          | 접근 허용 대상             | 금지 사항                   |
+| --------------- | -------------------------- | --------------------------- |
+| **Views**       | `Composables`, `Stores`    | `Services`, `API` 직접 접근 |
+| **Composables** | `Stores`                   | `Services`, `API` 직접 접근 |
+| **Stores**      | `Services`                 | `API` 직접 접근             |
+| **Services**    | `API Client`, `API Routes` | `axios` 직접 사용           |
+| **API Client**  | 모든 접근 허용             | -                           |
+
+### 🚫 ESLint 강제 규칙
+
+```javascript
+// ❌ 금지된 패턴들
+// Vue 컴포넌트에서
+import axios from "axios"; // axios 직접 사용 금지
+import { memberService } from "@/services"; // Service 직접 접근 금지
+
+// Store에서
+import { API } from "@/apis/routes"; // API 직접 접근 금지 (Service를 통해서만)
+
+// Service에서
+import axios from "axios"; // axios 직접 사용 금지 (apiClient 사용)
+```
 
 ---
 
-## 📁 디렉토리 구조
+## 🎯 단일 책임 원칙 (SRP) 적용
+
+### 각 레이어의 단일 책임
+
+#### Views Layer
+
+- **책임**: UI 렌더링과 사용자 상호작용만
+- **변경 이유**: UI 요구사항 변경, UX 개선
+
+#### Composables Layer
+
+- **책임**: 재사용 가능한 로직 캡슐화
+- **변경 이유**: 공통 로직 변경, 재사용 요구사항 변경
+
+#### Stores Layer
+
+- **책임**: 상태 관리와 컴포넌트-서비스 중재
+- **변경 이유**: 상태 구조 변경, 상태 관리 로직 변경
+
+#### Services Layer
+
+- **책임**: 비즈니스 로직 처리와 데이터 변환
+- **변경 이유**: 비즈니스 규칙 변경, 데이터 처리 로직 변경
+
+#### API Client Layer
+
+- **책임**: HTTP 통신 및 API 엔드포인트 관리
+- **변경 이유**: API 스펙 변경, 네트워크 정책 변경
+
+---
+
+## 📁 디렉토리 구조 & 파일 명명 규칙
 
 ```
 src/
-├── apis/                   # API 관련
-│   ├── apiClient.js       # Axios 래퍼, 인터셉터 설정
-│   └── routes/            # API 엔드포인트 정의
-├── components/            # Vue 컴포넌트
-│   ├── common/           # 공통 컴포넌트
-│   ├── attendance/       # 근태 관련 컴포넌트
-│   ├── employment/       # 채용 관련 컴포넌트
+├── apis/                      # API 관련
+│   ├── apiClient.js          # Axios 래퍼 (camelCase)
+│   └── routes/               # API 엔드포인트 정의
+├── components/               # Vue 컴포넌트 (PascalCase)
+│   ├── common/              # 공통 컴포넌트
+│   ├── attendance/          # 도메인별 컴포넌트
 │   └── ...
-├── composables/          # Vue Composition 함수
-├── config/               # 설정 파일
-├── constants/            # 상수 정의
-├── dto/                  # 데이터 전송 객체
-│   ├── auth/
-│   ├── member/
-│   ├── attendance/
-│   └── ...
-├── router/               # 라우팅 설정
-├── services/             # 비즈니스 로직 레이어
-├── stores/               # Pinia 상태 관리
-├── utils/                # 유틸리티 함수
-└── views/                # 페이지 컴포넌트
+├── composables/             # Composition 함수들 (use + PascalCase)
+├── stores/                  # Pinia 상태 관리 (camelCase + Store)
+├── services/                # 비즈니스 로직 (camelCase + Service)
+├── dto/                     # 데이터 전송 객체 (camelCase + DTO)
+├── constants/               # 상수 정의 (camelCase)
+├── utils/                   # 유틸리티 함수 (camelCase)
+└── views/                   # 페이지 컴포넌트 (PascalCase + Page)
 ```
+
+### 파일 명명 컨벤션
+
+| 파일 타입           | 패턴                     | 예시                                         |
+| ------------------- | ------------------------ | -------------------------------------------- |
+| **Vue 컴포넌트**    | `PascalCase.vue`         | `MemberList.vue`, `ProfileEditModal.vue`     |
+| **페이지 컴포넌트** | `PascalCase + Page.vue`  | `MemberListPage.vue`, `LoginPage.vue`        |
+| **Composables**     | `use + PascalCase.js`    | `useAuth.js`, `useMemberList.js`             |
+| **Stores**          | `camelCase + Store.js`   | `memberStore.js`, `authStore.js`             |
+| **Services**        | `camelCase + Service.js` | `memberService.js`, `authService.js`         |
+| **DTO**             | `camelCase + DTO.js`     | `memberResponseDTO.js`, `loginRequestDTO.js` |
+| **상수**            | `camelCase.js`           | `roleCode.js`, `apiEndpoints.js`             |
 
 ---
 
-## 🔒 ESLint 아키텍처 규칙
+## 🔧 개발 패턴 & 코딩 컨벤션
 
-### 1. Vue 컴포넌트 (.vue 파일)
+### 1. Vue 컴포넌트 패턴
 
 ```javascript
-// ❌ 금지된 import
-import axios from "axios"; // axios 직접 사용 금지
-import { someService } from "@/services"; // Service 직접 접근 금지
-import { API } from "@/apis/routes"; // API 직접 접근 금지
+<template>
+  <!-- 템플릿 구조 -->
+</template>
 
-// ✅ 허용된 import
-import { useAuthStore } from "@/stores/authStore"; // Store만 접근 허용
+<script setup>
+// ✅ 올바른 import 순서
+// 1. Vue 관련
+import { ref, computed, onMounted } from "vue";
+
+// 2. 외부 라이브러리
+import dayjs from "dayjs";
+
+// 3. Composables
+import { useAuth } from "@/composables/useAuth";
+import { useToast } from "@/composables/useToast";
+
+// 4. Stores (Composables가 없을 때만)
+import { useMemberStore } from "@/stores/memberStore";
+
+// 5. 상수 및 유틸리티
+import { RoleCode } from "@/constants/common/RoleCode";
+
+// ✅ 상태 선언
+const loading = ref(false);
+const members = ref([]);
+
+// ✅ Composables 사용
+const { isAuthenticated, hasHRAccess } = useAuth();
+const { showSuccess, showError } = useToast();
+
+// ✅ 계산된 속성
+const filteredMembers = computed(() => {
+  return members.value.filter(member => member.isActive);
+});
+
+// ✅ 메서드 정의
+const loadMembers = async () => {
+  loading.value = true;
+  try {
+    // 비즈니스 로직
+  } catch (error) {
+    showError("데이터 로드 실패");
+  } finally {
+    loading.value = false;
+  }
+};
+
+// ✅ 생명주기
+onMounted(() => {
+  loadMembers();
+});
+</script>
+
+<style scoped>
+/* 스타일 정의 */
+</style>
 ```
 
-### 2. Store 파일 (*Store.js, *store.js)
+### 2. Composables 패턴
 
 ```javascript
-// ❌ 금지된 import
-import axios from "axios"; // axios 직접 사용 금지
-import { API } from "@/apis/routes"; // API 직접 접근 금지
+// composables/useExample.js
+import { ref, computed } from "vue";
+import { useExampleStore } from "@/stores/exampleStore";
 
-// ✅ 허용된 import
-import { authService } from "@/services/authService"; // Service만 접근 허용
+export const useExample = () => {
+  const exampleStore = useExampleStore();
+
+  // ✅ 상태 정의
+  const loading = ref(false);
+  const error = ref(null);
+
+  // ✅ 계산된 속성
+  const isReady = computed(() => !loading.value && !error.value);
+
+  // ✅ 메서드 정의
+  const loadData = async () => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      await exampleStore.fetchData();
+    } catch (err) {
+      error.value = err.message;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // ✅ 명확한 반환 구조
+  return {
+    // 상태
+    loading,
+    error,
+
+    // 계산된 값
+    isReady,
+
+    // 메서드
+    loadData,
+  };
+};
 ```
 
-### 3. Service 파일 (services/\*_/_.js)
+### 3. Store 패턴
 
 ```javascript
-// ❌ 금지된 import
-import axios from "axios"; // axios 직접 사용 금지
+// stores/exampleStore.js
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import { exampleService } from "@/services/exampleService";
 
-// ✅ 허용된 import
-import api from "@/apis/apiClient"; // apiClient만 접근 허용
-import { API } from "@/apis/routes"; // API 라우트 접근 허용
+export const useExampleStore = defineStore("example", () => {
+  // ✅ 상태 정의
+  const items = ref([]);
+  const loading = ref(false);
+
+  // ✅ Getters (computed)
+  const itemCount = computed(() => items.value.length);
+  const activeItems = computed(() =>
+    items.value.filter((item) => item.isActive)
+  );
+
+  // ✅ Actions
+  const fetchItems = async () => {
+    loading.value = true;
+    try {
+      const result = await exampleService.getItems();
+      items.value = result;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const addItem = async (itemData) => {
+    const newItem = await exampleService.createItem(itemData);
+    items.value.push(newItem);
+  };
+
+  return {
+    // 상태
+    items,
+    loading,
+
+    // Getters
+    itemCount,
+    activeItems,
+
+    // Actions
+    fetchItems,
+    addItem,
+  };
+});
 ```
 
-### 4. API Client (apiClient.js)
+### 4. Service 패턴
 
-- **모든 제한 해제**: axios 직접 사용 가능
-- **유일한 HTTP 클라이언트**: 모든 API 요청의 중앙 집중점
+```javascript
+// services/exampleService.js
+import api from "@/apis/apiClient";
+import { API } from "@/apis/routes";
+import { ExampleResponseDTO } from "@/dto/example/exampleResponseDTO";
 
----
+export const exampleService = {
+  // ✅ 조회 메서드
+  async getItems() {
+    const response = await api.get(API.EXAMPLE.LIST);
+    return response.data.map((item) => new ExampleResponseDTO(item));
+  },
 
-## 📊 각 레이어별 역할
+  // ✅ 생성 메서드
+  async createItem(itemData) {
+    const response = await api.post(API.EXAMPLE.CREATE, itemData);
+    return new ExampleResponseDTO(response.data);
+  },
 
-### 1. Views Layer (views/, components/)
+  // ✅ 수정 메서드
+  async updateItem(id, itemData) {
+    const response = await api.put(API.EXAMPLE.UPDATE(id), itemData);
+    return new ExampleResponseDTO(response.data);
+  },
 
-**역할**: 사용자 인터페이스 및 사용자 상호작용 처리
-
-- Vue 컴포넌트로 구성
-- **Store만 접근 허용**
-- 사용자 입력 처리 및 화면 렌더링
-- 비즈니스 로직 없음
-
-**주요 디렉토리**:
-
-- `views/`: 페이지 단위 컴포넌트
-- `components/`: 재사용 가능한 컴포넌트
-
-### 2. Stores Layer (stores/)
-
-**역할**: 상태 관리 및 컴포넌트-서비스 간 중재
-
-- Pinia로 구현된 상태 관리
-- **Service만 접근 허용**
-- 전역 상태 관리
-- 컴포넌트에서 사용할 수 있는 인터페이스 제공
-
-**주요 Store들**:
-
-- `authStore.js`: 인증 상태 관리
-- `memberStore.js`: 사원 정보 관리
-- `attendanceStore.js`: 근태 관리
-- `approvalStore.js`: 결재 관리
-
-### 3. Services Layer (services/)
-
-**역할**: 비즈니스 로직 처리 및 데이터 변환
-
-- **apiClient만 접근 허용**
-- API 응답 데이터 가공
-- DTO 변환
-- 에러 처리
-- 파일 업로드 등 복잡한 로직
-
-**주요 Service들**:
-
-- `authService.js`: 로그인/로그아웃 로직
-- `memberService.js`: 사원 관리 로직
-- `attendanceService.js`: 근태 관리 로직
-- `fileService.js`: 파일 업로드 로직
-
-### 4. API Client Layer (apis/)
-
-**역할**: HTTP 통신 및 API 엔드포인트 관리
-
-- `apiClient.js`: Axios 래퍼, 인터셉터 설정
-- `routes/`: API 엔드포인트 정의
-- 토큰 관리 (Access/Refresh Token)
-- 요청/응답 로깅
-- 자동 토큰 갱신
-
-### 5. DTO Layer (dto/)
-
-**역할**: 데이터 구조 정의 및 유효성 검사
-
-- API 요청/응답 데이터 구조화
-- 데이터 유효성 검사
-- 타입 안전성 보장
-
-**구조**:
-
-```
-dto/
-├── auth/           # 인증 관련 DTO
-├── member/         # 사원 관리 DTO
-├── attendance/     # 근태 관리 DTO
-├── employment/     # 채용 관리 DTO
-└── common/         # 공통 DTO
+  // ✅ 삭제 메서드
+  async deleteItem(id) {
+    await api.delete(API.EXAMPLE.DELETE(id));
+    return true;
+  },
+};
 ```
 
 ---
 
-## 🔐 인증 시스템
+## 🔐 인증 시스템 가이드
 
-### JWT 토큰 기반 인증
+### JWT 토큰 플로우
 
-- **Access Token**: API 요청 인증
-- **Refresh Token**: Access Token 갱신
-- **자동 토큰 갱신**: apiClient에서 401 에러 시 자동 처리
+```javascript
+// ✅ 로그인 처리
+const { login } = useAuth();
 
-### 인증 플로우
+const handleLogin = async (credentials) => {
+  try {
+    await login(credentials);
+    // 자동으로 토큰 저장 및 헤더 설정
+    router.push("/dashboard");
+  } catch (error) {
+    showError("로그인 실패");
+  }
+};
 
-1. 로그인 → JWT 토큰 발급
-2. 모든 API 요청에 Access Token 자동 첨부
-3. 토큰 만료 시 Refresh Token으로 자동 갱신
-4. 갱신 실패 시 자동 로그아웃
+// ✅ 권한 체크
+const { hasHRAccess, hasRecruitmentOperator } = useAuth();
 
----
-
-## 🛠️ 주요 기능 도메인
-
-### 1. 인증 (Auth)
-
-- 로그인/로그아웃
-- 토큰 관리
-- 권한 기반 라우팅
-
-### 2. 사원 관리 (Member)
-
-- 사원 등록 (개별/일괄)
-- 프로필 이미지 업로드
-- 사원 정보 관리
-
-### 3. 근태 관리 (Attendance)
-
-- 출퇴근 기록
-- 근무시간 계산
-- 타임라인 시각화
-- 근태 현황 대시보드
-
-### 4. 채용 관리 (Employment)
-
-- 채용 공고 관리
-- 지원자 관리
-- 면접 관리
-- 채용 테스트
-
-### 5. 결재 시스템 (Approval)
-
-- 결재 문서 작성
-- 결재선 관리
-- 결재 현황 추적
-
----
-
-## 🎯 개발 가이드라인
-
-### 1. 새로운 기능 추가 시
-
-1. **DTO 정의**: 데이터 구조 먼저 설계
-2. **API Route 추가**: 엔드포인트 정의
-3. **Service 구현**: 비즈니스 로직 작성
-4. **Store 구현**: 상태 관리 로직
-5. **Component 구현**: UI 컴포넌트
-
-### 2. 코딩 컨벤션
-
-- **파일명**: camelCase (예: `memberStore.js`)
-- **컴포넌트**: PascalCase (예: `MemberList.vue`)
-- **함수명**: camelCase (예: `getMemberList`)
-- **상수**: UPPER_SNAKE_CASE (예: `API_BASE_URL`)
-
-### 3. 에러 처리
-
-- Service Layer에서 에러 분류 및 처리
-- 사용자 친화적인 에러 메시지 제공
-- 네트워크 에러, 서버 에러, 비즈니스 에러 구분
-
-### 4. 성능 최적화
-
-- 컴포넌트 레벨 코드 스플리팅
-- 이미지 lazy loading
-- API 응답 캐싱 (Store 레벨)
-- 불필요한 재렌더링 방지
-
----
-
-## 🔧 환경 설정
-
-### 개발 환경
-
-```bash
-npm run dev          # 개발 서버 실행
-npm run build        # 프로덕션 빌드
-npm run preview      # 빌드 결과 미리보기
+// 템플릿에서 사용
+<template>
+  <v-btn v-if="hasHRAccess" @click="handleHRAction">
+    HR 기능
+  </v-btn>
+</template>
 ```
+
+### 권한별 접근 제어
+
+| 권한           | 코드                               | 설명               |
+| -------------- | ---------------------------------- | ------------------ |
+| 기본 사용자    | `RoleCode.USER`                    | 기본 인증된 사용자 |
+| HR 접근        | `RoleCode.HR_ACCESS`               | 인사 관리 기능     |
+| 채용 계획 편집 | `RoleCode.RECRUITMENT_PLAN_EDITOR` | 채용 계획 수정     |
+| 결재 처리      | `RoleCode.APPROVAL_PROCESSOR`      | 결재 승인/거부     |
+| 채용 운영      | `RoleCode.RECRUITMENT_OPERATOR`    | 채용 전 과정 관리  |
+
+---
+
+## 📊 주요 도메인별 개발 가이드
+
+### 1. 사원 관리 (Member)
+
+```javascript
+// ✅ 사원 목록 조회
+const { members, loadAllMembers, filteredMembers } = useMemberList();
+
+// ✅ 프로필 이미지 처리
+const { profileImageSrc, uploadProfileImage } = useProfileImage();
+
+// ✅ 프로필 폼 관리
+const { isEditing, startEditing, saveChanges } = useProfileForm();
+```
+
+### 2. 근태 관리 (Attendance)
+
+```javascript
+// ✅ 근태 상세 정보
+const { memberData, attendanceRecords, attendanceStats } =
+  useAttendanceDetail(memberId);
+
+// ✅ 근태 계산
+import { attendanceCalculator } from "@/utils/attendance/attendanceCalculator";
+const workHours = attendanceCalculator.calculateWorkHours(checkIn, checkOut);
+```
+
+### 3. 채용 관리 (Employment)
+
+```javascript
+// ✅ 지원자 관리
+const { selectedApplicants, currentApplicant, toggleRegistrationSelection } =
+  useApplicantManager();
+
+// ✅ 등록 진행 상황
+const { registrationProgress, setRegistrationProgress, getStatusText } =
+  useRegistrationProgress();
+```
+
+---
+
+## 🎨 UI/UX 패턴
+
+### 1. 로딩 상태 처리
+
+```javascript
+<template>
+  <v-container>
+    <!-- 로딩 중 -->
+    <v-progress-circular
+      v-if="loading"
+      indeterminate
+      color="primary"
+    />
+
+    <!-- 데이터 표시 -->
+    <div v-else-if="!error">
+      <!-- 컨텐츠 -->
+    </div>
+
+    <!-- 에러 상태 -->
+    <v-alert v-else type="error">
+      {{ error }}
+    </v-alert>
+  </v-container>
+</template>
+```
+
+### 2. 토스트 메시지 패턴
+
+```javascript
+const { showSuccess, showError, showWarning, showInfo } = useToast();
+
+// ✅ 성공 메시지
+showSuccess("저장이 완료되었습니다.");
+
+// ✅ 에러 메시지
+showError("데이터를 불러오는데 실패했습니다.");
+
+// ✅ 경고 메시지
+showWarning("권한이 없습니다.");
+
+// ✅ 정보 메시지
+showInfo("처리 중입니다...");
+```
+
+### 3. 모달 패턴
+
+```javascript
+<template>
+  <v-dialog v-model="dialog" max-width="600px">
+    <v-card>
+      <v-card-title>제목</v-card-title>
+      <v-card-text>
+        <!-- 컨텐츠 -->
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="dialog = false">취소</v-btn>
+        <v-btn @click="handleConfirm" color="primary">확인</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+```
+
+---
+
+## ⚡ 성능 최적화 가이드
+
+### 1. 컴포넌트 최적화
+
+```javascript
+// ✅ defineAsyncComponent로 지연 로딩
+import { defineAsyncComponent } from "vue";
+
+const HeavyComponent = defineAsyncComponent(() =>
+  import("@/components/HeavyComponent.vue")
+);
+
+// ✅ v-memo 사용 (리스트 최적화)
+<template>
+  <div v-for="item in items" :key="item.id" v-memo="[item.id, item.name]">
+    {{ item.name }}
+  </div>
+</template>
+```
+
+### 2. 상태 관리 최적화
+
+```javascript
+// ✅ Store에서 캐싱 활용
+const fetchMembers = async (forceRefresh = false) => {
+  if (!forceRefresh && members.value.length > 0) {
+    return members.value; // 캐시된 데이터 반환
+  }
+
+  // API 호출
+  const result = await memberService.getMembers();
+  members.value = result;
+  return result;
+};
+```
+
+---
+
+## 🧪 테스트 가이드
+
+### 1. Composables 테스트
+
+```javascript
+// tests/composables/useAuth.test.js
+import { useAuth } from "@/composables/useAuth";
+
+describe("useAuth", () => {
+  it("should return authentication status", () => {
+    const { isAuthenticated, userRoles } = useAuth();
+
+    expect(isAuthenticated.value).toBe(false);
+    expect(userRoles.value).toEqual([]);
+  });
+});
+```
+
+### 2. 컴포넌트 테스트
+
+```javascript
+// tests/components/MemberList.test.js
+import { mount } from "@vue/test-utils";
+import MemberList from "@/components/MemberList.vue";
+
+describe("MemberList", () => {
+  it("should render member list", async () => {
+    const wrapper = mount(MemberList);
+
+    // 테스트 로직
+    expect(wrapper.find('[data-testid="member-list"]').exists()).toBe(true);
+  });
+});
+```
+
+---
+
+## 🚀 배포 & 환경 설정
 
 ### 환경 변수
 
-- `VITE_API_BASE_URL`: API 서버 주소
-- `VITE_TIMEOUT`: API 요청 타임아웃
+```bash
+# .env.development
+VITE_API_BASE_URL=http://localhost:8080/api
+VITE_TIMEOUT=30000
+
+# .env.production
+VITE_API_BASE_URL=https://api.empick.com
+VITE_TIMEOUT=60000
+```
+
+### 빌드 명령어
+
+```bash
+# 개발 서버 실행
+npm run dev
+
+# 프로덕션 빌드
+npm run build
+
+# 빌드 결과 미리보기
+npm run preview
+
+# 린트 검사
+npm run lint
+
+# 린트 자동 수정
+npm run lint:fix
+```
 
 ---
 
-## 📝 최근 주요 변경사항
+## 📝 체크리스트
 
-### 타임라인 UI 개선 (WeekSummaryCard.vue)
+### 🔍 코드 리뷰 체크리스트
 
-- 모눈종이 배경 제거
-- 인터랙티브 툴팁 제거
-- 단순한 근무시간 바 표시로 변경
-- 출근/퇴근 라벨 직접 표시
+#### 아키텍처 준수
 
-### 사원 등록 시스템
+- [ ] 레이어 간 의존성 규칙 준수
+- [ ] ESLint 규칙 통과
+- [ ] SRP 원칙 적용
+- [ ] 적절한 레이어에 코드 배치
 
-- 개별/일괄 등록 지원
-- 프로필 이미지 업로드
-- API 타임아웃 최적화 (30초/60초)
-- 로딩 UI 개선
+#### 코딩 컨벤션
 
-### 파일 업로드 최적화
+- [ ] 파일명 규칙 준수
+- [ ] 함수/변수명 camelCase 사용
+- [ ] 컴포넌트명 PascalCase 사용
+- [ ] 상수명 UPPER_SNAKE_CASE 사용
 
-- 멀티파트 요청 타임아웃 증가
-- 업로드 진행률 표시
-- 에러 메시지 분류
+#### 성능 & 보안
+
+- [ ] 불필요한 리렌더링 방지
+- [ ] 적절한 에러 처리
+- [ ] 로딩 상태 표시
+- [ ] 권한 체크 적용
+
+#### 사용자 경험
+
+- [ ] 토스트 메시지 적절히 사용
+- [ ] 로딩 인디케이터 표시
+- [ ] 에러 상태 적절히 처리
+- [ ] 반응형 디자인 적용
+
+### 🛠️ 새 기능 개발 체크리스트
+
+1. **설계 단계**
+
+   - [ ] DTO 구조 설계
+   - [ ] API 엔드포인트 정의
+   - [ ] 컴포넌트 구조 계획
+
+2. **개발 단계**
+
+   - [ ] Service 레이어 구현
+   - [ ] Store 레이어 구현
+   - [ ] Composable 구현 (필요시)
+   - [ ] 컴포넌트 구현
+
+3. **테스트 단계**
+
+   - [ ] 단위 테스트 작성
+   - [ ] 통합 테스트 확인
+   - [ ] 수동 테스트 수행
+
+4. **배포 단계**
+   - [ ] 코드 리뷰 완료
+   - [ ] 린트 검사 통과
+   - [ ] 빌드 오류 없음
 
 ---
 
-이 문서는 프로젝트의 전체적인 구조와 개발 가이드라인을 제공합니다. 새로운 개발자가 프로젝트에 참여하거나 기존 기능을 수정할 때 참고하시기 바랍니다.
+## 💡 자주 사용되는 코드 스니펫
+
+### 1. 기본 Vue 컴포넌트 템플릿
+
+```javascript
+<template>
+  <v-container>
+    <v-row>
+      <v-col>
+        <!-- 컨텐츠 -->
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { useToast } from "@/composables/useToast";
+
+// Props
+const props = defineProps({
+  // props 정의
+});
+
+// Emits
+const emit = defineEmits(['update', 'close']);
+
+// Composables
+const { showSuccess, showError } = useToast();
+
+// 상태
+const loading = ref(false);
+
+// 메서드
+const handleAction = async () => {
+  loading.value = true;
+  try {
+    // 비즈니스 로직
+    showSuccess("성공적으로 처리되었습니다.");
+    emit('update');
+  } catch (error) {
+    showError("처리 중 오류가 발생했습니다.");
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 생명주기
+onMounted(() => {
+  // 초기화 로직
+});
+</script>
+```
+
+### 2. API 호출 패턴
+
+```javascript
+// Store에서 API 호출
+const fetchData = async (params = {}) => {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const result = await exampleService.getData(params);
+    data.value = result;
+    return result;
+  } catch (err) {
+    error.value = err.message;
+    throw err;
+  } finally {
+    loading.value = false;
+  }
+};
+```
+
+### 3. 폼 유효성 검사 패턴
+
+```javascript
+const validationRules = {
+  required: [(v) => !!v || "필수 입력 항목입니다."],
+  email: [
+    (v) => !!v || "이메일을 입력해주세요.",
+    (v) => /.+@.+\..+/.test(v) || "올바른 이메일 형식이 아닙니다.",
+  ],
+  phone: [
+    (v) => !!v || "연락처를 입력해주세요.",
+    (v) => /^010-\d{4}-\d{4}$/.test(v) || "올바른 연락처 형식이 아닙니다.",
+  ],
+};
+```
+
+---
+
+이 문서는 **Empick Frontend 프로젝트의 완전한 개발 가이드**입니다. 모든 팀원과 AI는 이 가이드를 준수하여 일관된 코드 품질과 아키텍처를 유지해야 합니다.
