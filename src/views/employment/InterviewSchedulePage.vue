@@ -8,7 +8,7 @@
             <h3 class="text-h6 font-weight-bold mb-4">{{ selectedDate }} 면접 일정</h3>
             <v-btn color="primary" @click="goToCreateInterview">면접 등록하기</v-btn>
 
-            <v-alert v-if="interviews.length === 0" type="info" border="left" colored-border>
+            <v-alert v-if="interviews.length === 0" type="info" border="start" colored-border>
                 등록된 면접 일정이 없습니다.
             </v-alert>
 
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Calendar from '@/components/common/Calendar.vue'
 import { useInterviewStore } from '@/stores/interviewStore'
 import { useApplicationStore } from '@/stores/applicationStore'
@@ -50,43 +50,54 @@ const goToCreateInterview = () => {
     })
 }
 
-const selectedDate = ref('')
-const interviews = ref([])
-
 const interviewStore = useInterviewStore()
 const applicationStore = useApplicationStore()
 const applicantStore = useApplicantStore()
+
+const selectedInterview = ref(null)
+const selectedApplication = ref(null)
+const selectedApplicant = ref(null)
+const selectedDate = ref('')
+const interviews = ref([])
 
 const onDateSelected = async (date) => {
     selectedDate.value = date
     await interviewStore.fetchInterviewsByDate(date)
     const rawInterviews = interviewStore.interviewList
 
-    // interviews.value 초기화
-    interviews.value = []
+    // interviews.value 완전 초기화
+    interviews.value.splice(0)
 
-    // 각 인터뷰에 대해 applicantName 추가
+    // 각 인터뷰에 대해 applicantName 추가 (중복 없이 한 번씩만 추가)
     for (const interview of rawInterviews) {
         try {
-            const appRes = await applicationStore.fetchApplicationById(interview.applicationId)
-            const applicantId = appRes?.[0]?.applicantId
+            const applicationId = interview.applicationId
+            await applicationStore.fetchApplicationById(applicationId)
+            const application = applicationStore.selectedApplication
+            const applicantId = application.applicantId
+            await applicantStore.fetchApplicantById(applicantId)
+            const applicant = applicantStore.selectedApplicant
 
             let applicantName = '이름 없음'
-            if (applicantId) {
-                const applicantRes = await applicantStore.fetchApplicantById(applicantId)
-                applicantName = applicantRes?.name ?? '이름 없음'
+            if (applicant) {
+                applicantName = applicant.name
             }
 
-            interviews.value.push({
-                ...interview,
-                applicantName,
-            })
+            // 중복 방지
+            if (!interviews.value.some(i => i.applicationId === interview.applicationId)) {
+                interviews.value.push({
+                    ...interview,
+                    applicantName,
+                })
+            }
         } catch (err) {
             console.error('Error fetching applicant name:', err)
-            interviews.value.push({
-                ...interview,
-                applicantName: '오류',
-            })
+            if (!interviews.value.some(i => i.applicationId === interview.applicationId)) {
+                interviews.value.push({
+                    ...interview,
+                    applicantName: '오류',
+                })
+            }
         }
     }
 }

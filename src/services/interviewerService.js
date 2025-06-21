@@ -96,3 +96,15 @@ export const getInterviewersByInterviewIdService = async (interviewId, options =
         return apiResponse.data.map(item => InterviewerResponseDTO.fromJSON(item));
     }, options);
 };
+
+// 면접 id와 회원id로 면접 담당자를 조회하는 서비스
+export const getInterviewerByInterviewIdAndMemberIdService = async (interviewId, memberId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(InterviewAPI.GET_INTERVIEWERS_BY_INTERVIEW_ID_AND_MEMBER_ID(interviewId, memberId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return InterviewerResponseDTO.fromJSON(apiResponse.data);
+    }, options);
+};
