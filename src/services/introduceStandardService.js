@@ -12,8 +12,8 @@ export const deleteIntroduceStandard = async (id) => {
   return apiClient.delete(IntroduceAPI.DELETE_STANDARD(id))
 }
 
-export const createIntroduceStandard = async (title, memberId, itemIds) => {
-  return apiClient.post(IntroduceAPI.CREATE_STANDARD, { content:title, memberId, itemIds })
+export const createIntroduceStandard = async (content, memberId, itemIds) => {
+  return apiClient.post(IntroduceAPI.CREATE_STANDARD, { content, memberId, itemIds })
 }
 
 export const fetchIntroduceStandardDetail = async (id) => {

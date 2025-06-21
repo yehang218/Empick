@@ -69,18 +69,12 @@ const standard = computed(() => {
 })
 
 // 프론트에서만 관리되는 itemIds로 항목 리스트 생성
-const items = computed(() => {
-  if (!standard.value) return []
-  if (standard.value.items && standard.value.items.length > 0) return standard.value.items
-  if (standard.value.itemIds && Array.isArray(standard.value.itemIds)) {
-    return standardItemStore.items.filter(item => standard.value.itemIds.includes(item.id))
-  }
-  return []
-})
+const items = computed(() => standardItemStore.items)
 
 onMounted(async () => {
   await standardStore.fetchStandardDetail(route.params.id)
-  await standardItemStore.fetchItems()
+  await standardItemStore.fetchItemsByStandardId(route.params.id)
+  console.log('store items:', standardItemStore.items)
 })
 
 const goList = () => router.push('/employment/introduce-standard/list')

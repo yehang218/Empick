@@ -9,3 +9,16 @@ export const fetchStandardItems = async () => {
 export const createStandardItem = async (content, memberId) => {
   return apiClient.post(IntroduceAPI.CREATE_STANDARD_ITEM, { content, memberId })
 }
+
+export const updateStandardItemsFk = async (standardId, itemIds) => {
+  // itemIds: number[], standardId: number
+  return apiClient.post(IntroduceAPI.UPDATE_STANDARD_ITEMS_FK, { standardId, itemIds })
+}
+
+export const patchStandardItemFk = async (itemId, introduceStandardId) => {
+  return apiClient.patch(`${IntroduceAPI.CREATE_STANDARD_ITEM}/${itemId}`, { introduceStandardId })
+}
+
+export async function fetchItemsByStandardId(standardId) {
+  return apiClient.get(`/api/v1/employment/introduce-standard/items/standard/${standardId}`)
+}

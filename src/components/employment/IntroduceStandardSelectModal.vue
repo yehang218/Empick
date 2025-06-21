@@ -55,6 +55,7 @@ const selectedStandardId = ref(null)
 
 onMounted(() => {
   store.fetchStandards()
+  itemStore.fetchItems()
 })
 
 const standards = computed(() => store.standards)
@@ -71,6 +72,8 @@ function selectStandard() {
       items = selected.items
     } else if (selected.itemIds && Array.isArray(selected.itemIds)) {
       items = itemStore.items.filter(item => selected.itemIds.includes(item.id))
+    } else {
+      items = itemStore.items.filter(item => item.introduceStandardId === selected.id)
     }
     emit('select', { ...selected, items })
     close()

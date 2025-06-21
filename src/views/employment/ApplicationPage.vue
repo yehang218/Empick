@@ -198,7 +198,6 @@
         </v-card>
       </v-col>
 
-
       <!-- 우측: 평가 상세 -->
       <v-col cols="12" lg="7">
         <v-card class="modern-card evaluation-detail-card">
@@ -214,7 +213,7 @@
           <v-divider class="mb-4" />
           <v-card-text>
             <div v-if="viewMode === 'detail'">
-              <component :is="evaluationComponent" :applicant="applicant" />
+              <component :is="evaluationComponent" :applicant="applicant" :standard-title="standardTitle" :standard-items="standardItems" :standard-id="standardId" />
             </div>
             <div v-else class="score-analysis">
               <h4 class="text-h6 mb-4">점수 분석</h4>
@@ -282,15 +281,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineAsyncComponent, watch } from 'vue'
+import { ref, onMounted, defineAsyncComponent, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useToast } from 'vue-toastification'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
+import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 
 const route = useRoute()
 const router = useRouter()
 const applicationStore = useApplicationStore()
 const toast = useToast()
+const standardStore = useIntroduceStandardStore()
+const standardItemStore = useIntroduceStandardItemStore()
 const applicationId = Number(route.params.applicationId)
 const query = route.query
 
@@ -301,18 +304,38 @@ const IntroduceResult = defineAsyncComponent(() => import('@/components/employme
 const evaluationComponent = ref(IntroduceResult)
 const selectedEvaluation = ref('자기소개서')
 const viewMode = ref('detail')
+const standardTitle = ref('')
+const standardItems = ref([])
 
 const applicant = ref({})
 
+const standardId = computed(() => query.introduceStandardId || query.introduce_standard_id)
+console.log('지원서 평가 페이지 쿼리:', query)
+console.log('IntroduceEvaluationInput에 넘길 standardId:', standardId.value)
+
 onMounted(async () => {
   if (applicationId) {
-    await applicationStore.fetchApplicationById(applicationId)
-    if (applicationStore.selectedApplication) {
-      applicant.value = { ...applicationStore.selectedApplication }
+    try {
+      await applicationStore.fetchApplicationById(applicationId)
+      if (applicationStore.selectedApplication) {
+        applicant.value = { ...applicationStore.selectedApplication }
+      }
+    } catch (error) {
+      toast.error('지원서 정보를 불러오지 못했습니다.')
     }
   } else {
     // 쿼리스트링 기반 fallback
     applicant.value = { ...query }
+  }
+  // 기준표 정보 쿼리스트링에서 추출
+  if (standardId.value) {
+    await standardStore.fetchStandardDetail(standardId.value)
+    standardTitle.value = standardStore.standardDetail?.content || ''
+    await standardItemStore.fetchItemsByStandardId(standardId.value)
+    standardItems.value = Array.isArray(standardItemStore.items) ? standardItemStore.items : []
+  } else {
+    standardTitle.value = ''
+    standardItems.value = []
   }
 })
 
@@ -399,9 +422,8 @@ const updateStatus = () => {
 }
 
 const goBack = () => {
-  // 뒤로가기 또는 목록으로 이동
-  const from = route.query.from
-  const page = route.query.page
+  const from = route.query.from;
+  const page = route.query.page;
   if (from) {
     router.push(page ? { path: from, query: { page } } : { path: from })
   } else {

@@ -16,6 +16,7 @@ export const IntroduceAPI = {
     // IntroduceStandardItemCommandController
     CREATE_STANDARD_ITEM: '/api/v1/employment/introduce-standard-item',
     DELETE_STANDARD_ITEM: (id) => `/api/v1/employment/introduce-standard-item/${id}`,
+    UPDATE_STANDARD_ITEMS_FK: '/api/v1/employment/introduce-standard-item/bulk-update',
 
     // IntroduceTemplateCommandController
     CREATE_TEMPLATE: '/api/v1/employment/introduce-template',
@@ -40,6 +41,7 @@ export const IntroduceAPI = {
     GET_ALL_STANDARDS: '/api/v1/employment/introduce-standard',
     GET_ALL_STANDARD_ITEMS: '/api/v1/employment/introduce-standard/item',
     GET_STANDARD_BY_ID: (id) => `/api/v1/employment/introduce-standard/${id}`,
+    GET_ITEMS_BY_STANDARD_ID: (standardId) => `/api/v1/employment/introduce-standard/items/standard/${standardId}`,
 
     // IntroduceTemplateQueryController
     GET_ALL_TEMPLATES: '/api/v1/employment/introduce-template',

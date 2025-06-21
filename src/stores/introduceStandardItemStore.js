@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchStandardItems, createStandardItem } from '@/services/introduceStandardItemService'
+import { fetchStandardItems, createStandardItem, fetchItemsByStandardId } from '@/services/introduceStandardItemService'
 import apiClient from '@/apis/apiClient'
 import { IntroduceAPI } from '@/apis/routes/introduce'
 import { useMemberStore } from '@/stores/memberStore'
@@ -16,6 +16,19 @@ export const useIntroduceStandardItemStore = defineStore('introduceStandardItem'
       this.error = null
       try {
         this.items = await fetchStandardItems()
+      } catch (e) {
+        this.error = e
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchItemsByStandardId(standardId) {
+      this.loading = true
+      this.error = null
+      try {
+        const response = await fetchItemsByStandardId(standardId)
+        this.items = response.data
+        console.log('fetchItemsByStandardId response:', response.data)
       } catch (e) {
         this.error = e
       } finally {

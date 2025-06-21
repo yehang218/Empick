@@ -5,7 +5,7 @@
       <div class="field-group">
         <label class="field-label">기준표 제목</label>
         <v-text-field
-          :model-value="localStandardTitle"
+          :model-value="localStandardTitle || '연결된 기준표가 없습니다.'"
           variant="outlined"
           readonly
           hide-details
@@ -82,13 +82,15 @@
 </template>
 
 <script setup>
-import { ref, defineProps, watchEffect } from 'vue'
+import { ref, defineProps, watchEffect, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import IntroduceStandardSelectModal from './IntroduceStandardSelectModal.vue'
 import { useIntroduceStore } from '@/stores/introduceStore'
+import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 
 const router = useRouter()
 const introduceStore = useIntroduceStore()
+const standardItemStore = useIntroduceStandardItemStore()
 
 const props = defineProps({
   totalTitle: {
@@ -98,14 +100,6 @@ const props = defineProps({
   evaluationData: {
     type: Object,
     default: () => ({})
-  },
-  standardTitle: {
-    type: String,
-    default: ''
-  },
-  standardItems: {
-    type: Array,
-    default: () => []
   }
 })
 
@@ -126,9 +120,6 @@ watchEffect(() => {
     localTotalScore.value = null
     localComment.value = ''
   }
-  // props로 받은 기준표 정보가 있으면 반영
-  if (props.standardTitle) localStandardTitle.value = props.standardTitle
-  if (props.standardItems) localStandardItems.value = props.standardItems
 })
 
 const onStandardSelect = (standard) => {

@@ -23,7 +23,7 @@ export const useIntroduceStandardStore = defineStore('introduceStandard', {
         this.loading = false
       }
     },
-    async addStandard(title, itemIds) {
+    async addStandard(content, itemIds) {
       this.loading = true
       this.error = null
       try {
@@ -33,10 +33,23 @@ export const useIntroduceStandardStore = defineStore('introduceStandard', {
           alert('로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.')
           throw new Error('No memberId')
         }
-        await createIntroduceStandard(title, memberId, itemIds)
+        const res = await createIntroduceStandard(content, memberId, itemIds)
+        let standardId = res?.data?.id || res?.id
+        if (!standardId) {
+          await this.fetchStandards()
+          if (this.standards.length > 0) {
+            standardId = this.standards[this.standards.length - 1].id
+          }
+        }
+        if (standardId) {
+          const { patchStandardItemFk } = await import('@/services/introduceStandardItemService')
+          for (const itemId of itemIds) {
+            await patchStandardItemFk(itemId, standardId)
+          }
+        }
         this.standards.push({
-          id: Date.now(),
-          content: title,
+          id: standardId || Date.now(),
+          content,
           itemIds: [...itemIds],
         })
         await this.fetchStandards()
