@@ -5,9 +5,11 @@ import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
 import { useRecruitmentProcessStore } from '@/stores/recruitmentProcessStore'
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
+import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
 import { getStepTypeLabel } from '@/constants/employment/stepType'
+import { getInputTypeLabel } from '@/constants/employment/inputTypes'
 import ConfirmModal from '@/components/common/Modal.vue'
 import { useToast } from 'vue-toastification'
 
@@ -19,6 +21,8 @@ const applicationItemStore = useApplicationItemStore()
 
 const processStore = useRecruitmentProcessStore()
 const requestStore = useRecruitmentRequestStore()
+const introduceTemplateStore = useIntroduceTemplateStore()
+const introduceTemplateDialog = ref(false)
 
 const processList = computed(() => processStore.processList)
 const toast = useToast()
@@ -29,6 +33,13 @@ const applicationItemDialog = ref(false)
 const loading = computed(() => store.loadingDetail)
 const error = computed(() => store.detailError)
 const deleteDialog = ref(false)
+
+const selectedApplicationCategories = computed(() => {
+    // applicationItems: [{ applicationItemCategoryId, isRequired } ...]
+    const selectedIds = detail.value?.recruitment?.applicationItems?.map(item => item.applicationItemCategoryId) || []
+    // applicationItemStore.items: 전체 카테고리 리스트
+    return applicationItemStore.items.filter(cat => selectedIds.includes(cat.id))
+})
 
 const goToRecruitmentList = () => {
     const currentPage = route.query.page || 1;
@@ -49,6 +60,16 @@ const getInputComponent = (type) => {
     }
 }
 
+const openIntroduceTemplateDialog = async () => {
+    const templateId = detail.value?.recruitment?.introduceTemplateId
+    if (!templateId) {
+        toast.error('자기소개서 템플릿이 없습니다.')
+        return
+    }
+    await introduceTemplateStore.loadTemplateDetail(templateId)
+    introduceTemplateDialog.value = true
+}
+
 onMounted(async () => {
     const id = Number(route.params.id);
     await store.loadRecruitmentDetail(id);
@@ -67,6 +88,10 @@ onMounted(async () => {
 
     await processStore.loadProcesses(id);
     await applicationItemStore.loadApplicationItems(id);
+    console.log('지원서 항목 도착:', applicationItemStore.items)
+    if (applicationItemStore.items.length > 0) {
+        console.log('첫번째 카테고리명:', applicationItemStore.items[0].categoryName)
+    }
 });
 
 function formatDate(date) {
@@ -120,17 +145,17 @@ const getStatusColor = (status) => {
                 </v-col>
 
                 <v-col cols="auto" class="d-flex gap-2">
-                    <v-btn class="mr-2" variant="outlined" color="success" :to="{
+                    <v-btn class="mr-2" variant="elevated" color="primary" :to="{
                         path: `/employment/applicant/recruitments/${detail.recruitment.id}`,
                         query: { page: $route.query.page }
                     }">
-                        지원자 현황 보기
+                        <v-icon start>mdi-account-group</v-icon> 지원자 현황
                     </v-btn>
-                    <v-btn class="mr-2" variant="outlined" color="success" @click="applicationItemDialog = true">
-                        지원서 항목 보기
+                    <v-btn color="success" variant="outlined" class="mr-2" @click="applicationItemDialog = true">
+                        <v-icon start>mdi-file-document</v-icon> 지원서 항목 보기
                     </v-btn>
-                    <v-btn variant="outlined" color="error" @click="deleteDialog = true">
-                        삭제
+                    <v-btn color="secondary" variant="outlined" class="mr-2" @click="openIntroduceTemplateDialog">
+                        <v-icon start>mdi-file-account</v-icon> 자기소개서 항목 보기
                     </v-btn>
                 </v-col>
             </v-row>
@@ -196,6 +221,12 @@ const getStatusColor = (status) => {
                 </div>
             </v-card>
 
+            <v-row justify="end" class="mt-4">
+                <v-btn variant="outlined" color="error" @click="deleteDialog = true">
+                    <v-icon start>mdi-delete</v-icon> 삭제
+                </v-btn>
+            </v-row>
+
             <ConfirmModal v-if="deleteDialog" message="정말 삭제하시겠습니까?" @confirm="handleDelete"
                 @cancel="deleteDialog = false" />
 
@@ -211,7 +242,7 @@ const getStatusColor = (status) => {
                         <div class="font-weight-medium mb-2">
                             {{ item.categoryName }}
                             <span class="text-caption text-grey-darken-1">
-                                ({{ item.inputType }} / 필수: {{ item.required ? 'O' : 'X' }})
+                                ({{ getInputTypeLabel(item.inputType) }} / 필수: {{ item.isRequired ? 'O' : 'X' }})
                             </span>
                         </div>
                         <component :is="getInputComponent(item.inputType)" :label="item.categoryName" :readonly="true"
@@ -221,6 +252,25 @@ const getStatusColor = (status) => {
                 <v-card-actions>
                     <v-spacer />
                     <v-btn text @click="applicationItemDialog = false">닫기</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="introduceTemplateDialog" max-width="700px">
+            <v-card>
+                <v-card-title class="text-h6 font-weight-bold">자기소개서 항목 미리보기</v-card-title>
+                <v-divider />
+                <v-card-text>
+                    <v-card v-for="(item, index) in introduceTemplateStore.selectedTemplate?.items || []" :key="index"
+                        class="mb-4 pa-4" elevation="2">
+                        <div class="font-weight-medium mb-2">
+                            {{ item.title }}
+                        </div>
+                    </v-card>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn text @click="introduceTemplateDialog = false">닫기</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>

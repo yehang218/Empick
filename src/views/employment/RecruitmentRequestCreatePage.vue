@@ -1,6 +1,15 @@
 <template>
     <v-container fluid class="pa-6">
-        <h2 class="text-h5 font-weight-bold mb-6">채용 요청서 작성</h2>
+        <v-row align="center" class="mb-6">
+            <v-col cols="auto" class="d-flex align-center">
+                <v-icon @click="router.back()" class="me-2 cursor-pointer" size="28" color="black">
+                    mdi-arrow-left
+                </v-icon>
+                <h2 class="text-h5 font-weight-bold mb-0">
+                    채용 요청서 작성
+                </h2>
+            </v-col>
+        </v-row>
 
         <v-form ref="formRef" v-model="isValid" lazy-validation>
             <v-row dense>
