@@ -4,38 +4,46 @@
     <v-container class="custom-container">
       <v-row>
         <v-col cols="12" md="8">
-          <h2 class="title">{{ detail.title }}</h2>
-          <p class="mb-4 intro-text">{{ detail.intro }}</p>
+          <h2 class="title">{{ recruitment.title }}</h2>
+          <p class="mb-4 intro-text">{{ recruitment.content }}</p>
 
           <h3 class="subtitle">주요 업무</h3>
           <ul>
-            <li v-for="(task, idx) in detail.tasks" :key="idx">{{ task }}</li>
+            <li v-for="(task, idx) in (request.responsibility ? request.responsibility.split('\n') : [])" :key="idx">{{ task }}</li>
           </ul>
 
           <h3 class="subtitle">자격 요건</h3>
           <ul>
-            <li v-for="(qual, idx) in detail.qualifications" :key="idx">{{ qual }}</li>
+            <li v-for="(qual, idx) in (request.qualification ? request.qualification.split('\n') : [])" :key="idx">{{ qual }}</li>
           </ul>
 
           <h3 class="subtitle">우대 사항</h3>
           <ul>
-            <li v-for="(plus, idx) in detail.preferred" :key="idx">{{ plus }}</li>
+            <li v-for="(plus, idx) in (request.preference ? request.preference.split('\n') : [])" :key="idx">{{ plus }}</li>
           </ul>
 
           <h3 class="subtitle">전형 절차</h3>
-          <p>{{ detail.process }}</p>
+          <div v-if="processList.length">
+            <ol style="display: flex; gap: 12px; padding-left: 0; list-style: none;">
+              <li v-for="(step, idx) in processList" :key="step.id">
+                <span>{{ getStepTypeLabel(step.stepType) }}</span>
+                <span v-if="idx < processList.length - 1">→</span>
+              </li>
+            </ol>
+          </div>
+          <div v-else>전형 절차 정보가 없습니다.</div>
         </v-col>
 
         <v-col cols="12" md="4">
           <v-card class="pa-4 summary-card">
             <div class="info-box">
-              <div><strong>직군</strong><br />{{ detail.job }}</div>
+              <div><strong>직군</strong><br />{{ request.jobName }}</div>
               <v-divider class="my-2" />
-              <div><strong>경력사항</strong><br />{{ detail.career }}</div>
+              <div><strong>인원</strong><br />{{ request.headcount }}</div>
               <v-divider class="my-2" />
-              <div><strong>고용형태</strong><br />{{ detail.employmentType }}</div>
+              <div><strong>고용형태</strong><br />{{ request.employmentType }}</div>
               <v-divider class="my-2" />
-              <div><strong>근무지</strong><br />{{ detail.location }}</div>
+              <div><strong>근무지</strong><br />{{ request.workLocation }}</div>
             </div>
             <v-btn block class="mt-4 apply-btn" color="success" @click="goToResumePage">
               지원하기
@@ -48,57 +56,68 @@
 </template>
 
 <script setup>
-import { useRoute, useRouter } from 'vue-router' // ✅ useRouter 추가
+import { onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useRecruitmentStore } from '@/stores/recruitmentStore'
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
+import { useRecruitmentProcessStore } from '@/stores/recruitmentProcessStore'
 import CareerHeader from '@/components/career/CareerHeader.vue'
 
 const route = useRoute()
-const router = useRouter() // ✅ 선언 추가
+const router = useRouter()
 const id = Number(route.params.id)
 
+const recruitmentStore = useRecruitmentStore()
+const requestStore = useRecruitmentRequestStore()
+const processStore = useRecruitmentProcessStore()
+
+const recruitment = computed(() => recruitmentStore.detail?.recruitment || {})
+const request = computed(() => requestStore.recruitmentRequestDetail || {})
+const processList = computed(() => processStore.processList || [])
+
+const fetchRequestDetail = async () => {
+  const reqId = recruitment.value.recruitmentRequestId
+  if (reqId) {
+    await requestStore.loadRecruitmentRequestDetail(reqId)
+  } else if (recruitment.value.id) {
+    await requestStore.loadRecruitmentRequestDetail(recruitment.value.id)
+  }
+}
+
+const fetchProcessList = async () => {
+  if (recruitment.value.id) {
+    await processStore.loadProcesses(recruitment.value.id)
+  }
+}
+
+onMounted(async () => {
+  await recruitmentStore.loadRecruitmentDetail(id)
+  await fetchRequestDetail()
+  await fetchProcessList()
+})
+
+watch(
+  () => recruitment.value.recruitmentRequestId,
+  async (newVal, oldVal) => {
+    if (newVal && newVal !== oldVal) {
+      await requestStore.loadRecruitmentRequestDetail(newVal)
+    }
+  }
+)
+
+// stepType 한글 변환
+const getStepTypeLabel = (type) => {
+  switch (type) {
+    case 'DOCUMENT': return '서류'
+    case 'PRACTICAL': return '실무'
+    case 'INTERVIEW': return '면접'
+    default: return type
+  }
+}
+
 const goToResumePage = () => {
-  router.push(`/career/recruitments/resume/${id}`) // ✅ 라우터에 등록된 경로로 이동
+  router.push(`/career/recruitments/resume/${id}`)
 }
-
-const baseRecruitment = {
-  intro: '안녕하세요, [회사명] 팀입니다. 우리는 "진짜 가족 같은 동료"를 찾고 있습니다.',
-  tasks: [
-    '업무 기획 및 일정 조율',
-    '입사자 온보딩 및 관리',
-    '관련 제도 기획 및 운영'
-  ],
-  qualifications: [
-    '경력 3년 이상',
-    '소통 능력과 협업 마인드',
-    '문서 작성 능력'
-  ],
-  preferred: [
-    '관련 업무 경험자',
-    'IT 환경 이해도',
-    '자기주도적인 분'
-  ],
-  process: '서류 → 면접 → 입사',
-  location: '[회사명] 본사\n서울특별시 [구/주소] 또는 재택근무 가능'
-}
-
-const recruitmentMap = {
-  1: {
-    title: '인사팀에서 가족같이 지낼 인재를 찾습니다.',
-    job: '인사(HR)',
-    career: '경력 7년 이상',
-    employmentType: '정규직',
-    ...baseRecruitment
-  },
-  2: {
-    title: '경영팀 백엔드 개발자 채용',
-    job: '백엔드 개발자',
-    career: '경력무관',
-    employmentType: '계약직',
-    ...baseRecruitment
-  },
-  // ... 3 ~ 10번도 동일하게 작성
-}
-
-const detail = recruitmentMap[id] || {}
 </script>
 
 <style scoped>
