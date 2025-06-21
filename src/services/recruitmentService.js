@@ -2,6 +2,8 @@ import api from '@/apis/apiClient'
 import { API } from '@/apis/routes'
 import ApiResponseDTO from '@/dto/common/apiResponseDTO'
 import RecruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
+// import recruitmentResponseDTO from '@/dto/employment/recruitment/recruitmentResponseDTO'
+// import recruitmentDetailResponseDTO from '@/dto/employment/recruitment/recruitmentDetailResponseDTO'
 import RecruitmentDetailResponseDTO from '@/dto/employment/recruitment/recruitmentDetailResponseDTO'
 
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler'
@@ -26,10 +28,11 @@ export const fetchRecruitmentDetail = async (id, options = {}) => {
         const response = await api.get(API.RECRUITMENT.RECRUITMENT_DETAIL(id))
         console.log('📦 raw response:', response);
         const apiResponse = ApiResponseDTO.fromJSON(response.data)
-
+        
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400)
         }
+        
 
         return RecruitmentDetailResponseDTO.fromJSON(apiResponse.data)
     }, options) ?? {};

@@ -7,7 +7,7 @@ export const useApplicationItemStore = defineStore('applicationItem', () => {
     const loading = ref(false);
     const error = ref(null);
 
-    // 공고별 항목 로딩
+    // 공고별 항목 로딩 (ApplicationItemDTO)
     const loadApplicationItems = async (recruitmentId) => {
         loading.value = true;
         error.value = null;

@@ -1,18 +1,22 @@
 export default class InterviewerResponseDTO {
 
-    constructor(id, interviewId, interviewerId, score, review) {
+    constructor(id, interviewId, memberId, score, review) {
         this.id = id;
         this.interviewId = interviewId;
-        this.interviewerId = interviewerId;
+        this.memberId = memberId;
         this.score = score;
         this.review = review;
     }
 
     static fromJSON(json) {
-        return new InterviewerResponseDTO (
+        if (!json) {
+            console.warn('⚠️ InterviewerResponseDTO.fromJSON에 null/undefined가 들어왔습니다');
+            return null;
+        }
+        return new InterviewerResponseDTO(
             json.id,
             json.interviewId,
-            json.interviewerId,
+            json.memberId,
             json.score,
             json.review
         );
@@ -22,7 +26,7 @@ export default class InterviewerResponseDTO {
         return {
             id: this.id,
             interviewId: this.interviewId,
-            interviewerId: this.interviewerId,
+            memberId: this.memberId,
             score: this.score,
             review: this.review
         };
