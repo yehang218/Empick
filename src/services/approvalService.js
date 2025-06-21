@@ -6,6 +6,8 @@ import ApprovalReceivedListDTO from '@/dto/approval/approval/approvalReceivedLis
 import ApprovalRequestedListDTO from '@/dto/approval/approval/approvalRequestedListDTO';
 import ApprovalSentListDTO from '@/dto/approval/approval/approvalSentListDTO';
 
+import { ApprovalReceivedDetailQueryDTO } from '@/dto/approval/approval/approvalReceivedDetailDTO';
+import { ApprovalRequestedDetailDTO } from '@/dto/approval/approval/approvalRequestedDetailDTO';
 import ApprovalCategoryDTO from '@/dto/approval/approvalCategory/approvalCategoryDTO';
 import ApprovalCategoryItemDTO from '@/dto/approval/approvalCategoryItem/approvalCategoryItemDTO';
 import { ApprovalContentDTO, CreateApprovalDTO } from '@/dto/approval/approval/createApprovalDTO';
@@ -48,6 +50,40 @@ export const getApprovalsByApproverId = async (approverId) => { };
 // 단건 결재 조회
 export const getApprovalById = async (approvalId) => { };
 
+// 요청받은 결재문서 상세 조회
+export const getReceivedApprovalDetail = (approvalId, memberId) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(
+            ApprovalAPI.RECEIVED_DOCUMENT_DETAIL(approvalId, memberId)
+        );
+        
+        if (response.data && response.data.success && response.data.data) {
+            console.log('✅[approvalService] API 응답 데이터:', response.data.data);
+            return new ApprovalReceivedDetailQueryDTO(response.data.data);
+        } else {
+            console.error('API 로직 에러:', response.data?.message || '결재 문서 상세 정보를 불러오는데 실패했습니다.');
+            return null;
+        }
+    });
+};
+
+// 요청한 결재문서 상세 조회
+export const getRequestedApprovalDetail = (approvalId) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(
+            ApprovalAPI.REQUESTED_DOCUMENT_DETAIL(approvalId)
+        );
+        
+        if (response.data && response.data.success && response.data.data) {
+            console.log('✅[approvalService] API 응답 데이터:', response.data.data);
+            return new ApprovalRequestedDetailDTO(response.data.data);
+        } else {
+            console.error('API 로직 에러:', response.data?.message || '결재 문서 상세 정보를 불러오는데 실패했습니다.');
+            return null;
+        }
+    });
+};
+
 // 결재 생성
 export const createApprovalService = async (dto, options = {}) => {
     return withErrorHandling(async () => {
@@ -63,10 +99,33 @@ export const createApprovalService = async (dto, options = {}) => {
 };
 
 // 승인 처리
-export const approveApproval = async (approvalId) => { };
+export const approve = async (approvalId, memberId) => {
+    return withErrorHandling(async () => {
+        const payload = { approverId: memberId };
+        const response = await api.post(`/api/v1/approval/documents/${approvalId}/approve`, payload);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return apiResponse;
+    });
+};
 
 // 반려 처리
-export const rejectApproval = async (approvalId, rejectReason) => { };
+export const reject = async (approvalId, memberId, reason) => {
+    return withErrorHandling(async () => {
+        const payload = {
+            approverId: memberId,
+            rejectReason: reason
+        };
+        const response = await api.post(`/api/v1/approval/documents/${approvalId}/reject`, payload);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        return apiResponse;
+    });
+};
 
 // 자신이 결재자인 결재문서 목록 조회
 export const getReceivedApprovals = async (memberId) => {

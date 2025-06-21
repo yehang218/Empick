@@ -52,34 +52,83 @@
                 </div>
             </div>
 
-            <div class="timeline-content">
-                <div v-for="(day, index) in weekData" :key="index" class="timeline-row">
-                    <!-- 근무시간 바 (출근과 퇴근이 모두 있는 경우) -->
-                    <div v-if="day.startTime !== '-' && day.endTime !== '-'" class="work-bar"
-                        :style="getWorkBarStyle(day)">
-                        <span class="work-label start-label">출근</span>
-                        <span class="work-label end-label">퇴근</span>
-                    </div>
-                    <!-- 출근만 있는 경우 현재 시간까지 진행 바로 표시 -->
-                    <div v-else-if="day.startTime !== '-'" class="work-bar ongoing"
-                        :style="getOngoingWorkBarStyle(day)">
-                        <span class="work-label start-label">출근</span>
+            <div class="timeline-content" @mousemove="onTimelineMouseMove" @mouseleave="hideTimelineTooltip">
+                <!-- 모눈종이 배경 -->
+                <div class="grid-background">
+                    <!-- 세로선 (시간 구분선) -->
+                    <div v-for="hour in 24" :key="`vertical-${hour - 1}`" class="grid-line vertical"
+                        :style="{ left: `${((hour - 1) / 24) * 100}%` }"></div>
+                    <!-- 가로선 -->
+                    <div class="grid-line horizontal" style="top: 25%"></div>
+                    <div class="grid-line horizontal" style="top: 50%"></div>
+                    <div class="grid-line horizontal" style="top: 75%"></div>
+                </div>
+
+                <!-- 호버 시 빨간 세로선 -->
+                <div v-if="hoverTime.show" class="hover-line" :style="{ left: hoverTime.linePosition + '%' }"></div>
+
+                <!-- 주차의 마지막 날(최신일)만 표시 -->
+                <div v-if="latestDay" class="timeline-row">
+                    <!-- 날짜 표시 -->
+                    <div class="timeline-date-label">
+                        {{ latestDay.date }}일 (최신)
                     </div>
 
-                    <!-- 점심시간 구분선 -->
-                    <!-- <div class="lunch-break-line" :style="{ left: '50%' }"></div>
-                    <div class="end-break-line" :style="{ left: '75%' }"></div> -->
+                    <!-- 근무시간 바 (출근과 퇴근이 모두 있는 경우) -->
+                    <div v-if="latestDay.startTime !== '-' && latestDay.endTime !== '-'" class="work-bar"
+                        :style="getWorkBarStyle(latestDay)" @mouseenter="showWorkBarTooltip(latestDay, $event)"
+                        @mouseleave="hideWorkBarTooltip">
+                    </div>
+                    <!-- 출근만 있는 경우 현재 시간까지 진행 바로 표시 -->
+                    <div v-else-if="latestDay.startTime !== '-'" class="work-bar ongoing"
+                        :style="getOngoingWorkBarStyle(latestDay)" @mouseenter="showWorkBarTooltip(latestDay, $event)"
+                        @mouseleave="hideWorkBarTooltip">
+                    </div>
                 </div>
+                <!-- 데이터가 없는 경우 빈 타임라인 표시 -->
+                <div v-else class="timeline-row">
+                    <div class="no-data-message">근무 데이터가 없습니다</div>
+                </div>
+
             </div>
         </div>
     </div>
+
+    <!-- 타임라인 호버 툴팁 (body에 직접 렌더링) -->
+    <Teleport to="body">
+        <div v-if="hoverTime.show" class="timeline-tooltip-global"
+            :style="{ left: hoverTime.x + 'px', top: hoverTime.y + 'px' }">
+            {{ hoverTime.time }}
+        </div>
+    </Teleport>
+
+    <!-- 근무시간 바 툴팁 (body에 직접 렌더링) -->
+    <Teleport to="body">
+        <div v-if="workBarTooltip.show" class="work-bar-tooltip-global"
+            :style="{ left: workBarTooltip.x + 'px', top: workBarTooltip.y + 'px' }">
+            <div class="tooltip-content">
+                <div class="tooltip-item">
+                    <span class="tooltip-label">출근:</span>
+                    <span class="tooltip-value">{{ workBarTooltip.startTime }}</span>
+                </div>
+                <div v-if="workBarTooltip.endTime !== '-'" class="tooltip-item">
+                    <span class="tooltip-label">퇴근:</span>
+                    <span class="tooltip-value">{{ workBarTooltip.endTime }}</span>
+                </div>
+                <div class="tooltip-item">
+                    <span class="tooltip-label">근무시간:</span>
+                    <span class="tooltip-value">{{ workBarTooltip.duration }}</span>
+                </div>
+            </div>
+        </div>
+    </Teleport>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 // Props
-defineProps({
+const props = defineProps({
     weekData: {
         type: Array,
         default: () => [
@@ -99,9 +148,43 @@ defineProps({
     }
 })
 
+// 주차의 마지막 날(최신일) 계산
+const latestDay = computed(() => {
+    if (!props.weekData || props.weekData.length === 0) {
+        return null
+    }
+
+    // 날짜 기준으로 정렬하여 마지막 날 찾기
+    const sortedDays = [...props.weekData].sort((a, b) => {
+        const dateA = parseInt(a.date)
+        const dateB = parseInt(b.date)
+        return dateB - dateA // 내림차순 정렬 (최신일이 먼저)
+    })
+
+    return sortedDays[0] // 가장 최신일 반환
+})
+
 // 현재 시간을 주기적으로 업데이트하기 위한 reactive 변수
 const currentTime = ref(new Date())
 let timeUpdateInterval = null
+
+// 호버 상태 관리
+const hoverTime = ref({
+    show: false,
+    x: 0,
+    y: 0,
+    linePosition: 0,
+    time: ''
+})
+
+const workBarTooltip = ref({
+    show: false,
+    x: 0,
+    y: 0,
+    startTime: '',
+    endTime: '',
+    duration: ''
+})
 
 // 1분마다 현재 시간 업데이트
 onMounted(() => {
@@ -174,6 +257,54 @@ const getOngoingWorkBarStyle = (day) => {
 
 
 
+// 타임라인 마우스 이동 처리 (배경 - 실시간 시간 표시)
+const onTimelineMouseMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const x = event.clientX - rect.left
+    const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100))
+
+    // 24시간 기준으로 시간 계산 (실시간)
+    const totalMinutes = (percentage / 100) * 24 * 60
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = Math.floor(totalMinutes % 60)
+
+    // 마우스 위치를 화면 좌표로 저장
+    hoverTime.value = {
+        show: true,
+        x: event.clientX,
+        y: event.clientY - 50, // 마우스 위쪽에 표시
+        linePosition: percentage,
+        time: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+    }
+}
+
+// 타임라인 툴팁 숨기기
+const hideTimelineTooltip = () => {
+    hoverTime.value.show = false
+}
+
+// 근무시간 바 툴팁 표시
+const showWorkBarTooltip = (day, event) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+
+    // 타임라인 배경 툴팁 숨기기
+    hoverTime.value.show = false
+
+    workBarTooltip.value = {
+        show: true,
+        x: rect.left + rect.width / 2,
+        y: rect.top - 10,
+        startTime: day.startTime ? day.startTime.substring(0, 5) : '-',
+        endTime: day.endTime && day.endTime !== '-' ? day.endTime.substring(0, 5) : '-',
+        duration: day.totalDuration
+    }
+}
+
+// 근무시간 바 툴팁 숨기기
+const hideWorkBarTooltip = () => {
+    workBarTooltip.value.show = false
+}
+
 // 승인 요청 처리
 const requestApproval = (day) => {
     console.log('승인 요청:', day)
@@ -188,7 +319,7 @@ defineEmits(['requestApproval', 'editTime'])
     background: white;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .table-header {
@@ -310,6 +441,7 @@ defineEmits(['requestApproval', 'editTime'])
 .timeline-chart {
     border-top: 1px solid #e0e0e0;
     background: #fafafa;
+    overflow: visible;
 
     .time-scale {
         display: flex;
@@ -334,6 +466,52 @@ defineEmits(['requestApproval', 'editTime'])
     .timeline-content {
         position: relative;
         height: 60px;
+        background: #ffffff;
+        overflow: visible;
+
+        // 모눈종이 배경
+        .grid-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+
+            .grid-line {
+                position: absolute;
+
+                &.vertical {
+                    width: 1px;
+                    height: 100%;
+                    background: #f0f0f0;
+
+                    &:nth-child(4n+1) {
+                        // 4시간마다 진한 선
+                        background: #d0d0d0;
+                    }
+                }
+
+                &.horizontal {
+                    width: 100%;
+                    height: 1px;
+                    background: #f5f5f5;
+                }
+            }
+        }
+
+        // 호버 시 빨간 세로선
+        .hover-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ff4444;
+            pointer-events: none;
+            z-index: 20;
+            box-shadow: 0 0 4px rgba(255, 68, 68, 0.3);
+        }
 
         .timeline-row {
             position: relative;
@@ -344,72 +522,163 @@ defineEmits(['requestApproval', 'editTime'])
                 top: 15px;
                 height: 30px;
                 background: #4caf50;
-                border-radius: 4px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0 8px;
+                border-radius: 6px;
+                border: 2px solid #388e3c;
+                transition: all 0.2s ease;
+                z-index: 15;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+                &:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                    border-color: #2e7d32;
+                }
 
                 &.ongoing {
                     background: linear-gradient(90deg, #ff9800 0%, #ffcc80 100%);
+                    border-color: #f57c00;
                     animation: pulse 2s ease-in-out infinite alternate;
 
-                    .ongoing-label {
-                        font-size: 11px;
-                        color: white;
-                        font-weight: 600;
+                    &:hover {
+                        border-color: #ef6c00;
                     }
                 }
             }
 
-            .work-point {
+            // 타임라인 호버 툴팁 (벌룬 스타일)
+            .timeline-tooltip {
                 position: absolute;
-                top: 20px;
-                width: 20px;
-                height: 20px;
-                background: #ff9800;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transform: translateX(-50%);
+                top: -50px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 12px;
+                font-size: 13px;
+                font-weight: 600;
+                white-space: nowrap;
+                pointer-events: none;
+                z-index: 50;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                backdrop-filter: blur(10px);
+                animation: tooltipFadeIn 0.2s ease-out;
 
-                .work-label {
+                &::after {
+                    content: '';
                     position: absolute;
-                    top: -25px;
+                    top: 100%;
                     left: 50%;
                     transform: translateX(-50%);
-                    white-space: nowrap;
+                    border: 8px solid transparent;
+                    border-top-color: #667eea;
+                }
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: calc(100% + 2px);
+                    left: 50%;
+                    transform: translateX(-50%);
+                    border: 6px solid transparent;
+                    border-top-color: rgba(255, 255, 255, 0.2);
+                }
+
+                // Fixed position 버전
+                &.timeline-tooltip-fixed {
+                    position: fixed;
+                    top: auto;
+                    transform: translate(-50%, -100%);
+                    margin-top: -8px;
+                    z-index: 9999;
+
+                    &::after {
+                        top: 100%;
+                        border-top-color: #667eea;
+                    }
+
+                    &::before {
+                        top: calc(100% + 2px);
+                        border-top-color: rgba(255, 255, 255, 0.2);
+                    }
                 }
             }
 
-            .work-label {
-                color: white;
+            // 근무시간 바 툴팁
+            .work-bar-tooltip {
+                position: fixed;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                padding: 0;
+                font-size: 13px;
+                z-index: 40;
+                transform: translate(-50%, -100%);
+                margin-top: -8px;
+
+                .tooltip-content {
+                    padding: 12px;
+                }
+
+                .tooltip-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 6px;
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+
+                    .tooltip-label {
+                        color: #666;
+                        margin-right: 12px;
+                        font-weight: 500;
+                    }
+
+                    .tooltip-value {
+                        color: #333;
+                        font-weight: 600;
+                    }
+                }
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    border: 6px solid transparent;
+                    border-top-color: white;
+                }
+            }
+
+            .no-data-message {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #999;
+                font-size: 14px;
+                font-style: italic;
+            }
+
+            .timeline-date-label {
+                position: absolute;
+                top: -20px;
+                left: 8px;
                 font-size: 12px;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                height: 100%;
-
-                &.start-label {
-                    justify-content: flex-start;
-                }
-
-                &.end-label {
-                    justify-content: flex-end;
-                }
+                font-weight: 600;
+                color: #1976d2;
+                background: white;
+                padding: 2px 6px;
+                border-radius: 4px;
+                border: 1px solid #e0e0e0;
+                z-index: 10;
             }
         }
 
-        .lunch-break-line,
-        .end-break-line {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 1px;
-            background: #f44336;
-            opacity: 0.6;
-        }
+
     }
 }
 
@@ -422,6 +691,109 @@ defineEmits(['requestApproval', 'editTime'])
     100% {
         opacity: 1;
         transform: scaleY(1.05);
+    }
+}
+
+@keyframes tooltipFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(5px) scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+// Global 툴팁 스타일 (body에 직접 렌더링)
+.timeline-tooltip-global {
+    position: fixed;
+    transform: translate(-50%, -100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 99999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    animation: tooltipFadeIn 0.2s ease-out;
+    margin-top: -8px;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 8px solid transparent;
+        border-top-color: #667eea;
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: calc(100% + 2px);
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: rgba(255, 255, 255, 0.2);
+    }
+}
+
+// Global 근무시간 바 툴팁 스타일
+.work-bar-tooltip-global {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+    font-size: 13px;
+    z-index: 99999;
+    transform: translate(-50%, -100%);
+    margin-top: -8px;
+    pointer-events: none;
+
+    .tooltip-content {
+        padding: 12px;
+    }
+
+    .tooltip-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            color: #666;
+            margin-right: 12px;
+            font-weight: 500;
+        }
+
+        .tooltip-value {
+            color: #333;
+            font-weight: 600;
+        }
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 6px solid transparent;
+        border-top-color: white;
     }
 }
 </style>

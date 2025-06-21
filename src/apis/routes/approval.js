@@ -32,5 +32,11 @@ export const ApprovalAPI = {
     REQUESTED_DOCUMENTS_LIST: (memberId) => `/api/v1/approval/documents/requested?memberId=${memberId}`,
 
     // 카테고리별 결재 라인
-    APPROVAL_LINE: (categoryId) => `/api/v1/approval/categories/${categoryId}/lines`
+    APPROVAL_LINE: (categoryId) => `/api/v1/approval/categories/${categoryId}/lines`,
+
+    // 요청받은 결재문서 상세 조회
+    RECEIVED_DOCUMENT_DETAIL: (documentId, memberId) => `/api/v1/approval/documents/received/${documentId}?memberId=${memberId}`,
+
+    // 요청한 결재문서 상세 조회
+    REQUESTED_DOCUMENT_DETAIL: (documentId) => `/api/v1/approval/documents/requested/${documentId}`,
 };

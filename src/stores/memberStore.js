@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import {
-    registerMemberService,
     getMyInfoService,
     updateMyInfoService,
     profileImageFetchService,
@@ -109,24 +108,6 @@ export const useMemberStore = defineStore('member', {
             this.profileImageUrl = '';
 
             localStorage.removeItem('member-store');
-        },
-
-        // 📝 사원 등록
-        async registerMember(memberData) {
-            this.loading = true;
-            this.registerError = null;
-            try {
-                const result = await registerMemberService(memberData);
-                this.registerResult = result;
-                // 등록 후 캐시 무효화
-                this.invalidateMembersCache();
-                return result;
-            } catch (err) {
-                this.registerError = err.message;
-                throw err;
-            } finally {
-                this.loading = false;
-            }
         },
 
         // 🧑‍💼 내 정보 조회

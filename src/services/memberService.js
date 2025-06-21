@@ -1,20 +1,98 @@
 import api from '@/apis/apiClient';
 import { API } from '@/apis/routes';
+import MemberSignUpRequestDTO from '@/dto/member/memberSignUpRequestDTO'; // DTO import 추가
 
 /**
- * 신규 사원 등록 서비스
+ * 신규 사원 등록 서비스 (프로필 이미지 포함)
  * @param {Object} memberData - 사원 등록 데이터
+ * @param {File} profileImage - 프로필 이미지 파일
  * @returns {Promise<Object>} 등록 결과
  */
-export const registerMemberService = async (memberData) => {
+export const registerMemberService = async (memberData, profileImage) => {
     try {
-        const response = await api.post(API.MEMBER.REGISTER, memberData);
+        // 프로필 이미지 필수 검증
+        if (!profileImage) {
+            throw new Error('프로필 이미지는 필수입니다.');
+        }
+
+        // 파일 타입 검증
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(profileImage.type)) {
+            throw new Error('JPG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.');
+        }
+
+        // 파일 크기 검증 (5MB 이하)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (profileImage.size > maxSize) {
+            throw new Error('프로필 이미지는 5MB 이하만 업로드 가능합니다.');
+        }
+
+        // DTO 객체 생성 및 데이터 정제
+        const memberDto = new MemberSignUpRequestDTO(memberData);
+        const cleanedData = memberDto.toFormData();
+
+        // FormData 생성
+        const formData = new FormData();
+
+        // 정제된 사원 정보 추가
+        Object.keys(cleanedData).forEach(key => {
+            const value = cleanedData[key];
+            if (value !== null && value !== undefined && value !== '') {
+                formData.append(key, value);
+            }
+        });
+
+        // 프로필 이미지 추가
+        formData.append('profileImage', profileImage);
+
+        console.log('사원 등록 API 호출:', {
+            originalData: memberData,
+            cleanedData: cleanedData,
+            profileImage: profileImage?.name,
+            formDataEntries: Array.from(formData.entries())
+        });
+
+        const response = await api.post(API.MEMBER.REGISTER, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            timeout: 60000, // 파일 업로드를 위해 60초 타임아웃 설정
+            onUploadProgress: (progressEvent) => {
+                if (progressEvent.total) {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    console.log(`업로드 진행률: ${percentCompleted}%`);
+                }
+            }
+        });
+
+        console.log('사원 등록 API 응답:', response.data);
         return response.data;
     } catch (error) {
-        if (error.response) {
-            throw new Error(error.response.data?.message || '사원 등록 중 오류가 발생했습니다.');
+        console.error('사원 등록 API 오류:', error);
+
+        // 타임아웃 에러 처리
+        if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
+            throw new Error('네트워크 연결이 불안정하거나 서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.');
         }
-        throw error;
+
+        // 서버 응답 에러
+        if (error.response) {
+            const status = error.response.status;
+            const message = error.response.data?.message;
+
+            if (status >= 500) {
+                throw new Error(message || '서버 내부 오류가 발생했습니다. 관리자에게 문의해주세요.');
+            } else if (status >= 400) {
+                throw new Error(message || '요청 데이터에 문제가 있습니다. 입력 정보를 확인해주세요.');
+            }
+        }
+
+        // 네트워크 에러
+        if (error.request) {
+            throw new Error('서버와 연결할 수 없습니다. 네트워크 상태를 확인해주세요.');
+        }
+
+        throw new Error(error.message || '사원 등록 중 알 수 없는 오류가 발생했습니다.');
     }
 };
 
@@ -64,16 +142,47 @@ export const profileImageFetchService = async (memberId) => {
     }
 };
 
-export const profileImageUploadService = async (memberId, formData) => {
+export const profileImageUploadService = async (memberId, profileImage) => {
     try {
-        const response = await api.post(API.MEMBER.PROFILE_IMAGE(memberId), formData, {
+        // 파일 검증
+        if (!profileImage) {
+            throw new Error('프로필 이미지는 필수입니다.');
+        }
+
+        // 파일 타입 검증
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!allowedTypes.includes(profileImage.type)) {
+            throw new Error('JPG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.');
+        }
+
+        // 파일 크기 검증 (5MB 이하)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (profileImage.size > maxSize) {
+            throw new Error('프로필 이미지는 5MB 이하만 업로드 가능합니다.');
+        }
+
+        // FormData 생성 (fileName 파라미터 제거)
+        const formData = new FormData();
+        formData.append('file', profileImage); // 기존 'file' 파라미터명 유지
+
+        console.log('프로필 이미지 업로드 API 호출:', {
+            memberId,
+            fileName: profileImage.name,
+            size: profileImage.size,
+            type: profileImage.type
+        });
+
+        const response = await api.put(API.MEMBER.PROFILE_IMAGE(memberId), formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
-            }
+            },
+            timeout: 60000 // 파일 업로드를 위해 60초 타임아웃 설정
         });
+
+        console.log('프로필 이미지 업로드 성공:', response.data);
         return response.data;
     } catch (error) {
-        console.error('프로필 이미지 업로드 API 오류:', error)
+        console.error('프로필 이미지 업로드 API 오류:', error);
         throw error;
     }
 };
@@ -126,6 +235,8 @@ export const findMembersService = async (employeeNumber) => {
         throw error;
     }
 };
+
+// TODO: 프로필 이미지 업데이트 service 필요
 
 // 페이지네이션된 사원 목록 조회 (서버사이드) - 향후 구현 예정
 export const findMembersPaginatedService = async (page = 0, size = 10, sortBy = 'name', sortDir = 'asc', filters = {}) => {

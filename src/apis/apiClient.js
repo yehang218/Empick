@@ -4,7 +4,7 @@ import { setLoggingOut } from '@/utils/errorHandler';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-    timeout: parseInt(import.meta.env.VITE_TIMEOUT) || 5000,
+    timeout: parseInt(import.meta.env.VITE_TIMEOUT) || 60000, // 파일 업로드를 위해 60초로 증가
     // responseType: 'json', // 기본값은 json, profile-image 등은 개별 요청에서 blob으로 지정
 });
 

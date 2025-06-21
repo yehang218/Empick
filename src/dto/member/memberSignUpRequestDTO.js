@@ -4,7 +4,7 @@ export default class MemberSignUpRequestDTO {
         name = '',
         birth = '',
         phone = '',
-        pictureUrl = '',
+        // pictureUrl 제거 - 백엔드에서 UUID로 자동 생성
         email = '',
         address = '',
         vacationCount = 0,
@@ -13,7 +13,7 @@ export default class MemberSignUpRequestDTO {
         deletedMemberId = 0,
         updatedMemberId = 0,
         lastLoginAt = '',
-        status = 0, // 0 : 활성, 1 : 비활성
+        status = 1, // 1: 활성, 0: 비활성 (기본값 수정)
         departmentId = null,
         positionId = null,
         jobId = null,
@@ -23,7 +23,7 @@ export default class MemberSignUpRequestDTO {
         this.name = name;
         this.birth = birth;
         this.phone = phone;
-        this.pictureUrl = pictureUrl;
+        // this.pictureUrl 제거 - 백엔드에서 UUID로 자동 생성됨
         this.email = email;
         this.address = address;
         this.vacationCount = vacationCount;
@@ -38,4 +38,21 @@ export default class MemberSignUpRequestDTO {
         this.jobId = jobId;
         this.rankId = rankId;
     }
-} 
+
+    /**
+     * FormData로 변환 (프로필 이미지 제외)
+     * @returns {Object} 폼 데이터 객체
+     */
+    toFormData() {
+        const data = {};
+
+        // null이 아닌 값들만 추가
+        Object.keys(this).forEach(key => {
+            if (this[key] !== null && this[key] !== undefined && this[key] !== '') {
+                data[key] = this[key];
+            }
+        });
+
+        return data;
+    }
+}
