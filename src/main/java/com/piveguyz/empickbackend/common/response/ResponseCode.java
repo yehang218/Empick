@@ -40,6 +40,7 @@ public enum ResponseCode {
     MEMBER_PROFILE_IMAGE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1009 , "사원의 프로필 사진을 찾을 수 없습니다." ),
     MEMBER_ID_INVALID(false, HttpStatus.BAD_REQUEST, 1010, "유효하지 않은 사원 ID 입니다."),
     DUPLICATE_EDIT_REQUEST(false, HttpStatus.CONFLICT, 1011, "같은 필드에 대해 이미 대기중인 수정 요청이 존재합니다."),
+    MEMBER_PROFILE_IMAGE_REQUIRED(false, HttpStatus.BAD_REQUEST, 1012, "프로필 이미지는 필수입니다."),
     EDIT_PROPOSAL_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1100, "변경 요청을 찾을 수 없습니다."),
     EDIT_PROPOSAL_ALREADY_REJECTED(false, HttpStatus.BAD_REQUEST, 1101, "이미 거절된 요청입니다. 변경할 수 없습니다."),
     EDIT_PROPOSAL_SELF_APPROVE_NOT_ALLOWED(false, HttpStatus.FORBIDDEN, 1102, "본인이 요청한 변경은 본인이 처리할 수 없습니다."),
