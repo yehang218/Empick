@@ -30,7 +30,8 @@ public class IntroduceStandardQueryServiceImp implements IntroduceStandardQueryS
     }
 
     @Override
-    public List<IntroduceStandardItemQueryDTO> getIntroduceStandardItemById(int standardId) {
-        return IntroduceStandardMapper.findIntroduceStandardItemById(standardId);
+    public List<IntroduceStandardItemQueryDTO> getIntroduceStandardItemByStandardId(int standardId) {
+        return IntroduceStandardMapper.findIntroduceStandardItemByStandardId(standardId);
     }
+
 }
