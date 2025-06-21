@@ -5,6 +5,17 @@
 
 <mapper namespace="com.piveguyz.empickbackend.employment.introduce.query.mapper.IntroduceStandardMapper">
 
+    <resultMap id="introduceStandardQueryResultMap"
+               type="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO">
+        <id column="standard_id" property="id"/>
+        <result column="standard_content" property="content"/>
+        <result column="member_id" property="memberId"/>
+        <collection property="items" ofType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardItemQueryDTO">
+            <id column="item_id" property="id"/>
+            <result column="item_content" property="content"/>
+        </collection>
+    </resultMap>
+
     <select id="findAllIntroduceStandard"
             resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO">
         SELECT
@@ -14,6 +25,21 @@
             introduce_id AS introduceId
         FROM
             introduce_standard
+    </select>
+
+    <select id="findIntroduceStandardById" resultMap="introduceStandardQueryResultMap">
+        SELECT
+            ist.id AS standard_id,
+            ist.content AS standard_content,
+            ist.member_id AS member_id,
+            isi.id AS item_id,
+            isi.content AS item_content
+        FROM
+            introduce_standard ist
+                LEFT JOIN
+            introduce_standard_item isi ON ist.id = isi.introduce_standard_id
+        WHERE
+            ist.id = #{id}
     </select>
 
 </mapper>
