@@ -11,16 +11,13 @@
 
           <!-- 필터 영역 -->
           <v-row class="mb-6" dense>
-            <v-col cols="12" sm="6" md="3">
-              <v-select v-model="selectedCareer" :items="careerOptions" label="경력별" clearable dense outlined />
-            </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="4">
               <v-select v-model="selectedJob" :items="jobOptions" label="직무별" clearable dense outlined />
             </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="4">
               <v-select v-model="selectedStatus" :items="statusOptions" label="채용 상태" clearable dense outlined />
             </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="4">
               <v-select v-model="selectedType" :items="employmentTypeOptions" label="유형" clearable dense outlined />
             </v-col>
           </v-row>
@@ -35,6 +32,7 @@
                 <v-chip color="grey lighten-3">{{ getRecruitTypeLabel(item.recruitType) }}</v-chip>
                 <v-chip color="grey lighten-3">{{ getStatusLabel(item.status) }}</v-chip>
                 <v-chip color="grey lighten-3">{{ item.title }}</v-chip>
+                <v-chip v-if="item.jobName" color="grey lighten-3">{{ item.jobName }}</v-chip>
               </div>
               <div class="date-row mt-2">
                 <span class="date-label">게시일</span>
@@ -60,6 +58,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import CareerHeader from '@/components/career/CareerHeader.vue'
 import { useRouter } from 'vue-router'
+import { getRecruitTypeLabel, recruitTypeOptions } from '@/constants/employment/recruitTypes'
 
 const store = useRecruitmentStore()
 const page = ref(1)
@@ -70,30 +69,21 @@ onMounted(() => {
   store.loadRecruitmentList()
 })
 
-const selectedCareer = ref(null)
 const selectedJob = ref(null)
 const selectedStatus = ref(null)
 const selectedType = ref(null)
 
-const careerOptions = ['경력무관', '신입', '경력 2년 이상', '경력 3년 이상', '경력 5년 이상', '경력 7년 이상']
 const jobOptions = computed(() => {
-  // store.list에서 직무명(title)만 추출하여 중복 없이 옵션 제공
-  const jobs = store.list.map(item => item.title)
+  const jobs = store.list.map(item => item.jobName || item.title)
   return [...new Set(jobs)]
 })
-// 상태 옵션: '게시', '종료'
 const statusOptions = ['게시', '종료']
-const employmentTypeOptions = computed(() => {
-  // store.list에서 recruitType만 추출하여 중복 없이 옵션 제공
-  const types = store.list.map(item => getRecruitTypeLabel(item.recruitType))
-  return [...new Set(types)]
-})
+const employmentTypeOptions = recruitTypeOptions.map(opt => opt.label)
 
 const filteredList = computed(() => {
   return store.list.filter(item => {
     return (
-      (!selectedCareer.value || item.career === selectedCareer.value) &&
-      (!selectedJob.value || item.title === selectedJob.value) &&
+      (!selectedJob.value || (item.jobName || item.title) === selectedJob.value) &&
       (!selectedStatus.value || getStatusLabel(item.status) === selectedStatus.value) &&
       (!selectedType.value || getRecruitTypeLabel(item.recruitType) === selectedType.value)
     )
@@ -110,11 +100,11 @@ const goToDetail = (id) => {
   router.push({ name: 'RecruitmentDetail', params: { id } })
 }
 
-// 상태 한글 변환: OPEN=게시, CLOSED=종료
 const getStatusLabel = (status) => {
   switch (status) {
     case 'OPEN':
     case '채용 중':
+    case 'PUBLISHED':
       return '게시'
     case 'CLOSED':
     case '채용 종료':
@@ -123,24 +113,7 @@ const getStatusLabel = (status) => {
       return status
   }
 }
-// 고용 형태 한글 변환
-const getRecruitTypeLabel = (type) => {
-  switch (type) {
-    case 'FULL_TIME':
-      return '정규직'
-    case 'PART_TIME':
-      return '계약직'
-    case 'INTERN':
-      return '인턴'
-    case '정규직':
-    case '계약직':
-    case '인턴':
-      return type
-    default:
-      return type
-  }
-}
-// 날짜 포맷 YYYY.MM.DD
+
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   const d = new Date(dateStr)
