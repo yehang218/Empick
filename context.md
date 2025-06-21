@@ -62,6 +62,113 @@ import { API } from "@/apis/routes"; // API 직접 접근 금지 (Service를 통
 import axios from "axios"; // axios 직접 사용 금지 (apiClient 사용)
 ```
 
+### 📊 DTO/Model 사용 규칙
+
+**DTO(Data Transfer Object)와 Model은 Service 계층에서만 사용해야 합니다.**
+
+| 레이어          | DTO/Model 사용 | 사용 방식                         |
+| --------------- | -------------- | --------------------------------- |
+| **Views**       | ❌ 금지        | 일반 객체 사용                    |
+| **Composables** | ❌ 금지        | 일반 객체 사용                    |
+| **Stores**      | ❌ 금지        | Service에서 변환된 일반 객체 사용 |
+| **Services**    | ✅ 허용        | DTO 클래스 직접 사용 및 변환      |
+| **API Client**  | ❌ 금지        | 원시 데이터만 처리                |
+
+#### ✅ 올바른 DTO 사용 패턴
+
+```javascript
+// ✅ Service에서 DTO 사용 (허용)
+// services/memberService.js
+import { MemberResponseDTO } from "@/dto/member/memberResponseDTO";
+import { MemberCreateRequestDTO } from "@/dto/member/memberCreateRequestDTO";
+
+export const memberService = {
+  async getMembers() {
+    const response = await api.get(API.MEMBER.LIST);
+    // DTO 클래스로 변환하여 반환
+    return response.data.map((item) => new MemberResponseDTO(item));
+  },
+
+  async createMember(memberData) {
+    // 요청 데이터를 DTO로 변환
+    const requestDTO = new MemberCreateRequestDTO(memberData);
+    const response = await api.post(API.MEMBER.CREATE, requestDTO);
+    return new MemberResponseDTO(response.data);
+  },
+};
+```
+
+#### ❌ 잘못된 DTO 사용 패턴
+
+```javascript
+// ❌ Store에서 DTO 직접 사용 (금지)
+// stores/memberStore.js
+import { MemberResponseDTO } from "@/dto/member/memberResponseDTO"; // 금지
+
+export const useMemberStore = defineStore("member", () => {
+  const members = ref([]);
+
+  const fetchMembers = async () => {
+    // ❌ Store에서 DTO 직접 사용 금지
+    const response = await api.get(API.MEMBER.LIST);
+    members.value = response.data.map((item) => new MemberResponseDTO(item));
+  };
+});
+
+// ❌ Vue 컴포넌트에서 DTO 직접 사용 (금지)
+// components/MemberList.vue
+<script setup>
+import { MemberResponseDTO } from "@/dto/member/memberResponseDTO"; // 금지
+
+const formatMember = (memberData) => {
+  // ❌ 컴포넌트에서 DTO 직접 사용 금지
+  return new MemberResponseDTO(memberData);
+};
+</script>
+```
+
+#### 🔄 올바른 데이터 흐름
+
+```javascript
+// 1. Service 계층에서 DTO 변환
+// services/memberService.js
+export const memberService = {
+  async getMembers() {
+    const response = await api.get(API.MEMBER.LIST);
+    // DTO → 일반 객체로 변환하여 반환
+    return response.data.map((item) => {
+      const dto = new MemberResponseDTO(item);
+      return dto.toPlainObject(); // 일반 객체로 변환
+    });
+  },
+};
+
+// 2. Store에서 일반 객체 사용
+// stores/memberStore.js
+export const useMemberStore = defineStore("member", () => {
+  const fetchMembers = async () => {
+    // Service에서 이미 변환된 일반 객체 사용
+    const members = await memberService.getMembers();
+    members.value = members;
+  };
+});
+
+// 3. 컴포넌트에서 일반 객체 사용
+// components/MemberList.vue
+<script setup>
+  const memberStore = useMemberStore(); // 일반 객체로 받아서 사용 const members
+  = computed(() => memberStore.members);
+</script>;
+```
+
+#### 📋 DTO 사용 규칙 요약
+
+1. **DTO 클래스 정의**: `dto/` 디렉토리에만 정의
+2. **DTO 사용**: Service 계층에서만 import 및 사용
+3. **데이터 변환**: Service에서 DTO → 일반 객체로 변환
+4. **상위 계층**: Store, Composables, Views는 일반 객체만 사용
+5. **타입 안전성**: DTO 클래스 내부에서 유효성 검사 및 변환 로직 구현
+
 ---
 
 ## 🎯 단일 책임 원칙 (SRP) 적용
