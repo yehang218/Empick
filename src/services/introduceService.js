@@ -19,3 +19,9 @@ export const createIntroduceRatingResult = async (payload) => {
   // payload: { content, ratingScore, ... }
   return api.post(IntroduceAPI.CREATE_RATING_RESULT, payload)
 }
+
+// 자기소개서 템플릿 항목별 응답 등록
+export const createIntroduceTemplateItemResponse = async (payload) => {
+  // payload: { introduceId, introduceTemplateItemId, content }
+  return api.post(IntroduceAPI.CREATE_TEMPLATE_ITEM_RESPONSE, payload)
+}

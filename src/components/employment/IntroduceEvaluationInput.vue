@@ -11,7 +11,7 @@
           hide-details
           class="field-value-input"
         ></v-text-field>
-      </div>
+            </div>
       <template v-if="localStandardItems && localStandardItems.length > 0">
         <div class="field-group">
           <label class="field-label">항목 목록</label>
@@ -45,7 +45,7 @@
     <!-- 기준표 불러오기 버튼 -->
     <div class="mb-4" style="text-align:right;">
       <v-btn color="primary" @click="showStandardModal = true">기준표 불러오기</v-btn>
-    </div>
+      </div>
     <!-- 선택된 기준표 표시 -->
     <div v-if="selectedStandard" class="mb-2" style="text-align:right; color:#1976d2;">
       선택된 기준표: {{ selectedStandard.content }}

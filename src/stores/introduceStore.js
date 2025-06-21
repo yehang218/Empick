@@ -8,6 +8,7 @@ import {
 } from '@/services/introduceService'
 import { createTemplate } from '@/services/introduceTemplateService'
 import api from '@/apis/apiClient'
+import { IntroduceAPI } from '@/apis/routes/introduce'
 
 export const useIntroduceStore = defineStore('introduce', () => {
   const items = ref([])
@@ -63,7 +64,15 @@ export const useIntroduceStore = defineStore('introduce', () => {
   return {
     items, loading, error,
     fetchItems, addItem, removeItem,
-    saveIntroduceRatingResult
+    saveIntroduceRatingResult,
+    async createIntroduce({ memberId, introduceTemplateId, content }) {
+      const res = await api.post(IntroduceAPI.CREATE_INTRODUCE, {
+        memberId,
+        introduceTemplateId,
+        content
+      })
+      return res.data?.data?.id || res.data?.id
+    }
   }
 })
 
