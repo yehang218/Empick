@@ -14,8 +14,11 @@
         </v-row>
         <v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
         <v-progress-circular v-if="loading" indeterminate color="primary" class="mb-4" />
-        <ListView v-else :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
-            @update:page="page = $event" @item-click="goToDetail">
+        <div v-if="!loading && requestedList.length === 0 && !error" class="text-center pa-8" style="background-color: #f9f9f9; border-radius: 8px;">
+            <p class="text-h6">요청한 결재 문서가 없습니다.</p>
+        </div>
+        <ListView v-else-if="!loading && requestedList.length > 0" :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
+            @update:page="page = $event" @row-click="goToDetail">
             <template #item.status="{ item }">
                 <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small class="font-weight-bold"
                     outlined>
@@ -29,6 +32,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useMemberStore } from '@/stores/memberStore';
 import { useAuthStore } from '@/stores/authStore';
@@ -41,9 +45,7 @@ const memberStore = useMemberStore();
 const authStore = useAuthStore();
 const router = useRouter();
 
-const requestedList = approvalStore.requestedList;
-const loading = approvalStore.loadingRequested;
-const error = approvalStore.errorRequested;
+const { requestedList, loadingRequested: loading, errorRequested: error } = storeToRefs(approvalStore);
 
 const headers = [
     { key: 'approvalId', label: '문서번호' },
@@ -57,11 +59,11 @@ const page = ref(1);
 const selectedStatus = ref('ALL');
 
 const statusSummary = computed(() => {
-    const all = requestedList.length;
-    const canceled = requestedList.filter(i => i.status === 'CANCELED').length;
-    const rejected = requestedList.filter(i => i.status === 'REJECTED').length;
-    const inProgress = requestedList.filter(i => i.status === 'IN_PROGRESS').length;
-    const approved = requestedList.filter(i => i.status === 'APPROVED').length;
+    const all = requestedList.value.length;
+    const canceled = requestedList.value.filter(i => i.status === 'CANCELED').length;
+    const rejected = requestedList.value.filter(i => i.status === 'REJECTED').length;
+    const inProgress = requestedList.value.filter(i => i.status === 'IN_PROGRESS').length;
+    const approved = requestedList.value.filter(i => i.status === 'APPROVED').length;
     return {
         all,
         canceled,
@@ -80,8 +82,8 @@ const statusOptions = computed(() => [
 ]);
 
 const filteredList = computed(() => {
-    if (selectedStatus.value === 'ALL') return requestedList;
-    return requestedList.filter(item => item.status === selectedStatus.value);
+    if (selectedStatus.value === 'ALL') return requestedList.value;
+    return requestedList.value.filter(item => item.status === selectedStatus.value);
 });
 
 const pagedList = computed(() => {
@@ -100,7 +102,7 @@ const totalPages = computed(() => {
 
 function goToDetail(item) {
     if (item && item.approvalId) {
-        router.push(`/approval/${item.approvalId}`);
+        router.push(`/approval/sent/${item.approvalId}`);
     }
 }
 
