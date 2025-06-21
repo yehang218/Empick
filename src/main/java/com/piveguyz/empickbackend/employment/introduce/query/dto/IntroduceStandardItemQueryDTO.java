@@ -16,4 +16,5 @@ public class IntroduceStandardItemQueryDTO {
     private String content;
     private Integer memberId;
     private Integer introduceStandardId;
+
 }

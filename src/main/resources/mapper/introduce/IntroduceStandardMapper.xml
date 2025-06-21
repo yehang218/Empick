@@ -21,8 +21,7 @@
         SELECT
             id,
             content,
-            member_id AS memberId,
-            introduce_id AS introduceId
+            member_id AS memberId
         FROM
             introduce_standard
     </select>

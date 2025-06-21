@@ -33,6 +33,30 @@ public class IntroduceStandardItemCommandServiceImp implements IntroduceStandard
     }
 
     @Override
+    public IntroduceStandardItemCommandDTO update(int id, IntroduceStandardItemCommandDTO dto) {
+        // 1. 기존 엔티티 조회
+        IntroduceStandardItemEntity entity = introduceStandardItemRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ResponseCode.INTRODUCE_STANDARD_ITEM_NOT_FOUND));
+
+        // 2. 수정할 필드만 업데이트 (introduceStandardId 등)
+        if (dto.getContent() != null) {
+            entity.setContent(dto.getContent());
+        }
+        if (dto.getMemberId() != null) {
+            entity.setMemberId(dto.getMemberId());
+        }
+        if (dto.getIntroduceStandardId() != null) {
+            entity.setIntroduceStandardId(dto.getIntroduceStandardId());
+        }
+
+        // 3. 저장
+        IntroduceStandardItemEntity updatedEntity = introduceStandardItemRepository.save(entity);
+
+        // 4. DTO로 변환 후 반환
+        return IntroduceStandardItemMapper.toDTO(updatedEntity);
+    }
+
+    @Override
     public int delete(int id) {
         IntroduceStandardItemEntity entity = introduceStandardItemRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ResponseCode.INTRODUCE_STANDARD_ITEM_NOT_FOUND));

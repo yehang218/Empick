@@ -11,4 +11,6 @@ public interface IntroduceStandardMapper {
     List<IntroduceStandardItemQueryDTO> findAllIntroduceStandardItem();
 
     IntroduceStandardQueryDTO findIntroduceStandardById(int id);
+
+    List<IntroduceStandardItemQueryDTO> findIntroduceStandardItemById(int standardId);
 }
