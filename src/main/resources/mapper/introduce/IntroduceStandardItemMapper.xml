@@ -23,7 +23,7 @@
             introduce_standard_item
     </select>
 
-    <select id="findIntroduceStandardItemById" resultMap="introduceStandardItemQueryResultMap">
+    <select id="findIntroduceStandardItemByStandardId" resultMap="introduceStandardItemQueryResultMap">
         SELECT
             id,
             content,
