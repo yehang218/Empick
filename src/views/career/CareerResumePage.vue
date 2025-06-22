@@ -288,8 +288,8 @@ const handleSubmit = async () => {
 
     alert('자기소개서와 이력서가 성공적으로 등록되었습니다.')
     
-    // 완료 후 지원서 상세 페이지로 이동
-    router.push(`/employment/applications/${finalApplicationId}`)
+    // 완료 후 채용공고 목록 페이지로 이동
+    router.push('/career/recruitments/')
     
   } catch (e) {
     console.error('❌ 등록 실패:', e)
