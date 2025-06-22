@@ -52,8 +52,8 @@
                         :class="getApproverStatusClass(approver)"
                     >
                         <div class="signature-box">
-                            <span v-if="approver.approved === true" class="stamp approved">승인</span>
-                            <span v-else-if="approver.approved === false" class="stamp rejected">반려</span>
+                            <span v-if="getApproverStatusClass(approver) === 'approved'" class="stamp approved">승인</span>
+                            <span v-else-if="getApproverStatusClass(approver) === 'rejected'" class="stamp rejected">반려</span>
                         </div>
                         <div class="approver-name">{{ approver.memberName }} {{ approver.positionName }}</div>
                         <div v-if="approver.approvedAt" class="approval-date">
@@ -172,22 +172,38 @@ const getStatusClass = (status) => {
 };
 
 const getApproverStatusClass = (approver) => {
-    if (approver.approved === true) {
+    // 최종 상태: 날짜와 함께 승인됨
+    if (approver.approved === true && approver.approvedAt) {
         return 'approved';
     }
-    if (approver.approved === false) {
+    // 최종 상태: 날짜와 함께 반려됨
+    if (approver.approved === false && approver.approvedAt) {
         return 'rejected';
     }
 
-    // 'approved'가 null이면 아직 미결재 상태.
-    if (approvalDetail.value.status === 'IN_PROGRESS') {
-        // 미결재자 중 첫 번째 사람을 찾아 현재 차례인지 확인
-        const firstPending = approvalDetail.value.approvers.find(a => a.approved !== true && a.approved !== false);
-        if (firstPending && firstPending.memberId === approver.memberId && approvalDetail.value.isMyTurn) {
+    // 문서 전체가 '반려' 상태일 때
+    if (approvalDetail.value.status === 'REJECTED') {
+        // 반려자들 중 가장 첫 번째 순서의 사람을 찾음
+        const firstRejector = approvalDetail.value.approvers
+            .filter(a => a.approved === false)
+            .sort((a, b) => a.stepOrder - b.stepOrder)[0];
+        
+        // 현재 결재자가 첫 반려자인지 확인
+        if (firstRejector && approver.memberId === firstRejector.memberId) {
+            return 'rejected';
+        }
+    }
+    
+    // 문서가 '진행중' 상태일 때
+    if (approvalDetail.value.status === 'PROCEED') {
+        // 현재 결재 순서인 사람을 찾음
+        const firstPending = approvalDetail.value.approvers.find(a => a.approved === null);
+        if (firstPending && firstPending.memberId === approver.memberId) {
             return 'current-turn';
         }
     }
 
+    // 그 외 모든 경우는 '대기'
     return 'pending';
 }
 
@@ -412,7 +428,8 @@ h3 {
 }
 
 .approver-item.pending .signature-box {
-    border-style: dashed;
+    border-color: #aaaaaa;
+    border-style: solid;
 }
 .approver-item.current-turn .signature-box {
     border-color: #3498db;

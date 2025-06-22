@@ -132,6 +132,12 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         }
     };
 
+    const clearAllDrafts = () => {
+        clearDraftRecruitment();
+        clearDraftApplicationItems();
+        clearApplicationItemCategoryList();
+    };
+
     return {
         list,
         loadingList,
@@ -163,6 +169,8 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         updateExistingRecruitment,
         deleteExistingRecruitment,
 
-        requestDetail
+        requestDetail,
+
+        clearAllDrafts
     };
 });

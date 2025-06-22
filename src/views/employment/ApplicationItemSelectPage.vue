@@ -79,34 +79,35 @@
             </v-col>
         </v-row>
 
-        <v-btn color="primary" class="mt-6" @click="submit">공고 등록</v-btn>
+        <v-btn color="primary" class="mt-6" @click="submit">
+            {{ isEditMode ? '수정 완료' : '공고 등록' }}
+        </v-btn>
     </v-container>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { getInputTypeLabel } from '@/constants/employment/inputTypes'
 import { useMemberStore } from '@/stores/memberStore'
 import IntroduceTemplateSelectModal from '@/components/employment/IntroduceTemplateSelectModal.vue'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const route = useRoute()
 const store = useRecruitmentStore()
 const memberStore = useMemberStore()
+const toast = useToast()
+const isEditMode = computed(() => route.query.from === 'edit')
+const recruitmentIdToUpdate = computed(() => Number(route.query.id))
+
 const requestId = route.query.requestId
 const showTemplateModal = ref(false)
 
 // 선택된 항목 ID와 필수 여부
-const selectedIds = computed({
-    get: () => store.selectedApplicationItemIds,
-    set: (val) => store.selectedApplicationItemIds = val
-})
-const requiredIds = computed({
-    get: () => store.requiredApplicationItemIds,
-    set: (val) => store.requiredApplicationItemIds = val
-})
+const selectedIds = ref([])
+const requiredIds = ref([])
 
 // 지원서 항목 카테고리
 const categoryList = computed(() => store.applicationItemCategoryList || [])
@@ -147,14 +148,12 @@ onMounted(async () => {
         console.log('이미 있는 카테고리:', store.applicationItemCategoryList)
     }
 
-    // draftRecruitment에 선택된 항목 정보가 있으면 복원
-    if (store.draftRecruitment) {
-        if (store.draftRecruitment.selectedApplicationItemIds) {
-            store.selectedApplicationItemIds = store.draftRecruitment.selectedApplicationItemIds
-        }
-        if (store.draftRecruitment.selectedApplicationItemRequiredIds) {
-            store.selectedApplicationItemRequiredIds = store.draftRecruitment.selectedApplicationItemRequiredIds
-        }
+    // 수정 모드일 때 스토어에 저장된 값으로 초기화
+    if (store.selectedApplicationItemIds.length > 0) {
+        selectedIds.value = [...store.selectedApplicationItemIds]
+    }
+    if (store.requiredApplicationItemIds.length > 0) {
+        requiredIds.value = [...store.requiredApplicationItemIds]
     }
 })
 
@@ -203,31 +202,73 @@ const submit = async () => {
     }))
     
     const formData = {
-        ...draft,
-        recruitmentRequestId: draft.recruitmentRequestId,
+        title: draft.title,
+        content: draft.content,
         recruitType: draft.recruitType,
-        applicationItems,
-        introduceTemplateId: draft.introduceTemplateId || 1,
-        memberId: memberStore.form.id
+        imageUrl: draft.imageUrl,
+        startedAt: draft.startedAt,
+        endedAt: draft.endedAt,
+        memberId: memberStore.form.id,
+        recruitmentTemplateId: null,
+        introduceTemplateId: draft.introduceTemplateId,
+        recruitmentRequestId: draft.recruitmentRequestId,
+        applicationItems: applicationItems,
+        recruitmentProcesses: draft.recruitmentProcesses || []
     }
 
-    console.log('📦 전송 formData:', JSON.stringify(formData, null, 2))
+    if (isEditMode.value) {
+        formData.recruitmentRequestId = null;
+    }
 
-    await store.submitRecruitment(formData)
-    store.clearDraftRecruitment()
-    store.clearDraftApplicationItems()
-    store.clearApplicationItemCategoryList()
+    // ID가 있는 프로세스와 없는 프로세스가 섞이는 문제를 해결하기 위해,
+    // 전송 직전에 ID를 모두 제거하여 '전체 교체' 방식으로 전송합니다.
+    if (formData.recruitmentProcesses) {
+        formData.recruitmentProcesses = formData.recruitmentProcesses.map(({ stepType, displayOrder }) => ({
+            stepType,
+            displayOrder
+        }));
+    }
 
-    router.push('/employment/recruitments')
+    isSubmitting = true; // 제출 시작 플래그
+
+    try {
+        if (isEditMode.value) {
+            // 수정 모드
+            await store.updateExistingRecruitment(recruitmentIdToUpdate.value, formData)
+            toast.success('공고가 성공적으로 수정되었습니다.');
+            router.push(`/employment/recruitments/${recruitmentIdToUpdate.value}`)
+        } else {
+            // 등록 모드
+            await store.submitRecruitment(formData)
+            toast.success('공고가 성공적으로 등록되었습니다.');
+            router.push('/employment/recruitments')
+        }
+
+        // 성공 후 초기화
+        store.clearAllDrafts();
+
+    } catch (error) {
+        console.error('처리 중 오류 발생:', error)
+        toast.error(`오류 발생: ${error.message}`);
+    } finally {
+        isSubmitting = false; // 제출 완료 플래그
+    }
 }
 
-// 선택된 항목 변경 시 draftRecruitment에도 반영
-watch([selectedIds, requiredIds], ([ids, reqIds]) => {
-    if (store.draftRecruitment) {
-        store.draftRecruitment.selectedApplicationItemIds = ids
-        store.draftRecruitment.selectedApplicationItemRequiredIds = reqIds
-    }
+// selectedIds가 변경되면, 더 이상 선택되지 않은 항목을 requiredIds에서 제거
+watch(selectedIds, (newSelected) => {
+    requiredIds.value = requiredIds.value.filter(id => newSelected.includes(id))
 }, { deep: true })
+
+let isSubmitting = false;
+
+onBeforeRouteLeave((to) => {
+    // 제출 중이거나 이전 단계로 돌아가는 것이 아니라면 상태 초기화
+    if (isSubmitting || to.name === 'RecruitmentCreate' || to.name === 'RecruitmentUpdate') {
+        return;
+    }
+    store.clearAllDrafts();
+});
 </script>
 
 <style scoped>

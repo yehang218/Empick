@@ -12,17 +12,34 @@
                         </v-btn>
                     </div>
 
-                    <!-- 리스트 클릭 이벤트 감지용 래퍼 div -->
-                    <div @click="handleRowClick">
-                        <ListView
-                            :headers="headers"
-                            :data="formattedList"
-                            :itemsPerPage="itemsPerPage"
-                            :page="page"
-                            @update:page="page = $event"
+                    <v-data-table
+                        :headers="headers"
+                        :items="pagedList"
+                        @click:row="handleRowClick"
+                        class="elevation-1 list-item-hover"
+                        item-value="id"
+                        hide-default-footer
+                    />
+                    <div class="d-flex justify-end align-center mt-4 pa-2">
+                        <span class="text-caption mr-4">Items per page:</span>
+                        <div style="width: 80px;">
+                            <v-select
+                                v-model="itemsPerPage"
+                                :items="[10, 25, 50, 100]"
+                                dense
+                                hide-details
+                                variant="underlined"
+                            ></v-select>
+                        </div>
+
+                        <span class="text-caption mx-4">{{ pageText }}</span>
+
+                        <Pagination
+                            :model-value="page"
+                            @update:model-value="page = $event"
+                            :length="totalPages"
                         />
                     </div>
-
                 </v-card>
             </v-col>
         </v-row>
@@ -33,7 +50,7 @@
 import { onMounted, computed, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
-import ListView from '@/components/common/ListView.vue';
+import Pagination from '@/components/common/Pagination.vue';
 import dayjs from 'dayjs';
 
 const store = useRecruitmentRequestStore();
@@ -65,12 +82,7 @@ const goToCreate = () => {
 };
 
 // 행 클릭 시 상세 페이지로 이동
-const handleRowClick = (e) => {
-    const tr = e.target.closest('tr');
-    if (!tr || tr.rowIndex === 0) return; // 헤더 제외
-
-    const index = tr.rowIndex - 1;
-    const item = pagedList.value[index];
+const handleRowClick = (event, { item }) => {
     if (item?.id) {
         router.push({
             path: `/employment/recruitment-requests/${item.id}`,
@@ -88,26 +100,37 @@ const formattedList = computed(() =>
     }))
 );
 
+const totalPages = computed(() => {
+    return Math.ceil(formattedList.value.length / itemsPerPage.value)
+})
+
 const pagedList = computed(() => {
     const start = (page.value - 1) * itemsPerPage.value
     const end = start + itemsPerPage.value
     return formattedList.value.slice(start, end)
 })
 
-const totalPages = computed(() => Math.ceil(formattedList.value.length / itemsPerPage.value))
+const pageText = computed(() => {
+    const totalItems = formattedList.value.length;
+    if (totalItems === 0) return '0-0 of 0';
+    const start = (page.value - 1) * itemsPerPage.value + 1;
+    const end = Math.min(page.value * itemsPerPage.value, totalItems);
+    return `${start}-${end} of ${totalItems}`;
+})
+
 
 // 테이블 헤더 정의
 const headers = [
-    { key: 'jobName', label: '포지션명' },
-    { key: 'headcount', label: '인원' },
-    { key: 'createdAt', label: '요청일' },
-    { key: 'departmentName', label: '부서' },
-    { key: 'memberName', label: '작성자' }
+    { title: '포지션명', key: 'jobName', sortable: true },
+    { title: '인원', key: 'headcount', sortable: true },
+    { title: '요청일', key: 'createdAt', sortable: true },
+    { title: '부서', key: 'departmentName', sortable: true },
+    { title: '작성자', key: 'memberName', sortable: true }
 ];
 </script>
 
 <style scoped>
-::v-deep tbody tr {
+.list-item-hover :deep(tbody tr:hover) {
     cursor: pointer;
 }
 </style>

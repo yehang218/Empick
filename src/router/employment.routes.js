@@ -187,6 +187,17 @@ export const employmentRoutes = [
             requiredRoles: ['ROLE_HR_ACCESS']
         }
     },
+    // 채용 공고 수정 페이지
+    {
+        path: '/employment/recruitments/edit/:id',
+        name: 'RecruitmentUpdate',
+        component: () => import('@/views/employment/RecruitmentUpdatePage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
     // 지원서 항목 구성 페이지
     {
         path: '/employment/application-items/select',
@@ -248,6 +259,26 @@ export const employmentRoutes = [
         path: '/employment/interviews/create',
         name: 'CreateInterviewPage',
         component: () => import('@/views/employment/CreateInterviewPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+
+    // <---------- 안 내 메 일 ---------->
+    {
+        path: '/employment/send-email',
+        name: 'SendEmailPage',
+        component: () => import('@/views/employment/SendEmailPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+    {
+        path: '/employment/email-history',
+        name: 'EmailHistoryPage',
+        component: () => import('@/views/employment/EmailHistoryPage.vue'),
         meta: {
             requiresAuth: true,
             requiredRoles: ['ROLE_HR_ACCESS']
