@@ -176,6 +176,34 @@ export const useJobtestQuestionStore = defineStore('question', () => {
         clearSelection();
     };
 
+    // ✅ ID 배열로 문제 일괄 삭제
+    const deleteQuestionsByIds = async (questionIds, questionTypes) => {
+        const deletePromises = questionIds.map((id, index) => {
+            return (async () => {
+                try {
+                    const type = questionTypes[index];
+                    if (type === '선택형' || type === 'MULTIPLE') {
+                        await deleteQuestionOptionsByQuestionId(id);
+                    }
+                    await deleteQuestionService(id);
+                } catch (err) {
+                    console.error(`문제 ID ${id} 삭제 실패:`, err);
+                    throw err; // 오류를 다시 던져 Promise.all이 실패하도록 함
+                }
+            })();
+        });
+    
+        try {
+            await Promise.all(deletePromises);
+            await fetchQuestions(); // 모든 삭제 성공 후 목록 새로고침
+        } catch (err) {
+            // 하나 이상의 삭제가 실패하면 여기로옴
+            error.value = '일부 문제 삭제에 실패했습니다. 목록을 확인해주세요.';
+            await fetchQuestions(); // 실패하더라도 목록은 새로고침
+            throw err; // 호출한 쪽에서 오류를 처리할 수 있도록 다시 던짐
+        }
+    };
+
     // ✅ 단일 문제 삭제
 const deleteQuestion = async (questionId, type) => {
     try {
@@ -229,6 +257,7 @@ const deleteQuestion = async (questionId, type) => {
         clearSelection,
         deleteSelectedQuestions,
         deleteQuestion,
+        deleteQuestionsByIds,
 
         // 등록/수정용
         resetForm,
