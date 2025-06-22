@@ -2,8 +2,6 @@ import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import router from '@/router';
 import { useToast } from 'vue-toastification';
 
-const toast = useToast();
-
 const ERROR_MESSAGES = {
     UNKNOWN: '알 수 없는 오류가 발생했습니다.',
     NETWORK: '서버와의 통신에 실패했습니다.',
@@ -64,7 +62,13 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
 
     // 로그아웃 중이거나 401 에러이거나 로그인 페이지에 있을 때는 토스트 메시지 표시하지 않음
     if (showToast && !isLoggingOut && !(error.response?.status === 401) && !isLoginPage) {
-        toast.error(apiResponse.message);
+        try {
+            const toast = useToast();
+            toast.error(apiResponse.message);
+        } catch (toastError) {
+            console.warn('Toast 표시 실패:', toastError.message);
+            console.error('원본 에러:', apiResponse.message);
+        }
     }
 };
 
