@@ -72,7 +72,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import CareerHeader from '@/components/career/CareerHeader.vue'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
@@ -80,9 +80,42 @@ import { createIntroduceTemplateItemResponse } from '@/services/introduceService
 import { useIntroduceStore } from '@/stores/introduceStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
 import { useApplicationStore } from '@/stores/applicationStore'
+import api from '@/apis/apiClient'
 
 const route = useRoute()
+const router = useRouter()
 const id = Number(route.params.id)
+
+// URL 파라미터 또는 로컬 스토리지에서 ID 가져오기
+console.log('🔍 ID 소스 확인:', {
+  'route.query.applicantId': route.query.applicantId,
+  'route.query.applicationId': route.query.applicationId,
+  'localStorage.currentApplicantId': localStorage.getItem('currentApplicantId'),
+  'localStorage.currentApplicationId': localStorage.getItem('currentApplicationId')
+})
+
+const applicantId = ref(Number(route.query.applicantId) || Number(localStorage.getItem('currentApplicantId')) || null)
+const applicationId = ref(Number(route.query.applicationId) || Number(localStorage.getItem('currentApplicationId')) || null)
+
+// 상세 로깅 추가
+console.log('🔍 변환된 ID 값들:', {
+  'applicantId.value': applicantId.value,
+  'applicationId.value': applicationId.value,
+  'typeof applicantId.value': typeof applicantId.value,
+  'typeof applicationId.value': typeof applicationId.value,
+  'isNaN(applicantId.value)': isNaN(applicantId.value),
+  'isNaN(applicationId.value)': isNaN(applicationId.value)
+})
+
+console.log('🔍 Resume Page - IDs:', { applicantId: applicantId.value, applicationId: applicationId.value, recruitmentId: id })
+
+// ID 유효성 즉시 확인
+if (!applicantId.value || applicantId.value <= 0) {
+  console.error('❌ 유효하지 않은 applicantId:', applicantId.value)
+}
+if (!applicationId.value || applicationId.value <= 0) {
+  console.error('❌ 유효하지 않은 applicationId:', applicationId.value)
+}
 
 const recruitmentStore = useRecruitmentStore()
 const introduceTemplateStore = useIntroduceTemplateStore()
@@ -111,42 +144,156 @@ onMounted(async () => {
 // 등록 버튼 클릭 시 introduce 테이블에 먼저 insert 후 introduceId로 항목별 응답 등록
 const handleSubmit = async () => {
   try {
-    // 1. introduce 테이블에 insert (로그인 유저 id, 템플릿 id, content)
-    // memberId는 실제 로그인 유저 id로 대체 필요 (예시로 1)
-    const memberId = 1
-    const introduceTemplateId = recruitmentStore.detail?.recruitment?.introduceTemplateId
-    const content = '' // 템플릿 기반이므로 content는 비워둠
-    const introduceId = await introduceStore.createIntroduce({ memberId, introduceTemplateId, content })
-    if (!introduceId) throw new Error('자기소개서 등록 실패: introduceId 없음')
-
-    // 2. introduce_template_item_response에 항목별 응답 등록
-    for (const item of templateItems.value) {
-      const itemContent = itemAnswers.value[item.id] || ''
-      await createIntroduceTemplateItemResponse({
-        introduceId,
-        introduceTemplateItemId: item.id,
-        content: itemContent
-      })
+    // ID 유효성 검사
+    if (!applicantId.value || !applicationId.value) {
+      throw new Error('지원자 ID 또는 지원서 ID가 없습니다. 인적사항부터 다시 등록해주세요.')
     }
 
-    // 3. application_response(이력서) 등록
-    // (예시 dto: applicantId, recruitmentId, answers 등)
-    // 실제 applicationId, applicantId, recruitmentId는 실무에 맞게 교체 필요
-    const applicantId = 1 // 실제 지원자 id로 교체 필요
-    const recruitmentId = id
-    const answers = Object.entries(applicationAnswers.value).map(([itemId, value]) => ({
-      applicationItemId: Number(itemId),
-      content: value
-    }))
-    await applicationStore.createApplicationResponse({
-      applicantId,
-      recruitmentId,
-      answers
+    console.log('🔄 이력서/자기소개서 등록 시작')
+    
+    // 1. introduce 테이블에 레코드 생성 (템플릿 ID와 함께)
+    const introduceTemplateId = recruitmentStore.detail?.recruitment?.introduceTemplateId
+    
+    console.log('🔄 자기소개서 생성 시작:', { applicantId: applicantId.value, applicationId: applicationId.value, introduceTemplateId })
+    
+    // ID 값 검증 및 임시 fallback
+    let finalApplicantId = applicantId.value
+    let finalApplicationId = applicationId.value
+    
+    if (!finalApplicantId || finalApplicantId <= 0) {
+      console.error('❌ applicantId가 유효하지 않습니다:', finalApplicantId)
+      throw new Error('지원자 ID가 유효하지 않습니다. 인적사항부터 다시 등록해주세요.')
+    }
+    if (!finalApplicationId || finalApplicationId <= 0) {
+      console.error('❌ applicationId가 유효하지 않습니다:', finalApplicationId)
+      throw new Error('지원서 ID가 유효하지 않습니다. 인적사항부터 다시 등록해주세요.')
+    }
+    if (!introduceTemplateId || introduceTemplateId <= 0) {
+      throw new Error(`유효하지 않은 자기소개서 템플릿 ID: ${introduceTemplateId}`)
+    }
+    
+    console.log('🔧 최종 사용할 ID들:', { finalApplicantId, finalApplicationId, introduceTemplateId })
+    
+    // 기존 자기소개서 존재 여부 확인
+    console.log('🔍 기존 자기소개서 확인 중...')
+    const existingIntroduce = await introduceStore.getIntroduceByApplicationId(finalApplicationId)
+    
+    // applicationId로 찾지 못했다면 applicantId + templateId 조합으로도 확인
+    let duplicateCheck = existingIntroduce
+    if (!duplicateCheck) {
+      console.log('🔍 applicantId + templateId 조합으로 중복 확인...')
+      try {
+        // 전체 자기소개서 목록에서 applicantId + templateId 조합 확인
+        const allRes = await api.get('/api/v1/employment/introduce')
+        const allIntroduces = allRes.data?.data || allRes.data || []
+        console.log('📋 중복 체크용 전체 자기소개서:', allIntroduces)
+        
+        duplicateCheck = allIntroduces.find(item => 
+          item.applicantId == finalApplicantId && item.introduceTemplateId == introduceTemplateId
+        )
+        console.log('🔍 applicantId + templateId 조합 결과:', duplicateCheck)
+      } catch (e) {
+        console.warn('⚠️ 중복 체크 실패:', e)
+      }
+    }
+    
+        let introduceId = null
+    
+    if (duplicateCheck) {
+      console.log('⚠️ 이미 자기소개서가 존재합니다:', duplicateCheck)
+      alert('이미 해당 지원자에 대한 자기소개서가 존재합니다. 기존 자기소개서를 수정하시겠습니까?')
+      
+      // 기존 자기소개서 사용
+      introduceId = duplicateCheck.id
+      console.log('✅ 기존 자기소개서 ID 사용:', introduceId)
+      
+      // 2단계로 바로 이동
+      console.log('🔄 자기소개서 항목별 응답 등록 시작')
+      for (const item of templateItems.value) {
+        const itemContent = itemAnswers.value[item.id] || ''
+        console.log('📝 항목 응답 등록:', { introduceId, itemId: item.id, content: itemContent })
+        
+        await createIntroduceTemplateItemResponse({
+          introduceId,
+          introduceTemplateItemId: item.id,
+          content: itemContent
+        })
+      }
+      console.log('✅ 자기소개서 항목별 응답 등록 완료')
+      
+    } else {
+      // 새로 생성
+      const introducePayload = {
+        applicantId: finalApplicantId,
+        applicationId: finalApplicationId,
+        introduceTemplateId,
+        content: '' // 템플릿 기반이므로 content는 비워둠
+      }
+      
+      console.log('📤 자기소개서 생성 최종 페이로드:', introducePayload)
+      
+      const newIntroduce = await introduceStore.createIntroduce(introducePayload)
+      introduceId = newIntroduce.id || newIntroduce
+      
+      if (!introduceId) throw new Error('자기소개서 생성 실패')
+      console.log('✅ 자기소개서 생성 성공:', introduceId)
+
+      // 2. introduce_template_item_response에 항목별 응답 등록
+      console.log('🔄 자기소개서 항목별 응답 등록 시작')
+      for (const item of templateItems.value) {
+        const itemContent = itemAnswers.value[item.id] || ''
+        console.log('📝 항목 응답 등록:', { introduceId, itemId: item.id, content: itemContent })
+        
+        await createIntroduceTemplateItemResponse({
+          introduceId,
+          introduceTemplateItemId: item.id,
+          content: itemContent
+        })
+      }
+      console.log('✅ 자기소개서 항목별 응답 등록 완료')
+    }
+
+    // 3. application_response(이력서) 등록 - 각 항목별로 개별 등록
+    console.log('🔄 이력서 등록 시작')
+    
+    // application_id 유효성 검증 - 단순하게 처리
+    console.log('🔍 application 유효성 확인:', finalApplicationId)
+    
+    for (const [itemId, content] of Object.entries(applicationAnswers.value)) {
+      const applicationResponsePayload = {
+        applicationId: finalApplicationId,  // 백엔드 Entity에 맞춰 수정
+        applicationItemId: Number(itemId),
+        content: content || ''
+      }
+      
+      console.log('📝 이력서 항목 등록:', applicationResponsePayload)
+      
+      try {
+        await applicationStore.createApplicationResponse(applicationResponsePayload)
+        console.log(`✅ 이력서 항목 ${itemId} 등록 성공`)
+      } catch (error) {
+        console.error(`❌ 이력서 항목 ${itemId} 등록 실패:`, error.message)
+        throw new Error(`이력서 항목 등록 실패: ${error.message}`)
+      }
+    }
+    
+    console.log('✅ 이력서 등록 완료')
+
+    // 4. Application 테이블의 introduce_rating_result_id 업데이트
+    console.log('🔄 지원서에 자기소개서 연결')
+    await applicationStore.updateApplicationStatus(finalApplicationId, {
+      introduceRatingResultId: introduceId
     })
+    console.log('✅ 지원서에 자기소개서 연결 완료')
 
     alert('자기소개서와 이력서가 성공적으로 등록되었습니다.')
+    
+    // 완료 후 지원서 상세 페이지로 이동
+    router.push(`/employment/applications/${finalApplicationId}`)
+    
   } catch (e) {
-    alert('등록 실패: ' + e)
+    console.error('❌ 등록 실패:', e)
+    alert('등록 실패: ' + e.message)
   }
 }
 </script>

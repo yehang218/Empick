@@ -3,6 +3,7 @@
 export const IntroduceAPI = {
     // IntroduceCommandController
     CREATE_INTRODUCE: '/api/v1/employment/introduce',
+    UPDATE_INTRODUCE: (id) => `/api/v1/employment/introduce/${id}`,
 
     // IntroduceRatingResultCommandController
     CREATE_RATING_RESULT: '/api/v1/employment/introduce-rating-result',
@@ -33,6 +34,7 @@ export const IntroduceAPI = {
 
     // IntroduceQueryController
     GET_ALL_INTRODUCE: '/api/v1/employment/introduce',
+    GET_INTRODUCE_BY_ID: (id) => `/api/v1/employment/introduce/${id}`,
 
     // IntroduceResultQueryController
     GET_ALL_INTRODUCE_RESULTS: '/api/v1/employment/introduce-result',

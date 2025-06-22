@@ -33,6 +33,8 @@ export const ApplicationAPI = {
     GET_ALL_APPLICATIONS: '/api/v1/employment/application',
     GET_APPLICATION_BY_ID: (id) =>
         `/api/v1/employment/application/${id}`,
+    GET_APPLICATION_BY_APPLICANT_ID: (applicantId) =>
+        `/api/v1/employment/application/applicant/${applicantId}`,
 
     // 🔸 생성
     CREATE_APPLICATION: '/api/v1/employment/application',
@@ -53,6 +55,8 @@ export const ApplicationAPI = {
 export const ApplicationResponseAPI = {
     // 🔹 조회
     GET_ALL_APPLICATION_RESPONSES: '/api/v1/employment/application-response',
+    GET_APPLICATION_RESPONSES_BY_APPLICATION_ID: (applicationId) =>
+        `/api/v1/employment/application-response/application/${applicationId}`,
 
     // 🔸 생성
     CREATE_APPLICATION_RESPONSE: '/api/v1/employment/application-response',

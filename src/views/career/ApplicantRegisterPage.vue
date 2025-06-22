@@ -45,7 +45,8 @@
                   label="주소"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12">
+              <!-- 프로필 이미지 업로드는 v3에서 구현 예정 -->
+              <!-- <v-col cols="12">
                 <v-file-input
                   v-model="applicant.profileImage"
                   label="프로필 사진"
@@ -53,13 +54,13 @@
                   prepend-icon="mdi-camera"
                   show-size
                 ></v-file-input>
-              </v-col>
+              </v-col> -->
             </v-row>
           </v-form>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="saveApplicant">
+          <v-btn color="primary" @click="saveApplicant" :loading="isLoading">
             저장
           </v-btn>
           <v-btn color="grey darken-1" text @click="resetForm">
@@ -72,17 +73,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CareerHeader from '@/components/career/CareerHeader.vue'
-import { createApplicantService } from '@/services/applicantService'
+import { useApplicantStore } from '@/stores/applicantStore'
 import { useApplicationStore } from '@/stores/applicationStore'
+import { useIntroduceStore } from '@/stores/introduceStore'
 
 const route = useRoute()
 const router = useRouter()
 const recruitmentId = route.params.id
 
+// ===== Store 사용 (MVVM - Model) =====
+const applicantStore = useApplicantStore()
+const applicationStore = useApplicationStore()
+const introduceStore = useIntroduceStore()
+
+// ===== View State =====
 const valid = ref(true)
+const form = ref(null)
 const applicant = ref({
   name: '',
   phone: '',
@@ -92,6 +101,18 @@ const applicant = ref({
   profileImage: null,
 })
 
+// ===== ViewModel (Computed) =====
+const isLoading = computed(() => applicantStore.loading || applicationStore.loading)
+const applicantPayload = computed(() => ({
+  name: applicant.value.name,
+  phone: applicant.value.phone,
+  email: applicant.value.email,
+  birth: applicant.value.birthDate,
+  address: applicant.value.address,
+  profileImageUrl: null, // 일단 null로 설정 (v3 파일 업로드 구현 전까지)
+}))
+
+// ===== Validation Rules =====
 const nameRules = [v => !!v || '이름은 필수입니다.']
 const phoneRules = [
   v => !!v || '연락처는 필수입니다.',
@@ -106,49 +127,77 @@ const birthDateRules = [
   v => /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(v) || '유효한 생년월일 형식이 아닙니다. (예: 1990-01-01)',
 ]
 
-const form = ref(null)
-const applicationStore = useApplicationStore()
-
+// ===== Actions =====
 const saveApplicant = async () => {
-  if (form.value.validate()) {
-    try {
-      const payload = {
-        name: applicant.value.name,
-        phone: applicant.value.phone,
-        email: applicant.value.email,
-        birth: applicant.value.birthDate,
-        address: applicant.value.address,
-        profileImageUrl: applicant.value.profileImage
-          ? `/uploads/${applicant.value.profileImage.name}`
-          : '/assets/empick_logo.png',
-      }
-      const response = await createApplicantService(payload)
-      if (response && response.id) {
-        // 지원서(application) 자동 생성
-        const applicationRes = await applicationStore.createApplication({
-          applicantId: response.id,
-          recruitmentId: recruitmentId
-        })
-        if (applicationRes && applicationRes.id) {
-          alert('지원자 정보와 지원서가 성공적으로 등록되었습니다!')
-          resetForm()
-          router.push(`/career/recruitments/resume/${recruitmentId}`)
-        } else {
-          alert('지원서 생성에 실패했습니다. 관리자에게 문의하세요.')
-        }
-      } else {
-        alert('지원자 등록에 실패했습니다. 상세 오류는 콘솔을 확인해주세요.')
-      }
-    } catch (error) {
-      console.error('지원자 등록 중 오류 발생:', error)
-      alert('지원자 등록 중 오류가 발생했습니다. 다시 시도해주세요.')
+  if (!form.value.validate()) return
+
+  try {
+    console.log('🔄 지원자 등록 시작:', applicantPayload.value)
+    
+    // 1. 지원자 등록
+    const applicantResponse = await applicantStore.createApplicant(applicantPayload.value)
+    console.log('✅ 지원자 등록 성공:', applicantResponse)
+    
+    if (!applicantResponse?.id) {
+      alert('지원자 등록에 실패했습니다.')
+      return
     }
+    
+    // 2. 지원서 자동 생성 (백엔드 스펙에 맞는 최소 필드만)
+    console.log('🔄 지원서 생성 시작')
+    const applicationPayload = {
+      applicantId: applicantResponse.id,
+      recruitmentId: parseInt(recruitmentId)
+    }
+    
+    console.log('📝 지원서 생성 요청 데이터:', applicationPayload)
+    
+    try {
+      const applicationResponse = await applicationStore.createApplication(applicationPayload)
+      console.log('✅ 지원서 생성 성공:', applicationResponse)
+      
+      if (!applicationResponse?.id) {
+        // 백엔드에서 다른 형태로 응답할 수 있으므로 전체 응답 확인
+        console.log('⚠️ applicationResponse 전체 데이터:', applicationResponse)
+        const actualId = applicationResponse?.data?.id || applicationResponse?.id
+        if (!actualId) {
+          alert('지원서 생성에 실패했습니다.')
+          return
+        }
+        applicationResponse.id = actualId
+      }
+      
+      // 3. 성공 처리 (introduce는 이력서 페이지에서 생성)
+      localStorage.setItem('currentApplicantId', applicantResponse.id)
+      localStorage.setItem('currentApplicationId', applicationResponse.id)
+      
+      alert('지원자 정보와 지원서가 성공적으로 등록되었습니다!')
+      resetForm()
+      
+      // 4. 이력서 작성 페이지로 이동
+      router.push(`/career/recruitments/resume/${recruitmentId}?applicantId=${applicantResponse.id}&applicationId=${applicationResponse.id}`)
+      
+    } catch (appError) {
+      console.error('❌ 지원서 생성 실패:', appError)
+      
+      // 백엔드 응답 상세 확인
+      if (appError.response?.data) {
+        console.error('📋 백엔드 에러 응답:', appError.response.data)
+        alert(`지원서 생성 실패: ${appError.response.data.message || '알 수 없는 오류'}`)
+      } else {
+        alert(`지원서 생성 실패: ${appError.message}`)
+      }
+      return
+    }
+  } catch (error) {
+    console.error('❌ 등록 중 오류:', error)
+    alert(`등록 중 오류가 발생했습니다: ${error.message}`)
   }
 }
 
 const resetForm = () => {
-  form.value.reset()
-  form.value.resetValidation()
+  form.value?.reset()
+  form.value?.resetValidation()
   applicant.value = {
     name: '',
     phone: '',

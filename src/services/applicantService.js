@@ -46,7 +46,20 @@ export const getApplicantFullInfoListService = async (options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return apiResponse.data.map(item => ApplicantFullInfoListDTO.fromJSON(item));
+    // 🔍 원본 API 응답 데이터 로깅
+    console.log('🔍 API 원본 응답 데이터:', apiResponse.data);
+    if (apiResponse.data.length > 0) {
+      console.log('🔍 첫 번째 API 응답 항목:', apiResponse.data[0]);
+      console.log('🔍 API 응답 키들:', Object.keys(apiResponse.data[0]));
+    }
+
+    const mappedData = apiResponse.data.map(item => ApplicantFullInfoListDTO.fromJSON(item));
+    console.log('🔍 DTO 매핑 후 데이터:', mappedData);
+    if (mappedData.length > 0) {
+      console.log('🔍 첫 번째 매핑된 데이터:', mappedData[0]);
+    }
+
+    return mappedData;
   }, options);
 };
 

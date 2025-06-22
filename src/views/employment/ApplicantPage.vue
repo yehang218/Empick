@@ -320,13 +320,34 @@ const handleSort = (options) => {
 
 const viewDetail = (item) => {
   console.log('🔍 상세보기 클릭:', item);
+  console.log('🔍 item의 모든 키:', Object.keys(item));
+  console.log('🔍 applicationId:', item.applicationId);
+  console.log('🔍 applicantId:', item.applicantId);
+  console.log('🔍 id:', item.id);
+  
+  // ID 필드 중 사용 가능한 것 찾기 (applicantId 우선 사용)
+  let useId = item.applicationId || item.applicantId || item.id;
+  
+  // ID 필드 유효성 검사
+  if (!useId || isNaN(Number(useId))) {
+    console.error('❌ 사용 가능한 ID가 없음:', { 
+      applicationId: item.applicationId, 
+      id: item.id, 
+      applicantId: item.applicantId 
+    });
+    toast.error('지원서 ID를 찾을 수 없습니다. 관리자에게 문의하세요.');
+    return;
+  }
+  
+  console.log('✅ 사용할 ID:', useId);
+  
   // DTO의 모든 필드를 query parameter로 전달
   router.push({
-    path: `/employment/applications/${item.applicationId}`,
+    path: `/employment/applications/${useId}`,
     query: {
       // 기본 지원자 정보
       applicantId: item.applicantId,
-      applicationId: item.applicationId,
+      applicationId: useId, // 찾은 ID 사용
       name: item.name,
       phone: item.phone,
       email: item.email,
@@ -416,6 +437,20 @@ onMounted(async () => {
   if (applicantStore.filteredAndSortedApplicants.length > 0) {
     console.log('📋 첫 번째 항목:', applicantStore.filteredAndSortedApplicants[0]);
     console.log('🔑 첫 번째 항목 uniqueKey:', applicantStore.filteredAndSortedApplicants[0]?.uniqueKey);
+    
+    // 🔍 applicationId 검증 로그 추가
+    const firstItem = applicantStore.filteredAndSortedApplicants[0];
+    console.log('🔍 첫 번째 항목 applicationId:', firstItem?.applicationId);
+    console.log('🔍 applicationId 타입:', typeof firstItem?.applicationId);
+    console.log('🔍 applicationId 유효성:', !!(firstItem?.applicationId && !isNaN(Number(firstItem.applicationId))));
+    
+    // 🔍 잘못된 applicationId를 가진 항목 확인
+    const invalidItems = applicantStore.filteredAndSortedApplicants.filter(item => 
+      !item.applicationId || isNaN(Number(item.applicationId))
+    );
+    if (invalidItems.length > 0) {
+      console.warn('⚠️ 유효하지 않은 applicationId를 가진 항목들:', invalidItems);
+    }
   }
 })
 
@@ -428,6 +463,13 @@ const refreshList = async () => {
     applicantStore.setSearchQuery('')
     selectedApplicants.value = []; // 새로고침 시 선택 초기화
     console.log('✅ 데이터 새로고침 완료');
+    
+    // 🔍 원본 API 응답 데이터 로그 추가
+    console.log('🔍 Store의 원본 데이터:', applicantStore.applicantList);
+    if (applicantStore.applicantList.length > 0) {
+      console.log('🔍 첫 번째 원본 데이터:', applicantStore.applicantList[0]);
+      console.log('🔍 원본 데이터 키들:', Object.keys(applicantStore.applicantList[0]));
+    }
   } catch (error) {
     console.error('❌ 데이터 로드 에러:', error);
     toast.error('지원자 목록을 불러오는데 실패했습니다.')
