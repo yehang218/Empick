@@ -90,16 +90,33 @@ export const createApplicationService = async (dto, options = {}) => {
   }, options);
 };
 
-export const updateApplicationStatusService = async (id, dto, options = {}) => {
+export const updateApplicationStatusService = async (id, statusCode, options = {}) => {
   return withErrorHandling(async () => {
-    const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(id), dto);
+    console.log('🔄 지원서 상태 변경:', { applicationId: id, statusCode });
+    
+    const updateData = {
+      status: statusCode
+    };
+    
+    const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(id), updateData);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
     if (!apiResponse.success) {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationResponseDTO.fromJSON(apiResponse.data);
+    console.log('✅ 지원서 상태 변경 성공:', apiResponse.data);
+    
+    // 클라이언트에서 상태 설명 추가 (백엔드 수정 전 임시 해결책)
+    const result = ApplicationResponseDTO.fromJSON(apiResponse.data);
+    if (result && typeof result.status === 'number') {
+      const { getStatusByCode } = await import('@/constants/employment/applicationStatus');
+      const statusInfo = getStatusByCode(result.status);
+      result.statusDescription = statusInfo.label;
+      console.log('✅ 클라이언트에서 상태 설명 추가:', statusInfo.label);
+    }
+    
+    return result;
   }, options);
 };
 

@@ -268,7 +268,61 @@
       </v-col>
     </v-row>
 
-
+    <!-- 상태 변경 모달 -->
+    <v-dialog v-model="statusChangeDialog" max-width="500">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span>지원서 상태 변경</span>
+          <v-btn icon @click="statusChangeDialog = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-divider />
+        <v-card-text class="py-4">
+          <div class="mb-4">
+            <h4 class="text-subtitle-1 mb-2">현재 상태</h4>
+            <v-chip :color="getStatusChipColor(applicant?.status)" variant="elevated" size="large">
+              {{ getStatusText(applicant?.status) }}
+            </v-chip>
+          </div>
+          
+          <div class="mb-4">
+            <h4 class="text-subtitle-1 mb-3">변경할 상태 선택</h4>
+            <v-radio-group v-model="selectedNewStatus" class="mt-2">
+              <v-radio 
+                v-for="status in statusOptions" 
+                :key="status.code"
+                :value="status.code"
+                :color="status.color"
+              >
+                <template #label>
+                  <div class="d-flex align-center">
+                    <v-chip :color="status.color" variant="tonal" size="small" class="mr-2">
+                      {{ status.label }}
+                    </v-chip>
+                    <span class="text-body-2">{{ status.label }}</span>
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
+          </div>
+        </v-card-text>
+        <v-card-actions class="justify-end">
+          <v-btn color="grey" variant="text" @click="statusChangeDialog = false">
+            취소
+          </v-btn>
+          <v-btn 
+            color="primary" 
+            variant="elevated" 
+            @click="confirmStatusChange"
+            :disabled="selectedNewStatus === null || selectedNewStatus === applicant?.status"
+            :loading="statusUpdateLoading"
+          >
+            상태 변경
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- 액션 버튼 영역 -->
     <div class="action-section mt-6">
@@ -319,6 +373,8 @@ import {
   getIntroduceRatingResultById,
   getAllIntroduceRatingResults
 } from '@/services/introduceService'
+import { updateApplicationStatusService } from '@/services/applicationService'
+import { STATUS_OPTIONS, getStatusByCode, getStatusInfoByString } from '@/constants/employment/applicationStatus'
 
 
 const route = useRoute()
@@ -366,6 +422,12 @@ if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
 const currentEvaluationData = ref({})
 const selectedEvaluation = ref('자기소개서')
 const introduceRatingScore = ref(null)
+
+// 상태 변경 관련
+const statusChangeDialog = ref(false)
+const selectedNewStatus = ref(null)
+const statusUpdateLoading = ref(false)
+const statusOptions = STATUS_OPTIONS
 
 // ===== ViewModel (Store 데이터 + URL 쿼리 데이터 결합) =====
 const applicant = computed(() => {
@@ -514,34 +576,82 @@ const formatDate = (dateString) => {
 }
 
 const getStatusChipColor = (status) => {
-  switch (status) {
-    case 'PASSED_FINAL': return 'success'
-    case 'FAILED': return 'error'
-    case 'PASSED_DOCS': return 'info'
-    case 'PASSED_INTERVIEW_1': return 'teal'
-    case 'PASSED_INTERVIEW_2': return 'blue'
-    case 'PASSED_PRACTICAL': return 'purple'
-    case 'WAITING': return 'orange'
-    default: return 'grey'
+  // 숫자 코드인 경우 변환
+  if (typeof status === 'number') {
+    const statusInfo = getStatusByCode(status)
+    return statusInfo.color
   }
+  
+  // 문자열 상태인 경우 새로운 매핑 사용
+  if (typeof status === 'string') {
+    const statusInfo = getStatusInfoByString(status)
+    return statusInfo.color
+  }
+  
+  return 'grey'
 }
 
 const getStatusText = (status) => {
-  switch (status) {
-    case 'PASSED_FINAL': return '최종합격'
-    case 'FAILED': return '불합격'
-    case 'PASSED_DOCS': return '서류합격'
-    case 'PASSED_INTERVIEW_1': return '1차면접 합격'
-    case 'PASSED_INTERVIEW_2': return '2차면접 합격'
-    case 'PASSED_PRACTICAL': return '실무합격'
-    case 'WAITING': return '검토중'
-    default: return '알 수 없음'
+  // 숫자 코드인 경우 변환
+  if (typeof status === 'number') {
+    const statusInfo = getStatusByCode(status)
+    return statusInfo.label
   }
+  
+  // 문자열 상태인 경우 새로운 매핑 사용
+  if (typeof status === 'string') {
+    const statusInfo = getStatusInfoByString(status)
+    return statusInfo.label
+  }
+  
+  return '알 수 없음'
 }
 
 const updateStatus = () => {
-  // 상태 변경 모달이나 다이얼로그 열기
-  console.log('상태 변경')
+  // 상태 변경 모달 열기
+  selectedNewStatus.value = null
+  statusChangeDialog.value = true
+  console.log('상태 변경 모달 열기')
+}
+
+// 상태 변경 확인
+const confirmStatusChange = async () => {
+  if (selectedNewStatus.value === null || selectedNewStatus.value === applicant.value?.status) {
+    return
+  }
+  
+  try {
+    statusUpdateLoading.value = true
+    console.log('🔄 지원서 상태 변경 시작:', {
+      applicationId: applicant.value.id,
+      currentStatus: applicant.value.status,
+      newStatus: selectedNewStatus.value
+    })
+    
+    // 지원서 상태 변경 API 호출
+    const updatedApplication = await updateApplicationStatusService(
+      applicant.value.id, 
+      selectedNewStatus.value
+    )
+    
+    console.log('✅ 지원서 상태 변경 성공:', updatedApplication)
+    
+    // Store의 데이터 업데이트
+    applicationStore.updateApplicationStatus(applicant.value.id, selectedNewStatus.value)
+    
+    // 성공 메시지
+    const newStatusInfo = getStatusByCode(selectedNewStatus.value)
+    toast.success(`지원서 상태가 "${newStatusInfo.label}"로 변경되었습니다.`)
+    
+    // 모달 닫기
+    statusChangeDialog.value = false
+    
+  } catch (error) {
+    console.error('❌ 지원서 상태 변경 실패:', error)
+    toast.error('상태 변경에 실패했습니다. 다시 시도해주세요.')
+  } finally {
+    statusUpdateLoading.value = false
+  }
 }
 
 const goBack = () => {

@@ -174,10 +174,19 @@ export const useApplicationStore = defineStore('application', () => {
   };
 
   // 🔁 지원서 상태 업데이트
-  const updateApplicationStatus = async (id, dto) => {
-    const result = await updateApplicationStatusService(id, dto);
-    await fetchAllApplications();
-    return result;
+  const updateApplicationStatus = (id, newStatus) => {
+    // Store의 현재 지원서 상태 업데이트
+    if (selectedApplication.value && selectedApplication.value.id === id) {
+      selectedApplication.value.status = newStatus
+      console.log('✅ Store: 지원서 상태 업데이트 완료:', { id, newStatus })
+    }
+    
+    // 목록에서도 해당 지원서 상태 업데이트
+    const applicationInList = applicationList.value.find(app => app.id === id)
+    if (applicationInList) {
+      applicationInList.status = newStatus
+      console.log('✅ Store: 목록의 지원서 상태 업데이트 완료')
+    }
   };
 
   // ❌ 지원서 삭제
