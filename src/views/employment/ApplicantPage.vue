@@ -188,13 +188,7 @@ import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
 import SelectEmailModal from '@/components/mail/SelectEmailModal.vue';
 import EmailPreviewModal from '@/components/mail/EmailPreviewModal.vue';
 
-// 로컬 상태로 selectedApplicants 관리
-const selectedApplicants = ref([]);
-const jobtestModal = ref(false);
-const emailTypeModal = ref(false);
-const emailPreviewModal = ref(false);
-const selectedEmailType = ref('');
-const sendingEmail = ref(false);
+// ===== Store 및 기본 설정 =====
 const toast = useToast();
 const jobtestListStore = useJobtestListStore();
 const applicationJobtestStore = useApplicationJobtestStore();
@@ -202,7 +196,6 @@ const applicantStore = useApplicantStore();
 const applicationStore = useApplicationStore();
 const mailStore = useMailStore();
 const memberStore = useMemberStore();
-// ===== ViewModel 초기화 =====
 const router = useRouter()
 
 // Composable 사용 - 비즈니스 로직 분리
@@ -221,6 +214,10 @@ const {
 // ===== View 상태 관리 =====
 const search = ref('')
 const jobtestModal = ref(false)
+const emailTypeModal = ref(false);
+const emailPreviewModal = ref(false);
+const selectedEmailType = ref('');
+const sendingEmail = ref(false);
 
 // ===== View 데이터 (상수) =====
 const tableHeaders = [
