@@ -7,24 +7,45 @@ export const DIFFICULTY_MAP = {
     'HARD': '어려움'
 };
 
+export const DIFFICULTY_TYPES = {
+    'EASY': '0',
+    'MEDIUM': '1',
+    'HARD': '2'
+};
+
 /**
  * 실무테스트 난이도 색상 매핑
  */
 export const DIFFICULTY_COLORS = {
     'EASY': {
-        background: '#A5D6A7',
-        text: '#2E7D32',
-        hover: 'rgba(165, 214, 167, 0.3)'
+        background: '#e8f5e9',
+        text: '#2e7d32',
+        hover: 'rgba(232, 245, 233, 0.4)'
     },
     'MEDIUM': {
-        background: '#90CAF9',
-        text: '#1565C0',
-        hover: 'rgba(144, 202, 249, 0.3)'
+        background: '#e8eaf6',
+        text: '#3f51b5',
+        hover: 'rgba(232, 234, 246, 0.4)'
     },
     'HARD': {
-        background: '#EF9A9A',
-        text: '#C62828',
-        hover: 'rgba(239, 154, 154, 0.3)'
+        background: '#ffcdd2',
+        text: '#c62828',
+        hover: 'rgba(255, 205, 210, 0.4)'
+    },
+    '쉬움': {
+        background: '#e8f5e9',
+        text: '#2e7d32',
+        hover: 'rgba(232, 245, 233, 0.4)'
+    },
+    '보통': {
+        background: '#e8eaf6',
+        text: '#3f51b5',
+        hover: 'rgba(232, 234, 246, 0.4)'
+    },
+    '어려움': {
+        background: '#ffcdd2',
+        text: '#c62828',
+        hover: 'rgba(255, 205, 210, 0.4)'
     }
 };
 

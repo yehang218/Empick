@@ -15,7 +15,11 @@
                     <td>{{ index + 1 }}</td>
                     <td>{{ question.content }}</td>
                     <td>{{ question.score }}점</td>
-                    <td>{{ difficultyLabel(question.difficulty) }}</td>
+                    <td>
+                        <span class="difficulty-tag" :style="getDifficultyStyle(question.difficulty)">
+                            {{ getDifficultyLabel(question.difficulty) }}
+                        </span>
+                    </td>
                 </tr>
             </tbody>
         </v-table>
@@ -23,16 +27,27 @@
 </template>
 
 <script setup>
+import { getDifficultyLabel, getDifficultyColors } from '@/constants/employment/difficulty.js'
+
 defineProps({
     questions: Array
 })
 
-const difficultyLabel = (level) => {
-    switch (level) {
-        case 'EASY': return '쉬움'
-        case 'MEDIUM': return '보통'
-        case 'HARD': return '어려움'
-        default: return '알 수 없음'
-    }
-}
+const getDifficultyStyle = (difficulty) => {
+    const colors = getDifficultyColors(difficulty);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text,
+        padding: '4px 8px',
+        borderRadius: '12px',
+        fontSize: '0.75rem',
+        fontWeight: '600',
+        textTransform: 'uppercase',
+        letterSpacing: '0.3px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+        transition: 'all 0.2s ease',
+        display: 'inline-flex',
+        alignItems: 'center'
+    };
+};
 </script>

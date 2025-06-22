@@ -56,15 +56,15 @@
 
                     <!-- 유형 -->
                     <template #item.type="{ item }">
-                        <span class="type-tag" :class="getTypeClass(item.type)">
-                            {{ item.type }}
+                        <span class="type-tag" :style="getQuestionTypeStyle(item.type)">
+                            {{ getQuestionTypeLabel(item.type) }}
                         </span>
                     </template>
 
                     <!-- 난이도 -->
                     <template #item.difficulty="{ item }">
-                        <span class="difficulty-tag" :class="getDifficultyClass(item.difficulty)">
-                            {{ item.difficulty }}
+                        <span class="difficulty-tag" :style="getDifficultyStyle(item.difficulty)">
+                            {{ getDifficultyLabel(item.difficulty) }}
                         </span>
                     </template>
 
@@ -104,6 +104,8 @@ import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailMo
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 import Pagination from '@/components/common/Pagination.vue'
 import Modal from '@/components/common/Modal.vue'
+import { getDifficultyLabel, getDifficultyColors } from '@/constants/employment/difficulty.js'
+import { getQuestionTypeLabel, getQuestionTypeColors } from '@/constants/employment/questionTypes.js'
 
 const router = useRouter()
 const toast = useToast()
@@ -211,37 +213,21 @@ const toggleSelectAll = () => {
     }
 }
 
-const getTypeClass = (type) => {
-    switch (type) {
-        case '선택형':
-        case 'MULTIPLE':
-            return 'type-multiple'
-        case '단답형':
-        case 'SUBJECTIVE':
-            return 'type-subjective'
-        case '서술형':
-        case 'DESCRIPTIVE':
-            return 'type-descriptive'
-        default:
-            return 'type-default'
-    }
-}
+const getQuestionTypeStyle = (type) => {
+    const colors = getQuestionTypeColors(type);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text,
+    };
+};
 
-const getDifficultyClass = (difficulty) => {
-    switch (difficulty) {
-        case '쉬움':
-        case 'EASY':
-            return 'difficulty-easy'
-        case '보통':
-        case 'MEDIUM':
-            return 'difficulty-medium'
-        case '어려움':
-        case 'HARD':
-            return 'difficulty-hard'
-        default:
-            return 'difficulty-medium'
-    }
-}
+const getDifficultyStyle = (difficulty) => {
+    const colors = getDifficultyColors(difficulty);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text,
+    };
+};
 </script>
 
 <style scoped>
@@ -259,39 +245,7 @@ const getDifficultyClass = (difficulty) => {
     /* 수직 정렬을 위해 추가 */
 }
 
-.type-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-}
-
-.type-multiple {
-    background: #81C784;
-    color: #2E7D32;
-}
-
-.type-subjective {
-    background: #FFB74D;
-    color: #E65100;
-}
-
-.type-descriptive {
-    background: #BA68C8;
-    color: #7B1FA2;
-}
-
-.type-default {
-    background: #90A4AE;
-    color: #37474F;
-}
-
+.type-tag,
 .difficulty-tag {
     display: inline-flex;
     align-items: center;
@@ -303,21 +257,5 @@ const getDifficultyClass = (difficulty) => {
     letter-spacing: 0.3px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
-    color: white;
-}
-
-.difficulty-easy {
-    background: #A5D6A7;
-    color: #2E7D32;
-}
-
-.difficulty-medium {
-    background: #90CAF9;
-    color: #1565C0;
-}
-
-.difficulty-hard {
-    background: #EF9A9A;
-    color: #C62828;
 }
 </style>

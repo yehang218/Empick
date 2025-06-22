@@ -27,11 +27,11 @@
           <div class="info-row">
             <div class="info-item">
               <span class="info-label">유형:</span>
-              <span class="info-tag type-tag" :class="getQuestionTypeClass(question.type)">{{ getQuestionTypeLabel(question.type) }}</span>
+              <span class="info-tag" :style="getQuestionTypeStyle(question.type)">{{ getQuestionTypeLabel(question.type) }}</span>
             </div>
             <div class="info-item">
               <span class="info-label">난이도:</span>
-              <span class="info-tag difficulty-tag" :class="getDifficultyClass(question.difficulty)">{{ getDifficultyLabel(question.difficulty) }}</span>
+              <span class="info-tag" :style="getDifficultyStyle(question.difficulty)">{{ getDifficultyLabel(question.difficulty) }}</span>
             </div>
           </div>
           
@@ -152,8 +152,8 @@ import { useToast } from 'vue-toastification'
 
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 
-import { getQuestionTypeLabel, getQuestionTypeColors, getQuestionTypeClass } from '@/constants/employment/questionTypes.js'
-import { getDifficultyLabel, getDifficultyColors, getDifficultyClass } from '@/constants/employment/difficulty.js'
+import { getQuestionTypeLabel, getQuestionTypeColors } from '@/constants/employment/questionTypes.js'
+import { getDifficultyLabel, getDifficultyColors } from '@/constants/employment/difficulty.js'
 import AlertModal from '@/components/common/AlertModal.vue'
 
 const jobtestQuestionStore = useJobtestQuestionStore()
@@ -427,54 +427,9 @@ const getQuestionTypeStyle = (type) => {
   transition: all 0.3s ease;
 }
 
-.type-tag {
-  background: #4A7C59;
-  color: white;
-}
-
-.type-multiple {
-  background: #81C784;
-  color: #2E7D32;
-}
-
-.type-subjective {
-  background: #FFB74D;
-  color: #E65100;
-}
-
-.type-descriptive {
-  background: #BA68C8;
-  color: #7B1FA2;
-}
-
-.type-default {
-  background: #90A4AE;
-  color: #37474F;
-}
-
-.type-tag:hover,
-.difficulty-tag:hover {
+.info-tag:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.difficulty-tag {
-  color: white;
-}
-
-.difficulty-easy {
-  background: #A5D6A7;
-  color: #2E7D32;
-}
-
-.difficulty-medium {
-  background: #90CAF9;
-  color: #1565C0;
-}
-
-.difficulty-hard {
-  background: #EF9A9A;
-  color: #C62828;
 }
 
 /* 섹션 제목 */
