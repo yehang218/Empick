@@ -3,7 +3,6 @@
     <div class="header-content">
       <img src="@/assets/logo-career.png" class="logo" />
       <nav class="nav-items">
-        <router-link to="/career/main">메인</router-link>
         <router-link to="/career/welfare">복지안내</router-link>
         <router-link to="/career/recruitments">채용공고</router-link>
       </nav>

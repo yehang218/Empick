@@ -17,7 +17,7 @@ import { MemberResponseDTO } from '@/dto/member/memberResponseDTO';
  * - 사원 등록
  * - 프로필 이미지 관리
  * - 권한 관리
- * 
+ *
  * ⚠️ 사원 목록 관리는 useMemberList 컴포저블 사용
  */
 export const useMemberStore = defineStore('member', {
@@ -52,6 +52,9 @@ export const useMemberStore = defineStore('member', {
         // 🖼️ 프로필 이미지 관리
         profileImageUrl: '',
         defaultProfileImageUrl: '/images/default-profile.png',
+        user: null,
+        memberId: null,
+
         profileImageCache: new Map(), // 프로필 이미지 캐시
 
         // 📋 기본 사원 목록 (캐싱용 - 단순 조회만)
@@ -75,6 +78,10 @@ export const useMemberStore = defineStore('member', {
     },
 
     actions: {
+        setUser(user) {
+            this.user = user;
+            this.memberId = user?.id || null;
+        },
         // 🔄 상태 초기화
         reset() {
             this.form = {
@@ -293,7 +300,7 @@ export const useMemberStore = defineStore('member', {
                         if (response.data.data) {
                             rawData = response.data.data;
                         }
-                        // Case 2: { data: [...] } 
+                        // Case 2: { data: [...] }
                         else if (Array.isArray(response.data)) {
                             rawData = response.data;
                         }

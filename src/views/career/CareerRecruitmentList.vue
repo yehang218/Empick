@@ -11,37 +11,34 @@
 
           <!-- 필터 영역 -->
           <v-row class="mb-6" dense>
-            <v-col cols="12" sm="6" md="3">
-              <v-select v-model="selectedCareer" :items="careerOptions" label="경력별" clearable dense outlined />
-            </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="4">
               <v-select v-model="selectedJob" :items="jobOptions" label="직무별" clearable dense outlined />
             </v-col>
-            <v-col cols="12" sm="6" md="3">
+            <v-col cols="12" sm="6" md="4">
               <v-select v-model="selectedStatus" :items="statusOptions" label="채용 상태" clearable dense outlined />
             </v-col>
-            <v-col cols="12" sm="6" md="3">
-              <v-select v-model="selectedType" :items="employmentTypeOptions" label="고용 형태" clearable dense outlined />
+            <v-col cols="12" sm="6" md="4">
+              <v-select v-model="selectedType" :items="employmentTypeOptions" label="유형" clearable dense outlined />
             </v-col>
           </v-row>
 
           <!-- 채용 카드 목록 -->
-          <v-card v-for="(item, index) in paginatedData" :key="index" class="mb-4" @click="goToDetail(index)" hover style="cursor: pointer">>
+          <v-card v-for="(item, index) in paginatedData" :key="item.id" class="mb-4" @click="goToDetail(item.id)" hover style="cursor: pointer">
             <v-card-text>
               <div class="font-weight-medium mb-2 text-md">
-                {{ item.department }}에서 가족같이 지낼 인재를 찾습니다.
+                {{ item.departmentName }}에서 가족같이 지낼 인재를 찾습니다.
               </div>
               <div class="chip-row">
-                <v-chip color="grey lighten-3">{{ item.career }}</v-chip>
-                <v-chip color="grey lighten-3">{{ item.employmentType }}</v-chip>
-                <v-chip color="grey lighten-3">{{ item.job }}</v-chip>
-                <v-chip
-                  :color="item.status === '채용 중' ? 'green lighten-4' : 'red lighten-4'"
-                  :text-color="item.status === '채용 중' ? 'green darken-2' : 'red darken-2'"
-                  small
-                >
-                  {{ item.status }}
-                </v-chip>
+                <v-chip color="grey lighten-3">{{ getRecruitTypeLabel(item.recruitType) }}</v-chip>
+                <v-chip color="grey lighten-3">{{ getStatusLabel(item.status) }}</v-chip>
+                <v-chip color="grey lighten-3">{{ item.title }}</v-chip>
+                <v-chip v-if="item.jobName" color="grey lighten-3">{{ item.jobName }}</v-chip>
+              </div>
+              <div class="date-row mt-2">
+                <span class="date-label">게시일</span>
+                <span>{{ formatDate(item.startedAt) }}</span>
+                <span class="date-label ml-4">마감일</span>
+                <span>{{ formatDate(item.endedAt) }}</span>
               </div>
             </v-card-text>
           </v-card>
@@ -57,62 +54,72 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import CareerHeader from '@/components/career/CareerHeader.vue'
 import { useRouter } from 'vue-router'
+import { getRecruitTypeLabel, recruitTypeOptions } from '@/constants/employment/recruitTypes'
 
+const store = useRecruitmentStore()
 const page = ref(1)
 const perPage = 5
 const router = useRouter()
 
-const goToDetail = (index) => {
-  const globalIndex = (page.value - 1) * perPage + index
-  router.push({ name: 'RecruitmentDetail', params: { id: globalIndex + 1 } })  // id는 1부터 시작한다고 가정
-}
+onMounted(() => {
+  store.loadRecruitmentList()
+})
 
-const recruitmentList = ref([
-  { department: '인사팀', career: '경력 7년 이상', employmentType: '정규직', job: '퍼포먼스 마케터', status: '채용 중' },
-  { department: '경영팀', career: '경력무관', employmentType: '계약직', job: '백엔드 개발자', status: '채용 종료' },
-  { department: '식당팀', career: '경력 5년 이상', employmentType: '정규직', job: '영업 담당자', status: '채용 중' },
-  { department: '물류팀', career: '경력무관', employmentType: '계약직', job: '퍼포먼스 마케터', status: '채용 중' },
-  { department: '신발팀', career: '경력무관', employmentType: '정규직', job: '서비스 개발자', status: '채용 중' },
-  { department: '디자인팀', career: '경력 3년 이상', employmentType: '계약직', job: 'UX 디자이너', status: '채용 중' },
-  { department: '총무팀', career: '경력무관', employmentType: '정규직', job: '총무 담당자', status: '채용 중' },
-  { department: 'R&D팀', career: '경력 2년 이상', employmentType: '정규직', job: '제품 연구원', status: '채용 종료' },
-  { department: 'QA팀', career: '신입', employmentType: '정규직', job: '테스트 엔지니어', status: '채용 중' },
-  { department: '회계팀', career: '경력무관', employmentType: '계약직', job: '회계 보조', status: '채용 중' }
-])
-
-const selectedCareer = ref(null)
 const selectedJob = ref(null)
 const selectedStatus = ref(null)
 const selectedType = ref(null)
 
-const careerOptions = ['경력무관', '신입', '경력 2년 이상', '경력 3년 이상', '경력 5년 이상', '경력 7년 이상']
-const jobOptions = [
-  '퍼포먼스 마케터', '백엔드 개발자', '영업 담당자', '서비스 개발자',
-  'UX 디자이너', '총무 담당자', '제품 연구원', '테스트 엔지니어', '회계 보조'
-]
-const statusOptions = ['채용 중', '채용 종료']
-const employmentTypeOptions = ['정규직', '계약직']
+const jobOptions = computed(() => {
+  const jobs = store.list.map(item => item.jobName || item.title)
+  return [...new Set(jobs)]
+})
+const statusOptions = ['게시', '종료']
+const employmentTypeOptions = recruitTypeOptions.map(opt => opt.label)
 
 const filteredList = computed(() => {
-  return recruitmentList.value.filter(item => {
+  return store.list.filter(item => {
     return (
-      (!selectedCareer.value || item.career === selectedCareer.value) &&
-      (!selectedJob.value || item.job === selectedJob.value) &&
-      (!selectedStatus.value || item.status === selectedStatus.value) &&
-      (!selectedType.value || item.employmentType === selectedType.value)
+      (!selectedJob.value || (item.jobName || item.title) === selectedJob.value) &&
+      (!selectedStatus.value || getStatusLabel(item.status) === selectedStatus.value) &&
+      (!selectedType.value || getRecruitTypeLabel(item.recruitType) === selectedType.value)
     )
   })
 })
 
 const totalPages = computed(() => Math.ceil(filteredList.value.length / perPage))
-
 const paginatedData = computed(() => {
   const start = (page.value - 1) * perPage
   return filteredList.value.slice(start, start + perPage)
 })
+
+const goToDetail = (id) => {
+  router.push({ name: 'RecruitmentDetail', params: { id } })
+}
+
+const getStatusLabel = (status) => {
+  switch (status) {
+    case 'OPEN':
+    case '채용 중':
+    case 'PUBLISHED':
+      return '게시'
+    case 'CLOSED':
+    case '채용 종료':
+      return '종료'
+    default:
+      return status
+  }
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  const d = new Date(dateStr)
+  if (isNaN(d)) return '-'
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
+}
 </script>
 
 <style scoped>
@@ -127,6 +134,17 @@ const paginatedData = computed(() => {
   margin-bottom: 8px;
 }
 
+.date-row {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.date-label {
+  font-weight: 500;
+  color: #333;
+}
 .text-md {
   font-size: 16px;
 }

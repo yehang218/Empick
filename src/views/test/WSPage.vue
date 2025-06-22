@@ -26,6 +26,8 @@
     <!-- 다른 공통 컴포넌트 -->
     <Search />
     <EvaluationInput />
+    <IntroduceResult />
+    <IntroduceEvaluationInput />
   </div>
 </template>
 
@@ -36,6 +38,8 @@ import Modal from '@/components/common/Modal.vue'
 import AlertModal from '@/components/common/AlertModal.vue'
 import Search from '@/components/common/Search.vue'
 import EvaluationInput from '@/components/employment/EvaluationInput.vue'
+import IntroduceEvaluationInput from '@/components/employment/IntroduceEvaluationInput.vue'
+import IntroduceResult from '@/components/employment/IntroduceResult.vue'
 
 const showConfirmModal = ref(false)
 const dynamicMessage = ref('템플릿을 사용하시겠습니까?')
