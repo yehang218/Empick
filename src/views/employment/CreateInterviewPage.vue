@@ -117,6 +117,50 @@ const interviewCriteriaStore = useInterviewCriteriaStore()
 
 const goToInterviewPage = () => router.push('/employment/interviews')
 
+const goToApplicationDetail = (applicationId) => {
+    const selected = selectedApplication.value;
+    if (!selected) return;
+    
+    router.push({
+        path: `/employment/applications/${applicationId}`,
+        query: {
+            // 기본 지원자 정보
+            applicantId: selected.applicantId,
+            applicationId: selected.id,
+            name: selected.applicant?.name,
+            phone: selected.applicant?.phone,
+            email: selected.applicant?.email,
+            profileUrl: selected.applicant?.profileUrl,
+            birth: selected.applicant?.birth,
+            address: selected.applicant?.address,
+            recruitmentId: selected.recruitmentId,
+            introduceRatingResultId: selected.introduceRatingResultId,
+            jobId: selected.jobId,
+            jobName: selected.jobName,
+            createdAt: selected.createdAt,
+            status: selected.status,
+            updatedAt: selected.updatedAt,
+            updatedBy: selected.updatedBy,
+
+            // 추가된 필드들
+            introduceEvaluationContent: selected.introduceEvaluationContent,
+            introduceScore: selected.introduceScore,
+            introduceStatus: selected.introduceStatus,
+            motivation: selected.motivation,
+            experience: selected.experience,
+            skills: selected.skills,
+            education: selected.education,
+            portfolioUrl: selected.portfolioUrl,
+            coverLetter: selected.coverLetter,
+            jobtestTotalScore: selected.jobtestTotalScore,
+            jobtestEvaluationScore: selected.jobtestEvaluationScore,
+            jobtestStatus: selected.jobtestStatus,
+            interviewScore: selected.interviewScore,
+            interviewAddress: selected.interviewAddress,
+            interviewDatetime: selected.interviewDatetime
+        }
+    })
+}
 
 const selectedHour = ref('')
 const selectedMinute = ref('')
