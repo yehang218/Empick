@@ -309,15 +309,23 @@ import { useRoute, useRouter } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useIntroduceStore } from '@/stores/introduceStore'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
 import { useToast } from 'vue-toastification'
 import { watch, computed } from 'vue'
 import IntroduceEvaluationInput from '@/components/employment/IntroduceEvaluationInput.vue'
+import { 
+  getIntroduceRatingResultByApplicationId, 
+  getIntroduceRatingResultByIntroduceId,
+  getIntroduceRatingResultById,
+  getAllIntroduceRatingResults
+} from '@/services/introduceService'
 
 
 const route = useRoute()
 const router = useRouter()
 const applicationStore = useApplicationStore()
 const introduceStore = useIntroduceStore()
+const introduceStandardStore = useIntroduceStandardStore()
 const toast = useToast()
 let applicationId = Number(route.params.applicationId)
 console.log('🔍 받은 applicationId:', route.params.applicationId)
@@ -357,6 +365,7 @@ if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
 // 평가 관련
 const currentEvaluationData = ref({})
 const selectedEvaluation = ref('자기소개서')
+const introduceRatingScore = ref(null)
 
 // ===== ViewModel (Store 데이터 + URL 쿼리 데이터 결합) =====
 const applicant = computed(() => {
@@ -416,8 +425,7 @@ const evaluationStats = computed(() => {
   ]
 })
 
-// 자기소개서 평가 점수를 위한 ref
-const introduceRatingScore = ref(null)
+// 자기소개서 평가 점수를 위한 ref는 위에서 이미 선언됨
 
 // applicationStore.selectedApplication을 감시하여 데이터 확인
 watch(() => applicationStore.selectedApplication, (val) => {
@@ -659,6 +667,28 @@ const loadApplicationData = async () => {
       console.error('❌ 자기소개서 데이터 로딩 실패:', introduceError)
     }
     
+    // 4. 평가 기준표 데이터 로드 (평가 데이터 복원 전에 먼저 로드)
+    try {
+      console.log('📋 평가 기준표 데이터 로딩 시작...')
+      await loadEvaluationStandards()
+    } catch (standardError) {
+      console.error('❌ 평가 기준표 데이터 로딩 실패:', standardError)
+    }
+    
+    // 5. 기존 평가 결과 데이터 로드 (자기소개서 데이터 로드 후 실행)
+    try {
+      console.log('📊 기존 평가 결과 로딩 시작... (applicationId:', actualApplicationId, ')')
+      const existingEvaluation = await loadExistingEvaluationData(actualApplicationId)
+      
+      if (existingEvaluation) {
+        console.log('🎉 평가 결과 복원 성공! 새로고침 시에도 평가 데이터가 유지됩니다.')
+      } else {
+        console.log('ℹ️ 기존 평가 결과가 없습니다. 새로운 평가를 작성할 수 있습니다.')
+      }
+    } catch (evaluationError) {
+      console.error('❌ 기존 평가 결과 로딩 실패:', evaluationError)
+    }
+    
     console.log('✅ 지원서 데이터 로딩 완료')
     console.log('📊 최종 데이터 상태:', {
       actualApplicationId,
@@ -687,6 +717,112 @@ const loadApplicationData = async () => {
   }
 }
 
+// 기존 평가 결과 데이터 로드 함수
+const loadExistingEvaluationData = async (applicationId) => {
+  try {
+    console.log('🔍 기존 평가 결과 조회 시작... (applicationId:', applicationId, ')')
+    
+    let existingEvaluation = null
+    
+    // 1. 가장 효율적인 방법: application.introduce_rating_result_id로 직접 조회
+    const application = applicationStore.selectedApplication
+    if (application && application.introduceRatingResultId) {
+      console.log('🎯 application.introduce_rating_result_id로 직접 조회:', application.introduceRatingResultId)
+      existingEvaluation = await getIntroduceRatingResultById(application.introduceRatingResultId)
+      
+      if (existingEvaluation) {
+        console.log('✅ introduce_rating_result_id로 평가 결과 조회 성공!')
+      } else {
+        console.warn('⚠️ introduce_rating_result_id로 조회했지만 결과가 없습니다.')
+      }
+    } else {
+      console.log('ℹ️ application.introduce_rating_result_id가 없습니다:', {
+        application: !!application,
+        introduceRatingResultId: application?.introduceRatingResultId
+      })
+    }
+    
+    // 2. Fallback 1: applicationId로 평가 결과 조회 시도
+    if (!existingEvaluation) {
+      console.log('🔄 Fallback 1: applicationId로 평가 결과 조회 시도')
+      existingEvaluation = await getIntroduceRatingResultByApplicationId(applicationId)
+      
+      if (existingEvaluation) {
+        console.log('✅ applicationId로 평가 결과 조회 성공!')
+      }
+    }
+    
+    // 3. Fallback 2: introduceId로 조회 시도
+    if (!existingEvaluation) {
+      const introduceData = applicationStore.introduceData
+      if (introduceData && introduceData.id) {
+        console.log('🔄 Fallback 2: introduceId로 평가 결과 재조회 시도... (introduceId:', introduceData.id, ')')
+        existingEvaluation = await getIntroduceRatingResultByIntroduceId(introduceData.id)
+        
+        if (existingEvaluation) {
+          console.log('✅ introduceId로 평가 결과 조회 성공!')
+        }
+      } else {
+        console.log('ℹ️ introduceData가 없어서 Fallback 2를 건너뜁니다.')
+      }
+    }
+    
+    if (existingEvaluation) {
+      console.log('✅ 기존 평가 결과 발견:', {
+        id: existingEvaluation.id,
+        rating_score: existingEvaluation.rating_score || existingEvaluation.ratingScore,
+        content: existingEvaluation.content?.substring(0, 50) + '...',
+        introduce_standard_id: existingEvaluation.introduce_standard_id || existingEvaluation.introduceStandardId
+      })
+      
+      // 평가 데이터 복원
+      const restoredData = {
+        ...currentEvaluationData.value,
+        totalScore: existingEvaluation.rating_score || existingEvaluation.ratingScore,
+        comment: existingEvaluation.content,
+        ratingScore: existingEvaluation.rating_score || existingEvaluation.ratingScore,
+        content: existingEvaluation.content,
+        introduceStandardId: existingEvaluation.introduce_standard_id || existingEvaluation.introduceStandardId
+      }
+      
+      currentEvaluationData.value = restoredData
+      
+      // 전형 결과에 평가 점수 반영
+      const score = existingEvaluation.rating_score || existingEvaluation.ratingScore
+      if (score) {
+        introduceRatingScore.value = score
+        console.log('✅ 자기소개서 평가 점수 복원:', introduceRatingScore.value)
+      }
+      
+      console.log('✅ 평가 데이터 복원 완료:', restoredData)
+      return existingEvaluation
+    } else {
+      console.log('ℹ️ 기존 평가 결과가 없습니다.')
+      console.log('🔍 확인된 정보:', {
+        applicationId,
+        introduceRatingResultId: application?.introduceRatingResultId,
+        introduceDataId: applicationStore.introduceData?.id,
+        selectedApplication: !!application
+      })
+      return null
+    }
+  } catch (error) {
+    console.error('❌ 기존 평가 결과 로드 실패:', error)
+    return null
+  }
+}
+
+// 평가 기준표 데이터 로드 함수
+const loadEvaluationStandards = async () => {
+  try {
+    console.log('📋 평가 기준표 로딩 시작...')
+    await introduceStandardStore.fetchStandards()
+    console.log('✅ 평가 기준표 로딩 완료:', introduceStandardStore.standards.length, '개')
+  } catch (error) {
+    console.error('❌ 평가 기준표 로딩 실패:', error)
+  }
+}
+
 // 평가 저장 함수
 const handleEvaluationSave = async (evaluationData) => {
   try {
@@ -700,8 +836,24 @@ const handleEvaluationSave = async (evaluationData) => {
     
     toast.success('평가가 저장되었습니다.')
     
-    // 평가 완료 후 데이터 새로고침 (필요시)
-    // await loadApplicationData()
+    // 평가 완료 후 지원서 정보 새로고침하여 introduce_rating_result_id 반영
+    try {
+      console.log('🔄 평가 저장 후 지원서 정보 새로고침 시작...')
+      
+      // applicationId가 있으면 지원서 정보를 다시 조회
+      if (evaluationData.applicationId) {
+        await applicationStore.fetchApplicationById(evaluationData.applicationId)
+        console.log('✅ 지원서 정보 새로고침 완료')
+        
+        // 업데이트된 지원서 정보 확인
+        const updatedApplication = applicationStore.selectedApplication
+        if (updatedApplication && updatedApplication.introduceRatingResultId) {
+          console.log('✅ application.introduce_rating_result_id 연결 확인:', updatedApplication.introduceRatingResultId)
+        }
+      }
+    } catch (refreshError) {
+      console.warn('⚠️ 지원서 정보 새로고침 실패:', refreshError.message)
+    }
   } catch (error) {
     console.error('❌ 평가 저장 실패:', error)
     toast.error('평가 저장에 실패했습니다.')

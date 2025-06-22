@@ -51,13 +51,219 @@ export const createIntroduceRatingResult = async (payload) => {
   }
   
   try {
+    // 1. 평가 결과 저장
     const response = await api.post(IntroduceAPI.CREATE_RATING_RESULT, requestData)
     console.log('✅ 평가 결과 저장 성공:', response.data)
+    
+    // 2. 저장된 평가 결과의 ID 추출
+    const ratingResultId = response.data?.data?.id || response.data?.id
+    console.log('🔍 저장된 평가 결과 ID:', ratingResultId)
+    
+    // 3. application 테이블의 introduce_rating_result_id 업데이트
+    if (ratingResultId && payload.applicationId) {
+      try {
+        console.log('🔄 application.introduce_rating_result_id 업데이트 시작:', {
+          applicationId: payload.applicationId,
+          ratingResultId: ratingResultId
+        })
+        
+        // application 업데이트 API 호출
+        const { updateApplicationIntroduceRatingResultService } = await import('@/services/applicationService')
+        await updateApplicationIntroduceRatingResultService(payload.applicationId, ratingResultId)
+        
+        console.log('✅ application.introduce_rating_result_id 업데이트 완료')
+      } catch (updateError) {
+        console.error('❌ application.introduce_rating_result_id 업데이트 실패:', updateError)
+        // 평가 결과는 이미 저장되었으므로 업데이트 실패는 경고로만 처리
+        console.warn('⚠️ 평가 결과는 저장되었지만 application 연결 업데이트에 실패했습니다.')
+      }
+    } else {
+      console.warn('⚠️ ratingResultId 또는 applicationId가 없어 application 업데이트를 건너뜁니다.', {
+        ratingResultId,
+        applicationId: payload.applicationId
+      })
+    }
+    
     return response
   } catch (error) {
     console.error('❌ 평가 결과 저장 실패:', error)
     console.error('❌ 에러 응답:', error.response?.data)
     throw error
+  }
+}
+
+// ID로 평가 결과 직접 조회 (가장 효율적인 방법)
+export const getIntroduceRatingResultById = async (ratingResultId) => {
+  try {
+    console.log('🔍 평가 결과 ID로 직접 조회:', ratingResultId)
+    const response = await api.get(IntroduceAPI.GET_RATING_RESULT_BY_ID(ratingResultId))
+    const apiResponse = ApiResponseDTO.fromJSON(response.data)
+    
+    if (!apiResponse.success) {
+      console.warn('⚠️ 평가 결과 조회 실패:', apiResponse.message)
+      return null
+    }
+    
+    console.log('✅ 평가 결과 ID 직접 조회 성공:', apiResponse.data)
+    return apiResponse.data
+  } catch (error) {
+    console.warn('⚠️ 평가 결과 ID 직접 조회 실패:', error.message)
+    console.log('🔄 전체 조회 후 ID 필터링으로 Fallback 시도...')
+    
+    // Fallback: 전체 조회 후 ID로 필터링
+    try {
+      const allResults = await getAllIntroduceRatingResults()
+      const result = allResults.find(item => {
+        const match = item.id == ratingResultId || 
+                     String(item.id) === String(ratingResultId)
+        
+        if (match) {
+          console.log('✅ 전체 조회에서 평가 결과 ID 매칭 성공:', item)
+        }
+        
+        return match
+      })
+      
+      if (result) {
+        console.log('✅ Fallback으로 평가 결과 조회 성공:', result)
+        return result
+      } else {
+        console.log('ℹ️ 해당 ID의 평가 결과가 없습니다:', ratingResultId)
+        return null
+      }
+    } catch (fallbackError) {
+      console.error('❌ Fallback 조회도 실패:', fallbackError.message)
+      return null
+    }
+  }
+}
+
+// 전체 평가 결과 조회 (Fallback용)
+export const getAllIntroduceRatingResults = async () => {
+  try {
+    console.log('🔍 전체 자기소개서 평가 결과 조회')
+    const response = await api.get(IntroduceAPI.GET_ALL_RATING_RESULTS)
+    const apiResponse = ApiResponseDTO.fromJSON(response.data)
+    
+    if (!apiResponse.success) {
+      console.warn('⚠️ 전체 평가 결과 조회 실패:', apiResponse.message)
+      return []
+    }
+    
+    console.log('✅ 전체 평가 결과 조회 성공:', apiResponse.data?.length || 0, '개')
+    return apiResponse.data || []
+  } catch (error) {
+    console.warn('⚠️ 전체 평가 결과 조회 실패:', error.message)
+    return []
+  }
+}
+
+// introduceId로 평가 결과 조회 (전체 조회 후 필터링)
+export const getIntroduceRatingResultByIntroduceId = async (introduceId) => {
+  try {
+    console.log('🔍 자기소개서 평가 결과 조회 (introduceId):', introduceId)
+    
+    // 전체 평가 결과 조회
+    const allResults = await getAllIntroduceRatingResults()
+    console.log('🔍 전체 평가 결과 목록:', allResults.map(item => ({
+      id: item.id,
+      introduce_id: item.introduce_id,
+      introduceId: item.introduceId,
+      content: item.content?.substring(0, 30) + '...'
+    })))
+    
+    // introduceId로 필터링 (더 엄격한 매칭)
+    const matchingResults = allResults.filter(item => {
+      const match = item.introduce_id == introduceId || 
+                   item.introduceId == introduceId ||
+                   String(item.introduce_id) === String(introduceId) ||
+                   String(item.introduceId) === String(introduceId)
+      
+      if (match) {
+        console.log('🎯 매칭 후보 평가 결과:', {
+          id: item.id,
+          introduce_id: item.introduce_id,
+          introduceId: item.introduceId,
+          rating_score: item.rating_score,
+          content: item.content?.substring(0, 50) + '...'
+        })
+      }
+      
+      return match
+    })
+    
+    if (matchingResults.length > 1) {
+      console.warn('⚠️ 여러 개의 평가 결과가 매칭됨. 가장 최근 것을 선택:', matchingResults.length, '개')
+      // 가장 최근 것 선택 (ID가 큰 것)
+      const result = matchingResults.reduce((latest, current) => 
+        current.id > latest.id ? current : latest
+      )
+      console.log('✅ 최근 평가 결과 선택:', result)
+      return result
+    } else if (matchingResults.length === 1) {
+      const result = matchingResults[0]
+      console.log('✅ 평가 결과 조회 성공:', result)
+      return result
+    } else {
+      console.log('ℹ️ 해당 introduceId의 평가 결과가 없습니다:', introduceId)
+      console.log('🔍 확인된 introduce_id 값들:', allResults.map(item => item.introduce_id || item.introduceId))
+      return null
+    }
+  } catch (error) {
+    console.warn('⚠️ 평가 결과 조회 실패:', error.message)
+    return null
+  }
+}
+
+// applicationId로 평가 결과 조회 (전체 조회 후 필터링)
+export const getIntroduceRatingResultByApplicationId = async (applicationId) => {
+  try {
+    console.log('🔍 자기소개서 평가 결과 조회 (applicationId):', applicationId)
+    
+    // 1. 먼저 applicationId로 introduce를 찾기
+    let introduceId = null
+    try {
+      const introduceData = await getIntroduceByApplicationIdService(applicationId)
+      if (introduceData && introduceData.id) {
+        introduceId = introduceData.id
+        console.log('✅ applicationId로 introduceId 발견:', introduceId)
+      }
+    } catch (introduceError) {
+      console.warn('⚠️ applicationId로 introduce 조회 실패:', introduceError.message)
+    }
+    
+    // 2. introduceId가 있으면 평가 결과 조회
+    if (introduceId) {
+      return await getIntroduceRatingResultByIntroduceId(introduceId)
+    }
+    
+    // 3. Fallback: 전체 조회 후 application_id 필드로 직접 매칭 시도
+    console.log('🔄 Fallback: 전체 평가 결과에서 applicationId 직접 매칭 시도')
+    const allResults = await getAllIntroduceRatingResults()
+    
+    const result = allResults.find(item => {
+      const match = item.application_id == applicationId || 
+                   item.applicationId == applicationId ||
+                   String(item.application_id) === String(applicationId) ||
+                   String(item.applicationId) === String(applicationId)
+      
+      if (match) {
+        console.log('✅ 매칭된 평가 결과 (applicationId):', item)
+      }
+      
+      return match
+    })
+    
+    if (result) {
+      console.log('✅ 평가 결과 조회 성공:', result)
+      return result
+    } else {
+      console.log('ℹ️ 해당 applicationId의 평가 결과가 없습니다:', applicationId)
+      return null
+    }
+  } catch (error) {
+    console.warn('⚠️ 평가 결과 조회 실패:', error.message)
+    return null
   }
 }
 

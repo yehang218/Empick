@@ -87,11 +87,13 @@ import { useRouter } from 'vue-router'
 import IntroduceStandardSelectModal from './IntroduceStandardSelectModal.vue'
 import { useIntroduceStore } from '@/stores/introduceStore'
 import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
 import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const introduceStore = useIntroduceStore()
 const standardItemStore = useIntroduceStandardItemStore()
+const introduceStandardStore = useIntroduceStandardStore()
 const toast = useToast()
 
 const props = defineProps({
@@ -115,13 +117,77 @@ const localStandardItems = ref([])
 const savingLoading = ref(false)
 
 // ViewModel: 데이터 초기화
-watchEffect(() => {
+watchEffect(async () => {
   if (props.evaluationData) {
-    localTotalScore.value = props.evaluationData.totalScore || null
-    localComment.value = props.evaluationData.comment || ''
+    console.log('🔄 평가 데이터 초기화:', props.evaluationData)
+    
+    // 점수와 총평 복원
+    const score = props.evaluationData.totalScore || props.evaluationData.ratingScore
+    const comment = props.evaluationData.comment || props.evaluationData.content
+    
+    localTotalScore.value = score || null
+    localComment.value = comment || ''
+    
+    console.log('📊 복원된 평가 데이터:', {
+      score: localTotalScore.value,
+      comment: localComment.value?.substring(0, 50) + '...',
+      introduceStandardId: props.evaluationData.introduceStandardId
+    })
+    
+    // 기존 평가에서 기준표 정보가 있으면 복원
+    if (props.evaluationData.introduceStandardId) {
+      try {
+        console.log('🔍 기존 평가의 기준표 정보 복원 시도:', props.evaluationData.introduceStandardId)
+        
+        // 기준표 목록이 없으면 먼저 로드
+        if (!introduceStandardStore.standards || introduceStandardStore.standards.length === 0) {
+          console.log('📋 기준표 목록 로드 중...')
+          await introduceStandardStore.fetchStandards()
+        }
+        
+        // 기준표 찾기
+        const existingStandard = introduceStandardStore.standards.find(standard => 
+          standard.id == props.evaluationData.introduceStandardId
+        )
+        
+        if (existingStandard) {
+          console.log('✅ 기존 기준표 복원 성공:', {
+            id: existingStandard.id,
+            content: existingStandard.content
+          })
+          selectedStandard.value = existingStandard
+          localStandardTitle.value = existingStandard.content
+          
+          // 기준표 상세 정보 로드
+          try {
+            await introduceStandardStore.fetchStandardDetail(existingStandard.id)
+            if (introduceStandardStore.standardDetail && introduceStandardStore.standardDetail.items) {
+              localStandardItems.value = introduceStandardStore.standardDetail.items
+              console.log('✅ 기준표 항목 복원 완료:', localStandardItems.value.length, '개')
+            }
+          } catch (detailError) {
+            console.warn('⚠️ 기준표 상세 정보 로드 실패:', detailError)
+          }
+        } else {
+          console.warn('⚠️ 기존 기준표를 찾을 수 없습니다:', props.evaluationData.introduceStandardId)
+          console.log('🔍 사용 가능한 기준표들:', introduceStandardStore.standards.map(s => ({
+            id: s.id,
+            content: s.content
+          })))
+        }
+      } catch (standardError) {
+        console.error('❌ 기준표 복원 실패:', standardError)
+      }
+    } else {
+      console.log('ℹ️ 기준표 정보가 없습니다.')
+    }
   } else {
+    console.log('🔄 평가 데이터 초기화 (빈 상태)')
     localTotalScore.value = null
     localComment.value = ''
+    selectedStandard.value = null
+    localStandardTitle.value = ''
+    localStandardItems.value = []
   }
 })
 

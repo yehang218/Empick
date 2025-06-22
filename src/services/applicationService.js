@@ -103,6 +103,33 @@ export const updateApplicationStatusService = async (id, dto, options = {}) => {
   }, options);
 };
 
+// application의 introduce_rating_result_id 업데이트 전용 서비스
+export const updateApplicationIntroduceRatingResultService = async (applicationId, ratingResultId, options = {}) => {
+  return withErrorHandling(async () => {
+    console.log('🔄 application introduce_rating_result_id 업데이트:', {
+      applicationId,
+      ratingResultId
+    });
+    
+    // 업데이트 데이터 준비 (snake_case와 camelCase 모두 포함)
+    const updateData = {
+      introduceRatingResultId: ratingResultId,
+      introduce_rating_result_id: ratingResultId
+    };
+    
+    // PATCH 요청으로 application 업데이트
+    const response = await api.patch(`/api/v1/employment/application/${applicationId}`, updateData);
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    console.log('✅ application introduce_rating_result_id 업데이트 성공:', apiResponse.data);
+    return ApplicationResponseDTO.fromJSON(apiResponse.data);
+  }, options);
+};
+
 export const deleteApplicationService = async (id, options = {}) => {
   return withErrorHandling(async () => {
     const response = await api.delete(ApplicationAPI.DELETE_APPLICATION(id));

@@ -9,6 +9,10 @@ export const IntroduceAPI = {
     CREATE_RATING_RESULT: '/api/v1/employment/introduce-rating-result',
     UPDATE_RATING_RESULT: (id) => `/api/v1/employment/introduce-rating-result/${id}`,
     DELETE_RATING_RESULT: (id) => `/api/v1/employment/introduce-rating-result/${id}`,
+    
+    // IntroduceRatingResultQueryController (실제 백엔드 API 기준으로 수정)
+    GET_ALL_RATING_RESULTS: '/api/v1/employment/introduce-result',
+    GET_RATING_RESULT_BY_ID: (id) => `/api/v1/employment/introduce-result/${id}`,
 
     // IntroduceStandardCommandController
     CREATE_STANDARD: '/api/v1/employment/introduce-standard',
