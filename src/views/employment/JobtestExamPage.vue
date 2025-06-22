@@ -1,16 +1,29 @@
 <template>
   <div class="exam-layout">
-    <div class="exam-sidebar-wrap">
-      <ExamSidebar :testInfo="testInfo" :currentIndex="currentIndex" :totalQuestions="questions.length"
-        :timeLeft="timeLeft" @moveTo="handleMoveTo" @submit="openSubmitModal" />
-    </div>
-    <div class="exam-question-area">
-      <QuestionView :question="questions[currentIndex]" :answer="answers[currentIndex] ?? ''"
-        :questionIndex="currentIndex" @updateAnswer="updateAnswer" />
-      <div class="nav-buttons">
-        <button @click="async () => await prev()" :disabled="currentIndex === 0">이전</button>
-        <button v-if="currentIndex < questions.length - 1" @click="next">다음</button>
-        <button v-else class="submit-btn" @click="openSubmitModal">제출하기</button>
+    <CareerHeader />
+    <div class="exam-content-wrapper">
+      <div class="exam-sidebar-wrap">
+        <ExamSidebar
+          :testInfo="testInfo"
+          :currentIndex="currentIndex"
+          :totalQuestions="questions.length"
+          :timeLeft="timeLeft"
+          @moveTo="handleMoveTo"
+          @submit="openSubmitModal"
+        />
+      </div>
+      <div class="exam-question-area">
+        <QuestionView
+          :question="questions[currentIndex]"
+          :answer="answers[currentIndex] ?? ''"
+          :questionIndex="currentIndex"
+          @updateAnswer="updateAnswer"
+        />
+        <div class="nav-buttons">
+          <button @click="async () => await prev()" :disabled="currentIndex === 0">이전</button>
+          <button v-if="currentIndex < questions.length - 1" @click="next">다음</button>
+          <button v-else class="submit-btn" @click="openSubmitModal">제출하기</button>
+        </div>
       </div>
     </div>
     <Modal v-if="showSubmitModal" message="제출하시겠습니까?" @confirm="handleSubmitConfirm" @cancel="closeSubmitModal" />
@@ -26,6 +39,7 @@ import QuestionView from '@/components/employment/QuestionView.vue'
 import { QUESTION_TYPES } from '@/constants/employment/questionTypes'
 import AnswerRequestDTO from '@/dto/employment/jobtest/answerRequestDTO'
 import Modal from '@/components/common/Modal.vue'
+import CareerHeader from '@/components/career/CareerHeader.vue'
 
 const store = useJobtestExamStore()
 const route = useRoute()
@@ -152,11 +166,14 @@ async function handleSubmitConfirm() {
 <style scoped>
 .exam-layout {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  flex-direction: column;
   min-height: 100vh;
   background: #20432b;
-  /* 좌측 배경색, 필요시 조정 */
+}
+
+.exam-content-wrapper {
+  display: flex;
+  flex: 1;
 }
 
 .exam-sidebar-wrap {
@@ -164,7 +181,6 @@ async function handleSubmitConfirm() {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  min-height: 100vh;
   background: transparent;
   padding-top: 60px;
 }
@@ -175,13 +191,11 @@ async function handleSubmitConfirm() {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  min-height: 100vh;
   background: #fff;
   border-radius: 24px;
-  margin: 40px 0 40px 0;
+  margin: 40px 24px;
   padding: 48px 56px 56px 56px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.10);
-  margin-left: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   max-width: 900px;
   width: 100%;
 }
