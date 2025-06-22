@@ -4,6 +4,7 @@ import com.piveguyz.empickbackend.employment.jobtests.common.enums.JobtestDiffic
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @ToString
@@ -18,4 +19,6 @@ public class UpdateJobtestCommandDTO {
     private LocalDateTime endedAt;
 
     private int updatedMemberId;
+
+    private List<UpdateJobtestQuestionCommandDTO> jobtestQuestions;
 }
