@@ -83,6 +83,8 @@ const employmentTypeOptions = recruitTypeOptions.map(opt => opt.label)
 const filteredList = computed(() => {
   return store.list.filter(item => {
     return (
+      // WAITING 상태의 채용 공고는 제외
+      item.status !== 'WAITING' &&
       (!selectedJob.value || (item.jobName || item.title) === selectedJob.value) &&
       (!selectedStatus.value || getStatusLabel(item.status) === selectedStatus.value) &&
       (!selectedType.value || getRecruitTypeLabel(item.recruitType) === selectedType.value)
