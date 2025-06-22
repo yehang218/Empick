@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   answer: [String, Number, null]
@@ -18,9 +18,21 @@ const props = defineProps({
 const emit = defineEmits(['input'])
 
 const onInput = (e) => {
-  console.log('ShortAnswer emit:', e.target.value)
+  console.log('🔤 ShortAnswer 입력 이벤트:', {
+    value: e.target.value,
+    valueType: typeof e.target.value,
+    propsAnswer: props.answer
+  })
   emit('input', e.target.value)
 }
+
+// props.answer가 변경될 때마다 로그 출력
+watch(() => props.answer, (newVal) => {
+  console.log('📥 ShortAnswer props.answer 변경:', {
+    newValue: newVal,
+    valueType: typeof newVal
+  })
+}, { immediate: true })
 </script>
 
 <style scoped>

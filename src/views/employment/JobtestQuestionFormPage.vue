@@ -22,15 +22,23 @@
             </v-btn>
         </div>
 
-        <SuccessModal v-if="showSuccessModal" :message="isEdit ? '문제 수정이 완료되었습니다.' : '문제 등록이 완료되었습니다.'"
-            @confirm="handleSuccessConfirm" />
+        <SuccessModal 
+            v-if="showSuccessModal" 
+            :message="isEdit ? '문제 수정이 완료되었습니다.' : '문제 등록이 완료되었습니다.'"
+            @confirm="handleSuccessConfirm" 
+        />
 
-        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="handleCancelClose" />
+        <Modal 
+            v-if="showCancelModal && !showSuccessModal" 
+            message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." 
+            @confirm="handleCancelConfirm" 
+            @cancel="handleCancelClose" 
+        />
     </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 
@@ -75,13 +83,30 @@ const currentComponent = computed(() => {
     }
 })
 
+// activeTab이 변경될 때 폼 타입도 함께 업데이트
+watch(activeTab, (newType) => {
+    if (!isEdit.value) { // 수정 모드가 아닐 때만 타입 변경 허용
+        form.value.type = newType
+    }
+})
+
 function goBack() {
-    showCancelModal.value = true
+    // 입력된 내용이 있는지 확인
+    const hasContent = form.value.content || form.value.answer || 
+                      (form.value.questionOptions && form.value.questionOptions.length > 0) ||
+                      (form.value.gradingCriteria && form.value.gradingCriteria.length > 0)
+    
+    if (hasContent) {
+        showCancelModal.value = true
+    } else {
+        // 내용이 없으면 바로 목록으로 이동
+        router.push({ name: 'JobtestQuestionList' })
+    }
 }
 
 function handleSuccessConfirm() {
     showSuccessModal.value = false
-    goBack()
+    router.push({ name: 'JobtestQuestionList' })
 }
 
 async function handleSubmit() {
@@ -94,34 +119,44 @@ async function handleSubmit() {
 
         await jobtestQuestionStore.submitQuestion(userId)
         showSuccessModal.value = true
-    } catch {
+    } catch (error) {
+        console.error('문제 저장 실패:', error)
         toast.error(jobtestQuestionStore.error || '저장 중 오류가 발생했습니다.')
     }
 }
 
 function handleCancelConfirm() {
     showCancelModal.value = false
+    jobtestQuestionStore.resetForm()
     router.push({ name: 'JobtestQuestionList' })
 }
 
 function handleCancelClose() {
     showCancelModal.value = false
+    // 취소 모달을 닫으면 현재 페이지에 머무름
 }
 
 onMounted(async () => {
-    await memberStore.getMyInfo()
-    const memberId = memberStore.form.id
-    if (!memberId) {
-        toast.error('사용자 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
-        return
-    }
+    try {
+        await memberStore.getMyInfo()
+        const memberId = memberStore.form.id
+        if (!memberId) {
+            toast.error('사용자 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')
+            router.push({ name: 'JobtestQuestionList' })
+            return
+        }
 
-    if (questionId) {
-        await jobtestQuestionStore.loadQuestion(questionId, memberId)
-    } else {
-        jobtestQuestionStore.resetForm()
-    }
+        if (questionId) {
+            await jobtestQuestionStore.loadQuestion(questionId, memberId)
+        } else {
+            jobtestQuestionStore.resetForm()
+        }
 
-    activeTab.value = form.value.type || 'MULTIPLE'
+        activeTab.value = form.value.type || 'MULTIPLE'
+    } catch (error) {
+        console.error('페이지 초기화 실패:', error)
+        toast.error('페이지 로딩 중 오류가 발생했습니다.')
+        router.push({ name: 'JobtestQuestionList' })
+    }
 })
 </script>

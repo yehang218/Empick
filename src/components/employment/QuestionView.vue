@@ -9,7 +9,10 @@
       <MultipleChoice :options="question.options" :answer="answer" @select="val => $emit('updateAnswer', val)" />
     </div>
     <div v-else-if="question.type === QUESTION_TYPES.SUBJECTIVE">
-      <ShortAnswer :answer="answer" @input="val => { $emit('updateAnswer', val) }" />
+      <ShortAnswer :answer="answer" @input="val => { 
+        console.log('📝 QuestionView 단답형 답안 입력:', val)
+        $emit('updateAnswer', val) 
+      }" />
     </div>
   </div>
 </template>
