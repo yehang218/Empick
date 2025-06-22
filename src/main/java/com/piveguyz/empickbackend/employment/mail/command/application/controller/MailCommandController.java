@@ -83,9 +83,10 @@ public class MailCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2632", description = "유효하지 않은 형태의 이메일입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2633", description = "메일의 제목을 입력하지 않았습니다."),
     })
-    @PostMapping("/send/jobtest/{id}")
-    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendJobtestMail(@PathVariable("id") Integer id) {
-        MailCommandDTO sendedDTO = mailFacade.sendJobtestMail(id);
+    @PostMapping("/send/jobtest/{applicationId}")
+    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendJobtestMail(@PathVariable("applicationId") Integer applicationId,
+                                                                             @RequestParam("senderId") Integer senderId) {
+        MailCommandDTO sendedDTO = mailFacade.sendJobtestMail(applicationId, senderId);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, sendedDTO));
@@ -104,9 +105,10 @@ public class MailCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2632", description = "유효하지 않은 형태의 이메일입니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2633", description = "메일의 제목을 입력하지 않았습니다."),
     })
-    @PostMapping("/send/interview/{id}")
-    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendInterviewMail(@PathVariable("id") Integer id) {
-        MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(id);
+    @PostMapping("/send/interview/{applicationId}")
+    public ResponseEntity<CustomApiResponse<MailCommandDTO>> sendInterviewMail(@PathVariable("applicationId") Integer applicationId,
+                                                                               @RequestParam("senderId") Integer senderId) {
+        MailCommandDTO sendedDTO = mailFacade.sendInterviewMail(applicationId, senderId);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, sendedDTO));

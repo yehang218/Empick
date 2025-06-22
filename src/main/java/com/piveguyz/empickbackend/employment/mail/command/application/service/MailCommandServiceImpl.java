@@ -58,7 +58,7 @@ public class MailCommandServiceImpl implements MailCommandService {
         entity.setEmail(email);
         entity.setTitle(dto.getTitle());
         entity.setContent(dto.getContent());
-        entity.setSenderId(1);
+        entity.setSenderId(dto.getSenderId());
         entity.setSendedAt(LocalDateTime.now());
         MailEntity savedEntity = mailRepository.save(entity);
         return mailCommandMapper.toDTO(savedEntity);
@@ -109,7 +109,7 @@ public class MailCommandServiceImpl implements MailCommandService {
             sendedDTO.setEmail(email);
             sendedDTO.setTitle(dto.getTitle());
             sendedDTO.setContent(htmlContent);
-            sendedDTO.setSenderId(1);
+            sendedDTO.setSenderId(dto.getSenderId());
             sendedDTO.setSendedAt(LocalDateTime.now());
             return sendedDTO;
         } catch (MessagingException | IOException e) {
@@ -117,8 +117,8 @@ public class MailCommandServiceImpl implements MailCommandService {
         }
     }
 
-    public MailCommandDTO sendJobtestMail(Integer id) {
-        JobTestMailQueryDTO dto = mailMapper.findForJobTestMail(id);
+    public MailCommandDTO sendJobtestMail(Integer applicationId, Integer senderId) {
+        JobTestMailQueryDTO dto = mailMapper.findForJobTestMail(applicationId);
         Integer recruitmentId = dto.getRecruitmentId();
         String recruitmentTitle = dto.getRecruitmentTitle();
         Integer applicantId = dto.getApplicantId();
@@ -170,7 +170,7 @@ public class MailCommandServiceImpl implements MailCommandService {
             sendedDTO.setEmail(email);
             sendedDTO.setTitle(title);
             sendedDTO.setContent(htmlContent);
-            sendedDTO.setSenderId(1);
+            sendedDTO.setSenderId(senderId);
             sendedDTO.setSendedAt(LocalDateTime.now());
             return sendedDTO;
         } catch (MessagingException | IOException e) {
@@ -178,7 +178,7 @@ public class MailCommandServiceImpl implements MailCommandService {
         }
     }
 
-    public MailCommandDTO sendInterviewMail(Integer applicationId) {
+    public MailCommandDTO sendInterviewMail(Integer applicationId, Integer senderId) {
         InterviewMailQueryDTO dto = mailMapper.findForInterviewMail(applicationId);
         Integer recruitmentId = dto.getRecruitmentId();
         String recruitmentTitle = dto.getRecruitmentTitle();
@@ -221,7 +221,7 @@ public class MailCommandServiceImpl implements MailCommandService {
             sendedDTO.setEmail(email);
             sendedDTO.setTitle(title);
             sendedDTO.setContent(htmlContent);
-            sendedDTO.setSenderId(1);
+            sendedDTO.setSenderId(senderId);
             sendedDTO.setSendedAt(LocalDateTime.now());
             return sendedDTO;
         } catch (MessagingException | IOException e) {
