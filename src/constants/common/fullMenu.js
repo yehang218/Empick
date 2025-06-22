@@ -112,8 +112,8 @@ export const fullMenu = {
             label: '안내 메일 관리',
             roles: [RoleCode.HR_ACCESS],
             children: [
-                { label: '안내 메일', path: '/employment/emails' },
-                { label: '안내 메일 템플릿', path: '/employment/email-templates' }
+                { label: '안내 메일 발송', path: '/employment/send-email' },
+                { label: '메일 발송 이력', path: '/employment/email-history' }
             ]
         }
     ],

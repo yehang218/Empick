@@ -25,14 +25,16 @@ export const sendMailService = async (dto, options = {}) => {
         const response = await api.post(MailAPI.SEND, dto);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) throwCustomApiError(apiResponse.code, apiResponse.message, 400);
-        return apiResponse.data;
+        return MailResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
 
 // 실무 테스트 안내 메일을 전송하는 서비스(DB 등록 포함)
-export const sendJobtestMailService = async (id, options = {}) => {
+export const sendJobtestMailService = async (id, senderId, options = {}) => {
     return withErrorHandling(async () => {
-        const response = await api.post(MailAPI.SEND_JOBTEST(id));
+        const response = await api.post(MailAPI.SEND_JOBTEST(id, senderId), {}, {
+            timeout: 30000 // 30초 타임아웃
+        });
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if (!apiResponse.success) {
@@ -44,9 +46,11 @@ export const sendJobtestMailService = async (id, options = {}) => {
 };
 
 // 면접 안내 메일을 전송하는 서비스(DB 등록 포함)
-export const sendInterviewMailService = async (id, options = {}) => {
+export const sendInterviewMailService = async (id, senderId, options = {}) => {
     return withErrorHandling(async () => {
-        const response = await api.post(MailAPI.SEND_INTERVIEW(id));
+        const response = await api.post(MailAPI.SEND_INTERVIEW(id, senderId), {}, {
+            timeout: 30000 // 30초 타임아웃
+        });
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if (!apiResponse.success) {
