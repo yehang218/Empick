@@ -6,7 +6,7 @@ export default class AttendanceCategoryQueryDTO {
         updatedAt = null
     ) {
         this.id = id;                                    // 카테고리 ID
-        this.status = status;                            // 0=출근, 1=퇴근, 2=지각, 3=조퇴
+        this.status = status;                            // 1=출근, 2=퇴근, 3=지각, 4=조퇴 (DB 실제 ID)
         this.createdAt = createdAt;                      // 생성 시각
         this.updatedAt = updatedAt;                      // 수정 시각
     }

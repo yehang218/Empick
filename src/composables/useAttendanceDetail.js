@@ -25,7 +25,7 @@ export const useAttendanceDetail = (memberId) => {
 
     // 근태 통계
     const attendanceStats = computed(() => [
-        { label: '출근', count: attendanceRecords.value.filter(r => r.status === 'present').length, color: 'success' },
+        { label: '출근', count: attendanceRecords.value.filter(r => r.status === 'present').length, color: 'success' },  // 멤버 출근 상태
         { label: '지각', count: attendanceRecords.value.filter(r => r.status === 'late').length, color: 'warning' },
         { label: '조퇴', count: attendanceRecords.value.filter(r => r.status === 'early').length, color: 'info' },
         { label: '결근', count: attendanceRecords.value.filter(r => r.status === 'absent').length, color: 'error' },
