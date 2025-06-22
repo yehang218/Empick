@@ -84,13 +84,4 @@ public class JobtestCommandServiceImpl implements JobtestCommandService {
         return jobtestRepository.findById(jobtestId);
     }
 
-    @Override
-    public void checkJobtestTime(int jobtestId) {
-        LocalDateTime now = LocalDateTime.now();
-        JobtestEntity jobtest = jobtestRepository.findById(jobtestId)
-                .orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_INVALID_JOBTEST));
-        if(now.isBefore(jobtest.getStartedAt()) || now.isAfter(jobtest.getEndedAt())) {
-            throw new BusinessException(ResponseCode.EMPLOYMENT_INVALID_TIME);
-        }
-    }
 }

@@ -34,4 +34,20 @@
                  JOIN job_test jt ON ajt.job_test_id = jt.id
     </select>
 
+    <!-- entryCode에 해당하는 applicationJobtestId 반환 쿼리 -->
+    <select id="selectApplicationJobTestIdByJobTestIdAndEntryCode"
+            parameterType="map"
+            resultType="int">
+        SELECT id
+        FROM application_job_test
+        WHERE job_test_id = #{jobtestId}
+          AND entry_code = #{entryCode}
+        LIMIT 1
+    </select>
+
+    <select id="selectSubmittedAtById" resultType="java.util.Date">
+        SELECT submitted_at
+        FROM application_job_test
+        WHERE id = #{applicationJobtestId}
+    </select>
 </mapper>

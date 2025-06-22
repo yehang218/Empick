@@ -14,5 +14,5 @@ public interface ApplicationJobtestCommandService {
 
     void updateGradingStatusAndScore(int applicationJobTestId, double totalScore);
 
-    void verifyEntryCode(int jobtestId, JobtestEntryRequestDTO requestDTO);
+    void finishExam(int applicationJobTestId);
 }

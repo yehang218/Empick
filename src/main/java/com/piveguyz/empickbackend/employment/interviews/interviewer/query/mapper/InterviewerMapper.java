@@ -13,4 +13,6 @@ public interface InterviewerMapper {
     InterviewerQueryDTO findById(Integer id);
 
     List<InterviewerQueryDTO> findByInterviewId(Integer interviewId);
+
+    InterviewerQueryDTO findByInterviewMemberId(Integer interviewId, Integer memberId);
 }

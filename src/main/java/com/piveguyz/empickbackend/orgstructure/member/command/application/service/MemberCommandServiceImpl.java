@@ -4,6 +4,10 @@ import com.piveguyz.empickbackend.auth.facade.AuthFacade;
 import com.piveguyz.empickbackend.common.constants.RoleCode;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.employment.mail.command.application.dto.MailCommandDTO;
+import com.piveguyz.empickbackend.employment.mail.facade.MailFacade;
+import com.piveguyz.empickbackend.infra.s3.dto.S3UploadResponseDTO;
+import com.piveguyz.empickbackend.infra.s3.service.S3Service;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberSignUpRequestDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.application.dto.MemberSignUpResponseDTO;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEntity;
@@ -15,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +28,11 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthFacade authFacade;
+    private final S3Service s3Service;
+    private final MailFacade mailFacade;
 
     @Override
+    @Transactional
     public MemberSignUpResponseDTO signUp(MemberSignUpRequestDTO request) {
         // 🔥 Step 1️⃣: 현재 로그인 사용자 ID 조회
         Integer createdMemberId = authFacade.getCurrentMemberId();
@@ -41,10 +49,24 @@ public class MemberCommandServiceImpl implements MemberCommandService {
             throw new BusinessException(ResponseCode.MEMBER_EMAIL_DUPLICATED);
         }
 
-        // 🔥 Step 5️⃣: EmployeeNumber 생성
+        // 🔥 Step 5️⃣: UUID 생성 및 S3 프로필 이미지 업로드
+        String profileImageUrl;
+        if (request.getProfileImage() != null && !request.getProfileImage().isEmpty()) {
+            String uuid = UUID.randomUUID().toString();
+            String fileName = uuid + ".png";
+
+            S3UploadResponseDTO s3Response = s3Service.uploadFile("profiles", fileName, request.getProfileImage());
+            profileImageUrl = s3Response.getKey(); // "profiles/uuid.png"
+        } else {
+            throw new BusinessException(ResponseCode.MEMBER_PROFILE_IMAGE_REQUIRED);
+        }
+
+        // 🔥 Step 6️⃣: EmployeeNumber 생성
         Integer employeeNumber = generateUniqueEmployeeNumber();
 
-        // 🔥 Step 6️⃣: 신규 사원 생성
+        Integer defaultRankId = 1; // RANK_EMP (사원) - ROLE_USER 권한
+
+        // 🔥 Step 7️⃣: 신규 사원 생성
         MemberEntity member = MemberEntity.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(employeeNumber.toString()))
@@ -52,15 +74,39 @@ public class MemberCommandServiceImpl implements MemberCommandService {
                 .phone(request.getPhone())
                 .address(request.getAddress())
                 .birth(request.getBirth())
-                .pictureUrl(request.getPictureUrl())
+                .pictureUrl(profileImageUrl) // S3 key 저장 (profiles/uuid.png)
                 .employeeNumber(employeeNumber)
                 .hireAt(request.getHireAt())
                 .status(1) // 기본 활성 상태
+                .rankId(defaultRankId)
                 .createdAt(LocalDateTime.now())
                 .createdMemberId(createdMemberId)
                 .build();
 
         MemberEntity savedMember = memberRepository.save(member);
+
+        // 🔥 Step 8️⃣: 이메일 발송 (사번 전달)
+        MailCommandDTO mailDto = new MailCommandDTO(
+                null, // id (새로 생성되므로 null)
+                null, // applicantId (사원 등록이므로 null)
+                savedMember.getEmail(), // email
+                "[EMPICK] 사원 등록 완료 - 사번 안내", // title
+                String.format(
+                        "안녕하세요 %s님,\n\n" +
+                                "사원 등록이 완료되었습니다.\n\n" +
+                                "📋 사번: %d\n" +
+                                "🔑 초기 비밀번호: %d\n\n" +
+                                "로그인 후 반드시 비밀번호를 변경해주세요.\n\n" +
+                                "감사합니다.",
+                        savedMember.getName(),
+                        savedMember.getEmployeeNumber(),
+                        savedMember.getEmployeeNumber()
+                ), // content
+                createdMemberId, // senderId (입사처리자)
+                null // sendedAt (발송 시 자동 설정)
+        );
+
+        mailFacade.sendMail(mailDto);
 
         return MemberSignUpResponseDTO.builder()
                 .id(savedMember.getId())
@@ -72,6 +118,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
+    @Transactional
     public void updateProfileImage(int memberId, String key) {
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
@@ -80,6 +127,7 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     }
 
     @Override
+    @Transactional
     public void clearProfileImage(int memberId) {
         MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));

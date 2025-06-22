@@ -39,4 +39,10 @@ public class InterviewerQueryServiceImpl implements InterviewerQueryService {
         List<InterviewerQueryDTO> dtoList = mapper.findByInterviewId(interviewId);
         return dtoList;
     }
+
+    @Override
+    public InterviewerQueryDTO findByInterviewMemberId(Integer interviewId, Integer memberId) {
+        InterviewerQueryDTO dto = mapper.findByInterviewMemberId(interviewId, memberId);
+        return dto;
+    }
 }

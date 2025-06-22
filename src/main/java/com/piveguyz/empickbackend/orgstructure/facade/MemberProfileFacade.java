@@ -53,23 +53,16 @@ public class MemberProfileFacade {
     }
 
     public byte[] downloadProfileImage(int memberId) {
-        // 1. memberId로 pictureUrl 조회
+        // memberQueryService에서 이미 검증하므로 바로 사용
         String profileImageKey = getProfileImageKey(memberId);
-        if (profileImageKey == null || profileImageKey.isBlank()) {
-            throw new BusinessException(ResponseCode.MEMBER_PROFILE_IMAGE_NOT_FOUND);
-        }
 
-        // 2. S3에서 다운로드
+        // S3에서 다운로드
         return s3Service.download(profileImageKey);
     }
 
     public String getProfileImageKey(int memberId) {
-        String profileImageKey = memberQueryService.getProfileImageKey(memberId);
-
-        if (profileImageKey == null || profileImageKey.isBlank()) {
-            throw new BusinessException(ResponseCode.MEMBER_PROFILE_IMAGE_NOT_FOUND);
-        }
-        return profileImageKey;
+        // memberQueryService에서 이미 모든 검증을 수행하므로 바로 반환
+        return memberQueryService.getProfileImageKey(memberId);
     }
 
     public MemberResponseDTO getMemberInfo(int memberId) {

@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.*;
 public class ApplicationJobtestCommandController {
 
     private final ApplicationJobtestCommandService applicationJobtestCommandService;
-    private final JobtestFacade jobtestFacade;
-
 
     @Operation(
             summary = "지원서별 실무테스트 등록",
@@ -74,24 +72,5 @@ public class ApplicationJobtestCommandController {
         int deleteId = applicationJobtestCommandService.deleteApplicationJobtest(id);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body((CustomApiResponse.of(ResponseCode.SUCCESS, deleteId)));
-    }
-
-
-    @Operation(
-            summary = "실무테스트 입장",
-            description = """
-                    실무테스트 입장 검증
-                    """
-    )
-    @ApiResponses(value = {
-    })
-    @PostMapping("/enter/{jobtestId}")
-    public ResponseEntity<CustomApiResponse<String>> verifyEntry(
-            @PathVariable int jobtestId,
-            @RequestBody JobtestEntryRequestDTO request
-    ) {
-        jobtestFacade.verifyJobtestEnter(jobtestId, request);
-        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
-                .body((CustomApiResponse.of(ResponseCode.SUCCESS, ResponseCode.SUCCESS.getMessage())));
     }
 }

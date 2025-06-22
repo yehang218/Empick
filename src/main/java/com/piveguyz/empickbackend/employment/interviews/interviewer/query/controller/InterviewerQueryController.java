@@ -57,7 +57,7 @@ public class InterviewerQueryController {
         InterviewerQueryDTO dto = service.findById(id);
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
-                .body(CustomApiResponse.of(result, dto  ));
+                .body(CustomApiResponse.of(result, dto));
     }
 
     @Operation(
@@ -76,5 +76,14 @@ public class InterviewerQueryController {
         ResponseCode result = ResponseCode.SUCCESS;
         return ResponseEntity.status(result.getHttpStatus())
                 .body(CustomApiResponse.of(result, dtoList));
+    }
+
+    @GetMapping("/interview/{interviewId}/member/{memberId}")
+    public ResponseEntity<CustomApiResponse<InterviewerQueryDTO>> findByInterviewMemberId(@PathVariable("interviewId") Integer interviewId,
+                                                                                               @PathVariable("memberId") Integer memberId) {
+        InterviewerQueryDTO dto = service.findByInterviewMemberId(interviewId, memberId);
+        ResponseCode result = ResponseCode.SUCCESS;
+        return ResponseEntity.status(result.getHttpStatus())
+                .body(CustomApiResponse.of(result, dto));
     }
 }

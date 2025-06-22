@@ -169,4 +169,60 @@
         WHERE jt.id = #{id}
     </select>
 
+    <!-- jobtestId로 started_at, ended_at 조회 -->
+    <select id="selectStartedAndEndedAtById"
+            parameterType="int"
+            resultType="map">
+        SELECT started_at, ended_at
+        FROM job_test
+        WHERE id = #{jobtestId}
+    </select>
+
+    <resultMap id="JobtestExamQueryMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestExamQueryDTO">
+        <id property="jobtestId" column="jobtest_id"/>
+        <result property="applicationJobTestId" column="application_job_test_id"/>
+        <result property="title" column="title"/>
+        <result property="testTime" column="test_time"/>
+        <collection property="questions"
+                    ofType="com.piveguyz.empickbackend.employment.jobtests.jobtest.query.dto.JobtestExamQuestionSummaryDTO">
+            <id property="questionId" column="question_id"/>
+            <result property="type" column="type"/>
+            <result property="title" column="question_title"/>
+            <result property="score" column="score"/>
+            <!-- options 컬렉션 추가 -->
+            <collection property="options"
+                        ofType="com.piveguyz.empickbackend.employment.jobtests.question.query.dto.QuestionOptionDTO">
+                <id property="id" column="option_id"/>
+                <result property="optionNumber" column="option_number"/>
+                <result property="content" column="option_content"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="selectJobtestExamQuery"
+            resultMap="JobtestExamQueryMap"
+            parameterType="map">
+        SELECT
+            jt.id     AS jobtest_id,
+            ajt.id    AS application_job_test_id,
+            jt.title,
+            jt.test_time,
+            jq.question_id,
+            q.type,
+            q.content AS question_title,
+            jq.score,
+            qo.id     AS option_id,
+            qo.option_number,
+            qo.content AS option_content
+        FROM job_test jt
+                 JOIN application_job_test ajt ON ajt.job_test_id = jt.id
+                 JOIN job_test_question jq ON jq.job_test_id = jt.id
+                 JOIN question q ON jq.question_id = q.id
+                 LEFT JOIN question_option qo ON qo.question_id = q.id
+        WHERE jt.id = #{jobtestId}
+          AND ajt.id = #{applicationJobTestId}
+        ORDER BY jq.id, qo.option_number
+    </select>
+
 </mapper>

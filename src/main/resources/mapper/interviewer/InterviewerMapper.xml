@@ -7,7 +7,7 @@
     <resultMap id="InterviewerResultMap" type="com.piveguyz.empickbackend.employment.interviews.interviewer.query.dto.InterviewerQueryDTO">
         <id column="id" property="id"/>
         <result column="interview_id" property="interviewId"/>
-        <result column="interviewer_id" property="interviewerId"/>
+        <result column="member_id" property="memberId"/>
         <result column="score" property="score"/>
         <result column="review" property="review"/>
     </resultMap>
@@ -16,7 +16,7 @@
         SELECT
             id,
             interview_id,
-            interviewer_id,
+            member_id,
             score,
             review
         FROM interviewer
@@ -26,7 +26,7 @@
         SELECT
             id,
             interview_id,
-            interviewer_id,
+            member_id,
             score,
             review
         FROM interviewer
@@ -37,13 +37,24 @@
         SELECT
             id,
             interview_id,
-            interviewer_id,
+            member_id,
             score,
             review
         FROM interviewer
         WHERE interview_id = #{interviewId}
     </select>
 
+    <select id="findByInterviewMemberId" resultMap="InterviewerResultMap">
+        SELECT
+            id,
+            interview_id,
+            member_id,
+            score,
+            review
+        FROM interviewer
+        WHERE interview_id = #{interviewId}
+        AND member_id = #{memberId}
+    </select>
 
 
 </mapper>

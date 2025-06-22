@@ -28,6 +28,16 @@ public class IntroduceStandardItemCommandController {
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, created));
     }
 
+    @PatchMapping("/{id}")
+    @Operation(summary = "자기소개서 기준표 항목 수정", description = "자기소개서 기준표 항목의 기준표 ID 등 정보를 수정한다.")
+    public ResponseEntity<CustomApiResponse<IntroduceStandardItemCommandDTO>> update(
+            @PathVariable int id,
+            @RequestBody @Valid IntroduceStandardItemCommandDTO dto) {
+        IntroduceStandardItemCommandDTO updated = introduceStandardItemCommandService.update(id, dto);
+        return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
+                .body(CustomApiResponse.of(ResponseCode.SUCCESS, updated));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "자기소개서 기준표 항목 삭제", description = "자기소개서 기준표 항목을 삭제한다.")
 

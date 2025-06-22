@@ -7,4 +7,6 @@ public interface IntroduceStandardItemCommandService {
     IntroduceStandardItemCommandDTO create(@Valid IntroduceStandardItemCommandDTO dto);
 
     int delete(int id);
+
+    IntroduceStandardItemCommandDTO update(int id, @Valid IntroduceStandardItemCommandDTO dto);
 }
