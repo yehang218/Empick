@@ -122,6 +122,10 @@ const getStatusColor = (status) => {
         default: return 'grey'
     }
 }
+
+const goToEditPage = () => {
+    router.push(`/employment/recruitments/edit/${detail.value.recruitment.id}`);
+};
 </script>
 
 <template>
@@ -222,6 +226,9 @@ const getStatusColor = (status) => {
             </v-card>
 
             <v-row justify="end" class="mt-4">
+                <v-btn variant="tonal" color="secondary" class="mr-2" @click="goToEditPage">
+                    <v-icon start>mdi-pencil</v-icon> 수정
+                </v-btn>
                 <v-btn variant="outlined" color="error" @click="deleteDialog = true">
                     <v-icon start>mdi-delete</v-icon> 삭제
                 </v-btn>

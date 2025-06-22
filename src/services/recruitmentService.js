@@ -55,7 +55,7 @@ export const createRecruitment = async (dto) => {
 // 채용 공고 수정
 export const updateRecruitment = async (id, dto) => {
     return withErrorHandling(async () => {
-        const response = await api.put(`${API.RECRUITMENT.RECRUITMENT_UPDATE}/${id}`, dto)
+        const response = await api.put(API.RECRUITMENT.RECRUITMENT_UPDATE(id), dto)
         const apiResponse = ApiResponseDTO.fromJSON(response.data)
 
         if (!apiResponse.success) {
