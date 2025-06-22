@@ -114,11 +114,11 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
-import { createJobtestService, getJobtestService, updateJobtestService } from '@/services/jobtestService'
+import { useJobtestDetailStore } from '@/stores/jobtestDetailStore'
+import { useMemberStore } from '@/stores/memberStore'
 import { CreateJobtestRequestDTO, UpdateJobtestRequestDTO } from '@/dto/employment/jobtest/jobtestRequestDTO'
 import QuestionCreateModal from '@/components/employment/QuestionCreateModal.vue'
 import SuccessModal from '@/components/common/AlertModal.vue'
-import { useMemberStore } from '@/stores/memberStore'
 import Modal from '@/components/common/Modal.vue'
 import JobtestQuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
 import Search from '@/components/common/Search.vue'
@@ -126,6 +126,7 @@ import Search from '@/components/common/Search.vue'
 const router = useRouter();
 const route = useRoute()
 const jobtestQuestionStore = useJobtestQuestionStore()
+const jobtestDetailStore = useJobtestDetailStore()
 const memberStore = useMemberStore()
 
 const showSuccessModal = ref(false)
@@ -173,19 +174,24 @@ onMounted(async () => {
     if (jobtestId) {
         isEdit.value = true
         editingJobtestId.value = Number(jobtestId)
-        const jobtest = await getJobtestService(editingJobtestId.value)
-        jobtestTitle.value = jobtest.title
-        testTime.value = jobtest.testTime
-        difficulty.value = jobtest.difficulty
-        startedAt.value = jobtest.startedAt ? new Date(jobtest.startedAt).toISOString().slice(0, 16) : ''
-        endedAt.value = jobtest.endedAt ? new Date(jobtest.endedAt).toISOString().slice(0, 16) : ''
-        // Set selected questions and scores
-        selectedIds.value = jobtest.questions.map(q => q.questionId)
-        // Set score for each question in localQuestions
-        localQuestions.value = localQuestions.value.map(q => {
-            const found = jobtest.questions.find(jq => jq.questionId === q.id)
-            return found ? { ...q, score: found.score } : q
-        })
+        try {
+            await jobtestDetailStore.fetchJobtestDetail(editingJobtestId.value)
+            const jobtest = jobtestDetailStore.jobtest
+            jobtestTitle.value = jobtest.title
+            testTime.value = jobtest.testTime
+            difficulty.value = jobtest.difficulty
+            startedAt.value = jobtest.startedAt ? new Date(jobtest.startedAt).toISOString().slice(0, 16) : ''
+            endedAt.value = jobtest.endedAt ? new Date(jobtest.endedAt).toISOString().slice(0, 16) : ''
+            // Set selected questions and scores
+            selectedIds.value = jobtest.questions.map(q => q.questionId)
+            // Set score for each question in localQuestions
+            localQuestions.value = localQuestions.value.map(q => {
+                const found = jobtest.questions.find(jq => jq.questionId === q.id)
+                return found ? { ...q, score: found.score } : q
+            })
+        } catch (e) {
+            toast.error("데이터를 불러오는데 실패했습니다.")
+        }
     }
 })
 
@@ -259,40 +265,40 @@ const register = async () => {
         toast.error('시험 종료 일정을 입력해주세요.');
         return;
     }
-    const dto = new CreateJobtestRequestDTO(
-        jobtestTitle.value,
-        difficulty.value,
-        testTime.value,
-        new Date(startedAt.value),
-        new Date(endedAt.value),
-        memberStore.form.id,
-        selected.map(q => ({
-            questionId: q.id,
-            score: Number(q.score ?? 0)
-        }))
-    );
 
-    const updateDto = new UpdateJobtestRequestDTO(
-        jobtestTitle.value,
-        difficulty.value,
-        testTime.value,
-        new Date(startedAt.value),
-        new Date(endedAt.value),
-        memberStore.form.id,
-        selected.map(q => ({
-            questionId: q.id,
-            score: Number(q.score ?? 0)
-        }))
-    )
     try {
         if (isEdit.value && editingJobtestId.value) {
-            await updateJobtestService(editingJobtestId.value, updateDto)
+            const updateDto = new UpdateJobtestRequestDTO(
+                jobtestTitle.value,
+                difficulty.value,
+                testTime.value,
+                new Date(startedAt.value),
+                new Date(endedAt.value),
+                memberStore.form.id,
+                selected.map(q => ({
+                    questionId: q.id,
+                    score: Number(q.score ?? 0)
+                }))
+            )
+            await jobtestDetailStore.updateJobtest(editingJobtestId.value, updateDto)
             toast.success('실무 테스트가 수정되었습니다.')
+            router.push({ name: 'JobtestList' });
         } else {
-            await createJobtestService(dto)
+            const dto = new CreateJobtestRequestDTO(
+                jobtestTitle.value,
+                difficulty.value,
+                testTime.value,
+                new Date(startedAt.value),
+                new Date(endedAt.value),
+                memberStore.form.id,
+                selected.map(q => ({
+                    questionId: q.id,
+                    score: Number(q.score ?? 0)
+                }))
+            );
+            await jobtestDetailStore.createJobtest(dto)
             showSuccessModal.value = true
         }
-        showSuccessModal.value = true
     } catch (e) {
         toast.error('등록 중 오류가 발생했습니다.')
     }

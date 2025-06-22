@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { getJobtestService, updateJobtestService } from '@/services/jobtestService'
+import { getJobtestService, updateJobtestService, createJobtestService } from '@/services/jobtestService'
 import JobtestDetailDTO from '@/dto/employment/jobtest/jobtestDetailDTO';
 
 export const useJobtestDetailStore = defineStore('jobtestDetail', () => {
@@ -36,11 +36,25 @@ export const useJobtestDetailStore = defineStore('jobtestDetail', () => {
         }
     };
 
+    const createJobtest = async (dto) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            await createJobtestService(dto);
+        } catch (e) {
+            error.value = e.message || '실무테스트 등록 실패';
+            throw e;
+        } finally {
+            loading.value = false;
+        }
+    };
+
     return {
         jobtest,
         loading,
         error,
         fetchJobtestDetail,
-        updateJobtest
+        updateJobtest,
+        createJobtest
     };
 });
