@@ -29,7 +29,12 @@ export const getApplicationByIdService = async (id, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationResponseDTO.fromJSON(apiResponse.data);
+    const applicationDto = ApplicationResponseDTO.fromJSON(apiResponse.data);
+    if (!applicationDto) {
+      console.warn('⚠️ 지원서 데이터 변환 실패. API 응답:', apiResponse);
+      throw new Error(`지원서 데이터를 변환할 수 없습니다. (ID: ${id})`);
+    }
+    return applicationDto;
   }, options);
 };
 
@@ -47,7 +52,11 @@ export const getApplicationByApplicantIdService = async (applicantId, options = 
         throwCustomApiError(apiResponse.code, apiResponse.message);
       }
 
-      return ApplicationResponseDTO.fromJSON(apiResponse.data);
+      const applicationDto = ApplicationResponseDTO.fromJSON(apiResponse.data);
+      if (!applicationDto) {
+        throw new Error('지원서 데이터를 변환할 수 없습니다.');
+      }
+      return applicationDto;
     } catch (error) {
       console.warn('⚠️ applicantId 전용 엔드포인트 실패, 기본 엔드포인트 시도:', error.message);
       
@@ -59,7 +68,11 @@ export const getApplicationByApplicantIdService = async (applicantId, options = 
         throwCustomApiError(apiResponse.code, apiResponse.message);
       }
 
-      return ApplicationResponseDTO.fromJSON(apiResponse.data);
+      const fallbackDto = ApplicationResponseDTO.fromJSON(apiResponse.data);
+      if (!fallbackDto) {
+        throw new Error('지원서 데이터를 변환할 수 없습니다.');
+      }
+      return fallbackDto;
     }
   }, options);
 };

@@ -252,78 +252,30 @@
                 에서 먼저 작성을 완료해야 합니다.
               </p>
             </div>
-          </v-card-text>
-        </v-card>
-
-        <!-- 자기소개서 평가 결과 카드 -->
-        <v-card class="modern-card evaluation-detail-card">
-          <v-card-title class="pb-2">
-            <v-icon class="mr-2 text-primary">mdi-clipboard-text</v-icon>
-            {{ selectedEvaluation }} 평가 상세
-            <v-spacer />
-            <v-btn-toggle v-model="viewMode" mandatory variant="outlined" size="small">
-              <v-btn value="detail">상세</v-btn>
-              <v-btn value="score">점수</v-btn>
-            </v-btn-toggle>
-          </v-card-title>
-          <v-divider class="mb-4" />
-          <v-card-text>
-            <div v-if="viewMode === 'detail'">
-              <component :is="evaluationComponent" :applicant="applicant" />
-            </div>
-            <div v-else class="score-analysis">
-              <h4 class="text-h6 mb-4">점수 분석</h4>
-              <v-row>
-                <v-col cols="6">
-                  <div class="stat-card">
-                    <div class="stat-number text-primary">{{ getCurrentEvaluation()?.score }}</div>
-                    <div class="stat-label">개인 점수</div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="stat-card">
-                    <div class="stat-number">{{ getCurrentEvaluation()?.average }}</div>
-                    <div class="stat-label">평균 점수</div>
-                  </div>
-                </v-col>
-              </v-row>
-
-              <div class="mt-4">
-                <h5 class="text-subtitle-1 mb-2">점수 분포</h5>
-                <v-progress-linear :model-value="(getCurrentEvaluation()?.score / 100) * 100" color="primary"
-                  height="20" rounded>
-                  <template #default="{ value }">
-                    <strong class="text-white">{{ Math.ceil(value) }}%</strong>
-                  </template>
-                </v-progress-linear>
+            
+            <!-- 자기소개서 평가 입력 영역 (항상 표시) -->
+            <div v-if="introduceItems && introduceItems.length > 0" class="mt-6">
+              <v-divider class="mb-4" />
+              <div class="evaluation-section">
+                <h4 class="text-h6 mb-4 d-flex align-center">
+                  <v-icon class="mr-2" color="primary">mdi-clipboard-text</v-icon>
+                  자기소개서 평가
+                </h4>
+                
+                <IntroduceEvaluationInput 
+                  :evaluation-data="currentEvaluationData"
+                  @save="handleEvaluationSave"
+                />
               </div>
             </div>
           </v-card-text>
         </v-card>
+
+
       </v-col>
     </v-row>
 
-    <!-- 자기소개서 평가 모달 -->
-    <v-dialog v-model="showEvaluationModal" max-width="1000px" persistent>
-      <v-card>
-        <v-card-title class="d-flex justify-between align-center">
-          <div>
-            <h3>자기소개서 평가</h3>
-            <p class="text-body-2 text-grey ma-0">{{ applicant?.name }}님의 자기소개서를 평가해주세요</p>
-          </div>
-          <v-btn icon variant="text" @click="closeEvaluationModal">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-divider />
-        <v-card-text class="pa-6">
-          <IntroduceEvaluationInput 
-            :evaluation-data="currentEvaluationData"
-            @save="handleEvaluationSave"
-          />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+
 
     <!-- 액션 버튼 영역 -->
     <div class="action-section mt-6">
@@ -407,16 +359,9 @@ if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
   }
 }
 
-const IntroduceResult = markRaw(defineAsyncComponent(() => import('@/components/employment/IntroduceEvaluationInput.vue')))
-// const TestResult = markRaw(defineAsyncComponent(() => import('@/components/employment/TestResult.vue')))
-// const InterviewResult = markRaw(defineAsyncComponent(() => import('@/components/employment/InterviewResult.vue')))
 
-const evaluationComponent = ref(IntroduceResult)
-const selectedEvaluation = ref('자기소개서')
-const viewMode = ref('detail')
 
 // 평가 모달 관련
-const showEvaluationModal = ref(false)
 const currentEvaluationData = ref({})
 
 // ===== ViewModel (Store 데이터 + URL 쿼리 데이터 결합) =====
@@ -631,6 +576,9 @@ const loadApplicationData = async () => {
     
     // 1. 지원서 상세 정보 로드
     try {
+      if (!actualApplicationId || actualApplicationId <= 0) {
+        throw new Error('유효하지 않은 applicationId입니다.')
+      }
       await applicationStore.fetchApplicationById(actualApplicationId)
       console.log('✅ 지원서 상세 정보 로딩 완료')
     } catch (appError) {
@@ -707,6 +655,18 @@ const loadApplicationData = async () => {
       console.log('✅ 자기소개서 데이터 로딩 완료:', introduceData)
       console.log('📊 자기소개서 항목 개수:', introduceData?.items?.length || 0)
       
+      // 자기소개서 데이터가 있으면 평가 데이터 설정
+      if (introduceData && introduceData.id) {
+        currentEvaluationData.value = {
+          totalScore: null,
+          comment: '',
+          applicantId: applicant.value?.id,
+          applicationId: actualApplicationId,
+          introduceId: introduceData.id
+        }
+        console.log('✅ 평가 데이터 설정 완료:', currentEvaluationData.value)
+      }
+      
       // Store에서 fallback 처리를 담당하므로 여기서는 단순히 로그만 출력
       if (!introduceData || !introduceData.items || introduceData.items.length === 0) {
         console.warn('⚠️ 자기소개서 데이터가 없습니다. (Store에서 fallback 처리 시도됨)')
@@ -751,36 +711,14 @@ const loadApplicationData = async () => {
   }
 }
 
-// 평가 모달 관련 함수들
-const openEvaluationModal = () => {
-  // 현재 평가 데이터 설정 (기존 평가가 있다면 불러오기)
-  const introduceId = applicationStore.introduceData?.id || null
-  
-  currentEvaluationData.value = {
-    totalScore: null,
-    comment: '',
-    applicantId: applicant.value?.id,
-    applicationId: applicationId,
-    introduceId: introduceId
-  }
-  
-  console.log('🔍 평가 모달 열기 - 전달할 데이터:', currentEvaluationData.value)
-  showEvaluationModal.value = true
-}
-
-const closeEvaluationModal = () => {
-  showEvaluationModal.value = false
-  currentEvaluationData.value = {}
-}
-
+// 평가 저장 함수
 const handleEvaluationSave = async (evaluationData) => {
   try {
     console.log('💾 평가 데이터 저장:', evaluationData)
     toast.success('평가가 저장되었습니다.')
-    closeEvaluationModal()
     
-    // 평가 완료 후 데이터 새로고침
-    await loadApplicationData()
+    // 평가 완료 후 데이터 새로고침 (필요시)
+    // await loadApplicationData()
   } catch (error) {
     console.error('❌ 평가 저장 실패:', error)
     toast.error('평가 저장에 실패했습니다.')

@@ -17,8 +17,48 @@ export const deleteIntroduceItemService = async (id) => {
 }
 
 export const createIntroduceRatingResult = async (payload) => {
-  // payload: { content, ratingScore, ... }
-  return api.post(IntroduceAPI.CREATE_RATING_RESULT, payload)
+  console.log('📤 자기소개서 평가 결과 저장 요청:', payload)
+  console.log('🔍 payload.introduceId 상세:', {
+    value: payload.introduceId,
+    type: typeof payload.introduceId,
+    isNull: payload.introduceId === null,
+    isUndefined: payload.introduceId === undefined
+  })
+  
+  // 백엔드가 기대하는 필드명으로 변환 (snake_case와 camelCase 모두 시도)
+  const requestData = {
+    content: payload.content,
+    ratingScore: payload.ratingScore,
+    rating_score: payload.ratingScore, // snake_case 버전
+    introduceId: payload.introduceId,
+    introduce_id: payload.introduceId, // snake_case 버전 (중요!)
+    introduceStandardId: payload.introduceStandardId || payload.standardId || null,
+    introduce_standard_id: payload.introduceStandardId || payload.standardId || null, // snake_case 버전
+    memberId: payload.memberId || 1,
+    member_id: payload.memberId || 1 // snake_case 버전
+  }
+  
+  console.log('📤 백엔드 전송 데이터:', requestData)
+  console.log('🔍 requestData.introduce_id 상세:', {
+    value: requestData.introduce_id,
+    type: typeof requestData.introduce_id,
+    isNull: requestData.introduce_id === null,
+    isUndefined: requestData.introduce_id === undefined
+  })
+  
+  if (!requestData.introduceId && !requestData.introduce_id) {
+    throw new Error('introduceId가 필요합니다. 자기소개서 정보를 확인해주세요.')
+  }
+  
+  try {
+    const response = await api.post(IntroduceAPI.CREATE_RATING_RESULT, requestData)
+    console.log('✅ 평가 결과 저장 성공:', response.data)
+    return response
+  } catch (error) {
+    console.error('❌ 평가 결과 저장 실패:', error)
+    console.error('❌ 에러 응답:', error.response?.data)
+    throw error
+  }
 }
 
 // ID로 자기소개서 조회

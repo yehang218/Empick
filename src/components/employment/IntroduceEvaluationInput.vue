@@ -157,6 +157,7 @@ const handleSave = async () => {
       applicantId: props.evaluationData?.applicantId,
       applicationId: props.evaluationData?.applicationId,
       introduceId: props.evaluationData?.introduceId,
+      introduceStandardId: selectedStandard.value?.id,
       standardId: selectedStandard.value?.id
     }
     

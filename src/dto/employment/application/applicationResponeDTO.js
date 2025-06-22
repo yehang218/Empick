@@ -12,16 +12,27 @@ export default class ApplicationResponseDTO {
     }
 
     static fromJSON(json) {
-        return new ApplicationResponseDTO (
-            json.id,
-            json.recruitmentId,
-            json.createdAt,
-            json.status,
-            json.applicantId,
-            json.introduceRatingResultId,
-            json.updatedAt,
-            json.updatedBy
-        );
+        // null 체크 추가
+        if (!json || typeof json !== 'object') {
+            console.warn('⚠️ ApplicationResponseDTO.fromJSON: json이 null이거나 유효하지 않습니다:', json);
+            return null;
+        }
+        
+        try {
+            return new ApplicationResponseDTO (
+                json.id || null,
+                json.recruitmentId || null,
+                json.createdAt || null,
+                json.status || null,
+                json.applicantId || null,
+                json.introduceRatingResultId || null,
+                json.updatedAt || null,
+                json.updatedBy || null
+            );
+        } catch (error) {
+            console.error('❌ ApplicationResponseDTO.fromJSON 변환 실패:', error, json);
+            return null;
+        }
     }
 
     toJSON() {
