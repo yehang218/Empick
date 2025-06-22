@@ -59,7 +59,7 @@ export const createApplicationJobtestService = async (
     options = {}
 ) => {
     return withErrorHandling(async () => {
-        const response = await api.post(JobtestAPI.APPLICATION_JOBTESTS, dto);
+        const response = await api.post(JobtestAPI.APPLICATION_JOBTESTS, dto.toJSON());
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
@@ -67,6 +67,20 @@ export const createApplicationJobtestService = async (
         return apiResponse.data;
     }, options);
 }
+
+// applicationJobtest 상세 정보 조회
+export const getApplicationJobtestDetailService = async (applicationJobtestId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(JobtestAPI.APPLICATION_JOBTEST_DETAIL(applicationJobtestId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+        
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        
+        return apiResponse.data;
+    }, options);
+};
 
 // 실무테스트 입장
 export const verifyJobtestEntryService = async (jobtestId, dto, options = {}) => {

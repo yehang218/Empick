@@ -1,9 +1,10 @@
 // 문제 요약 DTO
 export class JobtestQuestionSummaryDTO {
-    constructor(score, optionNumber, questionId, difficulty, content) {
+    constructor(score, optionNumber, questionId, type, difficulty, content) {
         this.score = score;
         this.optionNumber = optionNumber;
         this.questionId = questionId;
+        this.type = type;
         this.difficulty = difficulty;
         this.content = content;
     }
@@ -13,6 +14,7 @@ export class JobtestQuestionSummaryDTO {
             json.score,
             json.optionNumber,
             json.questionId,
+            json.type,
             json.difficulty,
             json.content
         );
@@ -23,6 +25,7 @@ export class JobtestQuestionSummaryDTO {
             score: this.score,
             optionNumber: this.optionNumber,
             questionId: this.questionId,
+            type: this.type,
             difficulty: this.difficulty
         };
     }

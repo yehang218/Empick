@@ -41,6 +41,16 @@ const routes = [
         component: () => import('@/views/career/ApplicantRegisterPage.vue'),
         meta: { requiresAuth: false, hideHeader: true, hideSidebar: true }
     },
+    {
+        path: '/access-denied',
+        name: 'Forbidden',
+        component: () => import('@/views/errors/ForbiddenPage.vue'),
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: () => import('@/views/errors/NotFoundPage.vue'),
+    },
     ...allRouteModules
 ];
 
