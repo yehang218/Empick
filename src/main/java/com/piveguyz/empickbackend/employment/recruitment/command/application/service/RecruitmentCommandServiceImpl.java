@@ -117,9 +117,12 @@ public class RecruitmentCommandServiceImpl implements RecruitmentCommandService 
 		Recruitment recruitment = recruitmentRepository.findById(id)
 			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_NOT_FOUND));
 
-		RecruitmentTemplate template = recruitmentTemplateRepository.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
-			.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
-
+		RecruitmentTemplate template = null;
+		if (dto.getRecruitmentTemplateId() != null) {
+			template = recruitmentTemplateRepository.findByIdAndIsDeletedFalse(dto.getRecruitmentTemplateId())
+				.orElseThrow(() -> new BusinessException(ResponseCode.EMPLOYMENT_TEMPLATE_ALREADY_DELETED));
+		}
+		
 		// 게시된 공고는 수정 불가
 		if (recruitment.getStatus() == RecruitmentStatus.PUBLISHED) {
 			throw new BusinessException(ResponseCode.EMPLOYMENT_RECRUITMENT_CANNOT_MODIFY_PUBLISHED);
