@@ -4,6 +4,7 @@ import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import ApplicantResponseDTO from '@/dto/employment/application/applicantResponseDTO';
 // import ApplicantCommandDTO from '@/dto/employment/employment/applicant/applicantCommandDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
+// import ApplicantFullInfoListDTO from '@/dto/employment/applicant/applicantFullInfoListDTO';
 // import axios from '@/apis/axios';
 
 const APPLICANT_API_BASE_URL = '/api/v1/employment/applicant';
@@ -24,7 +25,6 @@ export const getAllApplicantsService = async (options = {}) => {
 };
 
 export const getApplicantByIdService = async (id, options = {}) => {
-  console.log('getApplicantByIdService called with id:', id);
   return withErrorHandling(async () => {
     const response = await api.get(ApplicantAPI.GET_APPLICANT_BY_ID(id));
     const apiResponse = ApiResponseDTO.fromJSON(response.data);

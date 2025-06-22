@@ -20,6 +20,9 @@ export const createInterviewService = async (dto, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
+        if(!apiResponse.data){
+            console.log('⚠️createInterviewService apiRespon.data 데이터 없음')
+        }
         return InterviewResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
@@ -32,6 +35,10 @@ export const updateInterviewService = async (id, dto, options = {}) => {
 
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        if(!apiResponse.data){
+            console.log('⚠️updateInterviewService apiResponse.data 데이터 없음')
         }
 
         return InterviewResponseDTO.fromJSON(apiResponse.data);
@@ -48,6 +55,10 @@ export const updateInterviewDatetimeService = async (id, datetime, options = {})
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
+        if(!apiResponse.data){
+            console.log('⚠️updateInterviewDatetimeService apiRespon.data 데이터 없음')
+        }
+
         return InterviewResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
@@ -62,6 +73,10 @@ export const updateInterviewAddressService = async (id, address, options = {}) =
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
+        if(!apiResponse.data){
+            console.log('⚠️updateInterviewAddressService apiRespon.data 데이터 없음')
+        }
+
         return InterviewResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
@@ -74,6 +89,10 @@ export const deleteInterviewService = async (id, options = {}) => {
 
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        if(!apiResponse.data){
+            console.log('⚠️deleteInterviewService apiRespon.data 데이터 없음')
         }
 
         return InterviewResponseDTO.fromJSON(apiResponse.data);
@@ -95,6 +114,10 @@ export const getAllInterviewsService = async (options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
+        if(!apiResponse.data){
+            console.log('⚠️getAllinterviewsService apiRespon.data 데이터 없음')
+        }
+
         return apiResponse.data.map(item => InterviewResponseDTO.fromJSON(item));
     }, options);
 };
@@ -107,6 +130,10 @@ export const getInterviewByIdService = async (id, options = {}) => {
 
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        if(!apiResponse.data){
+            console.log('!error : getInterviewByIdService')
         }
 
         return InterviewResponseDTO.fromJSON(apiResponse.data);
@@ -123,6 +150,10 @@ export const getInterviewByApplicationIdService = async (applicationId, options 
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
+        if(!apiResponse.data){
+            console.log('⚠️getInterviewByApplicationIdService apiRespon.data 데이터 없음')
+        }
+
         return InterviewResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
@@ -137,6 +168,10 @@ export const getInterviewsByDateService = async (date, options = {}) => {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
+        if(!apiResponse.data){
+            console.log('⚠️getInterviewsByDateService apiRespon.data 데이터 없음')
+        }
+
         return apiResponse.data.map(item => InterviewResponseDTO.fromJSON(item));
     }, options);
 };
@@ -149,6 +184,10 @@ export const checkAvailableDatetimeService = async (datetime, options = {}) => {
 
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        if(!apiResponse.data){
+            console.log('⚠️checkAvailableDatetimeService apiRespon.data 데이터 없음')
         }
 
         return apiResponse.data; // Boolean (true or false)

@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia'
-import MemberSignUpRequestDTO from '@/dto/member/memberSignUpRequestDTO'
 import MailRequestDTO from '@/dto/employment/mail/mailRequestDTO'
-import { useMemberStore } from '@/stores/memberStore'
 import { useFileStore } from '@/stores/fileStore'
 import { useMailStore } from '@/stores/mailStore'
+import { registerMemberService } from '@/services/memberService'
 
 export const useMemberRegisterStore = defineStore('memberRegister', {
     state: () => ({
@@ -30,6 +29,9 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
         employeeNumber: '',
         profileImageFile: null,
         profileImageUrl: '',
+        loading: false,
+        registerError: null,
+        registerResult: null,
     }),
     getters: {
         isFormValid(state) {
@@ -81,6 +83,62 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
             this.employeeNumber = ''
             this.profileImageFile = null
             this.profileImageUrl = ''
+            this.loading = false
+            this.registerError = null
+            this.registerResult = null
+        },
+
+        // 📝 사원 등록 (프로필 이미지 포함)
+        async registerMember(memberData, profileImage) {
+            console.log('📝 사원 등록 시작:', { memberData, profileImageName: profileImage?.name });
+
+            this.loading = true;
+            this.registerError = null;
+            this.registerResult = null;
+
+            try {
+                // 입력 데이터 검증
+                if (!memberData) {
+                    throw new Error('사원 정보가 필요합니다.');
+                }
+
+                if (!profileImage) {
+                    throw new Error('프로필 이미지는 필수입니다.');
+                }
+
+                // 파일 타입 검증
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+                if (!allowedTypes.includes(profileImage.type)) {
+                    throw new Error('JPG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.');
+                }
+
+                // 파일 크기 검증 (5MB 이하)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (profileImage.size > maxSize) {
+                    throw new Error('프로필 이미지는 5MB 이하만 업로드 가능합니다.');
+                }
+
+                console.log('✅ 입력 검증 완료');
+
+                // 서비스 호출 (DTO 처리는 Service에서 수행)
+                const result = await registerMemberService(memberData, profileImage);
+
+                this.registerResult = result;
+
+                // 등록 후 캐시 무효화
+                // this.invalidateMembersCache();
+
+                console.log('✅ 사원 등록 성공:', result);
+                return result;
+
+            } catch (err) {
+                console.error('❌ 사원 등록 실패:', err);
+                this.registerError = err.message || '사원 등록 중 오류가 발생했습니다.';
+                throw err;
+            } finally {
+                this.loading = false;
+                console.log('📝 사원 등록 프로세스 완료');
+            }
         },
 
         async sendWelcomeEmail(employeeNumber, name, email) {
@@ -124,75 +182,5 @@ export const useMemberRegisterStore = defineStore('memberRegister', {
                 return { success: false, error: e?.message || '프로필 이미지 업로드에 실패했습니다.' }
             }
         },
-
-        async registerMemberWithImage() {
-            const requiredFields = [
-                'name', 'phone', 'email', 'address'
-            ]
-            const fieldLabels = {
-                name: '이름',
-                phone: '연락처',
-                pictureUrl: '프로필 이미지',
-                email: '이메일',
-                address: '주소',
-            }
-
-            // 기본 필수 필드 검증
-            const missing = requiredFields.filter(key => !this.form[key] || this.form[key].toString().trim() === '')
-
-            // 프로필 이미지 검증: pictureUrl이 없고 profileImageFile도 없으면 오류
-            if (!this.form.pictureUrl && !this.profileImageFile) {
-                missing.push('pictureUrl')
-            }
-
-            if (missing.length > 0) {
-                throw new Error('다음 항목을 입력해 주세요: ' + missing.map(key => fieldLabels[key] || key).join(', '))
-            }
-
-            const body = new MemberSignUpRequestDTO({
-                ...this.form,
-                hireAt: this.form.hireAt ? new Date(this.form.hireAt).toISOString() : '',
-                birth: this.form.birth,
-            })
-
-            const memberStore = useMemberStore()
-            let registerResult = null
-
-            try {
-                // 1. 사원 등록
-                registerResult = await memberStore.registerMember(body)
-                if (!registerResult?.success) throw new Error('사원 등록에 실패했습니다.')
-
-                // 백엔드에서 생성된 사번 저장
-                if (!registerResult.data?.employeeNumber) {
-                    throw new Error('사번이 생성되지 않았습니다.')
-                }
-                this.employeeNumber = registerResult.data.employeeNumber
-                this.form.pictureUrl = `profiles/${this.employeeNumber}.png`
-
-                // 2. 프로필 이미지 업로드 (실패해도 계속 진행)
-                if (this.profileImageFile) {
-                    const uploadResult = await this.uploadProfileImage(this.employeeNumber)
-                    if (!uploadResult?.success && uploadResult?.error) {
-                        console.log(uploadResult.error)
-                    }
-                }
-
-                // 3. 이메일 발송 (비동기)
-                this.sendWelcomeEmail(this.employeeNumber, this.form.name, this.form.email)
-                    .then(result => {
-                        if (!result?.success && result?.error) {
-                            console.error(result.error)
-                        }
-                    })
-
-                // 4. 성공 메시지 (한 번만!)
-                this.resetForm()
-                return true
-            } catch (err) {
-                console.error(err)
-                throw err
-            }
-        }
     }
 }) 

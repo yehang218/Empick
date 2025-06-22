@@ -14,11 +14,23 @@ export const approvalRoutes = [
             }
         }
     },
+
     // 받은 결재 목록 페이지 (인사팀, 팀장급만)
     {
         path: '/approval/inbox',
         name: 'ApprovalInboxList',
         component: () => import('@/views/approval/ApprovalInboxPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS', 'ROLE_APPROVAL_PROCESSOR']
+        }
+    },
+    // 요청받은 결재문서 상세 조회 페이지
+    {
+        path: '/approval/inbox/:id',
+        name: 'ApprovalReceivedDetail',
+        component: () => import('@/views/approval/ApprovalReceivedDetailPage.vue'),
+        props: true,
         meta: {
             requiresAuth: true,
             requiredRoles: ['ROLE_HR_ACCESS', 'ROLE_APPROVAL_PROCESSOR']
@@ -36,6 +48,18 @@ export const approvalRoutes = [
         }
     },
 
+    // 요청한 결재문서 상세 조회 페이지
+    {
+        path: '/approval/sent/:id',
+        name: 'ApprovalRequestedDetail',
+        component: () => import('@/views/approval/ApprovaRequestedDetailPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_USER', 'ROLE_HR_ACCESS', 'ROLE_APPROVAL_PROCESSOR']
+        }
+    },
+
     // 결재 문서 작성 페이지
     {
         path: '/approval/create',
@@ -47,16 +71,5 @@ export const approvalRoutes = [
         }
     },
 
-    // 결재 상세 조회 페이지
-    {
-        path: '/approval/:id',
-        name: 'ApprovalDetail',
-        component: () => import('@/views/approval/ApprovalDetailPage.vue'),
-        props: true,
-        meta: {
-            requiresAuth: true,
-            requiredRoles: ['ROLE_USER', 'ROLE_HR_ACCESS', 'ROLE_APPROVAL_PROCESSOR']
-        }
-    }
 
 ];

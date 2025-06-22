@@ -9,7 +9,11 @@ export default class InterviewScoreResponseDTO {
     }
 
     static fromJSON(json) {
-        return new InterviewScoreResponseDTO (
+        if (!json) {
+            console.warn('⚠️ InterviewScoreResponseDTO.fromJSON에 null/undefined가 들어왔습니다');
+            return null;
+        }
+        return new InterviewScoreResponseDTO(
             json.id,
             json.interviewerId,
             json.criteriaId,

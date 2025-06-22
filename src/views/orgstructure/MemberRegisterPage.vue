@@ -73,6 +73,12 @@
         <!-- 확인 모달 -->
         <AlertModal v-if="showConfirmDialog" message="입력하신 내용이 모두 삭제됩니다. 정말로 나가시겠습니까?" @confirm="confirmLeave"
             @cancel="cancelLeave" />
+
+        <!-- 로딩 오버레이 (일괄 등록 중이 아닐 때만 표시) -->
+        <CircleLoading :visible="regStore.loading && !isBulkRegistering" :message="loadingMessage"
+            :sub-message="loadingSubMessage" color="#2196F3" :size="90" :width="4" />
+
+
     </v-container>
 </template>
 
@@ -88,6 +94,7 @@ import { useFileUpload } from '@/composables/useFileUpload'
 import AlertModal from '@/components/common/AlertModal.vue'
 import PageHeader from '@/components/common/PageHeader.vue'
 import RegistrationAlert from '@/components/common/RegistrationAlert.vue'
+import CircleLoading from '@/components/common/CircleLoading.vue'
 import ApplicantInfoCard from '@/components/orgstructure/ApplicantInfoCard.vue'
 import MemberRegistrationForm from '@/components/orgstructure/MemberRegistrationForm.vue'
 import ApplicantNavigation from '@/components/orgstructure/ApplicantNavigation.vue'
@@ -102,6 +109,11 @@ const router = useRouter()
 const route = useRoute()
 const showConfirmDialog = ref(false)
 const pendingNavigation = ref(null)
+
+// 로딩 상태용 메시지
+const loadingMessage = ref('')
+const loadingSubMessage = ref('')
+const isBulkRegistering = ref(false) // 일괄 등록 중인지 확인하는 플래그
 
 // Composables 사용
 const {
@@ -169,6 +181,11 @@ const restoreFormData = (applicant) => {
         // 이미지 정보 복원
         regStore.profileImageFile = savedData.profileImageFile
         regStore.profileImageUrl = savedData.profileImageUrl
+        console.log('📷 이미지 상태 복원:', {
+            hasFile: !!savedData.profileImageFile,
+            fileName: savedData.profileImageFile?.name,
+            hasUrl: !!savedData.profileImageUrl
+        })
 
         // pictureUrl 설정: 이미지 파일이 있으면 임시 경로, 없으면 빈 문자열
         if (savedData.profileImageFile) {
@@ -179,9 +196,12 @@ const restoreFormData = (applicant) => {
             console.log('📷 저장된 이미지 없음')
         }
     } else {
-        // 저장된 데이터가 없으면 기본값으로 로드
+        // 저장된 데이터가 없으면 기본값으로 로드 + 이미지 상태 초기화
         console.log('📝 기본 데이터로 폼 로드:', applicant.name)
         loadApplicantToForm(applicant)
+        // 이미지 상태 명시적 초기화
+        regStore.clearProfileImage()
+        console.log('📷 이미지 상태 초기화됨')
     }
 }
 
@@ -269,6 +289,9 @@ const onBulkRegister = async () => {
         return
     }
 
+    // 일괄 등록 모드 활성화 (로딩 UI 비활성화)
+    isBulkRegistering.value = true
+
     // 현재 폼 데이터 저장
     saveCurrentFormData(getCurrentFormData())
 
@@ -285,6 +308,8 @@ const onBulkRegister = async () => {
 
         try {
             console.log(`📝 등록 중 (${i + 1}/${selectedForRegistration.value.length}):`, applicant.name)
+
+
 
             // 진행 상황 업데이트: 처리 시작
             setRegistrationProgress(applicant.applicantId, 'processing', 10, '등록 준비 중...')
@@ -318,13 +343,15 @@ const onBulkRegister = async () => {
                 console.log('📝 기본 데이터로 등록:', applicant.name)
                 // 기본 지원자 데이터로 폼 설정
                 loadApplicantToForm(applicant)
+                // 이미지 상태 명시적 초기화
+                regStore.clearProfileImage()
             }
 
             // 진행 상황 업데이트: 사원 등록 중
             setRegistrationProgress(applicant.applicantId, 'processing', 50, '사원 등록 중...')
 
             // 사원 등록 실행
-            const result = await regStore.registerMemberWithImage()
+            const result = await regStore.registerMember(regStore.form, regStore.profileImageFile)
 
             if (result) {
                 successCount++
@@ -372,6 +399,11 @@ const onBulkRegister = async () => {
         toast.error(`모든 등록이 실패했습니다.\n실패: ${failedApplicants.join(', ')}`)
     }
 
+    // 일괄 등록 완료 후 정리
+    isBulkRegistering.value = false
+    loadingMessage.value = ''
+    loadingSubMessage.value = ''
+
     // 성공한 경우 지원자 목록으로 이동
     if (successCount > 0) {
         // 3초 후 자동 이동 (사용자가 결과를 확인할 수 있도록)
@@ -385,17 +417,21 @@ const onProfileImageChange = (event) => {
     handleImageUpload(
         event,
         (file) => {
+            console.log('📷 프로필 이미지 설정:', currentApplicant.value?.name, file.name)
             regStore.setProfileImage(file)
             // 현재 지원자의 이미지 정보를 즉시 저장
             if (currentApplicant.value) {
                 saveCurrentFormData(getCurrentFormData())
+                console.log('💾 이미지 설정 후 폼 데이터 저장됨')
             }
         },
         () => {
+            console.log('📷 프로필 이미지 제거:', currentApplicant.value?.name)
             regStore.clearProfileImage()
             // 현재 지원자의 이미지 정보를 즉시 저장
             if (currentApplicant.value) {
                 saveCurrentFormData(getCurrentFormData())
+                console.log('💾 이미지 제거 후 폼 데이터 저장됨')
             }
         }
     )
@@ -405,10 +441,15 @@ const onProfileImageChange = (event) => {
 
 const onRegister = async () => {
     try {
+        // 로딩 메시지 설정
+        const currentName = currentApplicant.value?.name || '지원자'
+        loadingMessage.value = '사원 등록 중...'
+        loadingSubMessage.value = `${currentName}님의 정보를 등록하고 있습니다.`
+
         // 현재 폼 데이터 저장
         saveCurrentFormData(getCurrentFormData())
 
-        const result = await regStore.registerMemberWithImage()
+        const result = await regStore.registerMember(regStore.form, regStore.profileImageFile)
         if (result) {
             const currentName = currentApplicant.value?.name || '지원자'
             toast.success(`${currentName}의 사원 등록이 완료되었습니다!`)
@@ -421,7 +462,7 @@ const onRegister = async () => {
             // 다중 선택 시 다음 지원자로 이동
             if (selectedApplicants.value.length > 1 && currentApplicantIndex.value < selectedApplicants.value.length - 1) {
                 handleNextApplicant()
-                regStore.resetForm() // 폼 초기화 후 다음 지원자 데이터 로드
+                regStore.resetForm() // 폼 초기화 (이미지 상태 포함)
                 restoreFormData(currentApplicant.value)
             } else {
                 // 모든 지원자 등록 완료 또는 단일 선택 시
@@ -434,6 +475,10 @@ const onRegister = async () => {
         }
     } catch (error) {
         toast.error(error.message || '사원 등록에 실패했습니다.')
+    } finally {
+        // 로딩 메시지 초기화
+        loadingMessage.value = ''
+        loadingSubMessage.value = ''
     }
 }
 
@@ -466,6 +511,8 @@ const cancelLeave = () => {
         pendingNavigation.value = null
     }
 }
+
+
 </script>
 
 <style scoped>

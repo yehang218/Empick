@@ -78,7 +78,7 @@ export const verifyJobtestEntryService = async (jobtestId, dto, options = {}) =>
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.message;
+        return apiResponse.data;
     }, options);
 };
 

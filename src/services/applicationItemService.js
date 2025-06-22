@@ -1,6 +1,7 @@
 import api from '@/apis/apiClient';
 import { API } from '@/apis/routes';
 import ApplicationItemCategoryDTO from '@/dto/employment/recruitment/applicationItemCategoryDTO';
+import ApplicationItemDTO from '@/dto/employment/recruitment/applicationItemDTO';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 
@@ -28,6 +29,6 @@ export const fetchApplicationItemsByRecruitment = async (recruitmentId, options 
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
-        return apiResponse.data.map(item => ApplicationItemCategoryDTO.fromJSON(item));
+        return apiResponse.data.map(item => ApplicationItemDTO.fromJSON(item));
     }, options);
 };

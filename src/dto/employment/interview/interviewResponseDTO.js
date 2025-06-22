@@ -10,7 +10,11 @@ export default class InterviewResponseDTO {
     }
 
     static fromJSON(json) {
-        return new InterviewResponseDTO (
+        if (!json) {
+            console.warn('⚠️InterviewResponseDTO.fromJSON');
+            return null;
+        }
+        return new InterviewResponseDTO(
             json.id,
             json.applicationId,
             json.sheetId,

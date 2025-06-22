@@ -17,7 +17,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(app, index) in applications" :key="app.applicationId">
+                <tr v-for="(app, index) in applications" :key="app.applicationJobtestId" @click="$emit('select', app.applicationJobtestId)">
                     <td>{{ index + 1 }}</td>
                     <td>{{ app.applicantName }}</td>
                     <td>{{ app.recruitmentTitle }}</td>

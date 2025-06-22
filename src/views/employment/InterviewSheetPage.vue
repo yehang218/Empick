@@ -1,50 +1,62 @@
 <template>
-    <v-container fluid class="pa-5" style="height: 100vh; display: flex; flex-direction: column;">
+    <v-container fluid class="pa-5 grass-bg" style="min-height: 100vh;">
         <!-- 헤더 -->
-        <v-row align="center" class="mb-4" style="height: 64px; flex-shrink: 0;">
-            <v-col cols="6">
-                <h2>면접 평가표</h2>
+        <v-row align="center" class="mb-4">
+            <v-col cols="12" md="6">
+                <h2 class="font-weight-bold grass-title">
+                    <v-icon left color="grass-green">mdi-clipboard-list-outline</v-icon>
+                    면접 평가표
+                </h2>
             </v-col>
-            <v-col cols="6" class="d-flex justify-end">
-                <div>
-                    <v-btn color="primary" class="mr-2" size="small" @click="goToCreatePage">+ 평가표 추가</v-btn>
-                    <!-- <v-btn color="secondary" class="mr-2" size="small" @click="goToEditPage">✏️ 평가표 수정</v-btn> -->
-                    <v-btn color="error" size="small" @click="openDeleteModal">🗑 평가표 삭제</v-btn>
-                </div>
+            <v-col cols="12" md="6" class="d-flex justify-end align-center">
+                <v-btn class="grass-btn mr-2" size="small" @click="goToCreatePage" elevation="2">
+                    <v-icon left>mdi-plus</v-icon> 평가표 추가
+                </v-btn>
+                <v-btn class="grass-btn grass-btn--danger" size="small" @click="openDeleteModal" elevation="2">
+                    <v-icon left>mdi-trash-can-outline</v-icon> 평가표 삭제
+                </v-btn>
             </v-col>
         </v-row>
 
         <!-- 평가표/기준 목록 -->
-        <v-row no-gutters style="height: 40%; flex-shrink: 0; margin-bottom: 16px;">
-            <v-col cols="6" class="d-flex">
-                <div class="pa-4 flex-grow-1 w-100" style="height: 70%;">
-                    <OneColumnList title="평가표" :items="sheets.map(item => item.name)"
-                        @update:selectedItem="onSelectSheet" />
-                </div>
+        <v-row no-gutters class="mb-4">
+            <v-col cols="12" md="6" class="d-flex">
+                <v-card class="pa-4 flex-grow-1 w-100 mr-2 grass-card" elevation="2" rounded="xl">
+                    <OneColumnList
+                        title="평가표"
+                        :items="sheets.map(item => item.name)"
+                        @update:selectedItem="onSelectSheet"
+                    />
+                </v-card>
             </v-col>
-            <v-col cols="6" class="d-flex">
-                <div class="pa-4 flex-grow-1 w-100" style="height: 70%;">
-                    <OneColumnList title="평가 기준"
+            <v-col cols="12" md="6" class="d-flex">
+                <v-card class="pa-4 flex-grow-1 w-100 ml-2 grass-card" elevation="2" rounded="xl">
+                    <OneColumnList
+                        title="평가 기준"
                         :items="criteriaList.map(item => `${item.title} (${Math.round(item.weight * 100)}%)`)"
-                        @update:selectedItem="onSelectItemByTitle" />
-                </div>
-            </v-col>
-        </v-row>
-
-
-        <!-- 상세 내용 -->
-        <v-row style="height: 50%; flex-shrink: 0;">
-            <v-col cols="12" class="d-flex">
-                <v-card outlined class="pa-4 flex-grow-1 w-100" style="height: 90%; overflow-y: auto;">
-                    <div class="text-subtitle-1 font-weight-bold mb-2">상세 내용</div>
-                    <div>{{ selectedCriteria?.content || '선택된 항목이 없습니다.' }}</div>
+                        @update:selectedItem="onSelectItemByTitle"
+                    />
                 </v-card>
             </v-col>
         </v-row>
 
-    </v-container>
+        <!-- 상세 내용 -->
+        <v-row>
+            <v-col cols="12">
+                <v-card outlined class="pa-6 grass-card" elevation="1" rounded="xl" style="min-height: 180px;">
+                    <div class="d-flex align-center mb-2">
+                        <v-icon color="grass-green" class="mr-2">mdi-information-outline</v-icon>
+                        <span class="text-h6 font-weight-bold grass-title">상세 내용</span>
+                    </div>
+                    <div class="text-body-1" style="min-height: 60px;">
+                        {{ selectedCriteria?.content || '선택된 항목이 없습니다.' }}
+                    </div>
+                </v-card>
+            </v-col>
+        </v-row>
 
-    <Modal v-if="showDeleteModal" message="정말 삭제하시겠습니까?" @confirm="confirmDelete" @cancel="closeDeleteModal" />
+        <Modal v-if="showDeleteModal" message="정말 삭제하시겠습니까?" @confirm="confirmDelete" @cancel="closeDeleteModal" />
+    </v-container>
 </template>
 
 <script setup>
@@ -113,5 +125,39 @@ const confirmDelete = async () => {
     }
 }
 
-
 </script>
+
+<style scoped>
+.grass-bg {
+    background: #e8f5e9;
+}
+.grass-title {
+    color: #204d28;
+    font-family: 'Spoqa Han Sans Neo', 'sans-serif';
+    letter-spacing: -1px;
+}
+.grass-card {
+    background: #f1f8f4;
+    border-radius: 24px !important;
+    border: 1.5px solid #81c784;
+}
+.grass-btn {
+    background: #388e3c !important;
+    color: #fff !important;
+    border-radius: 20px !important;
+    font-weight: bold;
+    font-family: 'Spoqa Han Sans Neo', 'sans-serif';
+    transition: box-shadow 0.2s;
+}
+.grass-btn:hover {
+    box-shadow: 0 2px 8px #388e3c55;
+}
+.grass-btn--danger {
+    background: #204d28 !important;
+    color: #fff !important;
+}
+/* Vuetify 커스텀 컬러 */
+.v-icon[color="grass-green"] {
+    color: #388e3c !important;
+}
+</style>

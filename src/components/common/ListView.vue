@@ -12,7 +12,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in pagedData" :key="index" @click="$emit('item-click', item)"
+                <tr v-for="(item, index) in pagedData" :key="index" @click="$emit('row-click', item)"
                     style="cursor: pointer;">
                     <td v-if="showCheckbox" @click.stop>
                         <v-btn size="small" icon :color="item.selected ? 'primary' : 'grey-lighten-1'" variant="tonal"
@@ -94,7 +94,7 @@ const props = defineProps({
         default: true
     }
 });
-const emit = defineEmits(['update:page', 'item-click', 'toggle-select']);
+const emit = defineEmits(['update:page', 'row-click', 'toggle-select']);
 
 const pageProxy = ref(props.page);
 watch(() => props.page, val => { pageProxy.value = val; });
