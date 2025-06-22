@@ -36,14 +36,6 @@
           <h3 class="section-title">자기소개서</h3>
 
           <template v-if="template">
-            <v-text-field
-              label="자기소개서 제목"
-              :model-value="template.title"
-              variant="outlined"
-              density="compact"
-              class="mb-4"
-              readonly
-            />
             <div v-if="templateItems.length > 0">
               <v-textarea
                 v-for="item in templateItems"
