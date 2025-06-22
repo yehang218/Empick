@@ -156,7 +156,6 @@ export const employmentRoutes = [
         }
     },
 
-
     // 채용 공고 목록 페이지
     {
         path: '/employment/recruitments',
@@ -199,8 +198,7 @@ export const employmentRoutes = [
         }
     },
 
-    // <---------- 면         접 ---------->
-
+    // <---------- 면접 ---------->
     {
         path: '/employment/interview-criteria',
         name: 'InterviewSheetPage',
@@ -266,7 +264,7 @@ export const employmentRoutes = [
             requiredRoles: ['ROLE_HR_ACCESS']
         }
     },
-    // 지원서 상세 조회 페이지 (기존 ApplicationPage를 상세 페이지로 사용)
+    // 지원서 상세 조회 페이지
     {
         path: '/employment/applications/:applicationId',
         name: 'ApplicationDetail',
@@ -277,24 +275,17 @@ export const employmentRoutes = [
             requiredRoles: ['ROLE_HR_ACCESS']
         }
     },
-
     // 채용공고별 지원자 목록 페이지
     {
         path: '/employment/applicant/recruitments/:recruitmentId',
         name: 'ApplicantRecruitmentPage',
         component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
-
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
     },
-
-    // 채용공고별 지원자 목록 페이지
-    {
-        path: '/employment/applicant/recruitments/:recruitmentId',
-        name: 'ApplicantRecruitmentPage',
-        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
-
-    },
-
-    // 지원자 인적사항 등록 페이지
+    // 지원자 인적사항 등록 페이지 (지원자용)
     {
         path: '/applicants/register',
         name: 'ApplicantRegistrationPage',
@@ -303,50 +294,10 @@ export const employmentRoutes = [
             requiresAuth: true
         }
     },
-    // 자기소개서 템플릿
-    {
-        path: '/employment/introduce-standard-items/:templateId',
-        name: 'IntroduceStandardItemPage',
-        component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
-        props: true
-    },
-
-    {
-        path: '/employment/introduce-templates',
-        name: 'IntroduceTemplateListPage',
-        component: () => import('@/views/employment/IntroduceTemplateListPage.vue')
-    },
-    {
-        path: '/employment/introduce-templates/create',
-        name: 'IntroduceTemplateCreatePage',
-        component: () => import('@/views/employment/IntroduceTemplateCreatePage.vue')
-    },
-    {
-        path: '/employment/introduce-templates/:id',
-        name: 'IntroduceTemplateDetailPage',
-        component: () => import('@/views/employment/IntroduceTemplateDetailPage.vue')
-    },
-    {
-        path: '/employment/introduce-items/manage',
-        name: 'IntroduceStandardItemManagePage',
-        component: () => import('@/views/employment/IntroduceStandardItemManagePage.vue')
-    },
-
-
-    // 채용공고별 지원자 목록 페이지
-    {
-        path: '/employment/applicant/recruitments/:recruitmentId',
-        name: 'ApplicantRecruitmentPage',
-        component: () => import('@/views/employment/ApplicantRecruitmentPage.vue'),
-        meta: {
-            requiresAuth: true,
-            requiredRoles: ['ROLE_HR_ACCESS']
-        }
-    },
-    // 지원자 인적사항 등록 페이지
+    // 지원자 인적사항 등록 페이지 (HR용)
     {
         path: '/employment/applicants/register',
-        name: 'ApplicantRegistrationPage',
+        name: 'ApplicantRegistrationPageHR',
         component: () => import('@/views/employment/ApplicantRegistrationPage.vue'),
         meta: {
             requiresAuth: true,
@@ -354,43 +305,7 @@ export const employmentRoutes = [
         }
     },
 
-    {
-        path: '/employment/introduce-standard-items/:templateId',
-        name: 'IntroduceStandardItemPage',
-        component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
-        props: true,
-        meta: {
-            requiresAuth: true,
-            requiredRoles: ['ROLE_HR_ACCESS']
-        }
-    },
-    {
-        path: '/employment/introduce-templates',
-        name: 'IntroduceTemplateListPage',
-        component: () => import('@/views/employment/IntroduceTemplateListPage.vue'),
-        meta: {
-            requiresAuth: true,
-            requiredRoles: ['ROLE_HR_ACCESS']
-        }
-    },
-
-    {
-        path: '/employment/introduce-templates/create',
-        name: 'IntroduceTemplateCreatePage',
-        component: () => import('@/views/employment/IntroduceTemplateCreatePage.vue'),
-        meta: {
-            requiresAuth: true,
-            requiredRoles: ['ROLE_HR_ACCESS']
-        }
-    },
-    // 자기소개서
-    {
-        path: '/employment/introduce-standard-items/:templateId',
-        name: 'IntroduceStandardItemPage',
-        component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
-            props: true
-        },
-
+    // <---------- 자기소개서 템플릿 ---------->
     {
         path: '/employment/introduce-templates',
         name: 'IntroduceTemplateListPage',
@@ -418,10 +333,22 @@ export const employmentRoutes = [
             requiredRoles: ['ROLE_HR_ACCESS']
         }
     },
+    // 자기소개서 템플릿 항목 관리 페이지
     {
-        path: '/employment/introduce-standard-items/manage',
-        name: 'IntroduceStandardItemCreatePage',
-        component: () => import('@/views/employment/IntroduceStandardItemCreatePage.vue'),
+        path: '/employment/introduce-items/manage',
+        name: 'IntroduceTemplateItemManagePage',
+        component: () => import('@/views/employment/IntroduceTemplateItemManagePage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+
+    // <---------- 자기소개서 기준표 ---------->
+    {
+        path: '/employment/introduce-standard/list',
+        name: 'IntroduceStandardListPage',
+        component: () => import('@/views/employment/IntroduceStandardListPage.vue'),
         meta: {
             requiresAuth: true,
             requiredRoles: ['ROLE_HR_ACCESS']
@@ -437,28 +364,34 @@ export const employmentRoutes = [
         }
     },
     {
-        path: '/employment/introduce-standard/list',
-        name: 'IntroduceStandardListPage',
-        component: () => import('@/views/employment/IntroduceStandardListPage.vue'),
-        meta: {
-            requiresAuth: true,
-            requiredRoles: ['ROLE_HR_ACCESS']
-        }
-    },
-    {
-        path: '/employment/introduce-items/manage',
-        name: 'IntroduceTemplateItemManagePage',
-        component: () => import('@/views/employment/IntroduceTemplateItemManagePage.vue'),
-        meta: {
-            requiresAuth: true,
-            requiredRoles: ['ROLE_HR_ACCESS']
-        }
-    },
-    {
         path: '/employment/introduce-standard/:id',
         name: 'IntroduceStandardDetail',
         component: () => import('@/views/employment/IntroduceStandardDetailPage.vue'),
-        meta: { requiresAuth: true }
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+    // 자기소개서 기준표 항목 페이지
+    {
+        path: '/employment/introduce-standard-items/:templateId',
+        name: 'IntroduceStandardItemPage',
+        component: () => import('@/views/employment/IntroduceStandardItemPage.vue'),
+        props: true,
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+    // 자기소개서 기준표 항목 관리 페이지
+    {
+        path: '/employment/introduce-standard-items/manage',
+        name: 'IntroduceStandardItemManagePage',
+        component: () => import('@/views/employment/IntroduceStandardItemManagePage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
     }
 
 ];
