@@ -1,5 +1,6 @@
 import api from '@/apis/apiClient'
 import { IntroduceAPI } from '@/apis/routes/introduce'
+import ApiResponseDTO from '@/dto/common/apiResponseDTO'
 
 export const fetchIntroduceItemsService = async (templateId) => {
   const res = await api.get(`${IntroduceAPI.GET_ALL_TEMPLATES}/${templateId}/items`)
@@ -58,18 +59,21 @@ export const getAllIntroduceService = async () => {
 
 // applicationId로 자기소개서 조회
 export const getIntroduceByApplicationIdService = async (applicationId) => {
-  // 전체 조회 후 applicationId로 필터링
-  const allRes = await api.get(IntroduceAPI.GET_ALL_INTRODUCE)
-  const allIntroduces = allRes.data?.data || allRes.data || []
-  
-  console.log('📋 전체 자기소개서 목록:', allIntroduces)
-  
-  // applicationId로 필터링
-  const targetIntroduce = allIntroduces.find(item => 
-    item.applicationId == applicationId
-  )
-  
-  return targetIntroduce || null
+  try {
+    console.log('🔍 새로운 API로 자기소개서 조회:', applicationId)
+    const response = await api.get(IntroduceAPI.GET_INTRODUCE_BY_APPLICATION_ID(applicationId))
+    const apiResponse = ApiResponseDTO.fromJSON(response.data)
+    
+    if (!apiResponse.success) {
+      throw new Error(apiResponse.message || '자기소개서 조회 실패')
+    }
+    
+    console.log('✅ 새로운 API로 자기소개서 조회 성공:', apiResponse.data)
+    return apiResponse.data
+  } catch (error) {
+    console.error('❌ 새로운 API 자기소개서 조회 실패:', error)
+    throw error
+  }
 }
 
 // 자기소개서 업데이트
@@ -117,66 +121,85 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
   try {
     console.log('🔍 applicationId로 자기소개서 조회:', applicationId)
     
-    // 1. introduce 테이블에서 applicationId로 자기소개서 조회
-    const introduceRes = await api.get(`${IntroduceAPI.GET_ALL_INTRODUCE}`)
-    const allIntroduces = introduceRes.data?.data || introduceRes.data || []
-    
-    // 🔍 디버깅: 전체 자기소개서 데이터 구조 확인
-    console.log('📊 전체 자기소개서 데이터:', allIntroduces)
-    console.log('🔍 찾고 있는 applicationId:', applicationId, '(타입:', typeof applicationId, ')')
-    
-    // 각 자기소개서의 applicationId 확인
-    allIntroduces.forEach((item, index) => {
-      console.log(`📋 자기소개서 ${index + 1}:`, {
-        id: item.id,
-        applicationId: item.applicationId,
-        application_id: item.application_id,
-        applicantId: item.applicantId,
-        applicant_id: item.applicant_id,
-        introduceTemplateId: item.introduceTemplateId,
-        introduce_template_id: item.introduce_template_id,
-        content: item.content?.substring(0, 50) + '...',
-        전체_데이터: item
-      })
-    })
-    
-    const introduce = allIntroduces.find(item => {
-      // application_id (snake_case) 우선으로 매칭 시도
-      const match = item.application_id == applicationId || 
-                   item.applicationId == applicationId ||
-                   String(item.application_id) === String(applicationId) ||
-                   String(item.applicationId) === String(applicationId)
+    // 1. 새로운 API를 사용해서 applicationId로 직접 자기소개서 조회
+    let introduce = null
+    try {
+      const introduceRes = await api.get(IntroduceAPI.GET_INTRODUCE_BY_APPLICATION_ID(applicationId))
+      const apiResponse = ApiResponseDTO.fromJSON(introduceRes.data)
       
-      if (match) {
-        console.log('✅ 매칭된 자기소개서 (applicationId):', item)
-        return true
+      if (apiResponse.success && apiResponse.data) {
+        introduce = apiResponse.data
+        console.log('✅ 새로운 API로 자기소개서 발견:', introduce)
       }
+    } catch (directError) {
+      console.warn('⚠️ 새로운 API 조회 실패, 기존 방식으로 fallback:', directError.message)
       
-      // 📍 Fallback: applicantId로 매칭 시도 (API에서 application_id가 undefined인 경우)
-      // URL에서 applicantId 가져오기
-      const urlParams = new URLSearchParams(window.location.search)
-      const applicantIdFromUrl = urlParams.get('applicantId')
+      // Fallback: 기존 방식 (전체 조회 후 필터링)
+      const introduceRes = await api.get(`${IntroduceAPI.GET_ALL_INTRODUCE}`)
+      const allIntroduces = introduceRes.data?.data || introduceRes.data || []
       
-      if (applicantIdFromUrl && (item.applicantId == applicantIdFromUrl || item.applicant_id == applicantIdFromUrl)) {
-        console.log('✅ 매칭된 자기소개서 (applicantId fallback):', item)
-        console.log('🔍 매칭 조건:', { 
-          itemApplicantId: item.applicantId, 
-          urlApplicantId: applicantIdFromUrl,
-          applicationId: applicationId 
+      // 🔍 디버깅: 전체 자기소개서 데이터 구조 확인
+      console.log('📊 Fallback - 전체 자기소개서 데이터:', allIntroduces)
+      console.log('🔍 찾고 있는 applicationId:', applicationId, '(타입:', typeof applicationId, ')')
+      
+      // 각 자기소개서의 applicationId 확인
+      allIntroduces.forEach((item, index) => {
+        console.log(`📋 자기소개서 ${index + 1}:`, {
+          id: item.id,
+          applicationId: item.applicationId,
+          application_id: item.application_id,
+          applicantId: item.applicantId,
+          applicant_id: item.applicant_id,
+          introduceTemplateId: item.introduceTemplateId,
+          introduce_template_id: item.introduce_template_id,
+          content: item.content?.substring(0, 50) + '...',
+          전체_데이터: item
         })
-        return true
-      }
+      })
       
-      return false
-    })
+      introduce = allIntroduces.find(item => {
+        // application_id (snake_case) 우선으로 매칭 시도
+        const match = item.application_id == applicationId || 
+                     item.applicationId == applicationId ||
+                     String(item.application_id) === String(applicationId) ||
+                     String(item.applicationId) === String(applicationId)
+        
+        if (match) {
+          console.log('✅ 매칭된 자기소개서 (applicationId):', item)
+          return true
+        }
+        
+        // 📍 Fallback: applicantId로 매칭 시도 (API에서 application_id가 undefined인 경우)
+        // URL에서 applicantId 가져오기
+        const urlParams = new URLSearchParams(window.location.search)
+        const applicantIdFromUrl = urlParams.get('applicantId')
+        
+        if (applicantIdFromUrl && (item.applicantId == applicantIdFromUrl || item.applicant_id == applicantIdFromUrl)) {
+          console.log('✅ 매칭된 자기소개서 (applicantId fallback):', item)
+          console.log('🔍 매칭 조건:', { 
+            itemApplicantId: item.applicantId, 
+            urlApplicantId: applicantIdFromUrl,
+            applicationId: applicationId 
+          })
+          return true
+        }
+        
+        return false
+      })
+      
+      if (!introduce) {
+        console.log('❌ 자기소개서가 없습니다.')
+        console.log('🔍 매칭 시도한 조건들:')
+        console.log('- item.application_id == applicationId (주요)')
+        console.log('- item.applicationId == applicationId') 
+        console.log('- String(item.application_id) === String(applicationId)')
+        console.log('- String(item.applicationId) === String(applicationId)')
+        return { introduce: null, templateItems: [], responses: [] }
+      }
+    }
     
     if (!introduce) {
       console.log('❌ 자기소개서가 없습니다.')
-      console.log('🔍 매칭 시도한 조건들:')
-      console.log('- item.application_id == applicationId (주요)')
-      console.log('- item.applicationId == applicationId') 
-      console.log('- String(item.application_id) === String(applicationId)')
-      console.log('- String(item.applicationId) === String(applicationId)')
       return { introduce: null, templateItems: [], responses: [] }
     }
     
@@ -202,23 +225,9 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
       console.warn('recruitment 정보 조회 실패:', recruitmentError)
     }
     
-    // 3. 템플릿 항목들 조회
-    let templateItems = []
-    if (introduceTemplateId) {
-      try {
-        const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
-        const allItems = itemsRes.data?.data || itemsRes.data || []
-        templateItems = allItems.filter(item => 
-          item.introduceTemplateId == introduceTemplateId
-        )
-        console.log('✅ 템플릿 항목들:', templateItems)
-      } catch (templateError) {
-        console.warn('템플릿 항목 조회 실패:', templateError)
-      }
-    }
-    
-    // 4. 자기소개서 템플릿 항목별 응답 조회 (전체 조회 후 필터링)
+    // 3. 자기소개서 템플릿 항목별 응답을 먼저 조회해서 필요한 템플릿 항목 ID들을 파악
     let responses = []
+    let templateItemIds = []
     try {
       const responsesRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEM_RESPONSES)
       const allResponses = responsesRes.data?.data || responsesRes.data || []
@@ -233,7 +242,11 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
                response.applicationId == applicationId
       })
       
+      // 응답에서 필요한 템플릿 항목 ID들 추출
+      templateItemIds = responses.map(response => response.introduceTemplateItemId).filter(Boolean)
+      
       console.log('✅ 필터링된 템플릿 항목 응답들:', responses)
+      console.log('🔍 필요한 템플릿 항목 ID들:', templateItemIds)
       console.log('🔍 필터링 조건:', { 
         introduceId: introduce.id, 
         applicationId: applicationId,
@@ -249,6 +262,39 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
     } catch (responseError) {
       console.warn('템플릿 항목 응답 조회 실패:', responseError)
     }
+
+    // 4. 응답에서 나온 템플릿 항목 ID들로 템플릿 항목들 조회
+    let templateItems = []
+    if (templateItemIds.length > 0) {
+      try {
+        const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
+        const allItems = itemsRes.data?.data || itemsRes.data || []
+        
+        // 응답에서 나온 템플릿 항목 ID들로 필터링
+        templateItems = allItems.filter(item => 
+          templateItemIds.includes(item.id)
+        )
+        console.log('✅ 응답 기반 템플릿 항목들:', templateItems)
+      } catch (templateError) {
+        console.warn('템플릿 항목 조회 실패:', templateError)
+        
+        // Fallback: introduceTemplateId로 필터링 시도 (기존 방식)
+        if (introduceTemplateId) {
+          try {
+            const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
+            const allItems = itemsRes.data?.data || itemsRes.data || []
+            templateItems = allItems.filter(item => 
+              item.introduceTemplateId == introduceTemplateId
+            )
+            console.log('✅ Fallback 템플릿 항목들:', templateItems)
+          } catch (fallbackError) {
+            console.warn('Fallback 템플릿 항목 조회도 실패:', fallbackError)
+          }
+        }
+      }
+    }
+    
+    // 5. 최종 결과 반환 (responses는 이미 위에서 조회됨)
     
     return { introduce, templateItems, responses }
   } catch (error) {
@@ -256,3 +302,5 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
     throw error
   }
 }
+
+

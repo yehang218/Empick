@@ -35,6 +35,7 @@ export const IntroduceAPI = {
     // IntroduceQueryController
     GET_ALL_INTRODUCE: '/api/v1/employment/introduce',
     GET_INTRODUCE_BY_ID: (id) => `/api/v1/employment/introduce/${id}`,
+    GET_INTRODUCE_BY_APPLICATION_ID: (applicationId) => `/api/v1/employment/introduce/application/${applicationId}`,
 
     // IntroduceResultQueryController
     GET_ALL_INTRODUCE_RESULTS: '/api/v1/employment/introduce-result',

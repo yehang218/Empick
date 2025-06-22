@@ -76,7 +76,7 @@
     <!-- 기준표 선택 모달 -->
     <IntroduceStandardSelectModal v-model="showStandardModal" @select="onStandardSelect" />
     <div class="d-flex justify-end mt-4">
-      <v-btn color="success" @click="handleSave" :loading="savingLoading">저장</v-btn>
+      <v-btn color="success" @click="handleSave" :loading="savingLoading">평가 저장</v-btn>
     </div>
   </div>
 </template>
@@ -138,15 +138,29 @@ const handleSave = async () => {
   try {
     savingLoading.value = true
     
+    // 입력 값 검증
+    if (!localTotalScore.value || localTotalScore.value < 0 || localTotalScore.value > 100) {
+      toast.error('평가 점수를 0~100 사이로 입력해주세요.')
+      return
+    }
+    
+    if (!localComment.value || localComment.value.trim() === '') {
+      toast.error('총평을 입력해주세요.')
+      return
+    }
+    
     const evaluationData = {
-      content: localComment.value,
+      content: localComment.value.trim(),
       ratingScore: localTotalScore.value,
       totalScore: localTotalScore.value,
-      comment: localComment.value,
+      comment: localComment.value.trim(),
       applicantId: props.evaluationData?.applicantId,
       applicationId: props.evaluationData?.applicationId,
+      introduceId: props.evaluationData?.introduceId,
       standardId: selectedStandard.value?.id
     }
+    
+    console.log('💾 자기소개서 평가 저장 데이터:', evaluationData)
     
     await introduceStore.saveIntroduceRatingResult(evaluationData)
     emit('save', evaluationData)

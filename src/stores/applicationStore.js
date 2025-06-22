@@ -262,7 +262,7 @@ export const useApplicationStore = defineStore('application', () => {
     try {
       console.log('📝 ApplicationStore: 자기소개서 조회 시작:', applicationId)
       
-      // 새로운 서비스를 사용하여 자기소개서와 템플릿 응답 조회
+      // 새로운 효율적인 API 사용
       const { getIntroduceWithTemplateResponses } = await import('@/services/introduceService')
       const result = await getIntroduceWithTemplateResponses(applicationId)
       
@@ -288,84 +288,18 @@ export const useApplicationStore = defineStore('application', () => {
           responses: result.responses,
           content: result.introduce.content
         }
-      } else {
-        console.warn('⚠️ 자기소개서 데이터가 없어서 대안 조회 시도')
         
-        // 대안: 다른 방법으로 자기소개서 조회 시도
-        try {
-          const { getIntroduceByApplicationIdService, getIntroduceTemplateItemResponses } = await import('@/services/introduceService')
-          const directIntroduce = await getIntroduceByApplicationIdService(applicationId)
-          console.log('🔄 직접 자기소개서 조회 결과:', directIntroduce)
-          
-          if (directIntroduce) {
-            // 템플릿 항목 응답도 함께 조회
-            const responses = await getIntroduceTemplateItemResponses(directIntroduce.id)
-            
-            // 템플릿 정보 조회
-            let templateItems = []
-            if (directIntroduce.introduceTemplateId) {
-              try {
-                const { default: api } = await import('@/apis/apiClient')
-                const templateRes = await api.get(`/api/v1/employment/introduce-template/${directIntroduce.introduceTemplateId}`)
-                const template = templateRes.data?.data || templateRes.data
-                
-                if (template?.items) {
-                  templateItems = template.items
-                } else {
-                  // 템플릿 항목들을 별도 조회
-                  const itemsRes = await api.get('/api/v1/employment/introduce-template/item')
-                  const allItems = itemsRes.data?.data || itemsRes.data || []
-                  templateItems = allItems.filter(item => 
-                    item.introduceTemplateId == directIntroduce.introduceTemplateId
-                  )
-                }
-              } catch (templateError) {
-                console.warn('템플릿 조회 실패:', templateError)
-              }
-            }
-            
-            // 데이터 결합
-            const combinedItems = templateItems.map(templateItem => {
-              const response = responses.find(r => 
-                r.introduceTemplateItemId == templateItem.id
-              )
-              return {
-                id: templateItem.id,
-                title: templateItem.title || templateItem.content,
-                content: response?.content || '응답이 없습니다.',
-                templateItemId: templateItem.id,
-                responseId: response?.id
-              }
-            })
-            
-            introduceData.value = {
-              ...directIntroduce,
-              items: combinedItems,
-              templateItems,
-              responses
-            }
-            
-            console.log('✅ 직접 조회로 자기소개서 데이터 확보:', introduceData.value)
-          } else {
-            introduceData.value = {
-              items: [],
-              templateItems: [],
-              responses: [],
-              content: null
-            }
-          }
-        } catch (directIntroduceError) {
-          console.error('❌ 직접 자기소개서 조회도 실패:', directIntroduceError)
-          introduceData.value = {
-            items: [],
-            templateItems: [],
-            responses: [],
-            content: null
-          }
+        console.log('✅ ApplicationStore: 새로운 API로 자기소개서 조회 성공:', introduceData.value)
+      } else {
+        console.warn('⚠️ 자기소개서 데이터가 없습니다.')
+        introduceData.value = {
+          items: [],
+          templateItems: [],
+          responses: [],
+          content: null
         }
       }
       
-      console.log('✅ ApplicationStore: 자기소개서 조회 완료:', introduceData.value)
       return introduceData.value;
     } catch (err) {
       console.error('❌ ApplicationStore: 자기소개서 조회 실패:', err)

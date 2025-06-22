@@ -206,20 +206,10 @@
         <!-- 자기소개서 카드 -->
         <v-card class="mb-4" elevation="2">
           <v-card-title class="d-flex align-center justify-between">
-            <div class="d-flex align-center">
+                        <div class="d-flex align-center">
               <v-icon class="mr-2" color="green">mdi-text-box-outline</v-icon>
               <span>자기소개서</span>
             </div>
-            <v-btn 
-              color="primary" 
-              variant="outlined" 
-              size="small" 
-              prepend-icon="mdi-clipboard-edit"
-              @click="openEvaluationModal"
-              v-if="introduceItems.length > 0"
-            >
-              평가하기
-            </v-btn>
           </v-card-title>
           
           <v-card-text>
@@ -764,12 +754,17 @@ const loadApplicationData = async () => {
 // 평가 모달 관련 함수들
 const openEvaluationModal = () => {
   // 현재 평가 데이터 설정 (기존 평가가 있다면 불러오기)
+  const introduceId = applicationStore.introduceData?.id || null
+  
   currentEvaluationData.value = {
     totalScore: null,
     comment: '',
     applicantId: applicant.value?.id,
-    applicationId: applicationId
+    applicationId: applicationId,
+    introduceId: introduceId
   }
+  
+  console.log('🔍 평가 모달 열기 - 전달할 데이터:', currentEvaluationData.value)
   showEvaluationModal.value = true
 }
 
