@@ -29,4 +29,17 @@
             introduce_rating_result
     </select>
 
+    <select id="findById" parameterType="int" resultType="IntroduceResultQueryDTO">
+        SELECT
+            id,
+            content,
+            rating_score,
+            introduce_id,
+            introduce_standard_id,
+            member_id,
+            updated_at
+        FROM introduce_rating_result
+        WHERE id = #{id}
+    </select>
+
 </mapper>
