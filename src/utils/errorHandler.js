@@ -54,10 +54,9 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
                 }
                 break;
             case 403:
-                router.push('/access-denied');      // 🚩 TODO : 권한이 필요하다고 뜨는 페이지
-                break;
+                router.push('/access-denied');
             case 404:
-                router.push('/not-found');          // 🚩 TODO : 404 페이지
+                router.push('/not-found');
                 break;
         }
     }
