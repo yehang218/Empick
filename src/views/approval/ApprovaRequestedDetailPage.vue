@@ -21,8 +21,9 @@
                 color="primary"
                 variant="flat"
                 :loading="linking"
+                :disabled="isAlreadyLinked"
             >
-                채용 요청서 생성
+                {{ isAlreadyLinked ? '생성 완료' : '채용 요청서로 생성' }}
             </v-btn>
         </div>
         <hr />
@@ -91,7 +92,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed, ref } from 'vue';
+import { onMounted, onUnmounted, computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '../../stores/approvalStore';
@@ -120,12 +121,22 @@ const { loadDepartmentList } = departmentStore;
 const { loadJobList } = jobStore;
 
 const linking = ref(false);
+const isAlreadyLinked = ref(false);
 
 const isRecruitmentRequest = computed(() => approvalDetail.value?.categoryId === 401);
 const isApproved = computed(() => approvalDetail.value?.status === 'APPROVED');
 
+watch(approvalDetail, (newDetail) => {
+    if (newDetail && newDetail.approvalId) {
+        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
+        if (linkedApprovals.includes(newDetail.approvalId)) {
+            isAlreadyLinked.value = true;
+        }
+    }
+}, { deep: true });
+
 const handleLinkRecruitmentRequest = async () => {
-    if (!approvalDetail.value) return;
+    if (!approvalDetail.value || isAlreadyLinked.value) return;
 
     linking.value = true;
     try {
@@ -145,6 +156,11 @@ const handleLinkRecruitmentRequest = async () => {
         );
 
         await recruitmentRequestStore.submitRecruitmentRequest(dto);
+        
+        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
+        linkedApprovals.push(approvalDetail.value.approvalId);
+        localStorage.setItem('empick-linked-approvals', JSON.stringify(linkedApprovals));
+        isAlreadyLinked.value = true;
         
         alert('채용 요청서가 성공적으로 생성되었습니다.');
         router.push('/employment/recruitment-requests');
@@ -253,14 +269,10 @@ const getApproverStatusClass = (approver) => {
 };
 
 onMounted(async () => {
-    await Promise.all([
-        loadDepartmentList(),
-        loadJobList()
-    ]);
-    const approvalId = parseInt(route.params.id);
-    if (approvalId) {
-        await fetchRequestedApprovalDetail(approvalId);
-    }
+    const id = route.params.id;
+    await fetchRequestedApprovalDetail(id);
+    await loadDepartmentList();
+    await loadJobList();
 });
 
 onUnmounted(() => {

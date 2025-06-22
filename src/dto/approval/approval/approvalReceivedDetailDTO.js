@@ -1,5 +1,5 @@
 export class ApprovalReceivedDetailQueryDTO {
-    constructor(data) {
+    constructor(data, currentMemberId) {
         this.approvalId = data.approvalId;
         this.categoryId = data.categoryId;
         this.categoryName = data.categoryName;
@@ -10,7 +10,18 @@ export class ApprovalReceivedDetailQueryDTO {
         this.status = data.status;
         this.items = data.items?.map(item => new ApprovalContentItemDTO(item)) || [];
         this.approvers = data.approvers?.map(approver => new ApprovalLineDetailDTO(approver)) || [];
-        this.isMyTurn = data.isMyTurn;
+        this.myTurn = this.calculateIsMyTurn(currentMemberId);
+    }
+
+    calculateIsMyTurn(currentMemberId) {
+        if (this.status !== 'IN_PROGRESS' || !this.approvers || this.approvers.length === 0) {
+            return false;
+        }
+
+        const sortedApprovers = [...this.approvers].sort((a, b) => a.stepOrder - b.stepOrder);
+        const nextApprover = sortedApprovers.find(approver => !approver.approvedAt);
+
+        return nextApprover ? nextApprover.memberId == currentMemberId : false;
     }
 }
 
