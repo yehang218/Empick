@@ -306,6 +306,9 @@ const goBack = () => {
 
 onMounted(async () => {
   try {
+    // 페이지 로드 시 스크롤을 맨 위로 이동
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     await Promise.all([
       answerStore.fetchAnswers(Number(props.applicationJobtestId)),
       fetchApplicantInfo()
