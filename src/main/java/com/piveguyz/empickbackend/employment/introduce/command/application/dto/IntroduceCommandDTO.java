@@ -12,4 +12,5 @@ public class IntroduceCommandDTO {
     private String content;
     private Integer introduceTemplateId;
     private Integer applicantId;
+    private Integer applicationId;
 }

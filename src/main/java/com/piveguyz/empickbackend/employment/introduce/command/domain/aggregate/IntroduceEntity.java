@@ -23,4 +23,7 @@ public class IntroduceEntity {
 
     @Column(name = "applicant_id", nullable = false)
     private Integer applicantId;
+
+    @Column(name = "application_id", nullable = false)
+    private Integer applicationId;
 }

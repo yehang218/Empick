@@ -12,6 +12,7 @@ public class IntroduceMapper {
                 .content(dto.getContent())
                 .introduceTemplateId(dto.getIntroduceTemplateId())
                 .applicantId(dto.getApplicantId())
+                .applicationId(dto.getApplicationId())
                 .build();
     }
 
@@ -21,6 +22,7 @@ public class IntroduceMapper {
                 .content(entity.getContent())
                 .introduceTemplateId(entity.getIntroduceTemplateId())
                 .applicantId(entity.getApplicantId())
+                .applicationId(entity.getApplicationId())
                 .build();
     }
 }

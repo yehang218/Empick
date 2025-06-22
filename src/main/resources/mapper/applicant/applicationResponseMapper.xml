@@ -19,6 +19,18 @@
             application_item_id,
             content
         FROM application_response
+        ORDER BY id
+    </select>
+
+    <select id="findApplicationResponsesByApplicationId" parameterType="int" resultMap="ApplicationResponseResultMap">
+        SELECT
+            id,
+            application_id,
+            application_item_id,
+            content
+        FROM application_response
+        WHERE application_id = #{applicationId}
+        ORDER BY id
     </select>
 
 </mapper>

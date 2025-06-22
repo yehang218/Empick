@@ -17,4 +17,9 @@ public class ApplicationResponseQueryServiceImp implements ApplicationResponseQu
     public List<ApplicationResponseQueryDTO> findAllApplicationResponse() {
         return applicationResponseMapper.findAllApplicationResponse();
     }
+
+    @Override
+    public List<ApplicationResponseQueryDTO> findApplicationResponsesByApplicationId(Integer applicationId) {
+        return applicationResponseMapper.findApplicationResponsesByApplicationId(applicationId);
+    }
 }
