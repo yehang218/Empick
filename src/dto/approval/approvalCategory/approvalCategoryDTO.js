@@ -1,11 +1,12 @@
 class ApprovalCategoryDTO {
-    constructor(id, name) {
+    constructor(id, name, approvalCategoryId = null) {
         this.id = id;
         this.name = name;
+        this.approvalCategoryId = approvalCategoryId;
     }
 
     static fromJSON(json) {
-        return new ApprovalCategoryDTO(json.id, json.name);
+        return new ApprovalCategoryDTO(json.id, json.name, json.approval_category_id);
     }
 }
 

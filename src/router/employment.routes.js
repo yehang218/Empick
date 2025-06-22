@@ -112,7 +112,11 @@ export const employmentRoutes = [
         name: 'JobtestEnter',
         component: () => import('@/views/employment/JobtestEnterPage.vue'),
         props: true,
-        meta: { requiresAuth: false }
+        meta: { 
+            requiresAuth: false,
+            hideHeader: true,
+            hideSidebar: true
+        }
     },
     // 실무테스트 응시 페이지
     {
@@ -120,7 +124,11 @@ export const employmentRoutes = [
         name: 'JobtestExam',
         component: () => import('@/views/employment/JobtestExamPage.vue'),
         props: true,
-        meta: { requiresAuth: false }
+        meta: { 
+            requiresAuth: false,
+            hideHeader: true,
+            hideSidebar: true
+        }
     },
 
     //    <------------------- 채용공고 -------------------->

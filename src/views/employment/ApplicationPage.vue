@@ -35,7 +35,12 @@
           <v-card-text>
             <div class="d-flex align-start mb-4">
               <v-avatar size="80" class="mr-4">
-                <v-img :src="applicant?.profileUrl" alt="프로필 사진" />
+                <v-img 
+                  :src="getFullImageUrl(applicant?.profileUrl)" 
+                  alt="프로필 사진"
+                  @error="handleImageError"
+                  @load="handleImageLoad"
+                />
               </v-avatar>
 
               <div class="flex-grow-1">
@@ -418,9 +423,6 @@
 
           <!-- 우측 버튼 영역 -->
           <div class="d-flex gap-3">
-            <v-btn color="error" variant="outlined" prepend-icon="mdi-close" class="px-6">
-              불합격 처리
-            </v-btn>
             <v-btn color="success" variant="elevated" prepend-icon="mdi-check" class="px-6">
               다음 전형 진행
             </v-btn>
@@ -522,6 +524,8 @@ const selectedNewStatus = ref(null)
 const statusUpdateLoading = ref(false)
 const statusOptions = STATUS_OPTIONS
 
+
+
 // ===== ViewModel (Store 데이터 + URL 쿼리 데이터 결합) =====
 const applicant = computed(() => {
   const app = applicationStore.selectedApplication
@@ -534,7 +538,7 @@ const applicant = computed(() => {
     name: app?.name || query.name || '지원자',
     phone: app?.phone || query.phone || '연락처 정보 없음',
     email: app?.email || query.email || '이메일 정보 없음',
-    profileUrl: app?.profileUrl || query.profileUrl || '/assets/empick_logo.png',
+    profileUrl: app?.profileUrl || query.profileUrl || '',
     birth: app?.birth || query.birth,
     address: app?.address || decodeURIComponent(query.address || '') || '주소 정보 없음',
     jobName: app?.jobName || query.jobName || '직무 정보 없음',
@@ -667,7 +671,7 @@ onMounted(async () => {
           name: decodeURIComponent(route.query.name || ''),
           phone: route.query.phone,
           email: route.query.email,
-          profileUrl: route.query.profileUrl || '/assets/empick_logo.png',
+          profileUrl: route.query.profileUrl || '',
           birth: route.query.birth,
           address: decodeURIComponent(route.query.address || ''),
           jobName: route.query.jobName,
@@ -877,6 +881,33 @@ const loadApplicationData = async () => {
       }
     }
 
+    
+    // 1.5. applicant 정보 별도 조회 (profileUrl 포함)
+    try {
+      const applicantId = Number(route.query.applicantId)
+      if (applicantId) {
+        console.log('👤 applicant 정보 별도 조회 시작... (applicantId:', applicantId, ')')
+        
+        // applicant API 직접 호출
+        const { default: api } = await import('@/apis/apiClient')
+        const applicantResponse = await api.get(`/api/v1/employment/applicant/${applicantId}`)
+        console.log('✅ applicant API 응답:', applicantResponse.data)
+        
+        if (applicantResponse.data?.data) {
+          const applicantData = applicantResponse.data.data
+          console.log('👤 applicant 데이터:', applicantData)
+          
+          // 현재 application 데이터에 applicant 정보 병합
+          if (applicationStore.selectedApplication) {
+            applicationStore.selectedApplication.profileUrl = applicantData.profileUrl || applicantData.pictureUrl
+            console.log('✅ profileUrl 병합 완료:', applicationStore.selectedApplication.profileUrl)
+          }
+        }
+      }
+    } catch (applicantError) {
+      console.error('❌ applicant 정보 조회 실패:', applicantError)
+    }
+    
     // 2. 이력서 응답 데이터 로드 (올바른 applicationId 사용)
     try {
       console.log('📄 이력서 응답 데이터 로딩 시작... (applicationId:', actualApplicationId, ')')
@@ -1102,6 +1133,63 @@ const loadEvaluationStandards = async () => {
     console.log('✅ 평가 기준표 로딩 완료:', introduceStandardStore.standards.length, '개')
   } catch (error) {
     console.error('❌ 평가 기준표 로딩 실패:', error)
+  }
+}
+
+// 프로필 URL을 표시 가능한 이미지 URL로 변환하는 함수
+const getFullImageUrl = (profileUrl) => {
+  console.log('🔍 getFullImageUrl 호출됨:', profileUrl)
+  
+  if (!profileUrl || typeof profileUrl !== 'string') {
+    console.log('🚫 프로필 URL이 없거나 유효하지 않음:', profileUrl)
+    // 기본 아바타 이미지 반환
+    return 'https://picsum.photos/seed/default/200'
+  }
+  
+  // 이미 완전한 URL인 경우 (http:// 또는 https://로 시작)
+  if (profileUrl.startsWith('http://') || profileUrl.startsWith('https://')) {
+    console.log('🌐 완전한 URL 사용:', profileUrl)
+    return profileUrl
+  }
+  
+  // 임시로 테스트 이미지 사용 (백엔드 API 문제 확인용)
+  console.log('⚠️ 임시 테스트: 백엔드 API 대신 랜덤 이미지 사용')
+  const testUrl = `https://picsum.photos/seed/${profileUrl.replace(/[^a-zA-Z0-9]/g, '')}/200`
+  console.log('🔗 테스트 이미지 URL:', testUrl)
+  
+  // 실제 백엔드 다운로드 API URL도 출력 (디버깅용)
+  const downloadUrl = `http://localhost:8080/api/v1/files/download?key=${encodeURIComponent(profileUrl)}`
+  console.log('🔗 백엔드 다운로드 API (테스트용):', downloadUrl)
+  console.log('🌐 브라우저에서 백엔드 API 테스트:', downloadUrl)
+  
+  return testUrl
+}
+
+
+
+// 이미지 로딩 성공 핸들러 (출석 상세 페이지와 동일한 방식)
+const handleImageLoad = (event) => {
+  if (event && event.target && event.target.src) {
+    console.log('✅ 프로필 이미지 로딩 성공:', event.target.src)
+  } else {
+    console.log('✅ 프로필 이미지 로딩 성공 (이벤트 정보 없음)')
+  }
+}
+
+// 이미지 로딩 실패 핸들러 (백엔드 다운로드 API 실패 시)
+const handleImageError = async (event) => {
+  const errorInfo = {
+    src: event?.target?.src || 'unknown',
+    profileUrl: applicant.value?.profileUrl || 'unknown'
+  }
+  console.error('❌ 프로필 이미지 로딩 실패:', errorInfo)
+  
+  // 백엔드 다운로드 API가 실패했으므로 기본 아이콘으로 표시
+  if (applicant.value) {
+    const originalUrl = applicant.value.profileUrl
+    applicant.value.profileUrl = ''
+    console.log('🔄 백엔드 다운로드 API 실패 - 기본 아이콘으로 표시됩니다')
+    console.log('🔍 원본 프로필 URL:', originalUrl)
   }
 }
 

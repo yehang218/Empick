@@ -41,7 +41,20 @@ export const useJobtestExamStore = defineStore('jobtestExam', () => {
     }
 
     async function saveAnswer({ content, applicationJobTestId, questionId }) {
-        return await postAnswer({ content, applicationJobTestId, questionId })
+        console.log('💾 jobtestExamStore.saveAnswer 호출:', {
+            content,
+            applicationJobTestId,
+            questionId
+        })
+        
+        try {
+            const result = await postAnswer({ content, applicationJobTestId, questionId })
+            console.log('✅ jobtestExamStore.saveAnswer 성공:', result)
+            return result
+        } catch (error) {
+            console.error('❌ jobtestExamStore.saveAnswer 실패:', error)
+            throw error
+        }
     }
 
     async function submitAnswers(applicationJobTestId) {

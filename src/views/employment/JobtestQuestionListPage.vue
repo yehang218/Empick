@@ -54,6 +54,20 @@
                         </a>
                     </template>
 
+                    <!-- 유형 -->
+                    <template #item.type="{ item }">
+                        <span class="type-tag" :style="getQuestionTypeStyle(item.type)">
+                            {{ getQuestionTypeLabel(item.type) }}
+                        </span>
+                    </template>
+
+                    <!-- 난이도 -->
+                    <template #item.difficulty="{ item }">
+                        <span class="difficulty-tag" :style="getDifficultyStyle(item.difficulty)">
+                            {{ getDifficultyLabel(item.difficulty) }}
+                        </span>
+                    </template>
+
                     <template #footer="{ page, pageCount, setPage }">
                         <Pagination :model-value="page" :length="pageCount" :total-visible="5" @update:modelValue="setPage" />
                     </template>
@@ -90,6 +104,8 @@ import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailMo
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 import Pagination from '@/components/common/Pagination.vue'
 import Modal from '@/components/common/Modal.vue'
+import { getDifficultyLabel, getDifficultyColors } from '@/constants/employment/difficulty.js'
+import { getQuestionTypeLabel, getQuestionTypeColors } from '@/constants/employment/questionTypes.js'
 
 const router = useRouter()
 const toast = useToast()
@@ -196,6 +212,22 @@ const toggleSelectAll = () => {
         selectedQuestions.value = [...questionStore.questions];
     }
 }
+
+const getQuestionTypeStyle = (type) => {
+    const colors = getQuestionTypeColors(type);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text,
+    };
+};
+
+const getDifficultyStyle = (difficulty) => {
+    const colors = getDifficultyColors(difficulty);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text,
+    };
+};
 </script>
 
 <style scoped>
@@ -211,5 +243,19 @@ const toggleSelectAll = () => {
     display: inline-block;
     vertical-align: top;
     /* 수직 정렬을 위해 추가 */
+}
+
+.type-tag,
+.difficulty-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
 }
 </style>

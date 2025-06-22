@@ -49,6 +49,13 @@
                         </a>
                     </template>
 
+                    <!-- 난이도 -->
+                    <template #item.difficulty="{ item }">
+                        <span class="difficulty-tag" :style="getDifficultyStyle(item.difficulty)">
+                            {{ getDifficultyLabel(item.difficulty) }}
+                        </span>
+                    </template>
+
                     <template #footer="{ page, pageCount, setPage }">
                         <Pagination :model-value="page" :length="pageCount" :total-visible="5" @update:modelValue="setPage" />
                     </template>
@@ -72,6 +79,7 @@ import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { useJobtestListStore } from '@/stores/jobtestListStore';
 import Pagination from '@/components/common/Pagination.vue'
+import { getDifficultyLabel, getDifficultyColors } from '@/constants/employment/difficulty.js'
 
 const router = useRouter();
 const store = useJobtestListStore();
@@ -153,6 +161,14 @@ const toggleSelectAll = (selectAll) => {
         selectedJobtests.value = [];
     }
 }
+
+const getDifficultyStyle = (difficulty) => {
+    const colors = getDifficultyColors(difficulty);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text,
+    };
+};
 </script>
 
 <style scoped>
@@ -167,5 +183,18 @@ const toggleSelectAll = (selectAll) => {
 
 .v-data-table {
     cursor: pointer;
+}
+
+.difficulty-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
 }
 </style>

@@ -26,7 +26,7 @@
           <v-card v-for="(item, index) in paginatedData" :key="item.id" class="mb-4" @click="goToDetail(item.id)" hover style="cursor: pointer">
             <v-card-text>
               <div class="font-weight-medium mb-2 text-md">
-                {{ item.departmentName }}에서 가족같이 지낼 인재를 찾습니다.
+                {{ item.title }}
               </div>
               <div class="chip-row">
                 <v-chip color="grey lighten-3">{{ getRecruitTypeLabel(item.recruitType) }}</v-chip>
@@ -83,6 +83,8 @@ const employmentTypeOptions = recruitTypeOptions.map(opt => opt.label)
 const filteredList = computed(() => {
   return store.list.filter(item => {
     return (
+      // WAITING 상태의 채용 공고는 제외
+      item.status !== 'WAITING' &&
       (!selectedJob.value || (item.jobName || item.title) === selectedJob.value) &&
       (!selectedStatus.value || getStatusLabel(item.status) === selectedStatus.value) &&
       (!selectedType.value || getRecruitTypeLabel(item.recruitType) === selectedType.value)

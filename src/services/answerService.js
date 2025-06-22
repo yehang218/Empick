@@ -26,14 +26,20 @@ export const getAnswersByApplicationJobtestId = async (applicationJobtestId, opt
 
 // 답안 제출 (응시 페이지에서 다음 버튼을 누를 때 호출)
 export const postAnswer = async (answerDTO, options = {}) => {
+    console.log('🌐 answerService.postAnswer 호출:', answerDTO)
+    
     return withErrorHandling(async () => {
         const response = await api.post(JobtestAPI.ANSWERS, answerDTO);
+        console.log('📡 API 응답:', response.data)
+        
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if (!apiResponse.success) {
+            console.error('❌ API 응답 실패:', apiResponse)
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
 
+        console.log('✅ API 응답 성공:', apiResponse.message)
         return apiResponse.message;
     }, options);
 }

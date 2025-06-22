@@ -11,9 +11,10 @@
                     <v-row class="mb-6" align="center">
                         <v-col cols="2" class="approval-label">결재 유형</v-col>
                         <v-col cols="4">
-                            <v-select v-model="form.categoryId" :items="categoryList" item-title="name" item-value="id"
-                                label="유형 선택" variant="solo" density="comfortable" class="approval-input" hide-details
-                                @update:model-value="onCategoryChange" clearable required />
+                            <v-select v-model="form.categoryId" :items="filteredCategoryList" item-title="name"
+                                item-value="id" label="유형 선택" variant="solo" density="comfortable"
+                                class="approval-input" hide-details @update:model-value="onCategoryChange" clearable
+                                required />
                         </v-col>
                         <v-col cols="2" class="approval-label">작성일</v-col>
                         <v-col cols="4">
@@ -43,45 +44,21 @@
                                 <!-- 직무 드롭다운 -->
                                 <v-select
                                     v-if="item.inputType === InputTypeEnum.NUMBER && dropdownMap[item.id] === 'job'"
-                                    v-model="form.contents[idx].content"
-                                    :items="jobOptions"
-                                    item-title="name"
-                                    item-value="id"
-                                    :label="item.name"
-                                    variant="solo"
-                                    density="comfortable"
-                                    class="approval-input"
-                                    hide-details
-                                    required
-                                />
+                                    v-model="form.contents[idx].content" :items="jobOptions" item-title="name"
+                                    item-value="id" :label="item.name" variant="solo" density="comfortable"
+                                    class="approval-input" hide-details required />
 
                                 <!-- 부서 드롭다운 -->
                                 <v-select
                                     v-else-if="item.inputType === InputTypeEnum.NUMBER && dropdownMap[item.id] === 'department'"
-                                    v-model="form.contents[idx].content"
-                                    :items="departmentOptions"
-                                    item-title="name"
-                                    item-value="id"
-                                    :label="item.name"
-                                    variant="solo"
-                                    density="comfortable"
-                                    class="approval-input"
-                                    hide-details
-                                    required
-                                />
+                                    v-model="form.contents[idx].content" :items="departmentOptions" item-title="name"
+                                    item-value="id" :label="item.name" variant="solo" density="comfortable"
+                                    class="approval-input" hide-details required />
 
                                 <!-- 나머지 숫자 입력 -->
-                                <v-text-field
-                                    v-else-if="item.inputType === InputTypeEnum.NUMBER"
-                                    v-model="form.contents[idx].content"
-                                    :label="item.name"
-                                    type="number"
-                                    variant="solo"
-                                    density="comfortable"
-                                    class="approval-input"
-                                    hide-details
-                                    required
-                                />
+                                <v-text-field v-else-if="item.inputType === InputTypeEnum.NUMBER"
+                                    v-model="form.contents[idx].content" :label="item.name" type="number" variant="solo"
+                                    density="comfortable" class="approval-input" hide-details required />
 
                                 <v-text-field v-else-if="item.inputType === InputTypeEnum.TEXT"
                                     v-model="form.contents[idx].content" :label="item.name" variant="solo"
@@ -165,7 +142,7 @@ const dropdownMap = {
 };
 
 // 부서 옵션 (API에서 조회)
-const departmentOptions = computed(() => 
+const departmentOptions = computed(() =>
     departmentStore.departmentList.map(dept => ({
         id: dept.id || dept.value,
         name: dept.name || dept.label
@@ -173,11 +150,15 @@ const departmentOptions = computed(() =>
 );
 
 // 직무 옵션 (API에서 조회)
-const jobOptions = computed(() => 
+const jobOptions = computed(() =>
     jobStore.jobList.map(job => ({
         id: job.id || job.value,
         name: job.name || job.label
     }))
+);
+
+const filteredCategoryList = computed(() =>
+    categoryList.value.filter(category => category.approvalCategoryId === null)
 );
 
 onMounted(async () => {

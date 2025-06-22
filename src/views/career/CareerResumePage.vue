@@ -17,12 +17,13 @@
                     ({{ item.inputType === 0 ? '텍스트' : '기타' }} / 필수: {{ item.isRequired ? 'O' : 'X' }})
                   </span>
                 </div>
-                <v-text-field
+                <v-textarea
                   v-model="applicationAnswers[item.id]"
                   :label="item.categoryName"
                   :required="item.isRequired"
                   variant="outlined"
-                  density="compact"
+                  rows="4"
+                  auto-grow
                 />
               </v-card>
             </div>
@@ -35,22 +36,15 @@
           <h3 class="section-title">자기소개서</h3>
 
           <template v-if="template">
-            <v-text-field
-              label="자기소개서 제목"
-              :model-value="template.title"
-              variant="outlined"
-              density="compact"
-              class="mb-4"
-              readonly
-            />
             <div v-if="templateItems.length > 0">
-              <v-text-field
+              <v-textarea
                 v-for="item in templateItems"
                 :key="item.id"
                 :label="item.title"
                 variant="outlined"
-                density="compact"
                 class="mb-3"
+                rows="6"
+                auto-grow
                 v-model="itemAnswers[item.id]"
               />
             </div>

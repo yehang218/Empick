@@ -61,15 +61,21 @@
         <div class="score-box total-align-right">
           <input
             type="number"
-            v-model.number="localTotalScore"
+            v-model="localTotalScore"
             min="0"
             max="100"
+            class="score-input-field"
+            @input="handleScoreInput"
+            @blur="handleScoreBlur"
           />
           <span>/100</span>
         </div>
         <textarea
           v-model="localComment"
           placeholder="지원자에 대한 총평을 남겨주세요."
+          class="comment-textarea"
+          @input="handleCommentInput"
+          @blur="handleCommentBlur"
         ></textarea>
       </div>
     </div>
@@ -121,12 +127,16 @@ watchEffect(async () => {
   if (props.evaluationData) {
     console.log('🔄 평가 데이터 초기화:', props.evaluationData)
     
-    // 점수와 총평 복원
+    // 점수와 총평 복원 (기존 값이 없을 때만 업데이트)
     const score = props.evaluationData.totalScore || props.evaluationData.ratingScore
     const comment = props.evaluationData.comment || props.evaluationData.content
     
-    localTotalScore.value = score || null
-    localComment.value = comment || ''
+    if (localTotalScore.value === null || localTotalScore.value === undefined) {
+      localTotalScore.value = score || null
+    }
+    if (localComment.value === '' || localComment.value === null || localComment.value === undefined) {
+      localComment.value = comment || ''
+    }
     
     console.log('📊 복원된 평가 데이터:', {
       score: localTotalScore.value,
@@ -244,6 +254,29 @@ const onStandardSelect = async (standard) => {
 }
 
 const emit = defineEmits(['save'])
+
+// 입력 값 유지를 위한 이벤트 핸들러
+const handleScoreInput = (event) => {
+  const value = event.target.value
+  localTotalScore.value = value ? Number(value) : null
+  console.log('📊 점수 입력:', localTotalScore.value)
+}
+
+const handleScoreBlur = (event) => {
+  const value = event.target.value
+  localTotalScore.value = value ? Number(value) : null
+  console.log('📊 점수 블러:', localTotalScore.value)
+}
+
+const handleCommentInput = (event) => {
+  localComment.value = event.target.value
+  console.log('📝 총평 입력:', localComment.value?.substring(0, 30) + '...')
+}
+
+const handleCommentBlur = (event) => {
+  localComment.value = event.target.value
+  console.log('📝 총평 블러:', localComment.value?.substring(0, 30) + '...')
+}
 
 const handleSave = async () => {
   try {
@@ -396,7 +429,7 @@ textarea {
   gap: 4px;
 }
 
-.total-body .score-box.total-align-right input {
+.score-input-field {
   width: 35px;
   height: 24px;
   padding: 2px;
@@ -404,6 +437,18 @@ textarea {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 0.9rem;
+}
+
+.comment-textarea {
+  width: 100%;
+  height: 70px;
+  padding: 0.5rem;
+  resize: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  margin-top: 0.5rem;
 }
 
 /* number input 스핀 제거 */

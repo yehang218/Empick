@@ -64,23 +64,40 @@ export const createIntroduceRatingResult = async (payload) => {
       try {
         console.log('🔄 application.introduce_rating_result_id 업데이트 시작:', {
           applicationId: payload.applicationId,
-          ratingResultId: ratingResultId
+          ratingResultId: ratingResultId,
+          ratingResultIdType: typeof ratingResultId,
+          applicationIdType: typeof payload.applicationId
         })
         
         // application 업데이트 API 호출
         const { updateApplicationIntroduceRatingResultService } = await import('@/services/applicationService')
-        await updateApplicationIntroduceRatingResultService(payload.applicationId, ratingResultId)
+        const updateResult = await updateApplicationIntroduceRatingResultService(payload.applicationId, ratingResultId)
         
-        console.log('✅ application.introduce_rating_result_id 업데이트 완료')
+        console.log('✅ application.introduce_rating_result_id 업데이트 완료:', updateResult)
+        console.log('🔍 업데이트된 application 정보:', {
+          id: updateResult?.id,
+          introduceRatingResultId: updateResult?.introduceRatingResultId,
+          introduce_rating_result_id: updateResult?.introduce_rating_result_id
+        })
       } catch (updateError) {
         console.error('❌ application.introduce_rating_result_id 업데이트 실패:', updateError)
+        console.error('❌ 업데이트 에러 상세:', {
+          message: updateError.message,
+          response: updateError.response?.data,
+          status: updateError.response?.status,
+          config: updateError.config
+        })
         // 평가 결과는 이미 저장되었으므로 업데이트 실패는 경고로만 처리
         console.warn('⚠️ 평가 결과는 저장되었지만 application 연결 업데이트에 실패했습니다.')
       }
     } else {
       console.warn('⚠️ ratingResultId 또는 applicationId가 없어 application 업데이트를 건너뜁니다.', {
         ratingResultId,
-        applicationId: payload.applicationId
+        ratingResultIdType: typeof ratingResultId,
+        applicationId: payload.applicationId,
+        applicationIdType: typeof payload.applicationId,
+        ratingResultIdTruthy: !!ratingResultId,
+        applicationIdTruthy: !!payload.applicationId
       })
     }
     
@@ -381,9 +398,9 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
       console.warn('⚠️ 새로운 API 조회 실패, 기존 방식으로 fallback:', directError.message)
       
       // Fallback: 기존 방식 (전체 조회 후 필터링)
-      const introduceRes = await api.get(`${IntroduceAPI.GET_ALL_INTRODUCE}`)
-      const allIntroduces = introduceRes.data?.data || introduceRes.data || []
-      
+    const introduceRes = await api.get(`${IntroduceAPI.GET_ALL_INTRODUCE}`)
+    const allIntroduces = introduceRes.data?.data || introduceRes.data || []
+    
       // 🔍 디버깅: 전체 자기소개서 데이터 구조 확인
       console.log('📊 Fallback - 전체 자기소개서 데이터:', allIntroduces)
       console.log('🔍 찾고 있는 applicationId:', applicationId, '(타입:', typeof applicationId, ')')
@@ -527,11 +544,11 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
         // Fallback: introduceTemplateId로 필터링 시도 (기존 방식)
         if (introduceTemplateId) {
           try {
-            const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
-            const allItems = itemsRes.data?.data || itemsRes.data || []
-            templateItems = allItems.filter(item => 
+          const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
+          const allItems = itemsRes.data?.data || itemsRes.data || []
+          templateItems = allItems.filter(item => 
               item.introduceTemplateId == introduceTemplateId
-            )
+          )
             console.log('✅ Fallback 템플릿 항목들:', templateItems)
           } catch (fallbackError) {
             console.warn('Fallback 템플릿 항목 조회도 실패:', fallbackError)
