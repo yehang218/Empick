@@ -5,7 +5,7 @@
         <v-tabs v-model="activeTab">
             <v-tab value="MULTIPLE">선택형</v-tab>
             <v-tab value="SUBJECTIVE">단답형</v-tab>
-            <v-tab value="DESCRIPTIVE">서술형</v-tab>
+            <!-- <v-tab value="DESCRIPTIVE">서술형</v-tab> -->
         </v-tabs>
 
         <v-select v-model="form.difficulty" :items="difficultyOptions" label="난이도" variant="outlined" class="mt-4" />
@@ -24,7 +24,6 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.vue'
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue'
-import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue'
 
 import { useMemberStore } from '@/stores/memberStore'
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
@@ -52,7 +51,7 @@ const currentComponent = computed(() => {
     switch (activeTab.value) {
         case 'MULTIPLE': return MultipleQuestionForm
         case 'SUBJECTIVE': return SubjectiveForm
-        default: return DescriptiveQuestionForm
+        default: return MultipleQuestionForm
     }
 })
 
@@ -98,17 +97,17 @@ function validateForm() {
         }
     }
 
-    if (form.value.type === 'DESCRIPTIVE') {
-        if (!form.value.gradingCriteria.length) {
-            toast.error('채점 기준을 입력해주세요.')
-            return false
-        }
-        const total = form.value.gradingCriteria.reduce((sum, c) => sum + c.scoreWeight, 0)
-        if (Math.abs(total - 1) > 0.001) {
-            toast.error('채점 기준 가중치의 합이 100%가 되어야 합니다.')
-            return false
-        }
-    }
+    // if (form.value.type === 'DESCRIPTIVE') {
+    //     if (!form.value.gradingCriteria.length) {
+    //         toast.error('채점 기준을 입력해주세요.')
+    //         return false
+    //     }
+    //     const total = form.value.gradingCriteria.reduce((sum, c) => sum + c.scoreWeight, 0)
+    //     if (Math.abs(total - 1) > 0.001) {
+    //         toast.error('채점 기준 가중치의 합이 100%가 되어야 합니다.')
+    //         return false
+    //     }
+    // }
 
     return true
 }
