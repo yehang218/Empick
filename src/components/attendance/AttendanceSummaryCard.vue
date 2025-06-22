@@ -100,16 +100,16 @@ defineEmits(['view-detail', 'view-attendance', 'send-mail'])
 
 const getStatusClass = (status) => {
     switch (status) {
-        case 1: return 'status-present'
-        case 0: return 'status-absent'
+        case 1: return 'status-present'     // 출근 (멤버 출근 상태)
+        case 0: return 'status-absent'      // 미출근 (멤버 출근 상태)  
         default: return 'status-unknown'
     }
 }
 
 const getStatusLabel = (status) => {
     switch (status) {
-        case 1: return '출근'
-        case 0: return '미출근'
+        case 1: return '출근'               // 출근 (멤버 출근 상태)
+        case 0: return '미출근'             // 미출근 (멤버 출근 상태)
         default: return '알 수 없음'
     }
 }

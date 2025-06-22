@@ -128,10 +128,10 @@ export const groupAttendanceByDate = (records) => {
 
         dailyData[date].records.push(record);
 
-        // 출근/퇴근 시간 설정
-        if (record.attendanceCategoryLabel === '출근') {
+        // 출근/퇴근 시간 설정 (categoryId로 판단)
+        if (record.attendanceCategoryId === 1) {  // 출근
             dailyData[date].checkIn = { ...record, time };
-        } else if (record.attendanceCategoryLabel === '퇴근') {
+        } else if (record.attendanceCategoryId === 2) {  // 퇴근
             dailyData[date].checkOut = { ...record, time };
         }
     });

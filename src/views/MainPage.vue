@@ -64,9 +64,12 @@ import WeekAccordionList from '@/components/attendance/WeekAccordionList.vue'
 import { useAttendanceStore } from '@/stores/attendanceStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useMemberStore } from '@/stores/memberStore'
+import { groupAttendanceByDate } from '@/utils/attendance/attendanceCalculator'
 
 // 현재 날짜 상태
 const currentDate = ref(new Date())
+// 반응성 강제 업데이트를 위한 키
+const refreshKey = ref(0)
 const attendanceStore = useAttendanceStore()
 const authStore = useAuthStore()
 const memberStore = useMemberStore()
@@ -211,23 +214,101 @@ const goToToday = () => {
     currentDate.value = new Date()
 }
 
-// 오늘 출근 기록 확인
+// 오늘 출근 기록 확인 (근태 카테고리 ID 1=출근 기준)
 const hasTodayCheckIn = computed(() => {
+    // refreshKey를 의존성에 포함하여 강제 업데이트
+    refreshKey.value
+
+    // 여러 방법으로 오늘 날짜 확인
+    const now = new Date()
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
-    const dailyData = attendanceStore.groupAttendanceByDate(rawAttendanceRecords.value)
-    const todayData = dailyData[today]
+    const todayKST = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // KST
+    const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
+    // 실제 데이터 구조 확인을 위한 로그
+    console.log('=== 날짜 및 데이터 구조 디버깅 ===')
+    console.log('현재 시스템 시간:', now)
+    console.log('today (UTC):', today)
+    console.log('todayKST:', todayKST)
+    console.log('todayLocal:', todayLocal)
+    console.log('rawAttendanceRecords 전체 샘플 (처음 5개):', rawAttendanceRecords.value.slice(0, 5))
+
+    // 모든 레코드의 날짜 추출해서 확인
+    const allDates = rawAttendanceRecords.value.map(record => {
+        const recordTime = record.recordTime?.split('T')[0]
+        const createdAt = record.createdAt?.split('T')[0]
+        return {
+            id: record.id,
+            recordTime: record.recordTime,
+            recordTimeDate: recordTime,
+            createdAt: record.createdAt,
+            createdAtDate: createdAt,
+            categoryId: record.attendanceCategoryId
+        }
+    })
+    console.log('모든 레코드의 날짜 정보:', allDates)
+
+    const dailyData = groupAttendanceByDate(rawAttendanceRecords.value)
+
+    console.log('groupAttendanceByDate 결과 키들:', Object.keys(dailyData))
+    console.log('groupAttendanceByDate 전체 결과:', dailyData)
+
+    // 여러 날짜로 시도해보기
+    const todayDataUTC = dailyData[today]
+    const todayDataKST = dailyData[todayKST]
+    const todayDataLocal = dailyData[todayLocal]
+
+    console.log('UTC 날짜로 찾은 데이터:', todayDataUTC)
+    console.log('KST 날짜로 찾은 데이터:', todayDataKST)
+    console.log('Local 날짜로 찾은 데이터:', todayDataLocal)
+
+    // 가장 적절한 todayData 선택
+    const todayData = todayDataLocal || todayDataKST || todayDataUTC
+
+    console.log('최종 선택된 todayData:', todayData)
+    console.log('출근 상태 체크:', {
+        today: todayLocal,
+        recordsCount: rawAttendanceRecords.value.length,
+        todayData,
+        hasCheckIn: todayData && todayData.checkIn !== null,
+        refreshKey: refreshKey.value
+    })
+
     return todayData && todayData.checkIn !== null
 })
 
-// 오늘 퇴근 기록 확인
+// 오늘 퇴근 기록 확인 (근태 카테고리 ID 2=퇴근 기준)
 const hasTodayCheckOut = computed(() => {
+    // refreshKey를 의존성에 포함하여 강제 업데이트
+    refreshKey.value
+
+    // 여러 방법으로 오늘 날짜 확인
+    const now = new Date()
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
-    const dailyData = attendanceStore.groupAttendanceByDate(rawAttendanceRecords.value)
-    const todayData = dailyData[today]
+    const todayKST = new Date(now.getTime() + (9 * 60 * 60 * 1000)).toISOString().split('T')[0] // KST
+    const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
+    const dailyData = groupAttendanceByDate(rawAttendanceRecords.value)
+
+    // 여러 날짜로 시도해보기
+    const todayDataUTC = dailyData[today]
+    const todayDataKST = dailyData[todayKST]
+    const todayDataLocal = dailyData[todayLocal]
+
+    // 가장 적절한 todayData 선택
+    const todayData = todayDataLocal || todayDataKST || todayDataUTC
+
+    console.log('퇴근 상태 체크:', {
+        today: todayLocal,
+        recordsCount: rawAttendanceRecords.value.length,
+        todayData,
+        hasCheckOut: todayData && todayData.checkOut !== null,
+        refreshKey: refreshKey.value
+    })
     return todayData && todayData.checkOut !== null
 })
 
-// 출퇴근 메서드
+// 출퇴근 메서드 (근태 카테고리 ID 1=출근, 2=퇴근으로 기록)
 const checkIn = async () => {
     // 이미 오늘 출근한 경우 중복 출근 방지
     if (hasTodayCheckIn.value) {
@@ -236,9 +317,19 @@ const checkIn = async () => {
     }
 
     try {
-        await attendanceStore.createCheckInRecord()
+        await attendanceStore.createCheckInRecord()  // 근태 카테고리 ID 1로 출근 기록
+
+        // 현재 보고 있는 월의 데이터를 다시 로드
         await loadAttendanceData()
+
+        // 추가로 workingHours도 즉시 업데이트
+        await updateWorkingHours()
+
+        // 강제로 computed 업데이트
+        refreshKey.value++
+
         console.log('출근 처리 완료')
+        console.log('출근 상태 확인:', hasTodayCheckIn.value)
     } catch (error) {
         console.error('출근 처리 실패:', error)
         alert('출근 처리에 실패했습니다. 다시 시도해주세요.')
@@ -259,9 +350,19 @@ const checkOut = async () => {
     }
 
     try {
-        await attendanceStore.createCheckOutRecord()
+        await attendanceStore.createCheckOutRecord() // 근태 카테고리 ID 2로 퇴근 기록
+
+        // 현재 보고 있는 월의 데이터를 다시 로드
         await loadAttendanceData()
+
+        // 추가로 workingHours도 즉시 업데이트
+        await updateWorkingHours()
+
+        // 강제로 computed 업데이트
+        refreshKey.value++
+
         console.log('퇴근 처리 완료')
+        console.log('퇴근 상태 확인:', hasTodayCheckOut.value)
     } catch (error) {
         console.error('퇴근 처리 실패:', error)
         alert('퇴근 처리에 실패했습니다. 다시 시도해주세요.')
@@ -362,8 +463,6 @@ const clearCache = () => {
     color: #1976d2;
 }
 
-
-
 .page-content {
     max-width: 1200px;
     margin: 0 auto;
@@ -378,8 +477,6 @@ const clearCache = () => {
     .attendance-page {
         padding: 16px;
     }
-
-
 
     .page-title {
         font-size: 24px;

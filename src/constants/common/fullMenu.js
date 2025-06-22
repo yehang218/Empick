@@ -37,7 +37,7 @@ export const fullMenu = {
             label: '사원 관리',
             roles: [RoleCode.HR_ACCESS],
             children: [
-                { label: "신규 사원 등록", path: "/orgstructure/members/new" },
+                { label: "신규 사원 등록", path: "/orgstructure/member-register" },
                 { label: "사원 목록", path: "/attendance/all" },
                 { label: "사원정보변경 요청", path: "/orgstructure/members/edit-request" }
             ]
@@ -81,7 +81,7 @@ export const fullMenu = {
             children: [
                 { label: '채용 공고', path: routeMap.RecruitmentList },
                 { label: '채용 요청서', path: routeMap.RecruitmentRequestList },
-//                 { label: '채용 공고 템플릿', path: '/employment/recruitments/templates' },
+                //                 { label: '채용 공고 템플릿', path: '/employment/recruitments/templates' },
                 { label: '자기소개서 템플릿', path: routeMap.IntroduceTemplateListPage },
                 { label: '자기소개서 기준표', path: routeMap.IntroduceStandardListPage }
             ]

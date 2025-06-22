@@ -234,6 +234,8 @@ export const useAttendanceStore = defineStore('attendance', () => {
             const data = await attendanceService.createAttendanceRecord(dto, options);
             // 새로운 레코드를 기존 배열에 추가
             attendanceRecords.value.unshift(data);
+            // myRecords에도 추가 (MainPage에서 사용하는 rawAttendanceRecords는 myRecords 참조)
+            myRecords.value.unshift(data);
 
             // 오늘 데이터 캐시 무효화 (새로운 출퇴근 기록이 생성되었을 수 있음)
             todayDataCache.value.checkin = { data: null, timestamp: null };

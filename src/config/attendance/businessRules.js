@@ -1,14 +1,15 @@
 /**
  * 근태 관련 비즈니스 규칙 (한국 근로기준법 기준)
  * 출퇴근, 승인, 지각/조퇴 등의 비즈니스 로직 규칙을 정의
+ * 근태 카테고리 ID: 1=출근, 2=퇴근, 3=지각, 4=조퇴
  */
 
 export const BUSINESS_RULES = {
-    // 출퇴근 규칙
+    // 출퇴근 규칙 (근태 카테고리 ID 기준)
     ATTENDANCE_RULES: {
-        MAX_CHECK_IN_PER_DAY: 1,
-        MAX_CHECK_OUT_PER_DAY: 1,
-        REQUIRE_CHECK_IN_BEFORE_CHECK_OUT: true,
+        MAX_CHECK_IN_PER_DAY: 1,                       // 하루 최대 출근 기록 수
+        MAX_CHECK_OUT_PER_DAY: 1,                      // 하루 최대 퇴근 기록 수  
+        REQUIRE_CHECK_IN_BEFORE_CHECK_OUT: true,       // 퇴근 전 출근 필수 여부
         ALLOW_RETROACTIVE_ENTRY: false, // 소급 입력 허용 여부
         FLEXIBLE_TIME_START: '08:00:00', // 유연근무제 시작 가능 시간
         FLEXIBLE_TIME_END: '10:00:00', // 유연근무제 종료 시간

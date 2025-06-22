@@ -76,21 +76,21 @@ export const getEmailDomain = (email) => {
     return email.split('@')[1]
 }
 
-// 상태 관련 유틸리티
+// 상태 관련 유틸리티 (근태 카테고리와는 별개의 멤버 출근 상태)
 export const getStatusClass = (status) => {
     switch (status) {
-        case 1: return 'status-present'
-        case 0: return 'status-absent'
-        case -1: return 'status-no-record'
+        case 1: return 'status-present'     // 출근
+        case 0: return 'status-absent'      // 미출근
+        case -1: return 'status-no-record'  // 기록없음
         default: return 'status-unknown'
     }
 }
 
 export const getStatusLabel = (status) => {
     switch (status) {
-        case 1: return '출근'
-        case 0: return '미출근'
-        case -1: return '기록없음'
+        case 1: return '출근'               // 출근
+        case 0: return '미출근'             // 미출근
+        case -1: return '기록없음'          // 기록없음
         default: return '알 수 없음'
     }
 }
@@ -112,7 +112,7 @@ export const TABLE_HEADERS = [
     { title: '입사일시', key: 'hireAt', sortable: true, width: '120px' }
 ]
 
-// 상태 옵션
+// 상태 옵션 (멤버 출근 상태)
 export const STATUS_OPTIONS = [
     { title: '전체', value: '전체' },
     { title: '출근', value: 1 },
