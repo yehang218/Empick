@@ -68,13 +68,25 @@ export const useApprovalStore = defineStore('approval', () => {
         }
     };
 
-    const fetchReceivedApprovalDetail = async (approvalId) => {
+    const fetchReceivedApprovalDetail = async (approvalId, memberId) => {
         loading.value = true;
         error.value = null;
         try {
-            const memberStore = useMemberStore();
-            const memberId = memberStore.form.id;
-            approvalDetail.value = await getReceivedApprovalDetail(approvalId, memberId);
+            const detailData = await getReceivedApprovalDetail(approvalId, memberId);
+
+            // [수정] myTurn 값을 결재선 기준으로 프론트에서 직접 계산하여 보정
+            if (detailData && detailData.approvers && detailData.status === 'IN_PROGRESS') {
+                const sortedApprovers = [...detailData.approvers].sort((a, b) => a.stepOrder - b.stepOrder);
+                const nextApprover = sortedApprovers.find(approver => !approver.approvedAt);
+
+                if (nextApprover && nextApprover.memberId == memberId) {
+                    if (detailData.myTurn === false) {
+                        detailData.myTurn = true;
+                    }
+                }
+            }
+
+            approvalDetail.value = detailData;
         } catch (err) {
             error.value = err;
             console.error('요청받은 결재문서 상세 조회 실패:', err);
@@ -110,7 +122,11 @@ export const useApprovalStore = defineStore('approval', () => {
         error.value = null;
         try {
             const memberStore = useMemberStore();
+            if (!memberStore.form.id) {
+                await memberStore.getMyInfo();
+            }
             const memberId = memberStore.form.id;
+            
             await approve(approvalId, memberId);
             await loadReceivedApprovals(memberId); // 목록 새로고침
         } catch(err) {
@@ -127,7 +143,11 @@ export const useApprovalStore = defineStore('approval', () => {
         error.value = null;
         try {
             const memberStore = useMemberStore();
+            if (!memberStore.form.id) {
+                await memberStore.getMyInfo();
+            }
             const memberId = memberStore.form.id;
+
             await reject(approvalId, memberId, reason);
             await loadReceivedApprovals(memberId); // 목록 새로고침
         } catch(err) {

@@ -174,7 +174,7 @@ const getItemContent = (item) => {
 
 const canApprove = computed(() => {
     if (!approvalDetail.value) return false;
-    const isMyTurn = approvalDetail.value.isMyTurn == 1 || approvalDetail.value.isMyTurn === true;
+    const isMyTurn = approvalDetail.value.myTurn === true;
     return isMyTurn && approvalDetail.value.status === 'IN_PROGRESS';
 });
 
@@ -341,7 +341,15 @@ const handleLinkRecruitmentRequest = async () => {
 
 onMounted(async () => {
     const id = route.params.id;
-    await fetchReceivedApprovalDetail(id);
+    if (!memberStore.form.id) {
+        await memberStore.getMyInfo();
+    }
+    const memberId = memberStore.form.id;
+
+    if (id && memberId) {
+        await fetchReceivedApprovalDetail(id, memberId);
+    }
+    
     await loadDepartmentList();
     await loadJobList();
 });

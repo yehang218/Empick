@@ -58,8 +58,8 @@ export const getReceivedApprovalDetail = (approvalId, memberId) => {
         );
         
         if (response.data && response.data.success && response.data.data) {
-            console.log('✅[approvalService] API 응답 데이터:', response.data.data);
-            return new ApprovalReceivedDetailQueryDTO(response.data.data);
+            const correctedDTO = new ApprovalReceivedDetailQueryDTO(response.data.data, memberId);
+            return correctedDTO;
         } else {
             console.error('API 로직 에러:', response.data?.message || '결재 문서 상세 정보를 불러오는데 실패했습니다.');
             return null;
