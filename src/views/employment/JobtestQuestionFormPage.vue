@@ -24,6 +24,8 @@
 
         <SuccessModal v-if="showSuccessModal" :message="isEdit ? '문제 수정이 완료되었습니다.' : '문제 등록이 완료되었습니다.'"
             @confirm="handleSuccessConfirm" />
+
+        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="handleCancelClose" />
     </v-container>
 </template>
 
@@ -36,6 +38,7 @@ import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.v
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue'
 import DescriptiveQuestionForm from '@/components/employment/DescriptiveQuestionForm.vue'
 import SuccessModal from '@/components/common/AlertModal.vue'
+import Modal from '@/components/common/Modal.vue'
 
 import { DIFFICULTY_MAP } from '@/constants/employment/difficulty'
 
@@ -51,6 +54,7 @@ const jobtestQuestionStore = useJobtestQuestionStore()
 
 const questionId = Number(route.params.id)
 const showSuccessModal = ref(false)
+const showCancelModal = ref(false)
 
 // ❗ form과 isEdit은 store에서 가져옴
 const form = computed(() => jobtestQuestionStore.form)
@@ -72,7 +76,7 @@ const currentComponent = computed(() => {
 })
 
 function goBack() {
-    router.push({ name: 'JobtestQuestionList' })
+    showCancelModal.value = true
 }
 
 function handleSuccessConfirm() {
@@ -93,6 +97,15 @@ async function handleSubmit() {
     } catch {
         toast.error(jobtestQuestionStore.error || '저장 중 오류가 발생했습니다.')
     }
+}
+
+function handleCancelConfirm() {
+    showCancelModal.value = false
+    router.push({ name: 'JobtestQuestionList' })
+}
+
+function handleCancelClose() {
+    showCancelModal.value = false
 }
 
 onMounted(async () => {

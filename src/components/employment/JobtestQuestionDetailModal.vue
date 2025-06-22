@@ -85,10 +85,10 @@
 
       <v-card-actions class="justify-end">
         <v-btn text @click="closeModal">닫기</v-btn>
-        <v-btn color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteConfirm">
+        <v-btn v-if="props.showDelete" color="error" variant="outlined" prepend-icon="mdi-delete" @click="handleDeleteConfirm">
           삭제하기
         </v-btn>
-        <v-btn color="primary" variant="tonal" @click="goEditPage" prepend-icon="mdi-pencil">
+        <v-btn v-if="props.showEdit" color="primary" variant="tonal" @click="goEditPage" prepend-icon="mdi-pencil">
           수정하기
         </v-btn>
       </v-card-actions>
@@ -117,7 +117,15 @@ const showDeleteConfirm = ref(false)
 
 const props = defineProps({
   modelValue: Boolean,
-  question: Object
+  question: Object,
+  showDelete: {
+    type: Boolean,
+    default: true
+  },
+  showEdit: {
+    type: Boolean,
+    default: true
+  }
 })
 const router = useRouter()
 const emit = defineEmits(['update:modelValue'])
