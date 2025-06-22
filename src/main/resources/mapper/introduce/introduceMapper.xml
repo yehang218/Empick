@@ -10,7 +10,8 @@
             id,
             content,
             applicant_id,
-            introduce_template_id
+            introduce_template_id,
+            application_id
         FROM
             introduce
     </select>
