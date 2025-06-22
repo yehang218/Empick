@@ -1,6 +1,6 @@
 <template>
     <div v-if="loading" class="loading-container">
-        <p>로딩 중...</p>
+        <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <div v-else-if="error" class="error-container">
         <p>오류가 발생했습니다: {{ error.message }}</p>
@@ -11,7 +11,10 @@
 
     <div v-else class="page-container">
         <div class="header">
-            <h1 class="page-title">요청한 결재 문서 조회</h1>
+            <div class="header-left">
+                <v-icon @click="$router.back()" class="mr-4 cursor-pointer">mdi-arrow-left</v-icon>
+                <h1 class="page-title">요청한 결재 문서 조회</h1>
+            </div>
             <v-btn
                 v-if="isRecruitmentRequest && isApproved"
                 @click="handleLinkRecruitmentRequest"
@@ -19,10 +22,10 @@
                 variant="flat"
                 :loading="linking"
             >
-                채용 요청서로 생성
+                채용 요청서 생성
             </v-btn>
         </div>
-
+        <hr />
         <div class="content-section">
             <table class="info-table">
                 <tbody>
@@ -279,10 +282,14 @@ onUnmounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
+}
+.header-left {
+    display: flex;
+    align-items: center;
 }
 .page-title {
-    font-size: 1.8rem;
+    font-size: 24px;
     font-weight: 600;
 }
 .content-section {
@@ -434,5 +441,8 @@ h3 {
 }
 .disclaimer p {
     margin: 0.3rem 0;
+}
+.cursor-pointer {
+    cursor: pointer;
 }
 </style>
