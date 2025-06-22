@@ -1,20 +1,65 @@
 <template>
-    <v-card-text>
-        <h2 class="text-h6 font-weight-bold mb-4">문제 등록</h2>
+    <v-card-text class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">문제 등록</h2>
+            <v-icon class="modal-icon">mdi-plus-circle</v-icon>
+        </div>
 
-        <v-tabs v-model="activeTab">
-            <v-tab value="MULTIPLE">선택형</v-tab>
-            <v-tab value="SUBJECTIVE">단답형</v-tab>
-            <!-- <v-tab value="DESCRIPTIVE">서술형</v-tab> -->
-        </v-tabs>
+        <!-- 문제 유형 탭 -->
+        <div class="tab-section">
+            <v-tabs v-model="activeTab" class="question-tabs">
+                <v-tab value="MULTIPLE" class="tab-item">
+                    <v-icon class="tab-icon">mdi-format-list-bulleted</v-icon>
+                    선택형
+                </v-tab>
+                <v-tab value="SUBJECTIVE" class="tab-item">
+                    <v-icon class="tab-icon">mdi-text-box-outline</v-icon>
+                    단답형
+                </v-tab>
+                <!-- <v-tab value="DESCRIPTIVE">서술형</v-tab> -->
+            </v-tabs>
+        </div>
 
-        <v-select v-model="form.difficulty" :items="difficultyOptions" label="난이도" variant="outlined" class="mt-4" />
+        <!-- 난이도 선택 -->
+        <div class="difficulty-section">
+            <div class="form-label">
+                <v-icon class="label-icon">mdi-trending-up</v-icon>
+                난이도
+            </div>
+            <v-select 
+                v-model="form.difficulty" 
+                :items="difficultyOptions" 
+                label="난이도를 선택해주세요" 
+                variant="outlined" 
+                class="difficulty-select"
+                prepend-inner-icon="mdi-trending-up"
+            />
+        </div>
 
-        <component :is="currentComponent" v-model:form="form" />
+        <!-- 문제 유형별 입력 폼 -->
+        <div class="component-section">
+            <component :is="currentComponent" v-model:form="form" />
+        </div>
 
-        <div class="d-flex justify-end mt-6">
-            <v-btn variant="tonal" @click="close">취소하기</v-btn>
-            <v-btn color="primary" class="ml-2" @click="handleSubmit">등록하기</v-btn>
+        <!-- 액션 버튼 -->
+        <div class="action-buttons">
+            <v-btn 
+                variant="tonal" 
+                color="grey" 
+                class="cancel-btn" 
+                @click="close"
+                prepend-icon="mdi-close"
+            >
+                취소하기
+            </v-btn>
+            <v-btn 
+                color="primary" 
+                class="submit-btn" 
+                @click="handleSubmit"
+                prepend-icon="mdi-check"
+            >
+                등록하기
+            </v-btn>
         </div>
     </v-card-text>
 </template>
@@ -125,3 +170,175 @@ onMounted(async () => {
     form.value.createdMemberId = memberId
 })
 </script>
+
+<style scoped>
+.modal-content {
+    padding: 24px;
+}
+
+/* 모달 헤더 */
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+    color: #1a237e;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-icon {
+    color: #1976d2;
+    font-size: 1.5rem;
+}
+
+/* 탭 섹션 */
+.tab-section {
+    margin-bottom: 24px;
+}
+
+.question-tabs {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.question-tabs :deep(.v-tab) {
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+    min-height: 48px;
+    transition: all 0.2s ease;
+}
+
+.question-tabs :deep(.v-tab:hover) {
+    background-color: rgba(25, 118, 210, 0.04);
+}
+
+.question-tabs :deep(.v-tab--selected) {
+    background-color: rgba(25, 118, 210, 0.08);
+    color: #1976d2;
+    font-weight: 600;
+}
+
+.tab-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-icon {
+    font-size: 1.1rem;
+}
+
+/* 난이도 섹션 */
+.difficulty-section {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+.label-icon {
+    color: #1976d2;
+    font-size: 1rem;
+}
+
+.difficulty-select {
+    max-width: 300px;
+}
+
+.difficulty-select :deep(.v-field) {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.difficulty-select :deep(.v-field:hover) {
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+}
+
+/* 컴포넌트 섹션 */
+.component-section {
+    margin-bottom: 24px;
+}
+
+/* 액션 버튼 */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.cancel-btn,
+.submit-btn {
+    min-width: 100px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 600px) {
+    .modal-content {
+        padding: 16px;
+    }
+    
+    .modal-title {
+        font-size: 1.1rem;
+    }
+    
+    .modal-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .cancel-btn,
+    .submit-btn {
+        min-width: auto;
+    }
+    
+    .difficulty-select {
+        max-width: none;
+    }
+    
+    .question-tabs :deep(.v-tab) {
+        min-height: 40px;
+        font-size: 0.9rem;
+    }
+    
+    .tab-icon {
+        font-size: 1rem;
+    }
+}
+</style>
