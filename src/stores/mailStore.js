@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { ref } from 'vue';
 import {
   createMailService,
   sendMailService,
@@ -9,98 +10,145 @@ import {
   findMailsByEmailService,
 } from '@/services/mailService';
 
-export const useMailStore = defineStore('mail', {
-  state: () => ({
-    mails: [],
-    currentMail: null,
-    loading: false,
-    error: null,
-  }),
+export const useMailStore = defineStore('mail', () => {
+  const mails = ref([]);
+  const selectedMail = ref(null);
+  const loading = ref(false);
+  const error = ref(null);
 
-  actions: {
-    async createMail(dto) {
-      this.loading = true;
-      try {
-        const result = await createMailService(dto);
-        return result;
-      } catch (e) {
-        this.error = e.message;
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // 모든 메일 조회
+  const fetchAllMails = async () => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await findAllMailsService();
+      mails.value = result;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
 
-    async sendMail(dto) {
-      this.loading = true;
-      try {
-        const result = await sendMailService(dto);
-        return result;
-      } catch (e) {
-        this.error = e.message;
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // ID로 메일 조회
+  const fetchMailById = async (id) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await findMailByIdService(id);
+      selectedMail.value = result;
+      return result;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
 
-    async sendJobtestMail(id) {
-      this.loading = true;
-      try {
-        const result = await sendJobtestMailService(id);
-        return result;
-      } catch (e) {
-        this.error = e.message;
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // 이메일로 메일 조회
+  const fetchMailsByEmail = async (email) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await findMailsByEmailService(email);
+      mails.value = result;
+      return result;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
 
-    async sendInterviewMail(id) {
-      this.loading = true;
-      try {
-        const result = await sendInterviewMailService(id);
-        return result;
-      } catch (e) {
-        this.error = e.message;
-        throw e;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // 메일 생성
+  const createMail = async (dto) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await createMailService(dto);
+      return result;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
 
-    async fetchAllMails() {
-      this.loading = true;
-      try {
-        this.mails = await findAllMailsService();
-      } catch (e) {
-        this.error = e.message;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // 메일 전송
+  const sendMail = async (dto) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await sendMailService(dto);
+      return result;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
 
-    async fetchMailById(id) {
-      this.loading = true;
-      try {
-        this.currentMail = await findMailByIdService(id);
-      } catch (e) {
-        this.error = e.message;
-      } finally {
-        this.loading = false;
-      }
-    },
+  // 실무 테스트 메일 전송
+  const sendJobtestMail = async (id, senderId) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await sendJobtestMailService(id, senderId);
+      return result;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
 
-    async fetchMailsByEmail(email) {
-      this.loading = true;
-      try {
-        this.mails = await findMailsByEmailService(email);
-      } catch (e) {
-        this.error = e.message;
-      } finally {
-        this.loading = false;
-      }
-    },
-  },
+  // 면접 메일 전송
+  const sendInterviewMail = async (id, senderId) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const result = await sendInterviewMailService(id, senderId);
+      return result;
+    } catch (err) {
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 선택된 메일 초기화
+  const clearSelectedMail = () => {
+    selectedMail.value = null;
+  };
+
+  // 에러 초기화
+  const clearError = () => {
+    error.value = null;
+  };
+
+  return {
+    // 상태
+    mails,
+    selectedMail,
+    loading,
+    error,
+    
+    // 액션
+    fetchAllMails,
+    fetchMailById,
+    fetchMailsByEmail,
+    createMail,
+    sendMail,
+    sendJobtestMail,
+    sendInterviewMail,
+    clearSelectedMail,
+    clearError,
+  };
 });

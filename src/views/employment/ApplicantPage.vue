@@ -33,8 +33,9 @@
           </v-btn>
 
           <!-- 📧 이메일 전송 버튼 -->
-          <v-btn color="success" variant="outlined" size="small" prepend-icon="mdi-email" style="min-width: 110px">
-            이메일 전송
+          <v-btn color="success" variant="outlined" size="small" prepend-icon="mdi-email" style="min-width: 110px"
+            @click="handleEmailClick" :disabled="!selectedApplicants.length">
+            이메일 전송 ({{ selectedApplicants.length }}개 선택)
           </v-btn>
         </div>
       </v-card-title>
@@ -144,18 +145,38 @@
 
     <!-- 실무 테스트 선택 모달 -->
     <JobtestSelectModal v-model="jobtestModal" :jobtests="jobtestListStore.jobtests" @select="handleJobtestSelected" />
+
+    <!-- 이메일 타입 선택 모달 -->
+    <SelectEmailModal 
+      v-model="emailTypeModal" 
+      :selected-count="selectedApplicants.length"
+      @select="handleEmailTypeSelected"
+      @cancel="handleEmailTypeCancel"
+    />
+
+    <!-- 이메일 미리보기 모달 -->
+    <EmailPreviewModal
+      v-model="emailPreviewModal"
+      :email-type="selectedEmailType"
+      :selected-count="selectedApplicants.length"
+      :applicants="selectedApplicants"
+      :loading="sendingEmail"
+      @send="handleSendEmail"
+      @cancel="handleEmailPreviewCancel"
+    />
   </v-container>
 </template>
 
 <script setup>
-
-// import { ref, computed, onMounted } from 'vue'
 
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Search from '@/components/common/Search.vue'
 import { useToast } from 'vue-toastification';
 import { useApplicantStore } from '@/stores/applicantStore';
+import { useApplicationStore } from '@/stores/applicationStore';
+import { useMailStore } from '@/stores/mailStore';
+import { useMemberStore } from '@/stores/memberStore';
 import { debounce } from 'lodash'
 
 // 실무테스트 할당
@@ -163,14 +184,23 @@ import { useJobtestListStore } from '@/stores/jobtestListStore';
 import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore';
 import ApplicationJobtestDTO from '@/dto/employment/jobtest/createApplicationJobtestDTO';
 import JobtestSelectModal from '@/components/employment/JobtestSelectModal.vue';
+import SelectEmailModal from '@/components/mail/SelectEmailModal.vue';
+import EmailPreviewModal from '@/components/mail/EmailPreviewModal.vue';
 
 // 로컬 상태로 selectedApplicants 관리
 const selectedApplicants = ref([]);
 const jobtestModal = ref(false);
+const emailTypeModal = ref(false);
+const emailPreviewModal = ref(false);
+const selectedEmailType = ref('');
+const sendingEmail = ref(false);
 const toast = useToast();
 const jobtestListStore = useJobtestListStore();
 const applicationJobtestStore = useApplicationJobtestStore();
 const applicantStore = useApplicantStore();
+const applicationStore = useApplicationStore();
+const mailStore = useMailStore();
+const memberStore = useMemberStore();
 const router = useRouter()
 
 const search = ref('')
@@ -528,6 +558,183 @@ const toggleSelectAll = (selectAll) => {
 // 지원자 등록 페이지로 이동
 const goToApplicantRegistration = () => {
   router.push('/employment/applicants/register');
+};
+
+const handleEmailClick = () => {
+  console.log('📧 이메일 전송 클릭, 선택된 항목:', selectedApplicants.value);
+
+  if (!selectedApplicants.value || selectedApplicants.value.length === 0) {
+    toast.warning('선택된 지원자가 없습니다.');
+    return;
+  }
+
+  // 이메일 타입 선택 모달 열기
+  selectedEmailType.value = '';
+  emailTypeModal.value = true;
+};
+
+const handleEmailTypeSelected = (type) => {
+  console.log('🎯 이메일 타입 선택:', type);
+  selectedEmailType.value = type;
+  emailPreviewModal.value = true;
+};
+
+const handleEmailTypeCancel = () => {
+  console.log('❌ 이메일 타입 취소');
+  emailTypeModal.value = false;
+};
+
+const handleSendEmail = async () => {
+  console.log('📧 이메일 발송 시작:', selectedEmailType.value);
+  console.log('📧 발송 대상:', selectedApplicants.value);
+  console.log('📧 첫 번째 선택된 항목 구조:', selectedApplicants.value[0]);
+  console.log('📧 첫 번째 선택된 항목의 모든 키:', Object.keys(selectedApplicants.value[0]));
+
+  sendingEmail.value = true;
+
+  try {
+    const emailData = [];
+    
+    // applicationId를 찾지 못한 경우를 위해 모든 지원서를 미리 가져오기
+    let allApplications = null;
+    
+    for (const selectedItem of selectedApplicants.value) {
+      // id 필드를 우선적으로 사용 (대부분의 경우 id가 applicationId임)
+      let applicationId = selectedItem.id || selectedItem.applicationId;
+      
+      console.log('🔍 찾은 applicationId:', applicationId, 'for applicant:', selectedItem.name);
+      
+      // applicationId가 없으면 모든 지원서에서 applicantId로 매칭되는 것 찾기
+      if (!applicationId && selectedItem.applicantId) {
+        console.log('🔍 applicationId가 없어서 모든 지원서에서 applicantId로 매칭 시도:', selectedItem.applicantId);
+        
+        // 모든 지원서를 한 번만 가져오기
+        if (!allApplications) {
+          try {
+            allApplications = await applicationStore.fetchAllApplications();
+            console.log('📋 모든 지원서 가져옴:', allApplications);
+          } catch (error) {
+            console.error('❌ 모든 지원서 조회 실패:', error);
+            allApplications = [];
+          }
+        }
+        
+        // applicantId가 일치하는 지원서 찾기
+        const matchingApplication = allApplications.find(app => 
+          app.applicantId === selectedItem.applicantId || 
+          app.applicant_id === selectedItem.applicantId
+        );
+        
+        if (matchingApplication) {
+          applicationId = matchingApplication.id || matchingApplication.applicationId;
+          console.log('🔍 매칭된 지원서 찾음:', matchingApplication);
+          console.log('🔍 찾은 applicationId:', applicationId);
+        } else {
+          console.error('❌ applicantId로 매칭되는 지원서를 찾을 수 없음:', selectedItem.applicantId);
+        }
+      }
+      
+      if (!applicationId) {
+        console.error('❌ applicationId를 찾을 수 없음:', selectedItem);
+        continue;
+      }
+
+      const emailInfo = {
+        applicationId: applicationId,
+        name: selectedItem.name,
+        email: selectedItem.email,
+        phone: selectedItem.phone,
+        birth: selectedItem.birth,
+        address: selectedItem.address,
+        profileUrl: selectedItem.profileUrl,
+        jobName: selectedItem.jobName,
+        createdAt: selectedItem.createdAt,
+        status: selectedItem.status,
+        recruitmentId: selectedItem.recruitmentId,
+        introduceRatingResultId: selectedItem.introduceRatingResultId,
+        education: selectedItem.education,
+        experience: selectedItem.experience,
+        skills: selectedItem.skills,
+        motivation: selectedItem.motivation,
+        coverLetter: selectedItem.coverLetter,
+        portfolioUrl: selectedItem.portfolioUrl,
+        introduceScore: selectedItem.introduceScore,
+        introduceStatus: selectedItem.introduceStatus,
+        jobtestTotalScore: selectedItem.jobtestTotalScore,
+        jobtestEvaluationScore: selectedItem.jobtestEvaluationScore,
+        jobtestStatus: selectedItem.jobtestStatus,
+        interviewScore: selectedItem.interviewScore,
+        interviewAddress: selectedItem.interviewAddress,
+        interviewDatetime: selectedItem.interviewDatetime
+      };
+
+      emailData.push(emailInfo);
+    }
+
+    console.log('📧 최종 이메일 데이터:', emailData);
+
+    if (emailData.length === 0) {
+      alert('발송할 지원자가 없습니다.');
+      return;
+    }
+
+    const senderId = memberStore.form.id || 1; // 현재 로그인한 사용자 ID
+    
+    console.log('📧 발송할 applicationIds:', emailData.map(item => item.applicationId));
+    console.log('📧 senderId:', senderId);
+    
+    // 이메일 발송 (병렬 처리)
+    if (selectedEmailType.value === 'jobtest') {
+      const promises = emailData.map(emailInfo => 
+        mailStore.sendJobtestMail(emailInfo.applicationId, senderId)
+          .catch(error => {
+            console.error(`❌ ${emailInfo.name}에게 실무테스트 메일 발송 실패:`, error);
+            return { error: true, name: emailInfo.name, error: error.message };
+          })
+      );
+      
+      const results = await Promise.allSettled(promises);
+      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const failCount = results.length - successCount;
+      
+      if (failCount > 0) {
+        toast.warning(`${successCount}명 발송 성공, ${failCount}명 발송 실패`);
+      } else {
+        toast.success(`선택한 ${emailData.length}명의 지원자에게 실무테스트 안내 메일을 발송했습니다.`);
+      }
+    } else if (selectedEmailType.value === 'interview') {
+      const promises = emailData.map(emailInfo => 
+        mailStore.sendInterviewMail(emailInfo.applicationId, senderId)
+          .catch(error => {
+            console.error(`❌ ${emailInfo.name}에게 면접 메일 발송 실패:`, error);
+            return { error: true, name: emailInfo.name, error: error.message };
+          })
+      );
+      
+      const results = await Promise.allSettled(promises);
+      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const failCount = results.length - successCount;
+      
+      if (failCount > 0) {
+        toast.warning(`${successCount}명 발송 성공, ${failCount}명 발송 실패`);
+      } else {
+        toast.success(`선택한 ${emailData.length}명의 지원자에게 면접 일정 안내 메일을 발송했습니다.`);
+      }
+    }
+
+    emailPreviewModal.value = false;
+    selectedEmailType.value = '';
+  } catch (error) {
+    console.error('❌ 이메일 발송 실패:', error);
+    toast.error('이메일 발송에 실패했습니다: ' + error.message);
+  } finally {
+    sendingEmail.value = false;
+  }
+};
+
+const handleEmailPreviewCancel = () => {
+  console.log('❌ 이메일 미리보기 취소');
+  emailPreviewModal.value = false;
 };
 
 </script>

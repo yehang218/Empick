@@ -267,6 +267,26 @@ export const employmentRoutes = [
         }
     },
 
+    // <---------- 안 내 메 일 ---------->
+    {
+        path: '/employment/send-email',
+        name: 'SendEmailPage',
+        component: () => import('@/views/employment/SendEmailPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+    {
+        path: '/employment/email-history',
+        name: 'EmailHistoryPage',
+        component: () => import('@/views/employment/EmailHistoryPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
+
     // <---------- 지원서 / 지원자 ---------->
     {
         path: '/employment/applicant',
