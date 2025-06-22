@@ -263,6 +263,7 @@ const getStatusStyle = (status) => {
 .jobtest-detail-page {
     padding: 24px;
     background-color: #f5f7fa;
+    min-height: 100vh;
 }
 
 .header-actions {
@@ -274,26 +275,45 @@ const getStatusStyle = (status) => {
 
 .list-btn {
     transition: all 0.2s ease-in-out;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .list-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .summary-card,
 .detail-card {
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
     margin-bottom: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
 }
 
 .summary-card:hover,
 .detail-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.detail-card {
+    position: relative;
+}
+
+.detail-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1976d2, #42a5f5);
+    border-radius: 16px 16px 0 0;
 }
 
 .truncate-text {
@@ -303,10 +323,7 @@ const getStatusStyle = (status) => {
     text-overflow: ellipsis;
     display: inline-block;
     vertical-align: middle;
-}
-
-.v-data-table {
-    cursor: pointer;
+    line-height: 1.4;
 }
 
 .custom-data-table {
@@ -316,26 +333,26 @@ const getStatusStyle = (status) => {
 .custom-data-table tbody tr:hover,
 .custom-data-table .v-data-table__tr:hover,
 .custom-data-table .v-data-table__tr:hover .v-data-table__td {
-    background-color: #f5f5f5 !important;
+    background-color: #f8f9fa !important;
     transition: background-color 0.2s ease;
 }
 
 .custom-data-table .v-data-table__td:hover {
-    background-color: #f5f5f5 !important;
+    background-color: #f8f9fa !important;
 }
 
 /* Vuetify 3의 새로운 클래스명 대응 */
 .custom-data-table .v-data-table__tr:hover .v-data-table__td {
-    background-color: #f5f5f5 !important;
+    background-color: #f8f9fa !important;
 }
 
 /* 더 강력한 선택자 */
 .custom-data-table :deep(.v-data-table__tr:hover) {
-    background-color: #f5f5f5 !important;
+    background-color: #f8f9fa !important;
 }
 
 .custom-data-table :deep(.v-data-table__tr:hover .v-data-table__td) {
-    background-color: #f5f5f5 !important;
+    background-color: #f8f9fa !important;
 }
 
 .question-type-tag,
@@ -343,20 +360,135 @@ const getStatusStyle = (status) => {
 .status-tag {
     display: inline-flex;
     align-items: center;
-    padding: 4px 8px;
-    border-radius: 12px;
+    padding: 6px 12px;
+    border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.3px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.question-type-tag:hover,
+.difficulty-tag:hover,
+.status-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* 테이블 헤더 스타일링 */
+.custom-data-table :deep(.v-data-table__thead) {
+    background-color: #f8f9fa;
+}
+
+.custom-data-table :deep(.v-data-table__thead th) {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding: 16px 12px;
+}
+
+/* 테이블 셀 스타일링 */
+.custom-data-table :deep(.v-data-table__td) {
+    padding: 16px 12px;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+}
+
+/* 링크 스타일링 */
+a.text-decoration-none {
+    color: #1976d2;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+a.text-decoration-none:hover {
+    color: #1565c0;
+    text-decoration: underline !important;
+}
+
+/* 카드 내부 패딩 조정 */
+.detail-card :deep(.v-card-text) {
+    padding: 20px 24px;
+}
+
+.detail-card :deep(.v-card-title) {
+    padding: 20px 24px 16px;
+    font-weight: 600;
+    color: #1a237e;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #fafbfc;
+}
+
+/* 페이지네이션 스타일링 */
+.detail-card :deep(.v-data-table-footer) {
+    padding: 16px 24px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #fafbfc;
+}
+
+/* 반응형 디자인 */
 @media (max-width: 960px) {
-    .v-col-md-6 {
-        flex-basis: 100%;
-        max-width: 100%;
+    .jobtest-detail-page {
+        padding: 16px;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+    
+    .list-btn {
+        align-self: flex-start;
+    }
+    
+    .summary-card,
+    .detail-card {
+        margin-bottom: 16px;
+        border-radius: 12px;
+    }
+    
+    .truncate-text {
+        max-width: 200px;
+    }
+    
+    .custom-data-table :deep(.v-data-table__thead th),
+    .custom-data-table :deep(.v-data-table__td) {
+        padding: 12px 8px;
+    }
+    
+    .question-type-tag,
+    .difficulty-tag,
+    .status-tag {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .jobtest-detail-page {
+        padding: 12px;
+    }
+    
+    .summary-card,
+    .detail-card {
+        border-radius: 8px;
+    }
+    
+    .truncate-text {
+        max-width: 150px;
+    }
+    
+    .detail-card :deep(.v-card-text) {
+        padding: 16px;
+    }
+    
+    .detail-card :deep(.v-card-title) {
+        padding: 16px;
+        font-size: 1.1rem;
     }
 }
 </style>
