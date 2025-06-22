@@ -9,9 +9,14 @@
                 <h2 class="text-h5 font-weight-bold ml-2">지원서 항목 선택</h2>
             </div>
 
-            <v-btn color="secondary" @click="selectIntroduceTemplate">
-                자기소개서 템플릿 선택
-            </v-btn>
+            <div class="d-flex align-center">
+                <span v-if="selectedTemplateName" class="mr-4 text-subtitle-1 text-grey-darken-1">
+                    선택된 템플릿: <strong>{{ selectedTemplateName }}</strong>
+                </span>
+                <v-btn color="secondary" @click="selectIntroduceTemplate">
+                    자기소개서 템플릿 선택
+                </v-btn>
+            </div>
         </v-row>
 
         <v-row>
@@ -104,6 +109,7 @@ const recruitmentIdToUpdate = computed(() => Number(route.query.id))
 
 const requestId = route.query.requestId
 const showTemplateModal = ref(false)
+const selectedTemplateName = ref('')
 
 // 선택된 항목 ID와 필수 여부
 const selectedIds = ref([])
@@ -155,12 +161,17 @@ onMounted(async () => {
     if (store.requiredApplicationItemIds.length > 0) {
         requiredIds.value = [...store.requiredApplicationItemIds]
     }
+    if (store.draftRecruitment?.introduceTemplateTitle) {
+        selectedTemplateName.value = store.draftRecruitment.introduceTemplateTitle;
+    }
 })
 
-const onTemplateSelected = (templateId) => {
+const onTemplateSelected = (selection) => {
     if (store.draftRecruitment) {
-        store.draftRecruitment.introduceTemplateId = templateId
-        alert('자기소개서 템플릿이 선택되었습니다.')
+        store.draftRecruitment.introduceTemplateId = selection.id
+        store.draftRecruitment.introduceTemplateTitle = selection.title
+        selectedTemplateName.value = selection.title
+        toast.success(`'${selection.title}' 템플릿이 선택되었습니다.`);
     }
 }
 
