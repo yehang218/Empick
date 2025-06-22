@@ -116,7 +116,7 @@ const localStandardTitle = ref('')
 const localStandardItems = ref([])
 const savingLoading = ref(false)
 
-// ViewModel: 데이터 초기화
+// ViewModel: 데이터 초기화 및 기준표 복원
 watchEffect(async () => {
   if (props.evaluationData) {
     console.log('🔄 평가 데이터 초기화:', props.evaluationData)
@@ -134,10 +134,10 @@ watchEffect(async () => {
       introduceStandardId: props.evaluationData.introduceStandardId
     })
     
-    // 기존 평가에서 기준표 정보가 있으면 복원
+    // introduce_rating_result에서 가져온 introduce_standard_id로 기준표 복원
     if (props.evaluationData.introduceStandardId) {
       try {
-        console.log('🔍 기존 평가의 기준표 정보 복원 시도:', props.evaluationData.introduceStandardId)
+        console.log('🔍 평가 결과의 기준표 ID로 복원:', props.evaluationData.introduceStandardId)
         
         // 기준표 목록이 없으면 먼저 로드
         if (!introduceStandardStore.standards || introduceStandardStore.standards.length === 0) {
@@ -145,41 +145,59 @@ watchEffect(async () => {
           await introduceStandardStore.fetchStandards()
         }
         
-        // 기준표 찾기
+        // introduce_standard_id로 기준표 찾기
         const existingStandard = introduceStandardStore.standards.find(standard => 
           standard.id == props.evaluationData.introduceStandardId
         )
         
         if (existingStandard) {
-          console.log('✅ 기존 기준표 복원 성공:', {
+          console.log('✅ 기준표 복원 성공:', {
             id: existingStandard.id,
             content: existingStandard.content
           })
           selectedStandard.value = existingStandard
           localStandardTitle.value = existingStandard.content
           
-          // 기준표 상세 정보 로드
+          // introduce_standard_id로 직접 기준표 항목들 조회
           try {
-            await introduceStandardStore.fetchStandardDetail(existingStandard.id)
-            if (introduceStandardStore.standardDetail && introduceStandardStore.standardDetail.items) {
-              localStandardItems.value = introduceStandardStore.standardDetail.items
-              console.log('✅ 기준표 항목 복원 완료:', localStandardItems.value.length, '개')
+            const { fetchItemsByStandardId } = await import('@/services/introduceStandardItemService')
+            const itemsResponse = await fetchItemsByStandardId(props.evaluationData.introduceStandardId)
+            
+            // 백엔드에서 직접 배열을 반환하는 경우 처리
+            let items = []
+            if (Array.isArray(itemsResponse.data)) {
+              items = itemsResponse.data
+            } else if (itemsResponse.data?.data && Array.isArray(itemsResponse.data.data)) {
+              items = itemsResponse.data.data
+            } else if (Array.isArray(itemsResponse)) {
+              items = itemsResponse
             }
-          } catch (detailError) {
-            console.warn('⚠️ 기준표 상세 정보 로드 실패:', detailError)
+            
+            localStandardItems.value = items
+            console.log('✅ 기준표 항목 직접 조회 완료:', {
+              standardId: props.evaluationData.introduceStandardId,
+              itemsCount: localStandardItems.value.length,
+              items: localStandardItems.value.map(item => ({ id: item.id, content: item.content }))
+            })
+          } catch (itemsError) {
+            console.warn('⚠️ 기준표 항목 조회 실패, fallback 시도:', itemsError)
+            // Fallback: 기존 방식으로 시도
+            try {
+              await introduceStandardStore.fetchStandardDetail(existingStandard.id)
+              if (introduceStandardStore.standardDetail && introduceStandardStore.standardDetail.items) {
+                localStandardItems.value = introduceStandardStore.standardDetail.items
+                console.log('✅ 기준표 항목 fallback 복원 완료:', localStandardItems.value.length, '개')
+              }
+            } catch (detailError) {
+              console.warn('⚠️ 기준표 상세 정보 로드도 실패:', detailError)
+            }
           }
         } else {
-          console.warn('⚠️ 기존 기준표를 찾을 수 없습니다:', props.evaluationData.introduceStandardId)
-          console.log('🔍 사용 가능한 기준표들:', introduceStandardStore.standards.map(s => ({
-            id: s.id,
-            content: s.content
-          })))
+          console.warn('⚠️ 기준표를 찾을 수 없습니다:', props.evaluationData.introduceStandardId)
         }
       } catch (standardError) {
         console.error('❌ 기준표 복원 실패:', standardError)
       }
-    } else {
-      console.log('ℹ️ 기준표 정보가 없습니다.')
     }
   } else {
     console.log('🔄 평가 데이터 초기화 (빈 상태)')
@@ -192,10 +210,37 @@ watchEffect(async () => {
 })
 
 // ViewModel: 이벤트 핸들러
-const onStandardSelect = (standard) => {
+const onStandardSelect = async (standard) => {
   selectedStandard.value = standard
   localStandardTitle.value = standard.content
-  localStandardItems.value = standard.items
+  
+  // introduce_standard_id로 직접 기준표 항목들 조회
+  try {
+    console.log('🔍 선택된 기준표의 항목들 조회:', standard.id)
+    const { fetchItemsByStandardId } = await import('@/services/introduceStandardItemService')
+    const itemsResponse = await fetchItemsByStandardId(standard.id)
+    
+    // 백엔드에서 직접 배열을 반환하는 경우 처리
+    let items = []
+    if (Array.isArray(itemsResponse.data)) {
+      items = itemsResponse.data
+    } else if (itemsResponse.data?.data && Array.isArray(itemsResponse.data.data)) {
+      items = itemsResponse.data.data
+    } else if (Array.isArray(itemsResponse)) {
+      items = itemsResponse
+    }
+    
+    localStandardItems.value = items
+    console.log('✅ 기준표 항목 조회 완료:', {
+      standardId: standard.id,
+      itemsCount: localStandardItems.value.length,
+      items: localStandardItems.value.map(item => ({ id: item.id, content: item.content }))
+    })
+  } catch (itemsError) {
+    console.warn('⚠️ 기준표 항목 조회 실패, fallback 사용:', itemsError)
+    // Fallback: 기존 방식 (standard.items가 있는 경우)
+    localStandardItems.value = standard.items || []
+  }
 }
 
 const emit = defineEmits(['save'])

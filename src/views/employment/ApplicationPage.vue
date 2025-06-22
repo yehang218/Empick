@@ -304,7 +304,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, markRaw } from 'vue'
+import { ref, onMounted, markRaw, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
 import { useApplicationStore } from '@/stores/applicationStore'
@@ -434,6 +434,15 @@ watch(() => applicationStore.selectedApplication, (val) => {
     console.log('👤 지원자 정보:', applicant.value)
   }
 }, { immediate: true })
+
+// currentEvaluationData 변경 감지 (디버깅용)
+watch(() => currentEvaluationData.value, (newData, oldData) => {
+  console.log('🔄 평가 데이터 변경 감지:', {
+    old: oldData,
+    new: newData,
+    hasStandardId: !!newData?.introduceStandardId
+  })
+}, { deep: true })
 
 onMounted(async () => {
   try {
@@ -641,14 +650,16 @@ const loadApplicationData = async () => {
       
       // 자기소개서 데이터가 있으면 평가 데이터 설정
       if (introduceData && introduceData.id) {
-        currentEvaluationData.value = {
+        const baseEvaluationData = {
           totalScore: null,
           comment: '',
           applicantId: applicant.value?.id,
           applicationId: actualApplicationId,
           introduceId: introduceData.id
         }
-        console.log('✅ 평가 데이터 설정 완료:', currentEvaluationData.value)
+        
+        currentEvaluationData.value = baseEvaluationData
+        console.log('✅ 기본 평가 데이터 설정 완료:', currentEvaluationData.value)
       }
       
       // Store에서 fallback 처리를 담당하므로 여기서는 단순히 로그만 출력
@@ -795,6 +806,11 @@ const loadExistingEvaluationData = async (applicationId) => {
       }
       
       console.log('✅ 평가 데이터 복원 완료:', restoredData)
+      
+      // Vue의 반응성을 위해 강제로 업데이트 트리거
+      await nextTick()
+      console.log('🔄 Vue 반응성 업데이트 완료')
+      
       return existingEvaluation
     } else {
       console.log('ℹ️ 기존 평가 결과가 없습니다.')
