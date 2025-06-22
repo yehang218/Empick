@@ -61,6 +61,20 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         draftRecruitment.value = null;
     };
 
+    const setDraftIntroduceTemplate = (id, title) => {
+        if (draftRecruitment.value) {
+            draftRecruitment.value.introduceTemplateId = id;
+            draftRecruitment.value.introduceTemplateTitle = title;
+        }
+    };
+    
+    const clearIntroduceTemplateDraft = () => {
+        if (draftRecruitment.value) {
+            draftRecruitment.value.introduceTemplateId = null;
+            draftRecruitment.value.introduceTemplateTitle = null;
+        }
+    }
+
     // 지원서 항목 초안
     const selectedApplicationItemIds = ref([]);
     const requiredApplicationItemIds = ref([]);
@@ -135,6 +149,7 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
     const clearAllDrafts = () => {
         clearDraftRecruitment();
         clearDraftApplicationItems();
+        clearIntroduceTemplateDraft();
         clearApplicationItemCategoryList();
     };
 
@@ -152,6 +167,8 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
         draftRecruitment,
         setDraftRecruitment,
         clearDraftRecruitment,
+        setDraftIntroduceTemplate,
+        clearIntroduceTemplateDraft,
 
         selectedApplicationItemIds,
         requiredApplicationItemIds,

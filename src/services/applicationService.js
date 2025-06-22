@@ -29,7 +29,12 @@ export const getApplicationByIdService = async (id, options = {}) => {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    return ApplicationResponseDTO.fromJSON(apiResponse.data);
+    const applicationDto = ApplicationResponseDTO.fromJSON(apiResponse.data);
+    if (!applicationDto) {
+      console.warn('⚠️ 지원서 데이터 변환 실패. API 응답:', apiResponse);
+      throw new Error(`지원서 데이터를 변환할 수 없습니다. (ID: ${id})`);
+    }
+    return applicationDto;
   }, options);
 };
 
@@ -47,7 +52,11 @@ export const getApplicationByApplicantIdService = async (applicantId, options = 
         throwCustomApiError(apiResponse.code, apiResponse.message);
       }
 
-      return ApplicationResponseDTO.fromJSON(apiResponse.data);
+      const applicationDto = ApplicationResponseDTO.fromJSON(apiResponse.data);
+      if (!applicationDto) {
+        throw new Error('지원서 데이터를 변환할 수 없습니다.');
+      }
+      return applicationDto;
     } catch (error) {
       console.warn('⚠️ applicantId 전용 엔드포인트 실패, 기본 엔드포인트 시도:', error.message);
       
@@ -59,7 +68,11 @@ export const getApplicationByApplicantIdService = async (applicantId, options = 
         throwCustomApiError(apiResponse.code, apiResponse.message);
       }
 
-      return ApplicationResponseDTO.fromJSON(apiResponse.data);
+      const fallbackDto = ApplicationResponseDTO.fromJSON(apiResponse.data);
+      if (!fallbackDto) {
+        throw new Error('지원서 데이터를 변환할 수 없습니다.');
+      }
+      return fallbackDto;
     }
   }, options);
 };
@@ -77,15 +90,59 @@ export const createApplicationService = async (dto, options = {}) => {
   }, options);
 };
 
-export const updateApplicationStatusService = async (id, dto, options = {}) => {
+export const updateApplicationStatusService = async (id, statusCode, options = {}) => {
   return withErrorHandling(async () => {
-    const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(id), dto);
+    console.log('🔄 지원서 상태 변경:', { applicationId: id, statusCode });
+    
+    const updateData = {
+      status: statusCode
+    };
+    
+    const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(id), updateData);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
     if (!apiResponse.success) {
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
+    console.log('✅ 지원서 상태 변경 성공:', apiResponse.data);
+    
+    // 클라이언트에서 상태 설명 추가 (백엔드 수정 전 임시 해결책)
+    const result = ApplicationResponseDTO.fromJSON(apiResponse.data);
+    if (result && typeof result.status === 'number') {
+      const { getStatusByCode } = await import('@/constants/employment/applicationStatus');
+      const statusInfo = getStatusByCode(result.status);
+      result.statusDescription = statusInfo.label;
+      console.log('✅ 클라이언트에서 상태 설명 추가:', statusInfo.label);
+    }
+    
+    return result;
+  }, options);
+};
+
+// application의 introduce_rating_result_id 업데이트 전용 서비스
+export const updateApplicationIntroduceRatingResultService = async (applicationId, ratingResultId, options = {}) => {
+  return withErrorHandling(async () => {
+    console.log('🔄 application introduce_rating_result_id 업데이트:', {
+      applicationId,
+      ratingResultId
+    });
+    
+    // 업데이트 데이터 준비 (snake_case와 camelCase 모두 포함)
+    const updateData = {
+      introduceRatingResultId: ratingResultId,
+      introduce_rating_result_id: ratingResultId
+    };
+    
+    // PATCH 요청으로 application 업데이트
+    const response = await api.patch(`/api/v1/employment/application/${applicationId}`, updateData);
+    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+    if (!apiResponse.success) {
+      throwCustomApiError(apiResponse.code, apiResponse.message);
+    }
+
+    console.log('✅ application introduce_rating_result_id 업데이트 성공:', apiResponse.data);
     return ApplicationResponseDTO.fromJSON(apiResponse.data);
   }, options);
 };

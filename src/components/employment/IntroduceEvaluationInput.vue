@@ -76,7 +76,7 @@
     <!-- 기준표 선택 모달 -->
     <IntroduceStandardSelectModal v-model="showStandardModal" @select="onStandardSelect" />
     <div class="d-flex justify-end mt-4">
-      <v-btn color="success" @click="handleSave" :loading="savingLoading">저장</v-btn>
+      <v-btn color="success" @click="handleSave" :loading="savingLoading">평가 저장</v-btn>
     </div>
   </div>
 </template>
@@ -87,11 +87,13 @@ import { useRouter } from 'vue-router'
 import IntroduceStandardSelectModal from './IntroduceStandardSelectModal.vue'
 import { useIntroduceStore } from '@/stores/introduceStore'
 import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
 import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const introduceStore = useIntroduceStore()
 const standardItemStore = useIntroduceStandardItemStore()
+const introduceStandardStore = useIntroduceStandardStore()
 const toast = useToast()
 
 const props = defineProps({
@@ -114,22 +116,131 @@ const localStandardTitle = ref('')
 const localStandardItems = ref([])
 const savingLoading = ref(false)
 
-// ViewModel: 데이터 초기화
-watchEffect(() => {
+// ViewModel: 데이터 초기화 및 기준표 복원
+watchEffect(async () => {
   if (props.evaluationData) {
-    localTotalScore.value = props.evaluationData.totalScore || null
-    localComment.value = props.evaluationData.comment || ''
+    console.log('🔄 평가 데이터 초기화:', props.evaluationData)
+    
+    // 점수와 총평 복원
+    const score = props.evaluationData.totalScore || props.evaluationData.ratingScore
+    const comment = props.evaluationData.comment || props.evaluationData.content
+    
+    localTotalScore.value = score || null
+    localComment.value = comment || ''
+    
+    console.log('📊 복원된 평가 데이터:', {
+      score: localTotalScore.value,
+      comment: localComment.value?.substring(0, 50) + '...',
+      introduceStandardId: props.evaluationData.introduceStandardId
+    })
+    
+    // introduce_rating_result에서 가져온 introduce_standard_id로 기준표 복원
+    if (props.evaluationData.introduceStandardId) {
+      try {
+        console.log('🔍 평가 결과의 기준표 ID로 복원:', props.evaluationData.introduceStandardId)
+        
+        // 기준표 목록이 없으면 먼저 로드
+        if (!introduceStandardStore.standards || introduceStandardStore.standards.length === 0) {
+          console.log('📋 기준표 목록 로드 중...')
+          await introduceStandardStore.fetchStandards()
+        }
+        
+        // introduce_standard_id로 기준표 찾기
+        const existingStandard = introduceStandardStore.standards.find(standard => 
+          standard.id == props.evaluationData.introduceStandardId
+        )
+        
+        if (existingStandard) {
+          console.log('✅ 기준표 복원 성공:', {
+            id: existingStandard.id,
+            content: existingStandard.content
+          })
+          selectedStandard.value = existingStandard
+          localStandardTitle.value = existingStandard.content
+          
+          // introduce_standard_id로 직접 기준표 항목들 조회
+          try {
+            const { fetchItemsByStandardId } = await import('@/services/introduceStandardItemService')
+            const itemsResponse = await fetchItemsByStandardId(props.evaluationData.introduceStandardId)
+            
+            // 백엔드에서 직접 배열을 반환하는 경우 처리
+            let items = []
+            if (Array.isArray(itemsResponse.data)) {
+              items = itemsResponse.data
+            } else if (itemsResponse.data?.data && Array.isArray(itemsResponse.data.data)) {
+              items = itemsResponse.data.data
+            } else if (Array.isArray(itemsResponse)) {
+              items = itemsResponse
+            }
+            
+            localStandardItems.value = items
+            console.log('✅ 기준표 항목 직접 조회 완료:', {
+              standardId: props.evaluationData.introduceStandardId,
+              itemsCount: localStandardItems.value.length,
+              items: localStandardItems.value.map(item => ({ id: item.id, content: item.content }))
+            })
+          } catch (itemsError) {
+            console.warn('⚠️ 기준표 항목 조회 실패, fallback 시도:', itemsError)
+            // Fallback: 기존 방식으로 시도
+            try {
+              await introduceStandardStore.fetchStandardDetail(existingStandard.id)
+              if (introduceStandardStore.standardDetail && introduceStandardStore.standardDetail.items) {
+                localStandardItems.value = introduceStandardStore.standardDetail.items
+                console.log('✅ 기준표 항목 fallback 복원 완료:', localStandardItems.value.length, '개')
+              }
+            } catch (detailError) {
+              console.warn('⚠️ 기준표 상세 정보 로드도 실패:', detailError)
+            }
+          }
+        } else {
+          console.warn('⚠️ 기준표를 찾을 수 없습니다:', props.evaluationData.introduceStandardId)
+        }
+      } catch (standardError) {
+        console.error('❌ 기준표 복원 실패:', standardError)
+      }
+    }
   } else {
+    console.log('🔄 평가 데이터 초기화 (빈 상태)')
     localTotalScore.value = null
     localComment.value = ''
+    selectedStandard.value = null
+    localStandardTitle.value = ''
+    localStandardItems.value = []
   }
 })
 
 // ViewModel: 이벤트 핸들러
-const onStandardSelect = (standard) => {
+const onStandardSelect = async (standard) => {
   selectedStandard.value = standard
   localStandardTitle.value = standard.content
-  localStandardItems.value = standard.items
+  
+  // introduce_standard_id로 직접 기준표 항목들 조회
+  try {
+    console.log('🔍 선택된 기준표의 항목들 조회:', standard.id)
+    const { fetchItemsByStandardId } = await import('@/services/introduceStandardItemService')
+    const itemsResponse = await fetchItemsByStandardId(standard.id)
+    
+    // 백엔드에서 직접 배열을 반환하는 경우 처리
+    let items = []
+    if (Array.isArray(itemsResponse.data)) {
+      items = itemsResponse.data
+    } else if (itemsResponse.data?.data && Array.isArray(itemsResponse.data.data)) {
+      items = itemsResponse.data.data
+    } else if (Array.isArray(itemsResponse)) {
+      items = itemsResponse
+    }
+    
+    localStandardItems.value = items
+    console.log('✅ 기준표 항목 조회 완료:', {
+      standardId: standard.id,
+      itemsCount: localStandardItems.value.length,
+      items: localStandardItems.value.map(item => ({ id: item.id, content: item.content }))
+    })
+  } catch (itemsError) {
+    console.warn('⚠️ 기준표 항목 조회 실패, fallback 사용:', itemsError)
+    // Fallback: 기존 방식 (standard.items가 있는 경우)
+    localStandardItems.value = standard.items || []
+  }
 }
 
 const emit = defineEmits(['save'])
@@ -138,15 +249,30 @@ const handleSave = async () => {
   try {
     savingLoading.value = true
     
+    // 입력 값 검증
+    if (!localTotalScore.value || localTotalScore.value < 0 || localTotalScore.value > 100) {
+      toast.error('평가 점수를 0~100 사이로 입력해주세요.')
+      return
+    }
+    
+    if (!localComment.value || localComment.value.trim() === '') {
+      toast.error('총평을 입력해주세요.')
+      return
+    }
+    
     const evaluationData = {
-      content: localComment.value,
+      content: localComment.value.trim(),
       ratingScore: localTotalScore.value,
       totalScore: localTotalScore.value,
-      comment: localComment.value,
+      comment: localComment.value.trim(),
       applicantId: props.evaluationData?.applicantId,
       applicationId: props.evaluationData?.applicationId,
+      introduceId: props.evaluationData?.introduceId,
+      introduceStandardId: selectedStandard.value?.id,
       standardId: selectedStandard.value?.id
     }
+    
+    console.log('💾 자기소개서 평가 저장 데이터:', evaluationData)
     
     await introduceStore.saveIntroduceRatingResult(evaluationData)
     emit('save', evaluationData)

@@ -23,8 +23,9 @@
                     variant="flat"
                     class="mr-4"
                     :loading="linking"
+                    :disabled="isAlreadyLinked"
                 >
-                    채용 요청서 생성
+                    {{ isAlreadyLinked ? '생성 완료' : '채용 요청서로 생성' }}
                 </v-btn>
                 <button class="btn approve" @click="handleApprove" :disabled="!canApprove">
                     승인
@@ -106,7 +107,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed, ref } from 'vue';
+import { onMounted, onUnmounted, computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '../../stores/approvalStore';
@@ -137,9 +138,19 @@ const { loadDepartmentList } = departmentStore;
 const { loadJobList } = jobStore;
 
 const linking = ref(false);
+const isAlreadyLinked = ref(false);
 
 const isRecruitmentRequest = computed(() => approvalDetail.value?.categoryId === 401);
 const isApproved = computed(() => approvalDetail.value?.status === 'APPROVED');
+
+watch(approvalDetail, (newDetail) => {
+    if (newDetail && newDetail.approvalId) {
+        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
+        if (linkedApprovals.includes(newDetail.approvalId)) {
+            isAlreadyLinked.value = true;
+        }
+    }
+}, { deep: true });
 
 const getDepartmentName = (id) => {
     const department = departmentList.value.find(d => d.id === Number(id));
@@ -163,7 +174,7 @@ const getItemContent = (item) => {
 
 const canApprove = computed(() => {
     if (!approvalDetail.value) return false;
-    const isMyTurn = approvalDetail.value.isMyTurn == 1 || approvalDetail.value.isMyTurn === true;
+    const isMyTurn = approvalDetail.value.myTurn === true;
     return isMyTurn && approvalDetail.value.status === 'IN_PROGRESS';
 });
 
@@ -291,7 +302,7 @@ const handleReject = async () => {
 };
 
 const handleLinkRecruitmentRequest = async () => {
-    if (!approvalDetail.value) return;
+    if (!approvalDetail.value || isAlreadyLinked.value) return;
 
     linking.value = true;
     try {
@@ -312,6 +323,11 @@ const handleLinkRecruitmentRequest = async () => {
 
         await recruitmentRequestStore.submitRecruitmentRequest(dto);
         
+        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
+        linkedApprovals.push(approvalDetail.value.approvalId);
+        localStorage.setItem('empick-linked-approvals', JSON.stringify(linkedApprovals));
+        isAlreadyLinked.value = true;
+        
         alert('채용 요청서가 성공적으로 생성되었습니다.');
         router.push('/employment/recruitment-requests');
 
@@ -324,29 +340,18 @@ const handleLinkRecruitmentRequest = async () => {
 };
 
 onMounted(async () => {
-    await Promise.all([
-        loadDepartmentList(),
-        loadJobList()
-    ]);
-    const approvalId = parseInt(route.params.id);
+    const id = route.params.id;
+    if (!memberStore.form.id) {
+        await memberStore.getMyInfo();
+    }
     const memberId = memberStore.form.id;
 
-    if (approvalId && memberId) {
-        await fetchReceivedApprovalDetail(approvalId, memberId);
-        
-        // isMyTurn 직접 계산
-        if (approvalDetail.value && approvalDetail.value.approvers) {
-            const firstPendingApprover = approvalDetail.value.approvers
-                .filter(a => !a.approvedAt)
-                .sort((a, b) => a.stepOrder - b.stepOrder)[0];
-            
-            approvalDetail.value.isMyTurn = firstPendingApprover && firstPendingApprover.memberId === memberId;
-        }
-
-        console.log('✅[ApprovalReceivedDetailPage] 스토어에 저장된 DTO:', approvalDetail.value);
-        console.log('isMyTurn 값:', approvalDetail.value?.isMyTurn, '타입:', typeof approvalDetail.value?.isMyTurn);
-        console.log('status 값:', approvalDetail.value?.status);
+    if (id && memberId) {
+        await fetchReceivedApprovalDetail(id, memberId);
     }
+    
+    await loadDepartmentList();
+    await loadJobList();
 });
 
 onUnmounted(() => {

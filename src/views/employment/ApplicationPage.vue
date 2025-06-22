@@ -172,7 +172,8 @@
                 @click="selectEvaluation(evaluation.type)">
                 <div class="d-flex justify-between align-center mb-2">
                   <h4 class="text-subtitle-2 font-weight-bold">{{ evaluation.type }}</h4>
-                  <v-chip :color="evaluation.result === '합격' ? 'success' : 'error'" size="x-small" variant="elevated">
+                  <v-chip :color="evaluation.result === '평가 완료' ? 'success' : (evaluation.result === '합격' ? 'success' : 'error')" 
+                          size="x-small" variant="elevated">
                     {{ evaluation.result }}
                   </v-chip>
                 </div>
@@ -183,16 +184,11 @@
                     <span class="font-weight-bold">{{ evaluation.score }}점</span>
                   </div>
                   <v-progress-linear :model-value="evaluation.score" color="primary" height="6" rounded class="mb-2" />
-
-                  <div class="d-flex justify-between text-body-2">
-                    <span class="text-grey">평균 점수</span>
-                    <span>{{ evaluation.average }}점</span>
-                  </div>
                 </div>
 
                 <v-btn variant="tonal" size="small" block
                   :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye">
-                  평가 상세보기
+                  평가 자세히 보기
                 </v-btn>
               </div>
             </div>
@@ -200,8 +196,7 @@
         </v-card>
       </v-col>
 
-
-      <!-- 우측: 자기소개서 및 평가 상세 -->
+      <!-- 오른쪽: 자기소개서 및 평가 -->
       <v-col cols="12" lg="7">
         <!-- 자기소개서 카드 -->
         <v-card class="mb-4" elevation="2">
@@ -210,16 +205,6 @@
               <v-icon class="mr-2" color="green">mdi-text-box-outline</v-icon>
               <span>자기소개서</span>
             </div>
-            <v-btn 
-              color="primary" 
-              variant="outlined" 
-              size="small" 
-              prepend-icon="mdi-clipboard-edit"
-              @click="openEvaluationModal"
-              v-if="introduceItems.length > 0"
-            >
-              평가하기
-            </v-btn>
           </v-card-title>
           
           <v-card-text>
@@ -262,50 +247,20 @@
                 에서 먼저 작성을 완료해야 합니다.
               </p>
             </div>
-          </v-card-text>
-        </v-card>
-
-        <!-- 자기소개서 평가 결과 카드 -->
-        <v-card class="modern-card evaluation-detail-card">
-          <v-card-title class="pb-2">
-            <v-icon class="mr-2 text-primary">mdi-clipboard-text</v-icon>
-            {{ selectedEvaluation }} 평가 상세
-            <v-spacer />
-            <v-btn-toggle v-model="viewMode" mandatory variant="outlined" size="small">
-              <v-btn value="detail">상세</v-btn>
-              <v-btn value="score">점수</v-btn>
-            </v-btn-toggle>
-          </v-card-title>
-          <v-divider class="mb-4" />
-          <v-card-text>
-            <div v-if="viewMode === 'detail'">
-              <component :is="evaluationComponent" :applicant="applicant" />
-            </div>
-            <div v-else class="score-analysis">
-              <h4 class="text-h6 mb-4">점수 분석</h4>
-              <v-row>
-                <v-col cols="6">
-                  <div class="stat-card">
-                    <div class="stat-number text-primary">{{ getCurrentEvaluation()?.score }}</div>
-                    <div class="stat-label">개인 점수</div>
-                  </div>
-                </v-col>
-                <v-col cols="6">
-                  <div class="stat-card">
-                    <div class="stat-number">{{ getCurrentEvaluation()?.average }}</div>
-                    <div class="stat-label">평균 점수</div>
-                  </div>
-                </v-col>
-              </v-row>
-
-              <div class="mt-4">
-                <h5 class="text-subtitle-1 mb-2">점수 분포</h5>
-                <v-progress-linear :model-value="(getCurrentEvaluation()?.score / 100) * 100" color="primary"
-                  height="20" rounded>
-                  <template #default="{ value }">
-                    <strong class="text-white">{{ Math.ceil(value) }}%</strong>
-                  </template>
-                </v-progress-linear>
+            
+            <!-- 자기소개서 평가 입력 영역 (항상 표시) -->
+            <div v-if="introduceItems && introduceItems.length > 0" class="mt-6">
+              <v-divider class="mb-4" />
+              <div class="evaluation-section">
+                <h4 class="text-h6 mb-4 d-flex align-center">
+                  <v-icon class="mr-2" color="primary">mdi-clipboard-text</v-icon>
+                  자기소개서 평가
+                </h4>
+                
+                <IntroduceEvaluationInput 
+                  :evaluation-data="currentEvaluationData"
+                  @save="handleEvaluationSave"
+                />
               </div>
             </div>
           </v-card-text>
@@ -313,25 +268,59 @@
       </v-col>
     </v-row>
 
-    <!-- 자기소개서 평가 모달 -->
-    <v-dialog v-model="showEvaluationModal" max-width="1000px" persistent>
+    <!-- 상태 변경 모달 -->
+    <v-dialog v-model="statusChangeDialog" max-width="500">
       <v-card>
-        <v-card-title class="d-flex justify-between align-center">
-          <div>
-            <h3>자기소개서 평가</h3>
-            <p class="text-body-2 text-grey ma-0">{{ applicant?.name }}님의 자기소개서를 평가해주세요</p>
-          </div>
-          <v-btn icon variant="text" @click="closeEvaluationModal">
+        <v-card-title class="d-flex justify-space-between align-center">
+          <span>지원서 상태 변경</span>
+          <v-btn icon @click="statusChangeDialog = false">
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
         <v-divider />
-        <v-card-text class="pa-6">
-          <IntroduceEvaluationInput 
-            :evaluation-data="currentEvaluationData"
-            @save="handleEvaluationSave"
-          />
+        <v-card-text class="py-4">
+          <div class="mb-4">
+            <h4 class="text-subtitle-1 mb-2">현재 상태</h4>
+            <v-chip :color="getStatusChipColor(applicant?.status)" variant="elevated" size="large">
+              {{ getStatusText(applicant?.status) }}
+            </v-chip>
+          </div>
+          
+          <div class="mb-4">
+            <h4 class="text-subtitle-1 mb-3">변경할 상태 선택</h4>
+            <v-radio-group v-model="selectedNewStatus" class="mt-2">
+              <v-radio 
+                v-for="status in statusOptions" 
+                :key="status.code"
+                :value="status.code"
+                :color="status.color"
+              >
+                <template #label>
+                  <div class="d-flex align-center">
+                    <v-chip :color="status.color" variant="tonal" size="small" class="mr-2">
+                      {{ status.label }}
+                    </v-chip>
+                    <span class="text-body-2">{{ status.label }}</span>
+                  </div>
+                </template>
+              </v-radio>
+            </v-radio-group>
+          </div>
         </v-card-text>
+        <v-card-actions class="justify-end">
+          <v-btn color="grey" variant="text" @click="statusChangeDialog = false">
+            취소
+          </v-btn>
+          <v-btn 
+            color="primary" 
+            variant="elevated" 
+            @click="confirmStatusChange"
+            :disabled="selectedNewStatus === null || selectedNewStatus === applicant?.status"
+            :loading="statusUpdateLoading"
+          >
+            상태 변경
+          </v-btn>
+        </v-card-actions>
       </v-card>
     </v-dialog>
 
@@ -369,20 +358,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted, markRaw } from 'vue'
+import { ref, onMounted, markRaw, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
 import { useApplicationStore } from '@/stores/applicationStore'
 import { useIntroduceStore } from '@/stores/introduceStore'
+import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
 import { useToast } from 'vue-toastification'
 import { watch, computed } from 'vue'
 import IntroduceEvaluationInput from '@/components/employment/IntroduceEvaluationInput.vue'
+import { 
+  getIntroduceRatingResultByApplicationId, 
+  getIntroduceRatingResultByIntroduceId,
+  getIntroduceRatingResultById,
+  getAllIntroduceRatingResults
+} from '@/services/introduceService'
+import { updateApplicationStatusService } from '@/services/applicationService'
+import { STATUS_OPTIONS, getStatusByCode, getStatusInfoByString } from '@/constants/employment/applicationStatus'
 
 
 const route = useRoute()
 const router = useRouter()
 const applicationStore = useApplicationStore()
 const introduceStore = useIntroduceStore()
+const introduceStandardStore = useIntroduceStandardStore()
 const toast = useToast()
 let applicationId = Number(route.params.applicationId)
 console.log('🔍 받은 applicationId:', route.params.applicationId)
@@ -417,17 +416,18 @@ if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
   }
 }
 
-const IntroduceResult = markRaw(defineAsyncComponent(() => import('@/components/employment/IntroduceEvaluationInput.vue')))
-// const TestResult = markRaw(defineAsyncComponent(() => import('@/components/employment/TestResult.vue')))
-// const InterviewResult = markRaw(defineAsyncComponent(() => import('@/components/employment/InterviewResult.vue')))
 
-const evaluationComponent = ref(IntroduceResult)
-const selectedEvaluation = ref('자기소개서')
-const viewMode = ref('detail')
 
-// 평가 모달 관련
-const showEvaluationModal = ref(false)
+// 평가 관련
 const currentEvaluationData = ref({})
+const selectedEvaluation = ref('자기소개서')
+const introduceRatingScore = ref(null)
+
+// 상태 변경 관련
+const statusChangeDialog = ref(false)
+const selectedNewStatus = ref(null)
+const statusUpdateLoading = ref(false)
+const statusOptions = STATUS_OPTIONS
 
 // ===== ViewModel (Store 데이터 + URL 쿼리 데이터 결합) =====
 const applicant = computed(() => {
@@ -471,24 +471,23 @@ const evaluationStats = computed(() => {
   return [
     {
       type: '자기소개서',
-      score: applicant.value.introduceScore || 0,
-      average: 75,
-      result: (applicant.value.introduceScore || 0) >= 70 ? '합격' : '미평가'
+      score: introduceRatingScore.value || applicant.value.introduceScore || 0,
+      result: introduceRatingScore.value ? '평가 완료' : '미평가'
     },
     {
       type: '실무 테스트',
       score: applicant.value.jobtestTotalScore || 0,
-      average: 80,
       result: (applicant.value.jobtestTotalScore || 0) >= 70 ? '합격' : '미평가'
     },
     {
       type: '면접',
       score: applicant.value.interviewScore || 0,
-      average: 85,
       result: (applicant.value.interviewScore || 0) >= 70 ? '합격' : '미평가'
     }
   ]
 })
+
+// 자기소개서 평가 점수를 위한 ref는 위에서 이미 선언됨
 
 // applicationStore.selectedApplication을 감시하여 데이터 확인
 watch(() => applicationStore.selectedApplication, (val) => {
@@ -497,6 +496,15 @@ watch(() => applicationStore.selectedApplication, (val) => {
     console.log('👤 지원자 정보:', applicant.value)
   }
 }, { immediate: true })
+
+// currentEvaluationData 변경 감지 (디버깅용)
+watch(() => currentEvaluationData.value, (newData, oldData) => {
+  console.log('🔄 평가 데이터 변경 감지:', {
+    old: oldData,
+    new: newData,
+    hasStandardId: !!newData?.introduceStandardId
+  })
+}, { deep: true })
 
 onMounted(async () => {
   try {
@@ -555,25 +563,7 @@ onMounted(async () => {
 
 const selectEvaluation = (type) => {
   selectedEvaluation.value = type
-  switch (type) {
-    case '자기소개서':
-      evaluationComponent.value = IntroduceResult
-      break
-    case '실무 테스트':
-      // TODO: TestResult 컴포넌트 구현 필요
-      evaluationComponent.value = IntroduceResult
-      break
-    case '면접':
-      // TODO: InterviewResult 컴포넌트 구현 필요
-      evaluationComponent.value = IntroduceResult
-      break
-    default:
-      evaluationComponent.value = IntroduceResult
-  }
-}
-
-const getCurrentEvaluation = () => {
-  return evaluationStats.value?.find(evaluation => evaluation.type === selectedEvaluation.value)
+  console.log('선택된 평가 유형:', type)
 }
 
 const formatDate = (dateString) => {
@@ -586,34 +576,82 @@ const formatDate = (dateString) => {
 }
 
 const getStatusChipColor = (status) => {
-  switch (status) {
-    case 'PASSED_FINAL': return 'success'
-    case 'FAILED': return 'error'
-    case 'PASSED_DOCS': return 'info'
-    case 'PASSED_INTERVIEW_1': return 'teal'
-    case 'PASSED_INTERVIEW_2': return 'blue'
-    case 'PASSED_PRACTICAL': return 'purple'
-    case 'WAITING': return 'orange'
-    default: return 'grey'
+  // 숫자 코드인 경우 변환
+  if (typeof status === 'number') {
+    const statusInfo = getStatusByCode(status)
+    return statusInfo.color
   }
+  
+  // 문자열 상태인 경우 새로운 매핑 사용
+  if (typeof status === 'string') {
+    const statusInfo = getStatusInfoByString(status)
+    return statusInfo.color
+  }
+  
+  return 'grey'
 }
 
 const getStatusText = (status) => {
-  switch (status) {
-    case 'PASSED_FINAL': return '최종합격'
-    case 'FAILED': return '불합격'
-    case 'PASSED_DOCS': return '서류합격'
-    case 'PASSED_INTERVIEW_1': return '1차면접 합격'
-    case 'PASSED_INTERVIEW_2': return '2차면접 합격'
-    case 'PASSED_PRACTICAL': return '실무합격'
-    case 'WAITING': return '검토중'
-    default: return '알 수 없음'
+  // 숫자 코드인 경우 변환
+  if (typeof status === 'number') {
+    const statusInfo = getStatusByCode(status)
+    return statusInfo.label
   }
+  
+  // 문자열 상태인 경우 새로운 매핑 사용
+  if (typeof status === 'string') {
+    const statusInfo = getStatusInfoByString(status)
+    return statusInfo.label
+  }
+  
+  return '알 수 없음'
 }
 
 const updateStatus = () => {
-  // 상태 변경 모달이나 다이얼로그 열기
-  console.log('상태 변경')
+  // 상태 변경 모달 열기
+  selectedNewStatus.value = null
+  statusChangeDialog.value = true
+  console.log('상태 변경 모달 열기')
+}
+
+// 상태 변경 확인
+const confirmStatusChange = async () => {
+  if (selectedNewStatus.value === null || selectedNewStatus.value === applicant.value?.status) {
+    return
+  }
+  
+  try {
+    statusUpdateLoading.value = true
+    console.log('🔄 지원서 상태 변경 시작:', {
+      applicationId: applicant.value.id,
+      currentStatus: applicant.value.status,
+      newStatus: selectedNewStatus.value
+    })
+    
+    // 지원서 상태 변경 API 호출
+    const updatedApplication = await updateApplicationStatusService(
+      applicant.value.id, 
+      selectedNewStatus.value
+    )
+    
+    console.log('✅ 지원서 상태 변경 성공:', updatedApplication)
+    
+    // Store의 데이터 업데이트
+    applicationStore.updateApplicationStatus(applicant.value.id, selectedNewStatus.value)
+    
+    // 성공 메시지
+    const newStatusInfo = getStatusByCode(selectedNewStatus.value)
+    toast.success(`지원서 상태가 "${newStatusInfo.label}"로 변경되었습니다.`)
+    
+    // 모달 닫기
+    statusChangeDialog.value = false
+    
+  } catch (error) {
+    console.error('❌ 지원서 상태 변경 실패:', error)
+    toast.error('상태 변경에 실패했습니다. 다시 시도해주세요.')
+  } finally {
+    statusUpdateLoading.value = false
+  }
 }
 
 const goBack = () => {
@@ -641,6 +679,9 @@ const loadApplicationData = async () => {
     
     // 1. 지원서 상세 정보 로드
     try {
+      if (!actualApplicationId || actualApplicationId <= 0) {
+        throw new Error('유효하지 않은 applicationId입니다.')
+      }
       await applicationStore.fetchApplicationById(actualApplicationId)
       console.log('✅ 지원서 상세 정보 로딩 완료')
     } catch (appError) {
@@ -717,6 +758,20 @@ const loadApplicationData = async () => {
       console.log('✅ 자기소개서 데이터 로딩 완료:', introduceData)
       console.log('📊 자기소개서 항목 개수:', introduceData?.items?.length || 0)
       
+      // 자기소개서 데이터가 있으면 평가 데이터 설정
+      if (introduceData && introduceData.id) {
+        const baseEvaluationData = {
+          totalScore: null,
+          comment: '',
+          applicantId: applicant.value?.id,
+          applicationId: actualApplicationId,
+          introduceId: introduceData.id
+        }
+        
+        currentEvaluationData.value = baseEvaluationData
+        console.log('✅ 기본 평가 데이터 설정 완료:', currentEvaluationData.value)
+      }
+      
       // Store에서 fallback 처리를 담당하므로 여기서는 단순히 로그만 출력
       if (!introduceData || !introduceData.items || introduceData.items.length === 0) {
         console.warn('⚠️ 자기소개서 데이터가 없습니다. (Store에서 fallback 처리 시도됨)')
@@ -731,6 +786,28 @@ const loadApplicationData = async () => {
       }
     } catch (introduceError) {
       console.error('❌ 자기소개서 데이터 로딩 실패:', introduceError)
+    }
+    
+    // 4. 평가 기준표 데이터 로드 (평가 데이터 복원 전에 먼저 로드)
+    try {
+      console.log('📋 평가 기준표 데이터 로딩 시작...')
+      await loadEvaluationStandards()
+    } catch (standardError) {
+      console.error('❌ 평가 기준표 데이터 로딩 실패:', standardError)
+    }
+    
+    // 5. 기존 평가 결과 데이터 로드 (자기소개서 데이터 로드 후 실행)
+    try {
+      console.log('📊 기존 평가 결과 로딩 시작... (applicationId:', actualApplicationId, ')')
+      const existingEvaluation = await loadExistingEvaluationData(actualApplicationId)
+      
+      if (existingEvaluation) {
+        console.log('🎉 평가 결과 복원 성공! 새로고침 시에도 평가 데이터가 유지됩니다.')
+      } else {
+        console.log('ℹ️ 기존 평가 결과가 없습니다. 새로운 평가를 작성할 수 있습니다.')
+      }
+    } catch (evaluationError) {
+      console.error('❌ 기존 평가 결과 로딩 실패:', evaluationError)
     }
     
     console.log('✅ 지원서 데이터 로딩 완료')
@@ -761,31 +838,148 @@ const loadApplicationData = async () => {
   }
 }
 
-// 평가 모달 관련 함수들
-const openEvaluationModal = () => {
-  // 현재 평가 데이터 설정 (기존 평가가 있다면 불러오기)
-  currentEvaluationData.value = {
-    totalScore: null,
-    comment: '',
-    applicantId: applicant.value?.id,
-    applicationId: applicationId
+// 기존 평가 결과 데이터 로드 함수
+const loadExistingEvaluationData = async (applicationId) => {
+  try {
+    console.log('🔍 기존 평가 결과 조회 시작... (applicationId:', applicationId, ')')
+    
+    let existingEvaluation = null
+    
+    // 1. 가장 효율적인 방법: application.introduce_rating_result_id로 직접 조회
+    const application = applicationStore.selectedApplication
+    if (application && application.introduceRatingResultId) {
+      console.log('🎯 application.introduce_rating_result_id로 직접 조회:', application.introduceRatingResultId)
+      existingEvaluation = await getIntroduceRatingResultById(application.introduceRatingResultId)
+      
+      if (existingEvaluation) {
+        console.log('✅ introduce_rating_result_id로 평가 결과 조회 성공!')
+      } else {
+        console.warn('⚠️ introduce_rating_result_id로 조회했지만 결과가 없습니다.')
+      }
+    } else {
+      console.log('ℹ️ application.introduce_rating_result_id가 없습니다:', {
+        application: !!application,
+        introduceRatingResultId: application?.introduceRatingResultId
+      })
+    }
+    
+    // 2. Fallback 1: applicationId로 평가 결과 조회 시도
+    if (!existingEvaluation) {
+      console.log('🔄 Fallback 1: applicationId로 평가 결과 조회 시도')
+      existingEvaluation = await getIntroduceRatingResultByApplicationId(applicationId)
+      
+      if (existingEvaluation) {
+        console.log('✅ applicationId로 평가 결과 조회 성공!')
+      }
+    }
+    
+    // 3. Fallback 2: introduceId로 조회 시도
+    if (!existingEvaluation) {
+      const introduceData = applicationStore.introduceData
+      if (introduceData && introduceData.id) {
+        console.log('🔄 Fallback 2: introduceId로 평가 결과 재조회 시도... (introduceId:', introduceData.id, ')')
+        existingEvaluation = await getIntroduceRatingResultByIntroduceId(introduceData.id)
+        
+        if (existingEvaluation) {
+          console.log('✅ introduceId로 평가 결과 조회 성공!')
+        }
+      } else {
+        console.log('ℹ️ introduceData가 없어서 Fallback 2를 건너뜁니다.')
+      }
+    }
+    
+    if (existingEvaluation) {
+      console.log('✅ 기존 평가 결과 발견:', {
+        id: existingEvaluation.id,
+        rating_score: existingEvaluation.rating_score || existingEvaluation.ratingScore,
+        content: existingEvaluation.content?.substring(0, 50) + '...',
+        introduce_standard_id: existingEvaluation.introduce_standard_id || existingEvaluation.introduceStandardId
+      })
+      
+      // 평가 데이터 복원
+      const restoredData = {
+        ...currentEvaluationData.value,
+        totalScore: existingEvaluation.rating_score || existingEvaluation.ratingScore,
+        comment: existingEvaluation.content,
+        ratingScore: existingEvaluation.rating_score || existingEvaluation.ratingScore,
+        content: existingEvaluation.content,
+        introduceStandardId: existingEvaluation.introduce_standard_id || existingEvaluation.introduceStandardId
+      }
+      
+      currentEvaluationData.value = restoredData
+      
+      // 전형 결과에 평가 점수 반영
+      const score = existingEvaluation.rating_score || existingEvaluation.ratingScore
+      if (score) {
+        introduceRatingScore.value = score
+        console.log('✅ 자기소개서 평가 점수 복원:', introduceRatingScore.value)
+      }
+      
+      console.log('✅ 평가 데이터 복원 완료:', restoredData)
+      
+      // Vue의 반응성을 위해 강제로 업데이트 트리거
+      await nextTick()
+      console.log('🔄 Vue 반응성 업데이트 완료')
+      
+      return existingEvaluation
+    } else {
+      console.log('ℹ️ 기존 평가 결과가 없습니다.')
+      console.log('🔍 확인된 정보:', {
+        applicationId,
+        introduceRatingResultId: application?.introduceRatingResultId,
+        introduceDataId: applicationStore.introduceData?.id,
+        selectedApplication: !!application
+      })
+      return null
+    }
+  } catch (error) {
+    console.error('❌ 기존 평가 결과 로드 실패:', error)
+    return null
   }
-  showEvaluationModal.value = true
 }
 
-const closeEvaluationModal = () => {
-  showEvaluationModal.value = false
-  currentEvaluationData.value = {}
+// 평가 기준표 데이터 로드 함수
+const loadEvaluationStandards = async () => {
+  try {
+    console.log('📋 평가 기준표 로딩 시작...')
+    await introduceStandardStore.fetchStandards()
+    console.log('✅ 평가 기준표 로딩 완료:', introduceStandardStore.standards.length, '개')
+  } catch (error) {
+    console.error('❌ 평가 기준표 로딩 실패:', error)
+  }
 }
 
+// 평가 저장 함수
 const handleEvaluationSave = async (evaluationData) => {
   try {
     console.log('💾 평가 데이터 저장:', evaluationData)
-    toast.success('평가가 저장되었습니다.')
-    closeEvaluationModal()
     
-    // 평가 완료 후 데이터 새로고침
-    await loadApplicationData()
+    // 평가 점수 업데이트
+    if (evaluationData.ratingScore) {
+      introduceRatingScore.value = evaluationData.ratingScore
+      console.log('✅ 자기소개서 평가 점수 업데이트:', evaluationData.ratingScore)
+    }
+    
+    toast.success('평가가 저장되었습니다.')
+    
+    // 평가 완료 후 지원서 정보 새로고침하여 introduce_rating_result_id 반영
+    try {
+      console.log('🔄 평가 저장 후 지원서 정보 새로고침 시작...')
+      
+      // applicationId가 있으면 지원서 정보를 다시 조회
+      if (evaluationData.applicationId) {
+        await applicationStore.fetchApplicationById(evaluationData.applicationId)
+        console.log('✅ 지원서 정보 새로고침 완료')
+        
+        // 업데이트된 지원서 정보 확인
+        const updatedApplication = applicationStore.selectedApplication
+        if (updatedApplication && updatedApplication.introduceRatingResultId) {
+          console.log('✅ application.introduce_rating_result_id 연결 확인:', updatedApplication.introduceRatingResultId)
+        }
+      }
+    } catch (refreshError) {
+      console.warn('⚠️ 지원서 정보 새로고침 실패:', refreshError.message)
+    }
   } catch (error) {
     console.error('❌ 평가 저장 실패:', error)
     toast.error('평가 저장에 실패했습니다.')
@@ -845,33 +1039,6 @@ const handleEvaluationSave = async (evaluationData) => {
   background: rgba(0, 0, 0, 0.02);
   padding: 0.75rem;
   border-radius: 8px;
-}
-
-.evaluation-detail-card {
-  min-height: 600px;
-}
-
-.score-analysis {
-  padding: 1rem 0;
-}
-
-.stat-card {
-  text-align: center;
-  padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
-}
-
-.stat-number {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.6);
-  font-weight: 500;
 }
 
 .action-section {

@@ -178,6 +178,7 @@ import { useToast } from 'vue-toastification'
 import { useApplicantStore } from '@/stores/applicantStore'
 import { useApplicantManager } from '@/composables/useApplicantManager'
 import { debounce } from 'lodash'
+import { getStatusByCode, getStatusInfoByString } from '@/constants/employment/applicationStatus'
 
 // 실무테스트 할당
 
@@ -232,31 +233,37 @@ const tableHeaders = [
 ]
 
 // ===== ViewModel: 계산된 속성 =====
-// 상태 관련 유틸리티 함수들
+// 상태 관련 유틸리티 함수들 (통합된 상태 관리 사용)
 const getStatusColor = (status) => {
-  const statusMap = {
-    'PASSED_FINAL': 'success',
-    'FAILED': 'error',
-    'PASSED_DOCS': 'info',
-    'PASSED_INTERVIEW_1': 'teal',
-    'PASSED_INTERVIEW_2': 'blue',
-    'PASSED_PRACTICAL': 'purple',
-    'WAITING': 'grey'
+  // 숫자 코드인 경우 변환
+  if (typeof status === 'number') {
+    const statusInfo = getStatusByCode(status)
+    return statusInfo.color
   }
-  return statusMap[status] || 'grey'
+  
+  // 문자열 상태인 경우 새로운 매핑 사용
+  if (typeof status === 'string') {
+    const statusInfo = getStatusInfoByString(status)
+    return statusInfo.color
+  }
+  
+  return 'grey'
 }
 
 const getStatusText = (status) => {
-  const statusTextMap = {
-    'PASSED_FINAL': '최종합격',
-    'FAILED': '불합격',
-    'PASSED_DOCS': '서류합격',
-    'PASSED_INTERVIEW_1': '1차합격',
-    'PASSED_INTERVIEW_2': '2차합격',
-    'PASSED_PRACTICAL': '실무합격',
-    'WAITING': '대기중'
+  // 숫자 코드인 경우 변환
+  if (typeof status === 'number') {
+    const statusInfo = getStatusByCode(status)
+    return statusInfo.label
   }
-  return statusTextMap[status] || '알 수 없음'
+  
+  // 문자열 상태인 경우 새로운 매핑 사용
+  if (typeof status === 'string') {
+    const statusInfo = getStatusInfoByString(status)
+    return statusInfo.label
+  }
+  
+  return '알 수 없음'
 }
 
 const viewDetail = (item) => {

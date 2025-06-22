@@ -4,7 +4,7 @@
 
         <!-- 면접 총점(평균) 상단 고정 -->
         <div class="mb-4 text-h5 font-weight-bold text-center">
-            면접 총점(평균): {{ selectedInterview?.score ?? '-' }}
+            면접 총점(평균): {{ formatScore(selectedInterview?.score) }}
         </div>
 
         <v-alert v-if="loading" type="info">로딩 중...</v-alert>
@@ -78,13 +78,13 @@
             <v-card-title class="d-flex justify-space-between align-center font-weight-bold">
                 <span>면접관 평가 보기</span>
                 <span class="text-primary font-weight-bold">
-                    합산 점수: {{ currentInterviewerScore }}
+                    합산 점수: {{ formatScore(currentInterviewerScore) }}
                 </span>
                 <div>
                     <v-btn icon @click="prevInterviewer" :disabled="currentIndex === 0">
                         <v-icon>mdi-chevron-left</v-icon>
                     </v-btn>
-                    <span class="mx-4">익명 {{ currentIndex + 1 }}</span>
+                    <span class="mx-4">{{ currentInterviewerName }}</span>
                     <v-btn icon @click="nextInterviewer" :disabled="allScores.length === 0 || currentIndex === allScores.length - 1">
                         <v-icon>mdi-chevron-right</v-icon>
                     </v-btn>
@@ -116,6 +116,25 @@
                             </v-card>
                         </v-col>
                         <v-divider v-if="index < evaluationItems.length - 1"></v-divider>
+                    </v-row>
+
+                    <!-- 면접관 총평 섹션 -->
+                    <v-divider class="my-4"></v-divider>
+                    <v-row class="py-4">
+                        <v-col cols="12">
+                            <div class="d-flex align-center mb-3">
+                                <v-icon class="mr-2" color="primary">mdi-comment-text</v-icon>
+                                <h4 class="text-subtitle-1 font-weight-bold mb-0">면접관 총평</h4>
+                            </div>
+                            <v-card class="pa-4" outlined style="background-color: #f8f9fa;">
+                                <p class="mb-0 text-body-1" v-if="currentInterviewerReview">
+                                    {{ currentInterviewerReview }}
+                                </p>
+                                <p class="mb-0 text-grey text-body-1" v-else>
+                                    입력된 총평이 없습니다.
+                                </p>
+                            </v-card>
+                        </v-col>
                     </v-row>
                 </template>
             </v-container>
@@ -283,10 +302,11 @@ const fetchAll = async () => {
         // 면접관별 점수 가져오기
         const scorePromises = InterviewerList.value.map(async (interviewer) => {
             await interviewScoreStore.fetchScoresByInterviewerId(interviewer.id)
-            await memberStore.fetchM
             return {
                 interviewerId: interviewer.id,
+                memberId: interviewer.memberId,
                 name: interviewer.name,
+                review: interviewer.review,
                 scores: [...interviewScoreStore.scoreList]
             }
         })
@@ -409,6 +429,24 @@ const currentInterviewerScore = computed(() => {
     )
     return found?.score ?? '-'
 })
+
+// 현재 면접관의 총평
+const currentInterviewerReview = computed(() => {
+    const current = allScores.value[currentIndex.value]
+    return current?.review ?? null;
+})
+
+const currentInterviewerName = computed(() => {
+    const current = allScores.value[currentIndex.value]
+    return current?.name ?? '면접관 이름 없음';
+})
+
+const formatScore = (score) => {
+    if (typeof score === 'number') {
+        return score.toFixed(1);
+    }
+    return '-';
+};
 
 </script>
 

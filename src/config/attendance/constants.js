@@ -4,28 +4,28 @@
  */
 
 export const ATTENDANCE_CONSTANTS = {
-    // 근태 카테고리 ID
+    // 근태 카테고리 ID (DB의 실제 ID에 맞춤)
     CATEGORY_IDS: {
-        CHECK_IN: 0,
-        CHECK_OUT: 1,
-        LATE: 2,
-        EARLY_LEAVE: 3,
-        BREAK_START: 4,
-        BREAK_END: 5,
-        OVERTIME_START: 6,
-        OVERTIME_END: 7,
+        CHECK_IN: 1,        // 출근 (DB의 실제 ID)
+        CHECK_OUT: 2,       // 퇴근 (DB의 실제 ID)
+        LATE: 3,            // 지각 (DB의 실제 ID)
+        EARLY_LEAVE: 4,     // 조퇴 (DB의 실제 ID)
+        BREAK_START: 5,     // 휴게시작
+        BREAK_END: 6,       // 휴게종료
+        OVERTIME_START: 7,  // 연장시작
+        OVERTIME_END: 8,    // 연장종료
     },
 
-    // 근태 카테고리 라벨
+    // 근태 카테고리 라벨 (DB ID에 맞춤)
     CATEGORY_LABELS: {
-        0: '출근',
-        1: '퇴근',
-        2: '지각',
-        3: '조퇴',
-        4: '휴게시작',
-        5: '휴게종료',
-        6: '연장시작',
-        7: '연장종료',
+        1: '출근',
+        2: '퇴근',
+        3: '지각',
+        4: '조퇴',
+        5: '휴게시작',
+        6: '휴게종료',
+        7: '연장시작',
+        8: '연장종료',
     },
 
     // 상태 코드

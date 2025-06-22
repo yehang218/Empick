@@ -20,7 +20,20 @@ export const patchStandardItemFk = async (itemId, introduceStandardId) => {
 }
 
 export async function fetchItemsByStandardId(standardId) {
-  return apiClient.get(`/api/v1/employment/introduce-standard/items/standard/${standardId}`)
+  const response = await apiClient.get(`/api/v1/employment/introduce-standard/items/standard/${standardId}`)
+  console.log('🔍 기준표별 항목 조회 API 응답:', response.data)
+  
+  // 백엔드에서 직접 배열을 반환하는 경우
+  if (Array.isArray(response.data)) {
+    return { data: response.data }
+  }
+  
+  // CustomApiResponse 형태인 경우
+  if (response.data?.data) {
+    return response.data
+  }
+  
+  return response
 }
 
 export const deleteStandardItem = async (id) => {
