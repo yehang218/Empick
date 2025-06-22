@@ -56,7 +56,7 @@ public class IntroduceStandardQueryController {
                         introduceStandardQueryService.findAllIntroduceStandardItem()));
     }
 
-    @Operation(summary = "기준표 상세 조회", description = "기준표 ID로 기준표 정보를 조회합니다.")
+    @Operation(summary = "기준표 ID로 기준표 정보 조회", description = "기준표 ID로 기준표 정보를 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "404", description = "기준표를 찾을 수 없음")
@@ -77,7 +77,7 @@ public class IntroduceStandardQueryController {
     })
     @GetMapping("/items/standard/{standardId}")
     public ResponseEntity<List<IntroduceStandardItemQueryDTO>> getItemsByStandardId(@PathVariable("standardId") int standardId) {
-        List<IntroduceStandardItemQueryDTO> items = introduceStandardQueryService.getIntroduceStandardItemById(standardId);
+        List<IntroduceStandardItemQueryDTO> items = introduceStandardQueryService.getIntroduceStandardItemByStandardId(standardId);
 
         if (items == null || items.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
