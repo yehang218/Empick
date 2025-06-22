@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import {
     getApprovalCategories,
+    getSubCategories,
     getApprovalCategoryItems,
     createApprovalService,
     getApprovalLine,
@@ -37,7 +38,7 @@ export const useApprovalWriteStore = defineStore('approvalWrite', () => {
     const fetchCategories = async () => {
         loading.value = true;
         try {
-            categoryList.value = await getApprovalCategories();
+            categoryList.value = await getSubCategories();
         } finally {
             loading.value = false;
         }

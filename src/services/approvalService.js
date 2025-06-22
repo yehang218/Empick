@@ -27,6 +27,25 @@ export const getApprovalCategories = async (options = {}) => {
     }, options);
 };
 
+// 하위 카테고리만 조회 (상위 카테고리 제외)
+export const getSubCategories = async (options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(ApprovalAPI.CATEGORIES);
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+        
+        // approvalCategoryId가 null이 아닌 것들만 필터링 (하위 카테고리만)
+        const subCategories = (apiResponse.data || []).filter(category => 
+            category.approvalCategoryId !== null
+        );
+
+        return subCategories.map(ApprovalCategoryDTO.fromJSON);
+    }, options);
+};
+
 // 선택 카테고리의 결재 항목 조회
 export const getApprovalCategoryItems = async (categoryId, options = {}) => {
     return withErrorHandling(async () => {
