@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ApplicationResponseQueryService {
     List<ApplicationResponseQueryDTO> findAllApplicationResponse();
+
+    List<ApplicationResponseQueryDTO> findApplicationResponsesByApplicationId(Integer applicationId);
 }
