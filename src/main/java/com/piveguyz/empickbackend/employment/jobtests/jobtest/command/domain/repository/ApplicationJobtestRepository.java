@@ -15,4 +15,6 @@ public interface ApplicationJobtestRepository extends JpaRepository<ApplicationJ
     List<ApplicationJobtestEntity> findByJobTestId(int jobtestId);
 
     boolean existsByJobTestIdAndEntryCode(int jobTestId, String entryCode);
+
+    ApplicationJobtestEntity findByEntryCode(String entryCode);
 }

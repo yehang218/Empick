@@ -1,6 +1,13 @@
 package com.piveguyz.empickbackend.approvals.approval.query.mapper;
 
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineDetailDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineQueryDTO;
 import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedDetailQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedDetailQueryDTO;
+import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -16,5 +23,15 @@ public interface ApprovalQueryMapper {
 
     List<ApprovalQueryDTO> findByWriterId(Integer writerId);
 
-    List<ApprovalQueryDTO> findReceivedApprovals(Integer memberId);
+    List<ApprovalReceivedQueryDTO> findReceivedApprovals(Integer memberId);
+
+    List<ApprovalLineQueryDTO> selectApprovalLinePreview(Integer categoryId, Integer writerId);
+
+    List<ApprovalRequestedListQueryDTO> findRequestedApprovals(Integer memberId);
+
+    ApprovalReceivedDetailQueryDTO findApprovalBasicDetail(Integer approvalId);
+    List<ApprovalLineDetailDTO> findApproverDetails(Integer approvalId);
+    boolean isMyTurn(Integer approvalId, Integer memberId);
+
+    ApprovalRequestedDetailQueryDTO findRequestedApprovalBasicDetail(Integer approvalId);
 }

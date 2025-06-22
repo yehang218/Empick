@@ -18,10 +18,10 @@
         <result column="second_approved_at" property="secondApprovedAt"/>
         <result column="third_approved_at" property="thirdApprovedAt"/>
         <result column="fourth_approved_at" property="fourthApprovedAt"/>
-
     </resultMap>
 
-    <resultMap id="ApprovalReceivedResultMap" type="ApprovalReceivedQueryDTO">
+<!--    요청받은 결재 목록 조회-->
+    <resultMap id="ApprovalReceivedResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedQueryDTO">
         <result column="approval_id" property="approvalId" />
         <result column="category_name" property="categoryName" />
         <result column="writer_name" property="writerName" />
@@ -29,6 +29,24 @@
         <result column="status" property="status"
                 typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler" />
         <result column="my_approval_step" property="myApprovalStep" />
+    </resultMap>
+
+<!--    요청한 결재 목록 조회-->
+    <resultMap id="ApprovalRequestedListResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO">
+        <id column="approval_id" property="approvalId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="status" property="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+    </resultMap>
+
+<!--    결재 라인 조회-->
+    <resultMap id="ApprovalLinePreviewMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineQueryDTO">
+        <result property="order"          column="order" />
+        <result property="positionId"     column="positionId" />
+        <result property="positionName"   column="positionName" />
+        <result property="memberId"       column="memberId" />
+        <result property="memberName"     column="memberName" />
+        <result property="departmentName" column="departmentName" />
     </resultMap>
 
     <select id="findAll" resultMap="ApprovalResultMap">
@@ -143,5 +161,38 @@
            OR a.fourth_approver_id = #{memberId}
         ORDER BY a.created_at DESC
     </select>
+
+<!--    요청한 결재 목록 조회-->
+    <select id="findRequestedApprovals" resultMap="ApprovalRequestedListResultMap">
+        SELECT
+            a.id AS approval_id,
+            ac.name AS category_name,
+            a.created_at,
+            a.status
+        FROM approval a
+                 JOIN approval_category ac ON a.category_id = ac.id
+        WHERE a.writer_id = #{memberId}
+        ORDER BY a.created_at DESC
+    </select>
+
+    <!--    결재라인 조회-->
+    <select id="selectApprovalLinePreview"
+            resultMap="ApprovalLinePreviewMap">
+        SELECT al.step_order  AS `order`,
+               al.position_id AS positionId,
+               p.name         AS positionName,
+               m.id           AS memberId,
+               m.name         AS memberName,
+               d.name         AS departmentName
+        FROM approval_line al
+                 JOIN position p ON al.position_id = p.id
+                 JOIN member writer ON writer.id = #{writerId}
+                 LEFT JOIN member m
+                           ON m.department_id = writer.department_id AND m.position_id = al.position_id
+                 LEFT JOIN department d ON d.id = m.department_id
+        WHERE al.approval_category_id = #{categoryId}
+        ORDER BY al.step_order ASC
+    </select>
+
 
 </mapper>

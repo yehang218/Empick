@@ -40,6 +40,7 @@ public class MemberEntity {
     @Column(name = "phone", nullable = false, length = 255)
     private String phone;
 
+    // uuid를 백에서 생성하고 경로를 저장해야 하므로 프론트에서는
     @Column(name = "picture_url", nullable = false, length = 255)
     private String pictureUrl;
 

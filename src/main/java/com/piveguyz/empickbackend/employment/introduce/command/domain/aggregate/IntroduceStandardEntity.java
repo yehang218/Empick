@@ -22,6 +22,4 @@ public class IntroduceStandardEntity {
     @Column(name = "member_id", nullable = false)
     private Integer memberId;
 
-    @Column(name = "introduce_id", nullable = false)
-    private Integer introduceId;
 }

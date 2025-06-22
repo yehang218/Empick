@@ -87,16 +87,30 @@ public class MemberQueryController {
             description = "- memberId로 S3에서 프로필 이미지를 다운로드합니다."
     )
     @GetMapping("/{memberId}/profile-image")
-    public ResponseEntity<byte[]> getProfileImage(
-            @PathVariable int memberId) {
+    public ResponseEntity<?> getProfileImage(@PathVariable int memberId) {
+        try {
+            // Facade를 통해 프로필 이미지 다운로드
+            byte[] imageData = memberProfileFacade.downloadProfileImage(memberId);
+            String profileImageKey = memberProfileFacade.getProfileImageKey(memberId);
 
-        byte[] imageData = memberProfileFacade.downloadProfileImage(memberId);
-        String profileImageKey = memberProfileFacade.getProfileImageKey(memberId);
-        String contentType = guessContentType(profileImageKey);
+            // profileImageKey가 null이거나 빈 문자열인 경우 처리
+            if (profileImageKey == null || profileImageKey.isEmpty()) {
+                return ResponseEntity.status(404).body("프로필 이미지가 없습니다.");
+            }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .body(imageData);
+            String contentType = guessContentType(profileImageKey);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(imageData);
+
+        } catch (Exception e) {
+            // S3에 파일이 없거나 기타 오류 발생 시
+            if (e.getMessage() != null && e.getMessage().contains("NoSuchKey")) {
+                return ResponseEntity.status(404).body("프로필 이미지를 찾을 수 없습니다.");
+            }
+            return ResponseEntity.status(500).body("서버 오류: " + e.getMessage());
+        }
     }
 
     @Operation(

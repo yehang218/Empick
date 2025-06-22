@@ -55,11 +55,11 @@ public class JobtestCommandController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2402", description = "작성자 정보가 유효하지 않습니다."),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2420", description = "이 실무테스트는 다른 곳에서 사용중이므로 수정하거나 삭제할 수 없습니다."),
     })
-    @PatchMapping("/{id}")
+    @PatchMapping("/{jobtestId}")
     public ResponseEntity<CustomApiResponse<UpdateJobtestCommandDTO>> updateJobtest(
-            @PathVariable int id,
+            @PathVariable int jobtestId,
             @RequestBody @Valid UpdateJobtestCommandDTO updateJobtestCommandDTO) {
-        UpdateJobtestCommandDTO newJobtestDTO = jobtestCommandService.updateJobtest(id, updateJobtestCommandDTO);
+        UpdateJobtestCommandDTO newJobtestDTO = jobtestCommandService.updateJobtest(jobtestId, updateJobtestCommandDTO);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, newJobtestDTO));
     }

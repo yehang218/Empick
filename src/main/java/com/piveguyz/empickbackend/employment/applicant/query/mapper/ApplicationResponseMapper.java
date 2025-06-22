@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ApplicationResponseMapper {
     List<ApplicationResponseQueryDTO> findAllApplicationResponse();
+
+    List<ApplicationResponseQueryDTO> findApplicationResponsesByApplicationId(Integer applicationId);
 }

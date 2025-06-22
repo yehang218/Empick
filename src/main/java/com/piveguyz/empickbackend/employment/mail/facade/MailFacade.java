@@ -38,14 +38,14 @@ public class MailFacade {
         return createdDTO;
     }
 
-    public MailCommandDTO sendJobtestMail(Integer id) {
-        MailCommandDTO sendedDTO = mailCommandService.sendJobtestMail(id);
+    public MailCommandDTO sendJobtestMail(Integer applicationId, Integer senderId) {
+        MailCommandDTO sendedDTO = mailCommandService.sendJobtestMail(applicationId, senderId);
         MailCommandDTO createdDTO = mailCommandService.createMail(sendedDTO);
         return createdDTO;
     }
 
-    public MailCommandDTO sendInterviewMail(Integer id) {
-        MailCommandDTO sendedDTO = mailCommandService.sendInterviewMail(id);
+    public MailCommandDTO sendInterviewMail(Integer applicationId, Integer senderId) {
+        MailCommandDTO sendedDTO = mailCommandService.sendInterviewMail(applicationId, senderId);
         MailCommandDTO createdDTO = mailCommandService.createMail(sendedDTO);
         return createdDTO;
     }

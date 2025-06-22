@@ -9,10 +9,8 @@
         SELECT
             id,
             content,
-            member_id,
-            introduce_template_id,
-            updated_by,
-            updated_at
+            applicant_id,
+            introduce_template_id
         FROM
             introduce
     </select>

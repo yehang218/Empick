@@ -40,6 +40,7 @@ public enum ResponseCode {
     MEMBER_PROFILE_IMAGE_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1009 , "사원의 프로필 사진을 찾을 수 없습니다." ),
     MEMBER_ID_INVALID(false, HttpStatus.BAD_REQUEST, 1010, "유효하지 않은 사원 ID 입니다."),
     DUPLICATE_EDIT_REQUEST(false, HttpStatus.CONFLICT, 1011, "같은 필드에 대해 이미 대기중인 수정 요청이 존재합니다."),
+    MEMBER_PROFILE_IMAGE_REQUIRED(false, HttpStatus.BAD_REQUEST, 1012, "프로필 이미지는 필수입니다."),
     EDIT_PROPOSAL_NOT_FOUND(false, HttpStatus.NOT_FOUND, 1100, "변경 요청을 찾을 수 없습니다."),
     EDIT_PROPOSAL_ALREADY_REJECTED(false, HttpStatus.BAD_REQUEST, 1101, "이미 거절된 요청입니다. 변경할 수 없습니다."),
     EDIT_PROPOSAL_SELF_APPROVE_NOT_ALLOWED(false, HttpStatus.FORBIDDEN, 1102, "본인이 요청한 변경은 본인이 처리할 수 없습니다."),
@@ -145,6 +146,8 @@ public enum ResponseCode {
     DUPLICATE_STANDARD_ITEM_CONTENT_TITLE(false, HttpStatus.CONFLICT, 2115, "이미 존재하는 자기소개서 기준표 항목명입니다."),
     INTRODUCE_STANDARD_NOT_FOUND(false, HttpStatus.NOT_FOUND , 2116 ,"자기소개서 기준표 id를 찾을 수 없습니다" ),
     DUPLICATE_STANDARD_CONTENT(false,HttpStatus.CONFLICT ,2117 ,"중복된 내용입니다" ),
+    INTRODUCE_RATING_RESULT_NOT_FOUND(false, HttpStatus.NOT_FOUND, 2113, "요청한 자기소개서 평가 결과 ID가 존재하지 않습니다."),
+
 
 
     //  지원서 - 2200 ~ 2299
@@ -188,6 +191,7 @@ public enum ResponseCode {
     EMPLOYMENT_INVALID_APPLICATION_JOBTEST(false, HttpStatus.NOT_FOUND, 2304, "존재하지 않는 지원서별 실무테스트입니다."),
     EMPLOYMENT_INVALID_TIME(false, HttpStatus.BAD_REQUEST, 2305, "시험 시간이 아닙니다."),
     EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_EXISTS(false, HttpStatus.CONFLICT, 2306, "해당 지원서에 이미 실무테스트가 할당되어 있습니다."),
+    EMPLOYMENT_APPLICATION_JOBTEST_ALREADY_COMPLETE(false, HttpStatus.BAD_REQUEST, 2307, "이미 제출된 테스트입니다."),
 
     //   4) 실무테스트 답안
     EMPLOYMENT_INVALID_JOBTEST_ANSWER(false, HttpStatus.NOT_FOUND,2440, "요청한 답안을 찾을 수 없습니다."),
@@ -274,8 +278,10 @@ public enum ResponseCode {
     APPROVAL_ALREADY_CANCELED(false, HttpStatus.BAD_REQUEST, 3010, "이미 결재 취소된 문서입니다."),
     APPROVAL_NOT_YOUR_TURN(false, HttpStatus.BAD_REQUEST, 3011, "결재 차례가 아닙니다."),
     APPROVAL_REJECT_REASON_REQUIRED(false, HttpStatus.BAD_REQUEST, 3012, "반려 사유가 필요합니다."),
-    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다.");
-
+    APPROVAL_ALREADY_PROCESSED(false, HttpStatus.BAD_REQUEST, 3013, "이미 처리된 결재입니다."),
+    APPROVAL_LINE_NOT_FOUND(false, HttpStatus.BAD_REQUEST, 3014, "결재 라인이 존재하지 않습니다.\n관리자에게 문의하세요."),
+    APPROVAL_CATEGORY_MISSING(false, HttpStatus.BAD_REQUEST, 3015, "결재 유형이 존재하지 않습니다."),
+    APPROVAL_WRITER_MISSING(false, HttpStatus.BAD_REQUEST, 3016, "결재 요청자가 존재하지 않습니다.");
 
 
     private final boolean success;

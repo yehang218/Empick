@@ -16,18 +16,18 @@ public class ApprovalStatusTypeHandler extends BaseTypeHandler<ApprovalStatus> {
     @Override
     public ApprovalStatus getNullableResult(ResultSet rs, String columnName) throws SQLException {
         int code = rs.getInt(columnName);
-        return ApprovalStatus.fromCode(code);
+        return rs.wasNull() ? null : ApprovalStatus.fromCode(code);
     }
 
     @Override
     public ApprovalStatus getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         int code = rs.getInt(columnIndex);
-        return ApprovalStatus.fromCode(code);
+        return rs.wasNull() ? null : ApprovalStatus.fromCode(code);
     }
 
     @Override
     public ApprovalStatus getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         int code = cs.getInt(columnIndex);
-        return ApprovalStatus.fromCode(code);
+        return cs.wasNull() ? null : ApprovalStatus.fromCode(code);
     }
 }

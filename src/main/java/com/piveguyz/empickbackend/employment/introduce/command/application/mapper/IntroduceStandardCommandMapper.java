@@ -10,7 +10,6 @@ public class IntroduceStandardCommandMapper {
                 .id(dto.getId())
                 .content(dto.getContent())
                 .memberId(dto.getMemberId())
-                .introduceId(dto.getIntroduceId())
                 .build();
     }
 
@@ -19,7 +18,6 @@ public class IntroduceStandardCommandMapper {
                 .id(entity.getId())
                 .content(entity.getContent())
                 .memberId(entity.getMemberId())
-                .introduceId(entity.getIntroduceId())
                 .build();
     }
 }

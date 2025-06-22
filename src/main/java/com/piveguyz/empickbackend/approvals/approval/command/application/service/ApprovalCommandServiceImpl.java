@@ -3,19 +3,24 @@ package com.piveguyz.empickbackend.approvals.approval.command.application.servic
 import com.piveguyz.empickbackend.approvals.approval.command.application.dto.*;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.aggregate.ApprovalContentEntity;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.aggregate.ApprovalEntity;
+import com.piveguyz.empickbackend.approvals.approval.command.domain.aggregate.ApprovalLineEntity;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalCategoryItemRepository;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalContentRepository;
+import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalLineRepository;
 import com.piveguyz.empickbackend.approvals.approval.command.domain.repository.ApprovalRepository;
 import com.piveguyz.empickbackend.common.exception.BusinessException;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import com.piveguyz.empickbackend.orgstructure.member.command.domain.aggregate.MemberEntity;
 import com.piveguyz.empickbackend.orgstructure.member.command.domain.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,38 +30,17 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
     private final ApprovalRepository approvalRepository;
     private final ApprovalCategoryItemRepository approvalCategoryItemRepository;
     private final ApprovalContentRepository approvalContentRepository;
+    private final ApprovalLineRepository approvalLineRepository;
 
     @Override
     public Integer createApproval(CreateApprovalCommandDTO dto) {
-        // 결재자/항목 필수 검증
-        if (dto.getApprovers() == null || dto.getApprovers().isEmpty()) {
-            throw new BusinessException(ResponseCode.APPROVAL_NO_APPROVER);
-        }
-        if (dto.getContents() == null || dto.getContents().isEmpty()) {
+        // 필수값 검증
+        if (dto.getCategoryId() == null)
+            throw new BusinessException(ResponseCode.APPROVAL_CATEGORY_MISSING);
+        if (dto.getWriterId() == null)
+            throw new BusinessException(ResponseCode.APPROVAL_WRITER_MISSING);
+        if (dto.getContents() == null || dto.getContents().isEmpty())
             throw new BusinessException(ResponseCode.APPROVAL_CONTENT_ITEM_MISSING);
-        }
-
-        // 결재 순서 중복 검사
-        Map<Integer, Integer> approverMap;
-        try {
-            approverMap = dto.getApprovers().stream()
-                    .collect(Collectors.toMap(
-                            CreateApprovalCommandDTO.ApproverDTO::getOrder,
-                            CreateApprovalCommandDTO.ApproverDTO::getMemberId,
-                            (a, b) -> {
-                                throw new BusinessException(ResponseCode.APPROVAL_DUPLICATE_APPROVER_ORDER);
-                            }
-                    ));
-        } catch (IllegalStateException e) {
-            throw new BusinessException(ResponseCode.APPROVAL_DUPLICATE_APPROVER_ORDER);
-        }
-
-        // 결재선의 모든 결재자가 member에 있는지
-        for (Integer memberId : approverMap.values()) {
-            if (memberId != null && !memberRepository.existsById(memberId)) {
-                throw new BusinessException(ResponseCode.APPROVAL_APPROVER_NOT_FOUND);
-            }
-        }
 
         // 항목 유효성 체크
         for (CreateApprovalCommandDTO.ApprovalContentDTO contentDTO : dto.getContents()) {
@@ -67,6 +51,31 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
             }
         }
 
+        // 작성자 정보
+        MemberEntity writer = memberRepository.findById(dto.getWriterId())
+                .orElseThrow(() -> new BusinessException(ResponseCode.MEMBER_NOT_FOUND));
+        Integer deptId = writer.getDepartmentId();
+
+        // 결재라인 불러오기
+        List<ApprovalLineEntity> approvalLineList =
+                approvalLineRepository.findByApprovalCategoryIdOrderByStepOrderAsc(dto.getCategoryId());
+        if (approvalLineList.isEmpty()) {
+            throw new BusinessException(ResponseCode.APPROVAL_LINE_NOT_FOUND);
+        }
+
+        // 결재자 매핑 (최대 4단계)
+        Map<Integer, Integer> approverMap = new HashMap<>();
+        for (ApprovalLineEntity line : approvalLineList) {
+            // 부서+직책 기준 결재자(멤버) 찾기
+            Optional<MemberEntity> approverOpt =
+                    memberRepository.findFirstByDepartmentIdAndPositionId(deptId, line.getPositionId());
+            Integer approverId = approverOpt
+                    .orElseThrow(() -> new BusinessException(ResponseCode.APPROVAL_APPROVER_NOT_FOUND))
+                    .getId();
+            approverMap.put(line.getStepOrder(), approverId);
+        }
+
+        // approval entity 생성
         ApprovalEntity approval = ApprovalEntity.builder()
                 .categoryId(dto.getCategoryId())
                 .writerId(dto.getWriterId())
@@ -101,7 +110,7 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_APPROVED);
         if (approval.getStatus() == -1)
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_REJECTED);
-        if(approval.getStatus() == -2)
+        if (approval.getStatus() == -2)
             throw new BusinessException(ResponseCode.APPROVAL_ALREADY_CANCELED);
     }
 
@@ -171,7 +180,7 @@ public class ApprovalCommandServiceImpl implements ApprovalCommandService {
 
             // 만약 결재 취소 요청이었다면
             Integer targetApprovalId = approval.getApprovalId();
-            if(targetApprovalId != null) approveCancel(targetApprovalId);
+            if (targetApprovalId != null) approveCancel(targetApprovalId);
             approval.setStatus(1);
         } else {
             approval.setStatus(0); // 계속 진행중

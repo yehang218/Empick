@@ -5,15 +5,34 @@
 
 <mapper namespace="com.piveguyz.empickbackend.employment.introduce.query.mapper.IntroduceStandardMapper">
 
+    <resultMap id="introduceStandardQueryResultMap"
+               type="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="member_id" property="memberId"/>
+    </resultMap>
+
+
     <select id="findAllIntroduceStandard"
             resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO">
         SELECT
             id,
             content,
-            member_id AS memberId,
-            introduce_id AS introduceId
+            member_id AS memberId
         FROM
             introduce_standard
+    </select>
+
+    <select id="findIntroduceStandardById"
+            resultType="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceStandardQueryDTO">
+        SELECT
+            id,
+            content,
+            member_id
+        FROM
+            introduce_standard
+        WHERE
+            id = #{id}
     </select>
 
 </mapper>
