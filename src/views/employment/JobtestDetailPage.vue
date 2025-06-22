@@ -180,10 +180,26 @@ const goEditJobtest = () => {
     router.push({ name: 'JobtestCreate', query: { jobtestId: jobtest.value.id } });
 }
 
-const goToJobtestAnswers = (applicationJobtestId) => {
-    router.push({
+const goToJobtestAnswers = (applicationJobtestId, applicantData = null) => {
+    const query = {};
+    
+    // 지원자 정보가 있으면 쿼리 파라미터로 전달
+    if (applicantData) {
+        query.applicantName = applicantData.applicantName;
+        query.recruitmentTitle = applicantData.recruitmentTitle;
+        query.applicantId = applicantData.applicantId;
+        query.applicationId = applicantData.applicationId;
+    }
+    
+    // 실무테스트 제목도 함께 전달
+    if (jobtest.value?.title) {
+        query.jobtestTitle = jobtest.value.title;
+    }
+    
+    router.push({ 
         name: 'JobtestAnswerDetail',
-        params: { applicationJobtestId }
+        params: { applicationJobtestId },
+        query
     });
 }
 
@@ -201,12 +217,12 @@ const handleQuestionRowClick = async (event, { item }) => {
 
 // 지원자 행 클릭 핸들러
 const handleApplicantRowClick = (event, { item }) => {
-    goToJobtestAnswers(item.applicationJobtestId);
+    goToJobtestAnswers(item.applicationJobtestId, item);
 }
 
 // 지원자 이름 클릭 핸들러
 const handleApplicantClick = (item) => {
-    goToJobtestAnswers(item.applicationJobtestId);
+    goToJobtestAnswers(item.applicationJobtestId, item);
 }
 
 // 스타일 함수들
