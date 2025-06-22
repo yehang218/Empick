@@ -35,7 +35,7 @@
           <v-card-text>
             <div class="d-flex align-start mb-4">
               <v-avatar size="80" class="mr-4">
-                <v-img :src="applicant?.profileUrl" alt="프로필 사진" />
+                <v-img :src="getProfileImageUrl(applicant?.profileUrl)" alt="프로필 사진" />
               </v-avatar>
 
               <div class="flex-grow-1">
@@ -947,6 +947,44 @@ const loadEvaluationStandards = async () => {
   } catch (error) {
     console.error('❌ 평가 기준표 로딩 실패:', error)
   }
+}
+
+// S3 프로필 이미지 URL 생성 함수
+const getProfileImageUrl = (profileUrl) => {
+  if (!profileUrl) {
+    // 기본 프로필 이미지 반환
+    return '/src/assets/empick_logo.png'
+  }
+  
+  // 이미 완전한 URL인 경우 (http:// 또는 https://로 시작)
+  if (profileUrl.startsWith('http://') || profileUrl.startsWith('https://')) {
+    console.log('🌐 완전한 URL 사용:', profileUrl)
+    return profileUrl
+  }
+  
+  // data: URL인 경우 (base64 이미지)
+  if (profileUrl.startsWith('data:')) {
+    return profileUrl
+  }
+  
+  // S3 key인 경우 (예: profiles/applicant_1750613387593.png)
+  if (profileUrl.startsWith('profiles/')) {
+    // 백엔드 다운로드 API를 통해 이미지 표시
+    const downloadUrl = `/api/v1/files/download?key=${encodeURIComponent(profileUrl)}`
+    
+    console.log('🔗 S3 다운로드 URL 생성:', {
+      originalKey: profileUrl,
+      downloadUrl: downloadUrl
+    })
+    
+    // 브라우저 콘솔에서 확인하기 위한 추가 로그
+    console.log('🖼️ 최종 이미지 URL:', downloadUrl)
+    
+    return downloadUrl
+  }
+  
+  // 기타 경우 원본 반환
+  return profileUrl
 }
 
 // 평가 저장 함수
