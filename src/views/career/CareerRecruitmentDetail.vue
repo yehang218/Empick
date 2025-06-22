@@ -5,7 +5,7 @@
       <v-row>
         <v-col cols="12" md="8">
           <h2 class="title">{{ recruitment.title }}</h2>
-          <p class="mb-4 intro-text">{{ recruitment.content }}</p>
+          <div class="mb-4 intro-text" v-html="recruitment.content"></div>
 
           <h3 class="subtitle">주요 업무</h3>
           <ul>
