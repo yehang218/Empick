@@ -158,30 +158,6 @@
                 <p class="text-body-2 line-height-1-6">{{ response.content }}</p>
               </div>
             </div>
-            
-            <!-- 자기소개서 섹션 -->
-            <div class="resume-section" v-if="introduceItems.length > 0 || applicant?.coverLetter">
-              <div class="d-flex justify-between align-center mb-2">
-                <h4 class="text-subtitle-1 font-weight-bold text-primary">자기소개서</h4>
-                <v-btn 
-                  color="primary" 
-                  variant="outlined" 
-                  size="small" 
-                  prepend-icon="mdi-clipboard-edit"
-                  @click="openEvaluationModal"
-                >
-                  평가하기
-                </v-btn>
-              </div>
-              <div v-if="introduceItems.length > 0">
-                <div v-for="item in introduceItems" :key="item.id" class="mb-3">
-                  <h5 class="text-subtitle-2 font-weight-medium mb-1">{{ item.title }}</h5>
-                  <p class="text-body-2 line-height-1-6">{{ item.content }}</p>
-                </div>
-              </div>
-              <p v-else-if="applicant?.coverLetter" class="text-body-2 line-height-1-6">{{ applicant.coverLetter }}</p>
-              <p v-else class="text-body-2 text-grey">자기소개서가 작성되지 않았습니다.</p>
-            </div>
           </v-card-text>
         </v-card>
 
@@ -227,8 +203,63 @@
       </v-col>
 
 
-      <!-- 우측: 평가 상세 -->
+      <!-- 우측: 자기소개서 및 평가 상세 -->
       <v-col cols="12" lg="7">
+        <!-- 자기소개서 카드 -->
+        <v-card class="mb-4" elevation="2">
+          <v-card-title class="d-flex align-center justify-between">
+            <div class="d-flex align-center">
+              <v-icon class="mr-2" color="green">mdi-text-box-outline</v-icon>
+              <span>자기소개서</span>
+            </div>
+            <v-btn 
+              color="primary" 
+              variant="outlined" 
+              size="small" 
+              prepend-icon="mdi-clipboard-edit"
+              @click="openEvaluationModal"
+              v-if="introduceItems.length > 0"
+            >
+              평가하기
+            </v-btn>
+          </v-card-title>
+          
+          <v-card-text>
+            <!-- 템플릿 기반 자기소개서 -->
+            <div v-if="introduceItems.length > 0">
+              <div v-for="item in introduceItems" :key="item.id" class="mb-4 introduce-item-card">
+                <div class="introduce-question">
+                  <v-icon class="mr-2" size="small" color="primary">mdi-help-circle-outline</v-icon>
+                  <span class="text-subtitle-2 font-weight-bold">{{ item.title }}</span>
+                </div>
+                <div class="introduce-answer mt-2">
+                  <p class="text-body-2 line-height-1-6">{{ item.content }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Fallback: 일반 자기소개서 -->
+            <div v-else-if="applicant?.coverLetter">
+              <div class="introduce-item-card">
+                <div class="introduce-question">
+                  <v-icon class="mr-2" size="small" color="primary">mdi-text-box-outline</v-icon>
+                  <span class="text-subtitle-2 font-weight-bold">자기소개서</span>
+                </div>
+                <div class="introduce-answer mt-2">
+                  <p class="text-body-2 line-height-1-6">{{ applicant.coverLetter }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 자기소개서가 없는 경우 -->
+            <div v-else class="text-center py-4">
+              <v-icon class="mb-2" size="48" color="grey-lighten-1">mdi-text-box-remove-outline</v-icon>
+              <p class="text-body-2 text-grey">자기소개서가 작성되지 않았습니다.</p>
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- 자기소개서 평가 결과 카드 -->
         <v-card class="modern-card evaluation-detail-card">
           <v-card-title class="pb-2">
             <v-icon class="mr-2 text-primary">mdi-clipboard-text</v-icon>
@@ -346,22 +377,34 @@ const router = useRouter()
 const applicationStore = useApplicationStore()
 const introduceStore = useIntroduceStore()
 const toast = useToast()
-const applicationId = Number(route.params.applicationId)
+let applicationId = Number(route.params.applicationId)
 console.log('🔍 받은 applicationId:', route.params.applicationId)
 console.log('🔍 변환된 applicationId:', applicationId)
 console.log('🔍 query params:', route.query)
 
+// applicationId가 유효하지 않은 경우 query에서 찾기
 if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
-  console.error('❌ 유효하지 않은 applicationId:', route.params.applicationId)
+  console.warn('⚠️ URL의 applicationId가 유효하지 않음:', route.params.applicationId)
   
-  // query에서 applicantId가 있다면 그것을 사용
-  const applicantId = route.query.applicantId
-  if (applicantId && !isNaN(Number(applicantId))) {
-    console.log('✅ applicantId를 applicationId 대신 사용:', applicantId)
-    // 여기서 applicantId를 사용하여 데이터를 가져올 수 있도록 수정
-    // 일단 사용자에게 알림만 표시
-    toast.warning('지원서 데이터를 불러오는 중입니다...')
-  } else {
+  // query에서 applicationId 먼저 확인
+  if (route.query.applicationId && !isNaN(Number(route.query.applicationId))) {
+    applicationId = Number(route.query.applicationId)
+    console.log('✅ query.applicationId 사용:', applicationId)
+  }
+  // 그 다음 applicantId 확인
+  else if (route.query.applicantId && !isNaN(Number(route.query.applicantId))) {
+    applicationId = Number(route.query.applicantId)
+    console.log('✅ query.applicantId를 applicationId로 사용:', applicationId)
+  }
+  // 마지막으로 id 확인
+  else if (route.query.id && !isNaN(Number(route.query.id))) {
+    applicationId = Number(route.query.id)
+    console.log('✅ query.id를 applicationId로 사용:', applicationId)
+  }
+  
+  // 여전히 유효하지 않은 경우
+  if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
+    console.error('❌ 모든 ID가 유효하지 않음')
     toast.error('잘못된 접근입니다. 지원서 ID가 유효하지 않습니다.')
     router.push('/employment/applicant')
   }
@@ -379,29 +422,33 @@ const viewMode = ref('detail')
 const showEvaluationModal = ref(false)
 const currentEvaluationData = ref({})
 
-// ===== ViewModel (Store 데이터 직접 사용) =====
+// ===== ViewModel (Store 데이터 + URL 쿼리 데이터 결합) =====
 const applicant = computed(() => {
   const app = applicationStore.selectedApplication
-  if (!app) return null
+  const query = route.query
   
+  // URL 쿼리에서 데이터가 있으면 우선 사용, 없으면 store 데이터 사용
   return {
-    ...app,
-    // 기본값 설정
-    name: app.name || '지원자',
-    jobName: app.jobName || '백엔드 개발자',
-    profileUrl: app.profileUrl || '/assets/empick_logo.png',
-    birth: app.birth,
-    phone: app.phone,
-    email: app.email,
-    address: app.address,
-    createdAt: app.createdAt,
-    education: app.education,
-    portfolioUrl: app.portfolioUrl,
-    motivation: app.motivation || '입사 동기가 입력되지 않았습니다.',
-    experience: app.experience || '경력 정보가 입력되지 않았습니다.',
-    skills: app.skills || 'JavaScript,Vue.js,Node.js',
-    coverLetter: app.coverLetter,
-    status: app.status || 'WAITING'
+    id: app?.id || query.applicationId || applicationId,
+    applicantId: app?.applicantId || query.applicantId,
+    name: app?.name || query.name || '지원자',
+    phone: app?.phone || query.phone || '연락처 정보 없음',
+    email: app?.email || query.email || '이메일 정보 없음',
+    profileUrl: app?.profileUrl || query.profileUrl || '/assets/empick_logo.png',
+    birth: app?.birth || query.birth,
+    address: app?.address || decodeURIComponent(query.address || '') || '주소 정보 없음',
+    jobName: app?.jobName || query.jobName || '백엔드 개발자',
+    createdAt: app?.createdAt || query.createdAt,
+    status: app?.status || query.status || 'WAITING',
+    education: app?.education || query.education,
+    portfolioUrl: app?.portfolioUrl || query.portfolioUrl,
+    motivation: app?.motivation || query.motivation || '입사 동기가 입력되지 않았습니다.',
+    experience: app?.experience || query.experience || '경력 정보가 입력되지 않았습니다.',
+    skills: app?.skills || query.skills || 'JavaScript,Vue.js,Node.js',
+    coverLetter: app?.coverLetter || query.coverLetter || '자기소개서가 작성되지 않았습니다.',
+    introduceScore: app?.introduceScore || query.introduceScore || 85,
+    jobtestTotalScore: app?.jobtestTotalScore || query.jobtestTotalScore || 90,
+    interviewScore: app?.interviewScore || query.interviewScore || 88
   }
 })
 
@@ -410,7 +457,9 @@ const applicationResponses = computed(() => {
 })
 
 const introduceItems = computed(() => {
-  return applicationStore.introduceItems || []
+  const items = applicationStore.introduceItems || []
+  console.log('🔍 현재 introduceItems:', items)
+  return items
 })
 
 const evaluationStats = computed(() => {
@@ -455,79 +504,49 @@ onMounted(async () => {
       allQuery: route.query 
     })
 
-    // URL query에서 지원자 정보 직접 사용 (임시 해결책)
-    if (route.query.name) {
-      console.log('📋 URL에서 지원자 정보 직접 설정')
-      const mockApplication = {
-        id: applicationId || route.query.applicationId,
-        applicantId: route.query.applicantId,
-        name: route.query.name,
-        phone: route.query.phone,
-        email: route.query.email,
-        profileUrl: route.query.profileUrl || '/assets/empick_logo.png',
-        birth: route.query.birth,
-        address: route.query.address,
-        jobName: route.query.jobName || '백엔드 개발자',
-        createdAt: route.query.createdAt,
-        status: route.query.status || 'WAITING',
-        motivation: route.query.motivation || '입사 동기가 입력되지 않았습니다.',
-        experience: route.query.experience || '경력 정보가 입력되지 않았습니다.',
-        skills: route.query.skills || 'JavaScript, Vue.js, Node.js',
-        education: route.query.education,
-        portfolioUrl: route.query.portfolioUrl,
-        coverLetter: route.query.coverLetter || '자기소개서가 작성되지 않았습니다.',
-        introduceScore: route.query.introduceScore || 85,
-        jobtestTotalScore: route.query.jobtestTotalScore || 90,
-        interviewScore: route.query.interviewScore || 88
-      }
-      
-      // Store에 직접 설정
-      applicationStore.setApplication(mockApplication)
-      console.log('✅ 지원자 정보 설정 완료:', mockApplication)
-      return
-    }
-    
-    // 기존 API 호출 (fallback)
-    if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
-      const applicantId = route.query.applicantId
-      if (applicantId && !isNaN(Number(applicantId))) {
-        console.log('🔍 applicantId로 데이터 조회 시도:', applicantId)
-        await applicationStore.fetchApplicationByApplicantId(applicantId)
-              } else {
-          // 기본 샘플 데이터 설정
-          applicationStore.setApplication({
-            id: 1,
-            name: '김지훈',
-            email: 'jihoon.kim@example.com',
-            phone: '010-1234-5678',
-            profileUrl: '/assets/empick_logo.png',
-            jobName: '백엔드 개발자',
-            status: 'WAITING',
-            motivation: '귀사의 비전에 공감하여 지원하게 되었습니다.',
-            experience: '3년간 백엔드 개발 경험이 있습니다.',
-            skills: 'Java, Spring Boot, MySQL, Redis'
-          })
-          console.log('📋 기본 샘플 데이터 설정됨')
-        }
+    // 실제 데이터 로딩
+    if (applicationId && !isNaN(applicationId) && applicationId > 0) {
+      console.log('🚀 실제 데이터 로딩 시작 - applicationId:', applicationId)
+      await loadApplicationData()
     } else {
-      await applicationStore.fetchApplicationById(applicationId)
+      // URL query에서 지원자 정보 직접 사용 (임시 해결책)
+      if (route.query.name) {
+        console.log('📋 URL에서 지원자 정보 직접 설정')
+        const mockApplication = {
+          id: applicationId || route.query.applicationId,
+          applicantId: route.query.applicantId,
+          name: route.query.name,
+          phone: route.query.phone,
+          email: route.query.email,
+          profileUrl: route.query.profileUrl || '/assets/empick_logo.png',
+          birth: route.query.birth,
+          address: route.query.address,
+          jobName: route.query.jobName || '백엔드 개발자',
+          createdAt: route.query.createdAt,
+          status: route.query.status || 'WAITING',
+          motivation: route.query.motivation || '입사 동기가 입력되지 않았습니다.',
+          experience: route.query.experience || '경력 정보가 입력되지 않았습니다.',
+          skills: route.query.skills || 'JavaScript, Vue.js, Node.js',
+          education: route.query.education,
+          portfolioUrl: route.query.portfolioUrl,
+          coverLetter: route.query.coverLetter || '자기소개서가 작성되지 않았습니다.',
+          introduceScore: route.query.introduceScore || 85,
+          jobtestTotalScore: route.query.jobtestTotalScore || 90,
+          interviewScore: route.query.interviewScore || 88
+        }
+        
+        // Store에 직접 설정
+        applicationStore.setApplication(mockApplication)
+        console.log('✅ 지원자 정보 설정 완료:', mockApplication)
+      } else {
+        console.warn('⚠️ 지원자 정보가 없어서 목록으로 이동')
+        toast.warning('지원자 정보를 찾을 수 없습니다. 목록으로 이동합니다.')
+        await router.push('/employment/applicant')
+      }
     }
   } catch (error) {
-    console.error('❌ 지원서 정보 로드 실패:', error)
-    // 에러 시에도 기본 데이터 제공
-    applicationStore.setApplication({
-      id: applicationId || 1,
-      name: '지원자',
-      email: 'applicant@example.com',
-      phone: '010-0000-0000',
-      profileUrl: '/assets/empick_logo.png',
-      jobName: '개발자',
-      status: 'WAITING',
-      motivation: '열정적으로 일하고 싶습니다.',
-      experience: '신입',
-      skills: 'JavaScript, Vue.js'
-    })
-    toast.warning('지원서 정보를 일부만 불러올 수 있었습니다.')
+    console.error('❌ ApplicationPage 마운트 오류:', error)
+    toast.error('페이지 로딩 중 오류가 발생했습니다.')
   }
 })
 
@@ -754,6 +773,28 @@ const handleEvaluationSave = async (evaluationData) => {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 16px;
   border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 자기소개서 스타일 */
+.introduce-item-card {
+  background: rgba(25, 118, 210, 0.02);
+  border: 1px solid rgba(25, 118, 210, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.introduce-question {
+  display: flex;
+  align-items: center;
+  color: #1976d2;
+  font-weight: 600;
+}
+
+.introduce-answer {
+  background: white;
+  border-radius: 6px;
+  padding: 0.75rem;
+  border-left: 3px solid #1976d2;
 }
 
 /* 반응형 디자인 */

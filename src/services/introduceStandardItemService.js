@@ -22,3 +22,7 @@ export const patchStandardItemFk = async (itemId, introduceStandardId) => {
 export async function fetchItemsByStandardId(standardId) {
   return apiClient.get(`/api/v1/employment/introduce-standard/items/standard/${standardId}`)
 }
+
+export const deleteStandardItem = async (id) => {
+  return apiClient.delete(`${IntroduceAPI.DELETE_STANDARD_ITEM(id)}`)
+}

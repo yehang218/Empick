@@ -128,15 +128,25 @@ const onStandardSelect = (standard) => {
   localStandardItems.value = standard.items
 }
 
+const emit = defineEmits(['save'])
+
 const handleSave = async () => {
   try {
-    await introduceStore.saveIntroduceRatingResult({
+    const evaluationData = {
       content: localComment.value,
       ratingScore: localTotalScore.value,
-      // 필요시 applicantId, standardId 등 추가
-    })
+      totalScore: localTotalScore.value,
+      comment: localComment.value,
+      applicantId: props.evaluationData?.applicantId,
+      applicationId: props.evaluationData?.applicationId,
+      standardId: selectedStandard.value?.id
+    }
+    
+    await introduceStore.saveIntroduceRatingResult(evaluationData)
+    emit('save', evaluationData)
     alert('평가 결과가 저장되었습니다.')
   } catch (e) {
+    console.error('평가 저장 실패:', e)
     alert('저장에 실패했습니다.')
   }
 }

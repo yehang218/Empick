@@ -180,7 +180,7 @@ export const useApplicationStore = defineStore('application', () => {
     return await createApplicationResponseService(dto);
   };
 
-  // 📄 지원서 ID로 이력서 응답 조회
+  // 📄 지원서 ID로 이력서 응답 조회 (기존 메서드 - 호환성 유지)
   const getApplicationResponsesByApplicationId = async (applicationId) => {
     loading.value = true;
     error.value = null;
@@ -200,6 +200,86 @@ export const useApplicationStore = defineStore('application', () => {
   // 📝 자기소개서 데이터 설정 (외부에서 호출)
   const setIntroduceData = (data) => {
     introduceData.value = data;
+  };
+
+  // 📄 이력서 응답 데이터 조회 (ApplicationPage에서 사용)
+  const fetchApplicationResponses = async (applicationId) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      console.log('📄 ApplicationStore: 이력서 응답 조회 시작:', applicationId)
+      const result = await getApplicationResponsesByApplicationIdService(applicationId);
+      applicationResponses.value = result || [];
+      console.log('✅ ApplicationStore: 이력서 응답 조회 성공:', result)
+      return result;
+    } catch (err) {
+      console.error('❌ ApplicationStore: 이력서 응답 조회 실패:', err)
+      error.value = err.message;
+      applicationResponses.value = [];
+      // 에러를 throw하지 않고 빈 배열로 처리
+      return [];
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // 📝 자기소개서 데이터 조회 (ApplicationPage에서 사용)
+  const fetchIntroduceData = async (applicationId) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      console.log('📝 ApplicationStore: 자기소개서 조회 시작:', applicationId)
+      
+      // 새로운 서비스를 사용하여 자기소개서와 템플릿 응답 조회
+      const { getIntroduceWithTemplateResponses } = await import('@/services/introduceService')
+      const result = await getIntroduceWithTemplateResponses(applicationId)
+      
+      if (result.introduce) {
+        // 템플릿 항목과 응답을 결합하여 표시용 데이터 생성
+        const combinedItems = result.templateItems.map(templateItem => {
+          const response = result.responses.find(r => 
+            r.introduceTemplateItemId == templateItem.id
+          )
+          return {
+            id: templateItem.id,
+            title: templateItem.title,
+            content: response?.content || '응답이 없습니다.',
+            templateItemId: templateItem.id,
+            responseId: response?.id
+          }
+        })
+        
+        introduceData.value = {
+          ...result.introduce,
+          items: combinedItems,
+          templateItems: result.templateItems,
+          responses: result.responses,
+          content: result.introduce.content
+        }
+      } else {
+        introduceData.value = {
+          items: [],
+          templateItems: [],
+          responses: [],
+          content: null
+        }
+      }
+      
+      console.log('✅ ApplicationStore: 자기소개서 조회 완료:', introduceData.value)
+      return introduceData.value;
+    } catch (err) {
+      console.error('❌ ApplicationStore: 자기소개서 조회 실패:', err)
+      error.value = err.message;
+      introduceData.value = {
+        items: [],
+        templateItems: [],
+        responses: [],
+        content: null
+      };
+      return introduceData.value;
+    } finally {
+      loading.value = false;
+    }
   };
 
   // 📋 지원서 직접 설정 (URL 파라미터나 임시 데이터 사용 시)
@@ -241,6 +321,8 @@ export const useApplicationStore = defineStore('application', () => {
     deleteApplication,
     createApplicationResponse,
     getApplicationResponsesByApplicationId,
+    fetchApplicationResponses,
+    fetchIntroduceData,
     setIntroduceData,
     setApplication,
     resetApplicationData,

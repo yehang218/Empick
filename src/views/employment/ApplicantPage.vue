@@ -325,11 +325,26 @@ const viewDetail = (item) => {
   console.log('🔍 applicantId:', item.applicantId);
   console.log('🔍 id:', item.id);
   
-  // ID 필드 중 사용 가능한 것 찾기 (applicantId 우선 사용)
-  let useId = item.applicationId || item.applicantId || item.id;
+  // applicationId가 있고 유효한 경우 우선 사용
+  let useId = null;
   
-  // ID 필드 유효성 검사
-  if (!useId || isNaN(Number(useId))) {
+  if (item.applicationId && !isNaN(Number(item.applicationId)) && Number(item.applicationId) > 0) {
+    useId = item.applicationId;
+    console.log('✅ applicationId 사용:', useId);
+  } 
+  // applicationId가 없거나 유효하지 않은 경우 applicantId 사용
+  else if (item.applicantId && !isNaN(Number(item.applicantId)) && Number(item.applicantId) > 0) {
+    useId = item.applicantId;
+    console.log('✅ applicantId를 applicationId 대신 사용:', useId);
+  } 
+  // 둘 다 없는 경우 id 사용
+  else if (item.id && !isNaN(Number(item.id)) && Number(item.id) > 0) {
+    useId = item.id;
+    console.log('✅ id를 applicationId 대신 사용:', useId);
+  }
+  
+  // 모든 ID가 유효하지 않은 경우
+  if (!useId) {
     console.error('❌ 사용 가능한 ID가 없음:', { 
       applicationId: item.applicationId, 
       id: item.id, 
@@ -339,7 +354,7 @@ const viewDetail = (item) => {
     return;
   }
   
-  console.log('✅ 사용할 ID:', useId);
+  console.log('✅ 최종 사용할 ID:', useId);
   
   // DTO의 모든 필드를 query parameter로 전달
   router.push({
