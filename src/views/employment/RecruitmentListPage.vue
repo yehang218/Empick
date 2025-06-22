@@ -26,14 +26,42 @@
                 <div class="text-caption">종료 된 공고</div>
             </v-col>
             <v-col cols="12" md="4" class="d-flex justify-end">
-                <v-btn class="mr-2" variant="outlined" color="success">채용 달력보기</v-btn>
                 <v-btn color="success" dark @click="goToCreate">+ 채용 공고 작성하기</v-btn>
             </v-col>
         </v-row>
 
-        <!-- 채용 공고 목록 테이블 -->
-        <div @click="handleRowClick">
-            <ListView :headers="headers" :data="recruitmentsForDisplay" :showPagination="true" />
+         <!-- 채용 공고 목록 -->
+        <v-data-table
+            :headers="headers"
+            :items="pagedRecruitments"
+            @click:row="handleRowClick"
+            class="elevation-1 list-item-hover"
+            item-value="id"
+            hide-default-footer
+        >
+             <template v-slot:item.status="{ item }">
+                <v-chip size="small">{{ item.status }}</v-chip>
+            </template>
+        </v-data-table>
+        <div class="d-flex justify-end align-center mt-4 pa-2">
+            <span class="text-caption mr-4">Items per page:</span>
+            <div style="width: 80px;">
+                <v-select
+                    v-model="itemsPerPage"
+                    :items="[10, 25, 50, 100]"
+                    dense
+                    hide-details
+                    variant="underlined"
+                ></v-select>
+            </div>
+
+            <span class="text-caption mx-4">{{ pageText }}</span>
+
+            <Pagination
+                :model-value="page"
+                @update:model-value="page = $event"
+                :length="totalPages"
+            />
         </div>
     </v-container>
 </template>
@@ -42,10 +70,10 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import ListView from '@/components/common/ListView.vue'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { getRecruitTypeLabel } from '@/constants/employment/recruitTypes'
 import { getRecruitStatusLabel } from '@/constants/employment/recruitStatus'
+import Pagination from '@/components/common/Pagination.vue';
 
 const router = useRouter()
 const route = useRoute()
@@ -73,13 +101,7 @@ onMounted(() => {
     }
 })
 
-const handleRowClick = (e) => {
-    const tr = e.target.closest('tr');
-    if (!tr || !tr.parentElement || tr.parentElement.tagName !== 'TBODY') return;
-
-    const index = tr.rowIndex - 1;
-
-    const item = pagedRecruitments.value[index];
+const handleRowClick = (event, { item }) => {
     if (item?.id) {
         router.push({
             path: `/employment/recruitments/${item.id}`,
@@ -89,13 +111,13 @@ const handleRowClick = (e) => {
 };
 
 const headers = [
-    { key: 'title', label: '제목' },
-    { key: 'recruitType', label: '유형' },
-    { key: 'startedAt', label: '시작일' },
-    { key: 'endedAt', label: '마감일' },
-    { key: 'departmentName', label: '부서' },
-    { key: 'status', label: '상태' },
-    { key: 'memberName', label: '작성자' }
+    { title: '제목', key: 'title', sortable: true },
+    { title: '유형', key: 'recruitType', sortable: true },
+    { title: '시작일', key: 'startedAt', sortable: true },
+    { title: '마감일', key: 'endedAt', sortable: true },
+    { title: '부서', key: 'departmentName', sortable: true },
+    { title: '상태', key: 'status', sortable: true },
+    { title: '작성자', key: 'memberName', sortable: true }
 ]
 
 const summary = computed(() => ({
@@ -115,17 +137,33 @@ const recruitmentsForDisplay = computed(() =>
         }))
 )
 
+const totalPages = computed(() => {
+    if (itemsPerPage.value === -1 || recruitmentsForDisplay.value.length === 0) {
+        return 1
+    }
+    return Math.ceil(recruitmentsForDisplay.value.length / itemsPerPage.value)
+})
+
 const pagedRecruitments = computed(() => {
+    if (itemsPerPage.value === -1) {
+        return recruitmentsForDisplay.value;
+    }
     const start = (page.value - 1) * itemsPerPage.value
     const end = start + itemsPerPage.value
     return recruitmentsForDisplay.value.slice(start, end)
 })
 
-const totalPages = computed(() => Math.ceil(recruitmentsForDisplay.value.length / itemsPerPage.value))
+const pageText = computed(() => {
+    const totalItems = recruitmentsForDisplay.value.length;
+    if (totalItems === 0) return '0-0 of 0';
+    const start = (page.value - 1) * itemsPerPage.value + 1;
+    const end = Math.min(page.value * itemsPerPage.value, totalItems);
+    return `${start}-${end} of ${totalItems}`;
+})
 </script>
 
 <style scoped>
-::v-deep tbody tr {
+.list-item-hover :deep(tbody tr:hover) {
     cursor: pointer;
 }
 </style>

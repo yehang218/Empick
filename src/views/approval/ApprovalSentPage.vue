@@ -17,15 +17,43 @@
         <div v-if="!loading && requestedList.length === 0 && !error" class="text-center pa-8" style="background-color: #f9f9f9; border-radius: 8px;">
             <p class="text-h6">요청한 결재 문서가 없습니다.</p>
         </div>
-        <ListView v-else-if="!loading && requestedList.length > 0" :headers="headers" :data="pagedList" :itemsPerPage="itemsPerPage" :page="page"
-            @update:page="page = $event" @row-click="goToDetail">
-            <template #item.status="{ item }">
-                <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small class="font-weight-bold"
-                    outlined>
-                    {{ item.status }}
-                </v-chip>
-            </template>
-        </ListView>
+        <div v-else-if="!loading && requestedList.length > 0">
+            <v-data-table
+                :headers="headers"
+                :items="pagedList"
+                @click:row="goToDetail"
+                class="elevation-1 list-item-hover"
+                item-value="approvalId"
+                hide-default-footer
+            >
+                <template #item.status="{ item }">
+                    <v-chip :color="getApprovalStatusColor(item.status)" text-color="white" small class="font-weight-bold"
+                        outlined>
+                        {{ item.status }}
+                    </v-chip>
+                </template>
+            </v-data-table>
+            <div class="d-flex justify-end align-center mt-4 pa-2">
+                <span class="text-caption mr-4">Items per page:</span>
+                <div style="width: 80px;">
+                    <v-select
+                        v-model="itemsPerPage"
+                        :items="[10, 25, 50, 100]"
+                        dense
+                        hide-details
+                        variant="underlined"
+                    ></v-select>
+                </div>
+
+                <span class="text-caption mx-4">{{ pageText }}</span>
+
+                <Pagination
+                    :model-value="page"
+                    @update:model-value="page = $event"
+                    :length="totalPages"
+                />
+            </div>
+        </div>
     </v-container>
 </template>
 
@@ -36,7 +64,7 @@ import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useMemberStore } from '@/stores/memberStore';
 import { useAuthStore } from '@/stores/authStore';
-import ListView from '@/components/common/ListView.vue';
+import Pagination from '@/components/common/Pagination.vue';
 import dayjs from 'dayjs';
 import { getApprovalStatusLabel } from '@/constants/approval/approvalStatus.js';
 
@@ -48,10 +76,10 @@ const router = useRouter();
 const { requestedList, loadingRequested: loading, errorRequested: error } = storeToRefs(approvalStore);
 
 const headers = [
-    { key: 'approvalId', label: '문서번호' },
-    { key: 'categoryName', label: '카테고리명' },
-    { key: 'status', label: '상태' },
-    { key: 'createdAt', label: '작성일' },
+    { title: '문서번호', key: 'approvalId' },
+    { title: '카테고리명', key: 'categoryName' },
+    { title: '상태', key: 'status', align: 'center' },
+    { title: '작성일', key: 'createdAt', align: 'center' },
 ];
 
 const itemsPerPage = ref(10);
@@ -100,7 +128,15 @@ const totalPages = computed(() => {
     return Math.ceil(filteredList.value.length / itemsPerPage.value);
 });
 
-function goToDetail(item) {
+const pageText = computed(() => {
+    const totalItems = filteredList.value.length;
+    if (totalItems === 0) return '0-0 of 0';
+    const start = (page.value - 1) * itemsPerPage.value + 1;
+    const end = Math.min(page.value * itemsPerPage.value, totalItems);
+    return `${start}-${end} of ${totalItems}`;
+});
+
+function goToDetail(event, { item }) {
     if (item && item.approvalId) {
         router.push(`/approval/sent/${item.approvalId}`);
     }

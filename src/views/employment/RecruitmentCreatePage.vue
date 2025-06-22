@@ -154,7 +154,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
 import { recruitTypeOptions } from '@/constants/employment/recruitTypes'
 import { QuillEditor } from '@vueup/vue-quill'
 import { stepTypeOptions, getStepTypeLabel } from '@/constants/employment/stepType'
@@ -220,8 +220,7 @@ const cancel = () => {
 }
 
 const confirmCancel = () => {
-    store.clearDraftRecruitment()
-    store.clearDraftApplicationItems()
+    store.clearAllDrafts()
     router.push('/employment/recruitments')
 }
 
@@ -251,6 +250,13 @@ const addStep = () => {
 const removeStep = (index) => {
     form.value.recruitmentProcesses.splice(index, 1)
 }
+
+onBeforeRouteLeave((to) => {
+    // 다음 단계로 이동하는 것이 아니라면, 상태를 초기화
+    if (to.name !== 'ApplicationItemSelectPage') {
+        store.clearAllDrafts();
+    }
+});
 </script>
 
 <style scoped>
