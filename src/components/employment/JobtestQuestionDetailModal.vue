@@ -27,7 +27,7 @@
           <div class="info-row">
             <div class="info-item">
               <span class="info-label">유형:</span>
-              <span class="info-tag type-tag">{{ getQuestionTypeLabel(question.type) }}</span>
+              <span class="info-tag type-tag" :class="getQuestionTypeClass(question.type)">{{ getQuestionTypeLabel(question.type) }}</span>
             </div>
             <div class="info-item">
               <span class="info-label">난이도:</span>
@@ -152,8 +152,8 @@ import { useToast } from 'vue-toastification'
 
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
 
-import { getQuestionTypeLabel } from '@/constants/employment/questionTypes'
-import { getDifficultyLabel } from '@/constants/employment/difficulty'
+import { getQuestionTypeLabel, getQuestionTypeColors, getQuestionTypeClass } from '@/constants/employment/questionTypes.js'
+import { getDifficultyLabel, getDifficultyColors, getDifficultyClass } from '@/constants/employment/difficulty.js'
 import AlertModal from '@/components/common/AlertModal.vue'
 
 const jobtestQuestionStore = useJobtestQuestionStore()
@@ -217,21 +217,22 @@ function formatDate(dateStr) {
   return `${yyyy}-${MM}-${dd} ${HH}:${mm}`
 }
 
-function getDifficultyClass(difficulty) {
-  switch (difficulty) {
-    case 'EASY':
-    case '쉬움':
-      return 'difficulty-easy'
-    case 'MEDIUM':
-    case '보통':
-      return 'difficulty-medium'
-    case 'HARD':
-    case '어려움':
-      return 'difficulty-hard'
-    default:
-      return 'difficulty-medium'
-  }
-}
+// 난이도 및 유형 색상 정보
+const getDifficultyStyle = (difficulty) => {
+  const colors = getDifficultyColors(difficulty);
+  return {
+    backgroundColor: colors.background,
+    color: colors.text
+  };
+};
+
+const getQuestionTypeStyle = (type) => {
+  const colors = getQuestionTypeColors(type);
+  return {
+    backgroundColor: colors.background,
+    color: colors.text
+  };
+};
 
 </script>
 
@@ -431,9 +432,30 @@ function getDifficultyClass(difficulty) {
   color: white;
 }
 
-.type-tag:hover {
+.type-multiple {
+  background: #81C784;
+  color: #2E7D32;
+}
+
+.type-subjective {
+  background: #FFB74D;
+  color: #E65100;
+}
+
+.type-descriptive {
+  background: #BA68C8;
+  color: #7B1FA2;
+}
+
+.type-default {
+  background: #90A4AE;
+  color: #37474F;
+}
+
+.type-tag:hover,
+.difficulty-tag:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(74, 124, 89, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .difficulty-tag {
@@ -441,30 +463,18 @@ function getDifficultyClass(difficulty) {
 }
 
 .difficulty-easy {
-  background: #4CAF50;
-}
-
-.difficulty-easy:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+  background: #A5D6A7;
+  color: #2E7D32;
 }
 
 .difficulty-medium {
-  background: #2196F3;
-}
-
-.difficulty-medium:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+  background: #90CAF9;
+  color: #1565C0;
 }
 
 .difficulty-hard {
-  background: #F44336;
-}
-
-.difficulty-hard:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+  background: #EF9A9A;
+  color: #C62828;
 }
 
 /* 섹션 제목 */

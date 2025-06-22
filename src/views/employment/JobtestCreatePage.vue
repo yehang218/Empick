@@ -61,7 +61,9 @@
             </template>
             <!-- 문제 유형 -->
             <template #item.type="{ item }">
-                <v-chip size="small">{{ item.type }}</v-chip>
+                <span class="type-tag" :class="getTypeClass(item.type)">
+                    {{ item.type }}
+                </span>
             </template>
             <!-- 난이도 -->
             <template #item.difficulty="{ item }">
@@ -218,6 +220,22 @@ const getDifficultyColor = level => {
         case '보통': return 'primary'
         case '어려움': return 'error'
         default: return 'grey'
+    }
+}
+
+const getTypeClass = (type) => {
+    switch (type) {
+        case '선택형':
+        case 'MULTIPLE':
+            return 'type-multiple'
+        case '단답형':
+        case 'SUBJECTIVE':
+            return 'type-subjective'
+        case '서술형':
+        case 'DESCRIPTIVE':
+            return 'type-descriptive'
+        default:
+            return 'type-default'
     }
 }
 
@@ -411,5 +429,38 @@ onMounted(async () => {
 .search-bar {
     margin-bottom: 0;
     margin-left: 16px;
+}
+
+.type-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.type-multiple {
+    background: #81C784;
+    color: #2E7D32;
+}
+
+.type-subjective {
+    background: #FFB74D;
+    color: #E65100;
+}
+
+.type-descriptive {
+    background: #BA68C8;
+    color: #7B1FA2;
+}
+
+.type-default {
+    background: #90A4AE;
+    color: #37474F;
 }
 </style>
