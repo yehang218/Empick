@@ -32,6 +32,21 @@ export const QUESTION_TYPE_COLORS = {
         background: '#BA68C8',
         text: '#7B1FA2',
         hover: 'rgba(186, 104, 200, 0.3)'
+    },
+    '선택형': {
+        background: '#81C784',
+        text: '#2E7D32',
+        hover: 'rgba(129, 199, 132, 0.3)'
+    },
+    '단답형': {
+        background: '#FFB74D',
+        text: '#E65100',
+        hover: 'rgba(255, 183, 77, 0.3)'
+    },
+    '서술형': {
+        background: '#BA68C8',
+        text: '#7B1FA2',
+        hover: 'rgba(186, 104, 200, 0.3)'
     }
 };
 
@@ -41,7 +56,7 @@ export const QUESTION_TYPE_COLORS = {
  * @returns {string} 한글화된 문제 유형
  */
 export const getQuestionTypeLabel = (type) => {
-    return QUESTION_TYPE_MAP[type] || type;
+    return QUESTION_TYPE_MAP[type] || type || '미지정';
 };
 
 /**

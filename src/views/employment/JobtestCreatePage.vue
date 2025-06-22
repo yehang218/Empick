@@ -61,15 +61,15 @@
             </template>
             <!-- 문제 유형 -->
             <template #item.type="{ item }">
-                <span class="type-tag" :class="getTypeClass(item.type)">
-                    {{ item.type }}
+                <span class="tag-style" :style="getQuestionTypeStyle(item.type)">
+                    {{ getQuestionTypeLabel(item.type) }}
                 </span>
             </template>
             <!-- 난이도 -->
             <template #item.difficulty="{ item }">
-                <v-chip size="small" :color="getDifficultyColor(item.difficulty)" dark>
-                    {{ item.difficulty }}
-                </v-chip>
+                <span class="tag-style" :style="getDifficultyStyle(item.difficulty)">
+                    {{ getDifficultyLabel(item.difficulty) }}
+                </span>
             </template>
             <!-- 점수 입력 -->
             <template #item.score="{ item }">
@@ -124,6 +124,8 @@ import SuccessModal from '@/components/common/AlertModal.vue'
 import Modal from '@/components/common/Modal.vue'
 import JobtestQuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
 import Search from '@/components/common/Search.vue'
+import { getDifficultyLabel, getDifficultyColors } from '@/constants/employment/difficulty.js'
+import { getQuestionTypeLabel, getQuestionTypeColors } from '@/constants/employment/questionTypes.js'
 
 const router = useRouter();
 const route = useRoute()
@@ -214,30 +216,21 @@ const selectedQuestions = computed(() =>
     localQuestions.value.filter(q => selectedIds.value.includes(q.id))
 )
 
-const getDifficultyColor = level => {
-    switch (level) {
-        case '쉬움': return 'success'
-        case '보통': return 'primary'
-        case '어려움': return 'error'
-        default: return 'grey'
-    }
-}
+const getDifficultyStyle = (difficulty) => {
+    const colors = getDifficultyColors(difficulty);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text
+    };
+};
 
-const getTypeClass = (type) => {
-    switch (type) {
-        case '선택형':
-        case 'MULTIPLE':
-            return 'type-multiple'
-        case '단답형':
-        case 'SUBJECTIVE':
-            return 'type-subjective'
-        case '서술형':
-        case 'DESCRIPTIVE':
-            return 'type-descriptive'
-        default:
-            return 'type-default'
-    }
-}
+const getQuestionTypeStyle = (type) => {
+    const colors = getQuestionTypeColors(type);
+    return {
+        backgroundColor: colors.background,
+        color: colors.text
+    };
+};
 
 const toggle = (item) => {
     if (selectedIds.value.includes(item.id)) {
@@ -431,7 +424,7 @@ onMounted(async () => {
     margin-left: 16px;
 }
 
-.type-tag {
+.tag-style {
     display: inline-flex;
     align-items: center;
     padding: 4px 8px;
@@ -442,25 +435,5 @@ onMounted(async () => {
     letter-spacing: 0.3px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease;
-}
-
-.type-multiple {
-    background: #81C784;
-    color: #2E7D32;
-}
-
-.type-subjective {
-    background: #FFB74D;
-    color: #E65100;
-}
-
-.type-descriptive {
-    background: #BA68C8;
-    color: #7B1FA2;
-}
-
-.type-default {
-    background: #90A4AE;
-    color: #37474F;
 }
 </style>

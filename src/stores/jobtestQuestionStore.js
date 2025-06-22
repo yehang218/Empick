@@ -133,27 +133,13 @@ export const useJobtestQuestionStore = defineStore('question', () => {
 
         try {
             const response = await getQuestionsService();
-
-            const mapped = response
-                .filter(q => q.type !== 'DESCRIPTIVE') // 서술형 우선 제외
-                .sort((a, b) => b.id - a.id)
-                .map(question => ({
-                    ...question,
-                    id: Number(question.id),
-                    selected: false,
-                    type: getQuestionTypeLabel(question.type),
-                    difficulty: getDifficultyLabel(question.difficulty)
-                }));
-
-            questions.value.splice(0, questions.value.length, ...mapped);
+            questions.value = response;
         } catch (err) {
-            error.value = err.message;
-            throw err;
+            error.value = err.message || '문제 목록을 불러오는 데 실패했습니다.';
         } finally {
             loading.value = false;
         }
     };
-
 
     // ✅ 문제 일괄 삭제
     const deleteSelectedQuestions = async () => {
@@ -205,18 +191,18 @@ export const useJobtestQuestionStore = defineStore('question', () => {
     };
 
     // ✅ 단일 문제 삭제
-const deleteQuestion = async (questionId, type) => {
-    try {
-        if (type === '선택형' || type === 'MULTIPLE') {
-            await deleteQuestionOptionsByQuestionId(questionId)
+    const deleteQuestion = async (questionId, type) => {
+        try {
+            if (type === '선택형' || type === 'MULTIPLE') {
+                await deleteQuestionOptionsByQuestionId(questionId)
+            }
+            await deleteQuestionService(questionId)
+            await fetchQuestions()
+        } catch (err) {
+            error.value = err.message || '문제 삭제 중 오류 발생'
+            throw err
         }
-        await deleteQuestionService(questionId)
-        await fetchQuestions()
-    } catch (err) {
-        error.value = err.message || '문제 삭제 중 오류 발생'
-        throw err
     }
-}
 
     // ✅ 선택 관련 유틸
     const toggleQuestionSelection = (questionId) => {

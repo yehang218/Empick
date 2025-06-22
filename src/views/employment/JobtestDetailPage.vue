@@ -10,9 +10,9 @@
             <v-btn prepend-icon="mdi-arrow-left" variant="tonal" @click="goJobtestList">
                 목록으로
             </v-btn>
-            <v-btn color="primary" variant="tonal" prepend-icon="mdi-pencil" @click="goEditJobtest">
+            <!-- <v-btn color="primary" variant="tonal" prepend-icon="mdi-pencil" @click="goEditJobtest">
                 수정하기
-            </v-btn>
+            </v-btn> -->
         </div>
 
         <!-- 요약 카드 -->
