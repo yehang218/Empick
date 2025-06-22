@@ -164,7 +164,7 @@ import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore'
 
 const router = useRouter()
 const route = useRoute()
-const requestId = route.query.requestId;
+const requestId = route.query.id;
 
 const store = useRecruitmentStore()
 const recruitmentRequestStore = useRecruitmentRequestStore()
@@ -188,7 +188,7 @@ const form = ref({
     startedAt: '',
     endedAt: '',
     recruitmentProcesses: [],
-    recruitmentRequestId: route.query.id || null
+    recruitmentRequestId: requestId || null
 })
 
 // 폼 값이 바뀔 때마다 draftRecruitment에 저장
@@ -201,16 +201,29 @@ onMounted(async () => {
         Object.assign(form.value, store.draftRecruitment)
     }
 
-    const requestId = route.query.id
-
+    // 요청서 ID가 있으면 해당 요청서 정보를 로드
     if (requestId) {
         await recruitmentRequestStore.loadRecruitmentRequestDetail(requestId)
         requestDetail.value = recruitmentRequestStore.recruitmentRequestDetail
-        if (requestDetail.value?.startedAt) {
-            form.value.startedAt = requestDetail.value.startedAt.slice(0, 16)
-        }
-        if (requestDetail.value?.endedAt) {
-            form.value.endedAt = requestDetail.value.endedAt.slice(0, 16)
+        
+        // 요청서 정보를 폼에 자동으로 설정
+        if (requestDetail.value) {
+            // 제목 자동 설정
+            form.value.title = `${requestDetail.value.jobName} 채용 공고`
+            
+            // 날짜 설정
+            if (requestDetail.value.startedAt) {
+                form.value.startedAt = requestDetail.value.startedAt.slice(0, 16)
+            }
+            if (requestDetail.value.endedAt) {
+                form.value.endedAt = requestDetail.value.endedAt.slice(0, 16)
+            }
+            
+            // 요청서 ID 설정
+            form.value.recruitmentRequestId = requestId
+            
+            // 기본 채용 유형 설정
+            form.value.recruitType = 'REGULAR'
         }
     }
 })
@@ -229,12 +242,11 @@ const rules = {
 }
 
 const goToApplicationItem = () => {
-
     store.setDraftRecruitment(form.value)
 
     router.push({
         path: '/employment/application-items/select',
-        query: { requestId: route.query.id }
+        query: { requestId: requestId }
     })
 }
 

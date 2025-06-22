@@ -40,7 +40,50 @@
                         <v-row align="center">
                             <v-col cols="2" class="approval-label">{{ item.name }}</v-col>
                             <v-col cols="10">
-                                <v-text-field v-if="item.inputType === InputTypeEnum.TEXT"
+                                <!-- 직무 드롭다운 -->
+                                <v-select
+                                    v-if="item.inputType === InputTypeEnum.NUMBER && dropdownMap[item.id] === 'job'"
+                                    v-model="form.contents[idx].content"
+                                    :items="jobOptions"
+                                    item-title="name"
+                                    item-value="id"
+                                    :label="item.name"
+                                    variant="solo"
+                                    density="comfortable"
+                                    class="approval-input"
+                                    hide-details
+                                    required
+                                />
+
+                                <!-- 부서 드롭다운 -->
+                                <v-select
+                                    v-else-if="item.inputType === InputTypeEnum.NUMBER && dropdownMap[item.id] === 'department'"
+                                    v-model="form.contents[idx].content"
+                                    :items="departmentOptions"
+                                    item-title="name"
+                                    item-value="id"
+                                    :label="item.name"
+                                    variant="solo"
+                                    density="comfortable"
+                                    class="approval-input"
+                                    hide-details
+                                    required
+                                />
+
+                                <!-- 나머지 숫자 입력 -->
+                                <v-text-field
+                                    v-else-if="item.inputType === InputTypeEnum.NUMBER"
+                                    v-model="form.contents[idx].content"
+                                    :label="item.name"
+                                    type="number"
+                                    variant="solo"
+                                    density="comfortable"
+                                    class="approval-input"
+                                    hide-details
+                                    required
+                                />
+
+                                <v-text-field v-else-if="item.inputType === InputTypeEnum.TEXT"
                                     v-model="form.contents[idx].content" :label="item.name" variant="solo"
                                     density="comfortable" class="approval-input" hide-details required />
                                 <v-textarea v-else-if="item.inputType === InputTypeEnum.TEXTAREA"
@@ -54,9 +97,6 @@
                                     density="comfortable" class="approval-input" hide-details required />
                                 <v-text-field v-else-if="item.inputType === InputTypeEnum.DATE"
                                     v-model="form.contents[idx].content" :label="item.name" type="date" variant="solo"
-                                    density="comfortable" class="approval-input" hide-details required />
-                                <v-text-field v-else-if="item.inputType === InputTypeEnum.NUMBER"
-                                    v-model="form.contents[idx].content" :label="item.name" type="number" variant="solo"
                                     density="comfortable" class="approval-input" hide-details required />
                                 <v-radio-group v-else-if="item.inputType === InputTypeEnum.RADIO"
                                     v-model="form.contents[idx].content" :label="item.name" class="approval-input"
@@ -98,10 +138,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useApprovalWriteStore } from '@/stores/approvalWriteStore';
 import { useMemberStore } from '@/stores/memberStore';
+import { useDepartmentStore } from '@/stores/departmentStore';
+import { useJobStore } from '@/stores/jobStore';
 import { InputTypeEnum } from '@/constants/common/inputType.js';
 import { useRouter } from 'vue-router';
 import { useToast } from "vue-toastification";
@@ -109,16 +151,44 @@ const toast = useToast();
 
 const approvalStore = useApprovalWriteStore();
 const memberStore = useMemberStore();
+const departmentStore = useDepartmentStore();
+const jobStore = useJobStore();
 const router = useRouter();
 
 const memberId = ref(null);
 const { form, categoryList, categoryItems, loading } = storeToRefs(approvalStore);
+
+// 드롭다운 매핑
+const dropdownMap = {
+    40101: 'department', // 부서
+    40102: 'job'         // 직무
+};
+
+// 부서 옵션 (API에서 조회)
+const departmentOptions = computed(() => 
+    departmentStore.departmentList.map(dept => ({
+        id: dept.id || dept.value,
+        name: dept.name || dept.label
+    }))
+);
+
+// 직무 옵션 (API에서 조회)
+const jobOptions = computed(() => 
+    jobStore.jobList.map(job => ({
+        id: job.id || job.value,
+        name: job.name || job.label
+    }))
+);
 
 onMounted(async () => {
     approvalStore.resetForm();
     await approvalStore.fetchCategories();
     await memberStore.getMyInfo();
     memberId.value = memberStore.form.id;
+
+    // 부서와 직무 데이터 로드
+    await departmentStore.loadDepartmentList();
+    await jobStore.loadJobList();
 
     if (!form.value.createdAt) {
         form.value.createdAt = new Date().toISOString().slice(0, 10);

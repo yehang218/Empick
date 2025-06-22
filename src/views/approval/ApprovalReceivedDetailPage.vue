@@ -1,6 +1,6 @@
 <template>
     <div v-if="loading" class="loading-container">
-        <p>로딩 중...</p>
+        <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <div v-else-if="error" class="error-container">
         <p>오류가 발생했습니다: {{ error.message }}</p>
@@ -11,8 +11,21 @@
 
     <div v-else class="page-container">
         <div class="header">
-            <h1 class="page-title">결재 문서 조회</h1>
+            <div class="header-left">
+                <v-icon @click="$router.back()" class="mr-4 cursor-pointer">mdi-arrow-left</v-icon>
+                <h1 class="page-title">결재 문서 조회</h1>
+            </div>
             <div class="action-buttons">
+                <v-btn
+                    v-if="isRecruitmentRequest && isApproved"
+                    @click="handleLinkRecruitmentRequest"
+                    color="primary"
+                    variant="flat"
+                    class="mr-4"
+                    :loading="linking"
+                >
+                    채용 요청서 생성
+                </v-btn>
                 <button class="btn approve" @click="handleApprove" :disabled="!canApprove">
                     승인
                 </button>
@@ -21,69 +34,71 @@
                 </button>
             </div>
         </div>
+        <hr />
+        <div v-if="approvalDetail" class="approval-detail-container">
+            <div class="document-info">
+                <table class="info-table">
+                    <tbody>
+                        <tr>
+                            <th>결재 유형</th>
+                            <td>{{ approvalDetail.categoryName }}</td>
+                            <th>작성일</th>
+                            <td>{{ formatDate(approvalDetail.createdAt, 'date') }}</td>
+                            <th>결재 완료일</th>
+                            <td>{{ getCompletionDate() }}</td>
+                            <th>결재 상태</th>
+                            <td>
+                                <span class="status-badge" :class="getStatusClass(approvalDetail.status)">
+                                    {{ getStatusText(approvalDetail.status) }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-        <div class="content-section">
-            <table class="info-table">
-                <tbody>
-                    <tr>
-                        <th>결재 유형</th>
-                        <td>{{ approvalDetail.categoryName }}</td>
-                        <th>작성일</th>
-                        <td>{{ formatDate(approvalDetail.createdAt, 'date') }}</td>
-                        <th>결재 완료일</th>
-                        <td>{{ getCompletionDate() }}</td>
-                        <th>결재 상태</th>
-                        <td>
-                            <span class="status-badge" :class="getStatusClass(approvalDetail.status)">
-                                {{ getStatusText(approvalDetail.status) }}
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="approval-line-section">
-                <h3>결재선</h3>
-                <div class="approvers-list">
-                    <div 
-                        v-for="approver in approvalDetail.approvers" 
-                        :key="approver.memberId" 
-                        class="approver-item"
-                        :class="getApproverStatusClass(approver)"
-                    >
-                        <div class="signature-box">
-                            <span v-if="getApproverStatusClass(approver) === 'approved'" class="stamp approved">승인</span>
-                            <span v-else-if="getApproverStatusClass(approver) === 'rejected'" class="stamp rejected">반려</span>
-                        </div>
-                        <div class="approver-name">{{ approver.memberName }} {{ approver.positionName }}</div>
-                        <div v-if="approver.approvedAt" class="approval-date">
-                            {{ formatDate(approver.approvedAt, 'date') }}
+                <div class="approval-line-section">
+                    <h3>결재선</h3>
+                    <div class="approvers-list">
+                        <div 
+                            v-for="approver in approvalDetail.approvers" 
+                            :key="approver.memberId" 
+                            class="approver-item"
+                            :class="getApproverStatusClass(approver)"
+                        >
+                            <div class="signature-box">
+                                <span v-if="getApproverStatusClass(approver) === 'approved'" class="stamp approved">승인</span>
+                                <span v-else-if="getApproverStatusClass(approver) === 'rejected'" class="stamp rejected">반려</span>
+                            </div>
+                            <div class="approver-name">{{ approver.memberName }} {{ approver.positionName }}</div>
+                            <div v-if="approver.approvedAt" class="approval-date">
+                                {{ formatDate(approver.approvedAt, 'date') }}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="attachment-section">
-                <h3>첨부 문서</h3>
-                <p>첨부된 문서가 없습니다.</p>
-            </div>
+                <div class="attachment-section">
+                    <h3>첨부 문서</h3>
+                    <p>첨부된 문서가 없습니다.</p>
+                </div>
 
-            <div class="main-content">
-                <h2 class="content-title">{{ approvalDetail.categoryName }}</h2>
-                <div class="form-layout">
-                    <div class="form-row">
-                        <label>신청자</label>
-                        <span>{{ approvalDetail.writerName }} ({{ approvalDetail.writerDepartment }})</span>
-                    </div>
-                    <template v-for="item in approvalDetail.items" :key="item.itemName">
+                <div class="main-content">
+                    <h2 class="content-title">{{ approvalDetail.categoryName }}</h2>
+                    <div class="form-layout">
                         <div class="form-row">
-                            <label>{{ item.itemName }}</label>
-                            <span>{{ item.content }}</span>
+                            <label>신청자</label>
+                            <span>{{ approvalDetail.writerName }} ({{ approvalDetail.writerDepartment }})</span>
                         </div>
-                    </template>
-                </div>
-                <div class="disclaimer">
-                    <p>※ 해당 문서는 결재 완료 후 수정이 불가능하니, 내용을 정확히 입력해 주세요.</p>
+                        <template v-for="item in approvalDetail.items" :key="item.itemName">
+                            <div class="form-row">
+                                <label>{{ item.itemName }}</label>
+                                <span>{{ getItemContent(item) }}</span>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="disclaimer">
+                        <p>※ 해당 문서는 결재 완료 후 수정이 불가능하니, 내용을 정확히 입력해 주세요.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,11 +106,15 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed } from 'vue';
+import { onMounted, onUnmounted, computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '../../stores/approvalStore';
 import { useMemberStore } from '../../stores/memberStore';
+import { useDepartmentStore } from '@/stores/departmentStore';
+import { useJobStore } from '@/stores/jobStore';
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
+import RecruitmentRequestCreateDTO from '@/dto/employment/recruitment/RecruitmentRequestCreateDTO';
 
 defineProps({
     id: { type: String, required: true }
@@ -105,9 +124,42 @@ const route = useRoute();
 const router = useRouter();
 const approvalStore = useApprovalStore();
 const memberStore = useMemberStore();
+const departmentStore = useDepartmentStore();
+const jobStore = useJobStore();
+const recruitmentRequestStore = useRecruitmentRequestStore();
 
 const { approvalDetail, loading, error } = storeToRefs(approvalStore);
+const { departmentList } = storeToRefs(departmentStore);
+const { jobList } = storeToRefs(jobStore);
+
 const { fetchReceivedApprovalDetail, clearApprovalDetail, approveDocument, rejectDocument } = approvalStore;
+const { loadDepartmentList } = departmentStore;
+const { loadJobList } = jobStore;
+
+const linking = ref(false);
+
+const isRecruitmentRequest = computed(() => approvalDetail.value?.categoryId === 401);
+const isApproved = computed(() => approvalDetail.value?.status === 'APPROVED');
+
+const getDepartmentName = (id) => {
+    const department = departmentList.value.find(d => d.id === Number(id));
+    return department ? department.name : id;
+}
+
+const getJobName = (id) => {
+    const job = jobList.value.find(j => j.id === Number(id));
+    return job ? job.name : id;
+}
+
+const getItemContent = (item) => {
+    if (item.itemName === '부서') {
+        return getDepartmentName(item.content);
+    }
+    if (item.itemName === '직무') {
+        return getJobName(item.content);
+    }
+    return item.content;
+}
 
 const canApprove = computed(() => {
     if (!approvalDetail.value) return false;
@@ -238,7 +290,44 @@ const handleReject = async () => {
     }
 };
 
+const handleLinkRecruitmentRequest = async () => {
+    if (!approvalDetail.value) return;
+
+    linking.value = true;
+    try {
+        const itemMap = new Map(approvalDetail.value.items.map(i => [i.itemName, i.content]));
+
+        const dto = new RecruitmentRequestCreateDTO(
+            parseInt(itemMap.get('직무'), 10),
+            parseInt(itemMap.get('부서'), 10),
+            parseInt(itemMap.get('모집 인원'), 10),
+            `${itemMap.get('모집 시작일')}T00:00:00`,
+            `${itemMap.get('모집 마감일')}T23:59:59`,
+            itemMap.get('지원자격'),
+            itemMap.get('우대사항'),
+            itemMap.get('주요업무'),
+            itemMap.get('고용형태'),
+            itemMap.get('근무 지역')
+        );
+
+        await recruitmentRequestStore.submitRecruitmentRequest(dto);
+        
+        alert('채용 요청서가 성공적으로 생성되었습니다.');
+        router.push('/employment/recruitment-requests');
+
+    } catch (err) {
+        console.error("Failed to create recruitment request:", err);
+        alert(`채용 요청서 생성에 실패했습니다: ${err.message}`);
+    } finally {
+        linking.value = false;
+    }
+};
+
 onMounted(async () => {
+    await Promise.all([
+        loadDepartmentList(),
+        loadJobList()
+    ]);
     const approvalId = parseInt(route.params.id);
     const memberId = memberStore.form.id;
 
@@ -283,11 +372,16 @@ onUnmounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
 }
 
 .page-title {
-    font-size: 1.8rem;
+    font-size: 24px;
     font-weight: 600;
 }
 
@@ -517,5 +611,9 @@ h3 {
 
 .disclaimer p {
     margin: 0.3rem 0;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }
 </style>

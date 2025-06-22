@@ -1,6 +1,6 @@
 <template>
     <div v-if="loading" class="loading-container">
-        <p>로딩 중...</p>
+        <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <div v-else-if="error" class="error-container">
         <p>오류가 발생했습니다: {{ error.message }}</p>
@@ -11,9 +11,21 @@
 
     <div v-else class="page-container">
         <div class="header">
-            <h1 class="page-title">요청한 결재 문서 조회</h1>
+            <div class="header-left">
+                <v-icon @click="$router.back()" class="mr-4 cursor-pointer">mdi-arrow-left</v-icon>
+                <h1 class="page-title">요청한 결재 문서 조회</h1>
+            </div>
+            <v-btn
+                v-if="isRecruitmentRequest && isApproved"
+                @click="handleLinkRecruitmentRequest"
+                color="primary"
+                variant="flat"
+                :loading="linking"
+            >
+                채용 요청서 생성
+            </v-btn>
         </div>
-
+        <hr />
         <div class="content-section">
             <table class="info-table">
                 <tbody>
@@ -66,7 +78,7 @@
                     <template v-for="item in approvalDetail.items" :key="item.itemName">
                         <div class="form-row">
                             <label>{{ item.itemName }}</label>
-                            <span>{{ item.content }}</span>
+                            <span>{{ getItemContent(item) }}</span>
                         </div>
                     </template>
                 </div>
@@ -79,20 +91,91 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { onMounted, onUnmounted, computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useApprovalStore } from '../../stores/approvalStore';
+import { useDepartmentStore } from '@/stores/departmentStore';
+import { useJobStore } from '@/stores/jobStore';
+import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
+import RecruitmentRequestCreateDTO from '@/dto/employment/recruitment/RecruitmentRequestCreateDTO';
 
 defineProps({
     id: { type: String, required: true }
 });
 
 const route = useRoute();
+const router = useRouter();
 const approvalStore = useApprovalStore();
+const departmentStore = useDepartmentStore();
+const jobStore = useJobStore();
+const recruitmentRequestStore = useRecruitmentRequestStore();
 
 const { approvalDetail, loading, error } = storeToRefs(approvalStore);
+const { departmentList } = storeToRefs(departmentStore);
+const { jobList } = storeToRefs(jobStore);
+
 const { fetchRequestedApprovalDetail, clearApprovalDetail } = approvalStore;
+const { loadDepartmentList } = departmentStore;
+const { loadJobList } = jobStore;
+
+const linking = ref(false);
+
+const isRecruitmentRequest = computed(() => approvalDetail.value?.categoryId === 401);
+const isApproved = computed(() => approvalDetail.value?.status === 'APPROVED');
+
+const handleLinkRecruitmentRequest = async () => {
+    if (!approvalDetail.value) return;
+
+    linking.value = true;
+    try {
+        const itemMap = new Map(approvalDetail.value.items.map(i => [i.itemName, i.content]));
+
+        const dto = new RecruitmentRequestCreateDTO(
+            parseInt(itemMap.get('직무'), 10),
+            parseInt(itemMap.get('부서'), 10),
+            parseInt(itemMap.get('모집 인원'), 10),
+            `${itemMap.get('모집 시작일')}T00:00:00`,
+            `${itemMap.get('모집 마감일')}T23:59:59`,
+            itemMap.get('지원자격'),
+            itemMap.get('우대사항'),
+            itemMap.get('주요업무'),
+            itemMap.get('고용형태'),
+            itemMap.get('근무 지역')
+        );
+
+        await recruitmentRequestStore.submitRecruitmentRequest(dto);
+        
+        alert('채용 요청서가 성공적으로 생성되었습니다.');
+        router.push('/employment/recruitment-requests');
+
+    } catch (err) {
+        console.error("Failed to create recruitment request:", err);
+        alert(`채용 요청서 생성에 실패했습니다: ${err.message}`);
+    } finally {
+        linking.value = false;
+    }
+};
+
+const getDepartmentName = (id) => {
+    const department = departmentList.value.find(d => d.id === Number(id));
+    return department ? department.name : id;
+}
+
+const getJobName = (id) => {
+    const job = jobList.value.find(j => j.id === Number(id));
+    return job ? job.name : id;
+}
+
+const getItemContent = (item) => {
+    if (item.itemName === '부서') {
+        return getDepartmentName(item.content);
+    }
+    if (item.itemName === '직무') {
+        return getJobName(item.content);
+    }
+    return item.content;
+}
 
 const formatDate = (dateString, format = 'full') => {
     if (!dateString) return '';
@@ -170,6 +253,10 @@ const getApproverStatusClass = (approver) => {
 };
 
 onMounted(async () => {
+    await Promise.all([
+        loadDepartmentList(),
+        loadJobList()
+    ]);
     const approvalId = parseInt(route.params.id);
     if (approvalId) {
         await fetchRequestedApprovalDetail(approvalId);
@@ -195,10 +282,14 @@ onUnmounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
+}
+.header-left {
+    display: flex;
+    align-items: center;
 }
 .page-title {
-    font-size: 1.8rem;
+    font-size: 24px;
     font-weight: 600;
 }
 .content-section {
@@ -350,5 +441,8 @@ h3 {
 }
 .disclaimer p {
     margin: 0.3rem 0;
+}
+.cursor-pointer {
+    cursor: pointer;
 }
 </style>

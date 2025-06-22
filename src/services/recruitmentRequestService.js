@@ -22,7 +22,6 @@ export const fetchRecruitmentRequestList = async (options = {}) => {
 export const fetchRecruitmentRequestDetail = async (id, options = {}) => {
     return withErrorHandling(async () => {
         const response = await api.get(API.RECRUITMENT.REQUEST_DETAIL(id));
-        console.log('📡 요청서 응답', response.data);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if (!apiResponse.success) {
