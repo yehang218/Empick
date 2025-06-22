@@ -20,6 +20,81 @@ export const createIntroduceRatingResult = async (payload) => {
   return api.post(IntroduceAPI.CREATE_RATING_RESULT, payload)
 }
 
+// ID로 자기소개서 조회
+export const getIntroduceByIdService = async (introduceId) => {
+  try {
+    // 먼저 단건 조회 API 시도
+    const res = await api.get(`${IntroduceAPI.GET_INTRODUCE_BY_ID(introduceId)}`)
+    console.log('📋 자기소개서 단건 조회 성공:', res.data)
+    return res.data?.data || res.data
+  } catch (singleError) {
+    console.warn('⚠️ 단건 조회 API 없음, 전체 조회 후 필터링 시도')
+    
+    // 전체 조회 후 클라이언트에서 필터링
+    const allRes = await api.get(IntroduceAPI.GET_ALL_INTRODUCE)
+    const allIntroduces = allRes.data?.data || allRes.data || []
+    
+    console.log('📋 전체 자기소개서 목록:', allIntroduces)
+    
+    // introduceId로 필터링
+    const targetIntroduce = allIntroduces.find(item => 
+      item.id == introduceId || item.introduceId == introduceId
+    )
+    
+    if (!targetIntroduce) {
+      throw new Error(`자기소개서를 찾을 수 없습니다. ID: ${introduceId}`)
+    }
+    
+    console.log('✅ 필터링으로 자기소개서 발견:', targetIntroduce)
+    return targetIntroduce
+  }
+}
+
+// 전체 자기소개서 조회
+export const getAllIntroduceService = async () => {
+  const res = await api.get(IntroduceAPI.GET_ALL_INTRODUCE)
+  return res.data?.data || res.data || []
+}
+
+// applicationId로 자기소개서 조회
+export const getIntroduceByApplicationIdService = async (applicationId) => {
+  // 전체 조회 후 applicationId로 필터링
+  const allRes = await api.get(IntroduceAPI.GET_ALL_INTRODUCE)
+  const allIntroduces = allRes.data?.data || allRes.data || []
+  
+  console.log('📋 전체 자기소개서 목록:', allIntroduces)
+  
+  // applicationId로 필터링
+  const targetIntroduce = allIntroduces.find(item => 
+    item.applicationId == applicationId
+  )
+  
+  return targetIntroduce || null
+}
+
+// 자기소개서 업데이트
+export const updateIntroduceService = async (introduceId, updateData) => {
+  const res = await api.patch(`${IntroduceAPI.UPDATE_INTRODUCE(introduceId)}`, updateData)
+  console.log('✅ 자기소개서 업데이트 성공:', res.data)
+  return res.data?.data || res.data
+}
+
+// 자기소개서 생성
+export const createIntroduceService = async (payload) => {
+  console.log('📤 각 필드 상세 확인:', {
+    applicantId: payload.applicantId,
+    applicantIdType: typeof payload.applicantId,
+    applicationId: payload.applicationId,
+    applicationIdType: typeof payload.applicationId,
+    introduceTemplateId: payload.introduceTemplateId,
+    introduceTemplateIdType: typeof payload.introduceTemplateId
+  })
+  
+  const res = await api.post(IntroduceAPI.CREATE_INTRODUCE, payload)
+  console.log('✅ 자기소개서 생성 응답:', res.data)
+  return res.data?.data || res.data
+}
+
 // 자기소개서 템플릿 항목별 응답 등록
 export const createIntroduceTemplateItemResponse = async (payload) => {
   // payload: { introduceId, introduceTemplateItemId, content }

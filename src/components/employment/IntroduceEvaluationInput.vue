@@ -76,7 +76,7 @@
     <!-- 기준표 선택 모달 -->
     <IntroduceStandardSelectModal v-model="showStandardModal" @select="onStandardSelect" />
     <div class="d-flex justify-end mt-4">
-      <v-btn color="success" @click="handleSave">저장</v-btn>
+      <v-btn color="success" @click="handleSave" :loading="savingLoading">저장</v-btn>
     </div>
   </div>
 </template>
@@ -87,10 +87,12 @@ import { useRouter } from 'vue-router'
 import IntroduceStandardSelectModal from './IntroduceStandardSelectModal.vue'
 import { useIntroduceStore } from '@/stores/introduceStore'
 import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
+import { useToast } from 'vue-toastification'
 
 const router = useRouter()
 const introduceStore = useIntroduceStore()
 const standardItemStore = useIntroduceStandardItemStore()
+const toast = useToast()
 
 const props = defineProps({
   totalTitle: {
@@ -103,15 +105,16 @@ const props = defineProps({
   }
 })
 
+// ViewModel: 반응형 상태
 const localTotalScore = ref(null)
 const localComment = ref('')
-
 const showStandardModal = ref(false)
 const selectedStandard = ref(null)
-
 const localStandardTitle = ref('')
 const localStandardItems = ref([])
+const savingLoading = ref(false)
 
+// ViewModel: 데이터 초기화
 watchEffect(() => {
   if (props.evaluationData) {
     localTotalScore.value = props.evaluationData.totalScore || null
@@ -122,6 +125,7 @@ watchEffect(() => {
   }
 })
 
+// ViewModel: 이벤트 핸들러
 const onStandardSelect = (standard) => {
   selectedStandard.value = standard
   localStandardTitle.value = standard.content
@@ -132,6 +136,8 @@ const emit = defineEmits(['save'])
 
 const handleSave = async () => {
   try {
+    savingLoading.value = true
+    
     const evaluationData = {
       content: localComment.value,
       ratingScore: localTotalScore.value,
@@ -144,10 +150,13 @@ const handleSave = async () => {
     
     await introduceStore.saveIntroduceRatingResult(evaluationData)
     emit('save', evaluationData)
-    alert('평가 결과가 저장되었습니다.')
+    toast.success('평가 결과가 성공적으로 저장되었습니다.')
+    
   } catch (e) {
     console.error('평가 저장 실패:', e)
-    alert('저장에 실패했습니다.')
+    toast.error('저장에 실패했습니다. 다시 시도해주세요.')
+  } finally {
+    savingLoading.value = false
   }
 }
 </script>

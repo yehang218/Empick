@@ -4,17 +4,23 @@ import {
   fetchIntroduceItemsService,
   createIntroduceItemService,
   deleteIntroduceItemService,
-  createIntroduceRatingResult
+  createIntroduceRatingResult,
+  getIntroduceByIdService,
+  getAllIntroduceService,
+  getIntroduceByApplicationIdService,
+  updateIntroduceService,
+  createIntroduceService
 } from '@/services/introduceService'
 import { createTemplate } from '@/services/introduceTemplateService'
-import api from '@/apis/apiClient'
-import { IntroduceAPI } from '@/apis/routes/introduce'
 
 export const useIntroduceStore = defineStore('introduce', () => {
+  // ===== Model: 상태 정의 =====
   const items = ref([])
   const loading = ref(false)
   const error = ref(null)
 
+  // ===== Actions: 비즈니스 로직은 Service 계층을 통해서만 =====
+  
   // 전체 항목 조회
   const fetchItems = async (templateId) => {
     loading.value = true
@@ -56,45 +62,27 @@ export const useIntroduceStore = defineStore('introduce', () => {
     }
   }
 
-  async function saveIntroduceRatingResult(payload) {
-    // payload: { content, ratingScore, ... }
-    return createIntroduceRatingResult(payload)
+  // 자기소개서 평가 결과 저장
+  const saveIntroduceRatingResult = async (payload) => {
+    loading.value = true
+    error.value = null
+    try {
+      return await createIntroduceRatingResult(payload)
+    } catch (e) {
+      error.value = e.message
+      throw e
+    } finally {
+      loading.value = false
+    }
   }
 
-  // ID로 자기소개서 조회 (전체 조회 후 필터링)
+  // ID로 자기소개서 조회
   const fetchIntroduceById = async (introduceId) => {
     loading.value = true
     error.value = null
     try {
       console.log('🔍 자기소개서 상세 조회:', introduceId)
-      
-      // 단건 조회 API가 없으므로 전체 조회 후 필터링
-      try {
-        // 먼저 단건 조회 API 시도
-        const res = await api.get(`${IntroduceAPI.GET_INTRODUCE_BY_ID(introduceId)}`)
-        console.log('📋 자기소개서 단건 조회 성공:', res.data)
-        return res.data?.data || res.data
-      } catch (singleError) {
-        console.warn('⚠️ 단건 조회 API 없음, 전체 조회 후 필터링 시도')
-        
-        // 전체 조회 후 클라이언트에서 필터링
-        const allRes = await api.get(IntroduceAPI.GET_ALL_INTRODUCE)
-        const allIntroduces = allRes.data?.data || allRes.data || []
-        
-        console.log('📋 전체 자기소개서 목록:', allIntroduces)
-        
-        // introduceId로 필터링
-        const targetIntroduce = allIntroduces.find(item => 
-          item.id == introduceId || item.introduceId == introduceId
-        )
-        
-        if (!targetIntroduce) {
-          throw new Error(`자기소개서를 찾을 수 없습니다. ID: ${introduceId}`)
-        }
-        
-        console.log('✅ 필터링으로 자기소개서 발견:', targetIntroduce)
-        return targetIntroduce
-      }
+      return await getIntroduceByIdService(introduceId)
     } catch (e) {
       error.value = e.message
       console.error('❌ 자기소개서 조회 실패:', e)
@@ -110,20 +98,9 @@ export const useIntroduceStore = defineStore('introduce', () => {
     error.value = null
     try {
       console.log('🔍 applicationId로 자기소개서 조회:', applicationId)
-      
-      // 전체 조회 후 applicationId로 필터링
-      const allRes = await api.get(IntroduceAPI.GET_ALL_INTRODUCE)
-      const allIntroduces = allRes.data?.data || allRes.data || []
-      
-      console.log('📋 전체 자기소개서 목록:', allIntroduces)
-      
-      // applicationId로 필터링
-      const targetIntroduce = allIntroduces.find(item => 
-        item.applicationId == applicationId
-      )
-      
-      console.log('✅ applicationId로 찾은 자기소개서:', targetIntroduce)
-      return targetIntroduce || null
+      const result = await getIntroduceByApplicationIdService(applicationId)
+      console.log('✅ applicationId로 찾은 자기소개서:', result)
+      return result
     } catch (e) {
       error.value = e.message
       console.error('❌ applicationId로 자기소개서 조회 실패:', e)
@@ -139,10 +116,9 @@ export const useIntroduceStore = defineStore('introduce', () => {
     error.value = null
     try {
       console.log('🔄 자기소개서 업데이트:', { introduceId, updateData })
-      
-      const res = await api.patch(`${IntroduceAPI.UPDATE_INTRODUCE(introduceId)}`, updateData)
-      console.log('✅ 자기소개서 업데이트 성공:', res.data)
-      return res.data?.data || res.data
+      const result = await updateIntroduceService(introduceId, updateData)
+      console.log('✅ 자기소개서 업데이트 성공:', result)
+      return result
     } catch (e) {
       error.value = e.message
       console.error('❌ 자기소개서 업데이트 실패:', e)
@@ -152,17 +128,13 @@ export const useIntroduceStore = defineStore('introduce', () => {
     }
   }
 
-  return {
-    items, loading, error,
-    fetchItems, addItem, removeItem,
-    saveIntroduceRatingResult,
-    fetchIntroduceById,
-    getIntroduceByApplicationId,
-    updateIntroduce,
-    async createIntroduce({ applicantId, applicationId, introduceTemplateId, content }) {
+  // 자기소개서 생성
+  const createIntroduce = async ({ applicantId, applicationId, introduceTemplateId, content }) => {
+    loading.value = true
+    error.value = null
+    try {
       console.log('📝 자기소개서 생성 요청 데이터:', { applicantId, applicationId, introduceTemplateId, content })
       
-      // 백엔드 IntroduceCommandDTO 스펙에 맞는 필드명
       const payload = {
         applicantId: applicantId,
         applicationId: applicationId,
@@ -171,20 +143,33 @@ export const useIntroduceStore = defineStore('introduce', () => {
       }
       
       console.log('📤 자기소개서 생성 최종 요청:', payload)
-      console.log('📤 각 필드 상세 확인:', {
-        applicantId: payload.applicantId,
-        applicantIdType: typeof payload.applicantId,
-        applicationId: payload.applicationId,
-        applicationIdType: typeof payload.applicationId,
-        introduceTemplateId: payload.introduceTemplateId,
-        introduceTemplateIdType: typeof payload.introduceTemplateId
-      })
-      
-      const res = await api.post(IntroduceAPI.CREATE_INTRODUCE, payload)
-      
-      console.log('✅ 자기소개서 생성 응답:', res.data)
-      return res.data?.data?.id || res.data?.id
+      const result = await createIntroduceService(payload)
+      console.log('✅ 자기소개서 생성 응답:', result)
+      return result?.id || result
+    } catch (e) {
+      error.value = e.message
+      console.error('❌ 자기소개서 생성 실패:', e)
+      throw e
+    } finally {
+      loading.value = false
     }
+  }
+
+  return {
+    // 상태
+    items,
+    loading,
+    error,
+    
+    // Actions
+    fetchItems,
+    addItem,
+    removeItem,
+    saveIntroduceRatingResult,
+    fetchIntroduceById,
+    getIntroduceByApplicationId,
+    updateIntroduce,
+    createIntroduce
   }
 })
 
@@ -197,6 +182,7 @@ export const useIntroduceTemplateStore = defineStore('introduceTemplate', {
 })
 
 export const fetchTemplates = async () => {
-  const res = await api.get('/api/v1/employment/introduce-template')
-  return res.data.data
+  // 이 함수는 Service를 통해 호출되어야 함
+  // TODO: introduceTemplateService.getTemplates() 로 변경 필요
+  console.warn('⚠️ fetchTemplates는 Service 계층을 통해 호출되어야 합니다.')
 }

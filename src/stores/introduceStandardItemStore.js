@@ -21,6 +21,29 @@ export const useIntroduceStandardItemStore = defineStore('introduceStandardItem'
         this.loading = false
       }
     },
+    async fetchItemsByStandardId(standardId) {
+      this.loading = true
+      this.error = null
+      try {
+        console.log('🔍 기준표별 항목 조회:', standardId)
+        const response = await fetchItemsByStandardId(standardId)
+        
+        const data = response.data?.data || response.data || response || []
+        this.items = Array.isArray(data) ? data : []
+        
+        console.log('✅ 기준표별 항목 조회 결과:', this.items)
+        console.log('✅ 조회된 항목 수:', this.items.length)
+        
+        return this.items
+      } catch (e) {
+        console.error('❌ 기준표별 항목 조회 실패:', e)
+        this.error = e
+        this.items = []
+        throw e
+      } finally {
+        this.loading = false
+      }
+    },
     async addItem(content) {
       try {
         const memberStore = useMemberStore()
