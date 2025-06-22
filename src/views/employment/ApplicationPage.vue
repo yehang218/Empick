@@ -172,7 +172,8 @@
                 @click="selectEvaluation(evaluation.type)">
                 <div class="d-flex justify-between align-center mb-2">
                   <h4 class="text-subtitle-2 font-weight-bold">{{ evaluation.type }}</h4>
-                  <v-chip :color="evaluation.result === '합격' ? 'success' : 'error'" size="x-small" variant="elevated">
+                  <v-chip :color="evaluation.result === '평가 완료' ? 'success' : (evaluation.result === '합격' ? 'success' : 'error')" 
+                          size="x-small" variant="elevated">
                     {{ evaluation.result }}
                   </v-chip>
                 </div>
@@ -183,16 +184,11 @@
                     <span class="font-weight-bold">{{ evaluation.score }}점</span>
                   </div>
                   <v-progress-linear :model-value="evaluation.score" color="primary" height="6" rounded class="mb-2" />
-
-                  <div class="d-flex justify-between text-body-2">
-                    <span class="text-grey">평균 점수</span>
-                    <span>{{ evaluation.average }}점</span>
-                  </div>
                 </div>
 
                 <v-btn variant="tonal" size="small" block
                   :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye">
-                  평가 상세보기
+                  평가 자세히 보기
                 </v-btn>
               </div>
             </div>
@@ -200,13 +196,12 @@
         </v-card>
       </v-col>
 
-
-      <!-- 우측: 자기소개서 및 평가 상세 -->
+      <!-- 오른쪽: 자기소개서 및 평가 -->
       <v-col cols="12" lg="7">
         <!-- 자기소개서 카드 -->
         <v-card class="mb-4" elevation="2">
           <v-card-title class="d-flex align-center justify-between">
-                        <div class="d-flex align-center">
+            <div class="d-flex align-center">
               <v-icon class="mr-2" color="green">mdi-text-box-outline</v-icon>
               <span>자기소개서</span>
             </div>
@@ -270,8 +265,6 @@
             </div>
           </v-card-text>
         </v-card>
-
-
       </v-col>
     </v-row>
 
@@ -361,8 +354,9 @@ if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
 
 
 
-// 평가 모달 관련
+// 평가 관련
 const currentEvaluationData = ref({})
+const selectedEvaluation = ref('자기소개서')
 
 // ===== ViewModel (Store 데이터 + URL 쿼리 데이터 결합) =====
 const applicant = computed(() => {
@@ -406,24 +400,24 @@ const evaluationStats = computed(() => {
   return [
     {
       type: '자기소개서',
-      score: applicant.value.introduceScore || 0,
-      average: 75,
-      result: (applicant.value.introduceScore || 0) >= 70 ? '합격' : '미평가'
+      score: introduceRatingScore.value || applicant.value.introduceScore || 0,
+      result: introduceRatingScore.value ? '평가 완료' : '미평가'
     },
     {
       type: '실무 테스트',
       score: applicant.value.jobtestTotalScore || 0,
-      average: 80,
       result: (applicant.value.jobtestTotalScore || 0) >= 70 ? '합격' : '미평가'
     },
     {
       type: '면접',
       score: applicant.value.interviewScore || 0,
-      average: 85,
       result: (applicant.value.interviewScore || 0) >= 70 ? '합격' : '미평가'
     }
   ]
 })
+
+// 자기소개서 평가 점수를 위한 ref
+const introduceRatingScore = ref(null)
 
 // applicationStore.selectedApplication을 감시하여 데이터 확인
 watch(() => applicationStore.selectedApplication, (val) => {
@@ -490,25 +484,7 @@ onMounted(async () => {
 
 const selectEvaluation = (type) => {
   selectedEvaluation.value = type
-  switch (type) {
-    case '자기소개서':
-      evaluationComponent.value = IntroduceResult
-      break
-    case '실무 테스트':
-      // TODO: TestResult 컴포넌트 구현 필요
-      evaluationComponent.value = IntroduceResult
-      break
-    case '면접':
-      // TODO: InterviewResult 컴포넌트 구현 필요
-      evaluationComponent.value = IntroduceResult
-      break
-    default:
-      evaluationComponent.value = IntroduceResult
-  }
-}
-
-const getCurrentEvaluation = () => {
-  return evaluationStats.value?.find(evaluation => evaluation.type === selectedEvaluation.value)
+  console.log('선택된 평가 유형:', type)
 }
 
 const formatDate = (dateString) => {
@@ -715,6 +691,13 @@ const loadApplicationData = async () => {
 const handleEvaluationSave = async (evaluationData) => {
   try {
     console.log('💾 평가 데이터 저장:', evaluationData)
+    
+    // 평가 점수 업데이트
+    if (evaluationData.ratingScore) {
+      introduceRatingScore.value = evaluationData.ratingScore
+      console.log('✅ 자기소개서 평가 점수 업데이트:', evaluationData.ratingScore)
+    }
+    
     toast.success('평가가 저장되었습니다.')
     
     // 평가 완료 후 데이터 새로고침 (필요시)
@@ -778,33 +761,6 @@ const handleEvaluationSave = async (evaluationData) => {
   background: rgba(0, 0, 0, 0.02);
   padding: 0.75rem;
   border-radius: 8px;
-}
-
-.evaluation-detail-card {
-  min-height: 600px;
-}
-
-.score-analysis {
-  padding: 1rem 0;
-}
-
-.stat-card {
-  text-align: center;
-  padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
-}
-
-.stat-number {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.stat-label {
-  font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.6);
-  font-weight: 500;
 }
 
 .action-section {
