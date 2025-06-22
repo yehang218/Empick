@@ -63,10 +63,22 @@ export const useApplicationStore = defineStore('application', () => {
 
   // 이력서 응답 요약 (computed)
   const resumeSummary = computed(() => {
-    return applicationResponses.value.map(response => ({
-      itemName: response.itemName || response.categoryName || '항목',
-      content: response.content || response.answer || ''
-    }))
+    console.log('📊 resumeSummary computed - applicationResponses:', applicationResponses.value)
+    
+    if (!applicationResponses.value || applicationResponses.value.length === 0) {
+      return []
+    }
+    
+    return applicationResponses.value.map(response => {
+      console.log('📋 개별 응답 매핑:', response)
+      return {
+        id: response.id,
+        itemName: response.categoryName || response.itemName || response.applicationItemCategoryName || '항목명 없음',
+        content: response.content || response.answer || response.responseContent || '응답 없음',
+        inputType: response.inputType,
+        isRequired: response.isRequired
+      }
+    })
   })
 
   // 자기소개서 항목들 (computed)
@@ -211,6 +223,26 @@ export const useApplicationStore = defineStore('application', () => {
       const result = await getApplicationResponsesByApplicationIdService(applicationId);
       applicationResponses.value = result || [];
       console.log('✅ ApplicationStore: 이력서 응답 조회 성공:', result)
+      
+      // 데이터가 없으면 직접 API 호출 시도 (fallback)
+      if (!result || result.length === 0) {
+        console.warn('⚠️ 이력서 응답 데이터가 없어서 직접 API 호출 시도')
+        try {
+          const { default: api } = await import('@/apis/apiClient')
+          const directResponse = await api.get(`/api/v1/employment/application-response/application/${applicationId}`)
+          console.log('🔄 직접 API 호출 결과:', directResponse.data)
+          
+          const directData = directResponse.data?.data || directResponse.data || []
+          if (directData.length > 0) {
+            applicationResponses.value = directData
+            console.log('✅ 직접 API 호출로 이력서 데이터 확보:', directData)
+            return directData
+          }
+        } catch (directError) {
+          console.error('❌ 직접 API 호출도 실패:', directError)
+        }
+      }
+      
       return result;
     } catch (err) {
       console.error('❌ ApplicationStore: 이력서 응답 조회 실패:', err)
@@ -257,11 +289,79 @@ export const useApplicationStore = defineStore('application', () => {
           content: result.introduce.content
         }
       } else {
-        introduceData.value = {
-          items: [],
-          templateItems: [],
-          responses: [],
-          content: null
+        console.warn('⚠️ 자기소개서 데이터가 없어서 대안 조회 시도')
+        
+        // 대안: 다른 방법으로 자기소개서 조회 시도
+        try {
+          const { getIntroduceByApplicationIdService, getIntroduceTemplateItemResponses } = await import('@/services/introduceService')
+          const directIntroduce = await getIntroduceByApplicationIdService(applicationId)
+          console.log('🔄 직접 자기소개서 조회 결과:', directIntroduce)
+          
+          if (directIntroduce) {
+            // 템플릿 항목 응답도 함께 조회
+            const responses = await getIntroduceTemplateItemResponses(directIntroduce.id)
+            
+            // 템플릿 정보 조회
+            let templateItems = []
+            if (directIntroduce.introduceTemplateId) {
+              try {
+                const { default: api } = await import('@/apis/apiClient')
+                const templateRes = await api.get(`/api/v1/employment/introduce-template/${directIntroduce.introduceTemplateId}`)
+                const template = templateRes.data?.data || templateRes.data
+                
+                if (template?.items) {
+                  templateItems = template.items
+                } else {
+                  // 템플릿 항목들을 별도 조회
+                  const itemsRes = await api.get('/api/v1/employment/introduce-template/item')
+                  const allItems = itemsRes.data?.data || itemsRes.data || []
+                  templateItems = allItems.filter(item => 
+                    item.introduceTemplateId == directIntroduce.introduceTemplateId
+                  )
+                }
+              } catch (templateError) {
+                console.warn('템플릿 조회 실패:', templateError)
+              }
+            }
+            
+            // 데이터 결합
+            const combinedItems = templateItems.map(templateItem => {
+              const response = responses.find(r => 
+                r.introduceTemplateItemId == templateItem.id
+              )
+              return {
+                id: templateItem.id,
+                title: templateItem.title || templateItem.content,
+                content: response?.content || '응답이 없습니다.',
+                templateItemId: templateItem.id,
+                responseId: response?.id
+              }
+            })
+            
+            introduceData.value = {
+              ...directIntroduce,
+              items: combinedItems,
+              templateItems,
+              responses
+            }
+            
+            console.log('✅ 직접 조회로 자기소개서 데이터 확보:', introduceData.value)
+          } else {
+            introduceData.value = {
+              items: [],
+              templateItems: [],
+              responses: [],
+              content: null
+            }
+          }
+        } catch (directIntroduceError) {
+          console.error('❌ 직접 자기소개서 조회도 실패:', directIntroduceError)
+          introduceData.value = {
+            items: [],
+            templateItems: [],
+            responses: [],
+            content: null
+          }
         }
       }
       

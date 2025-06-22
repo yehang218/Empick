@@ -121,47 +121,138 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
     const introduceRes = await api.get(`${IntroduceAPI.GET_ALL_INTRODUCE}`)
     const allIntroduces = introduceRes.data?.data || introduceRes.data || []
     
-    const introduce = allIntroduces.find(item => 
-      item.applicationId == applicationId
-    )
+    // 🔍 디버깅: 전체 자기소개서 데이터 구조 확인
+    console.log('📊 전체 자기소개서 데이터:', allIntroduces)
+    console.log('🔍 찾고 있는 applicationId:', applicationId, '(타입:', typeof applicationId, ')')
+    
+    // 각 자기소개서의 applicationId 확인
+    allIntroduces.forEach((item, index) => {
+      console.log(`📋 자기소개서 ${index + 1}:`, {
+        id: item.id,
+        applicationId: item.applicationId,
+        application_id: item.application_id,
+        applicantId: item.applicantId,
+        applicant_id: item.applicant_id,
+        introduceTemplateId: item.introduceTemplateId,
+        introduce_template_id: item.introduce_template_id,
+        content: item.content?.substring(0, 50) + '...',
+        전체_데이터: item
+      })
+    })
+    
+    const introduce = allIntroduces.find(item => {
+      // application_id (snake_case) 우선으로 매칭 시도
+      const match = item.application_id == applicationId || 
+                   item.applicationId == applicationId ||
+                   String(item.application_id) === String(applicationId) ||
+                   String(item.applicationId) === String(applicationId)
+      
+      if (match) {
+        console.log('✅ 매칭된 자기소개서 (applicationId):', item)
+        return true
+      }
+      
+      // 📍 Fallback: applicantId로 매칭 시도 (API에서 application_id가 undefined인 경우)
+      // URL에서 applicantId 가져오기
+      const urlParams = new URLSearchParams(window.location.search)
+      const applicantIdFromUrl = urlParams.get('applicantId')
+      
+      if (applicantIdFromUrl && (item.applicantId == applicantIdFromUrl || item.applicant_id == applicantIdFromUrl)) {
+        console.log('✅ 매칭된 자기소개서 (applicantId fallback):', item)
+        console.log('🔍 매칭 조건:', { 
+          itemApplicantId: item.applicantId, 
+          urlApplicantId: applicantIdFromUrl,
+          applicationId: applicationId 
+        })
+        return true
+      }
+      
+      return false
+    })
     
     if (!introduce) {
-      console.log('자기소개서가 없습니다.')
+      console.log('❌ 자기소개서가 없습니다.')
+      console.log('🔍 매칭 시도한 조건들:')
+      console.log('- item.application_id == applicationId (주요)')
+      console.log('- item.applicationId == applicationId') 
+      console.log('- String(item.application_id) === String(applicationId)')
+      console.log('- String(item.applicationId) === String(applicationId)')
       return { introduce: null, templateItems: [], responses: [] }
     }
     
     console.log('✅ 자기소개서 발견:', introduce)
     
-    // 2. 템플릿 정보 조회
-    let templateItems = []
-    if (introduce.introduceTemplateId) {
-      try {
-        const templateRes = await api.get(IntroduceAPI.GET_TEMPLATE_BY_ID(introduce.introduceTemplateId))
-        const template = templateRes.data?.data || templateRes.data
+    // 2. recruitment 테이블에서 introduce_template_id 조회
+    let introduceTemplateId = null
+    try {
+      // application → recruitment 관계를 통해 template ID 찾기
+      const applicationRes = await api.get(`/api/v1/employment/application/${applicationId}`)
+      const application = applicationRes.data?.data || applicationRes.data
+      
+      if (application && application.recruitmentId) {
+        const recruitmentRes = await api.get(`/api/v1/employment/recruitments/${application.recruitmentId}`)
+        const recruitment = recruitmentRes.data?.data || recruitmentRes.data
         
-        if (template?.items) {
-          templateItems = template.items
-        } else {
-          // 템플릿 항목들을 별도 조회
-          const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
-          const allItems = itemsRes.data?.data || itemsRes.data || []
-          templateItems = allItems.filter(item => 
-            item.introduceTemplateId == introduce.introduceTemplateId
-          )
+        if (recruitment && recruitment.introduceTemplateId) {
+          introduceTemplateId = recruitment.introduceTemplateId
+          console.log('✅ recruitment에서 introduce_template_id 발견:', introduceTemplateId)
         }
+      }
+    } catch (recruitmentError) {
+      console.warn('recruitment 정보 조회 실패:', recruitmentError)
+    }
+    
+    // 3. 템플릿 항목들 조회
+    let templateItems = []
+    if (introduceTemplateId) {
+      try {
+        const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
+        const allItems = itemsRes.data?.data || itemsRes.data || []
+        templateItems = allItems.filter(item => 
+          item.introduceTemplateId == introduceTemplateId
+        )
         console.log('✅ 템플릿 항목들:', templateItems)
       } catch (templateError) {
-        console.warn('템플릿 조회 실패:', templateError)
+        console.warn('템플릿 항목 조회 실패:', templateError)
       }
     }
     
-    // 3. 템플릿 항목별 응답 조회
-    const responses = await getIntroduceTemplateItemResponses(introduce.id)
-    console.log('✅ 템플릿 항목 응답들:', responses)
+    // 4. 자기소개서 템플릿 항목별 응답 조회 (전체 조회 후 필터링)
+    let responses = []
+    try {
+      const responsesRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEM_RESPONSES)
+      const allResponses = responsesRes.data?.data || responsesRes.data || []
+      
+      // introduce.id로 필터링 (introduce_template_item_response 테이블의 introduce_id와 매칭)
+      responses = allResponses.filter(response => {
+        // introduce_id (snake_case) 우선으로 매칭 시도
+        return response.introduce_id == introduce.id || 
+               response.introduceId == introduce.id ||
+               // 또는 application_id로 직접 매칭 (만약 response에 application_id가 있다면)
+               response.application_id == applicationId ||
+               response.applicationId == applicationId
+      })
+      
+      console.log('✅ 필터링된 템플릿 항목 응답들:', responses)
+      console.log('🔍 필터링 조건:', { 
+        introduceId: introduce.id, 
+        applicationId: applicationId,
+        totalResponses: allResponses.length,
+        filteredResponses: responses.length 
+      })
+      
+      // 디버깅을 위해 전체 응답 데이터의 구조 확인
+      if (allResponses.length > 0) {
+        console.log('📊 전체 응답 데이터 샘플:', allResponses[0])
+      }
+      
+    } catch (responseError) {
+      console.warn('템플릿 항목 응답 조회 실패:', responseError)
+    }
     
     return { introduce, templateItems, responses }
   } catch (error) {
     console.error('자기소개서 조회 실패:', error)
-    return { introduce: null, templateItems: [], responses: [] }
+    throw error
   }
 }

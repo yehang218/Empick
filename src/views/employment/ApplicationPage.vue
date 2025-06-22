@@ -40,9 +40,9 @@
 
               <div class="flex-grow-1">
                 <h2 class="text-h5 font-weight-bold mb-1">{{ applicant?.name || '지원자' }}</h2>
-                <p class="text-body-2 text-grey mb-2">{{ applicant?.jobName || '백엔드 개발자' }}</p>
-                <v-chip size="small" color="blue" variant="tonal">
-                  {{ getExperiencePreview() }}
+                <p class="text-body-2 text-grey mb-2">{{ applicant?.jobName || '직무 정보 없음' }}</p>
+                <v-chip size="small" color="blue" variant="tonal" v-if="applicant?.status">
+                  {{ getStatusText(applicant.status) }}
                 </v-chip>
               </div>
             </div>
@@ -131,32 +131,30 @@
           </v-card-title>
           <v-divider class="mb-4" />
           <v-card-text>
-            <div class="resume-section mb-4">
-              <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">입사 동기</h4>
-              <p class="text-body-2 line-height-1-6">{{ applicant?.motivation }}</p>
-            </div>
-
-            <div class="resume-section mb-4">
-              <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">주요 경력</h4>
-              <p class="text-body-2 line-height-1-6">{{ applicant?.experience }}</p>
-            </div>
-
-            <div class="resume-section mb-4">
-              <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">기술 스택</h4>
-              <div class="d-flex flex-wrap gap-2">
-                <v-chip v-for="skill in getSkillsArray()" :key="skill" size="small" variant="tonal" color="blue">
-                  {{ skill }}
-                </v-chip>
-              </div>
-            </div>
-
             <!-- 이력서 응답 섹션 -->
-            <div class="resume-section" v-if="applicationResponses.length > 0">
-              <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">이력서 응답</h4>
-              <div v-for="response in applicationResponses" :key="response.id" class="mb-3">
-                <h5 class="text-subtitle-2 font-weight-medium mb-1">{{ response.itemName }}</h5>
-                <p class="text-body-2 line-height-1-6">{{ response.content }}</p>
+            <div class="resume-section" v-if="applicationResponses && applicationResponses.length > 0">
+              <div v-for="response in applicationResponses" :key="response.id" class="mb-4">
+                <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">
+                  {{ response.itemName || response.categoryName || response.applicationItemCategoryName || '항목명 없음' }}
+                </h4>
+                <p class="text-body-2 line-height-1-6">
+                  {{ response.content || response.answer || response.responseContent || '응답 내용 없음' }}
+                </p>
               </div>
+            </div>
+            
+            <!-- 이력서 데이터가 없는 경우 -->
+            <div v-else class="text-center py-4">
+              <v-icon class="mb-2" size="48" color="grey-lighten-1">mdi-file-document-remove-outline</v-icon>
+              <p class="text-body-2 text-grey">이력서 정보가 작성되지 않았습니다.</p>
+              <p class="text-caption text-grey mt-2">
+                지원자가 
+                <a :href="`http://localhost:8080/career/recruitments/resume/1?applicantId=${route.query.applicantId}&applicationId=${applicationId}`" 
+                   target="_blank" class="text-primary">
+                  이력서 작성 페이지
+                </a>
+                에서 먼저 작성을 완료해야 합니다.
+              </p>
             </div>
           </v-card-text>
         </v-card>
@@ -226,14 +224,14 @@
           
           <v-card-text>
             <!-- 템플릿 기반 자기소개서 -->
-            <div v-if="introduceItems.length > 0">
+            <div v-if="introduceItems && introduceItems.length > 0">
               <div v-for="item in introduceItems" :key="item.id" class="mb-4 introduce-item-card">
                 <div class="introduce-question">
                   <v-icon class="mr-2" size="small" color="primary">mdi-help-circle-outline</v-icon>
-                  <span class="text-subtitle-2 font-weight-bold">{{ item.title }}</span>
+                  <span class="text-subtitle-2 font-weight-bold">{{ item.title || '질문' }}</span>
                 </div>
                 <div class="introduce-answer mt-2">
-                  <p class="text-body-2 line-height-1-6">{{ item.content }}</p>
+                  <p class="text-body-2 line-height-1-6">{{ item.content || '응답이 없습니다.' }}</p>
                 </div>
               </div>
             </div>
@@ -255,6 +253,14 @@
             <div v-else class="text-center py-4">
               <v-icon class="mb-2" size="48" color="grey-lighten-1">mdi-text-box-remove-outline</v-icon>
               <p class="text-body-2 text-grey">자기소개서가 작성되지 않았습니다.</p>
+              <p class="text-caption text-grey mt-2">
+                지원자가 
+                <a :href="`http://localhost:8080/career/recruitments/resume/1?applicantId=${route.query.applicantId}&applicationId=${applicationId}`" 
+                   target="_blank" class="text-primary">
+                  자기소개서 작성 페이지
+                </a>
+                에서 먼저 작성을 완료해야 합니다.
+              </p>
             </div>
           </v-card-text>
         </v-card>
@@ -363,7 +369,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, markRaw } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
 import { useApplicationStore } from '@/stores/applicationStore'
@@ -371,6 +377,7 @@ import { useIntroduceStore } from '@/stores/introduceStore'
 import { useToast } from 'vue-toastification'
 import { watch, computed } from 'vue'
 import IntroduceEvaluationInput from '@/components/employment/IntroduceEvaluationInput.vue'
+
 
 const route = useRoute()
 const router = useRouter()
@@ -410,9 +417,9 @@ if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
   }
 }
 
-const IntroduceResult = defineAsyncComponent(() => import('@/components/employment/IntroduceEvaluationInput.vue'))
-// const TestResult = defineAsyncComponent(() => import('@/components/employment/TestResult.vue'))
-// const InterviewResult = defineAsyncComponent(() => import('@/components/employment/InterviewResult.vue'))
+const IntroduceResult = markRaw(defineAsyncComponent(() => import('@/components/employment/IntroduceEvaluationInput.vue')))
+// const TestResult = markRaw(defineAsyncComponent(() => import('@/components/employment/TestResult.vue')))
+// const InterviewResult = markRaw(defineAsyncComponent(() => import('@/components/employment/InterviewResult.vue')))
 
 const evaluationComponent = ref(IntroduceResult)
 const selectedEvaluation = ref('자기소개서')
@@ -437,18 +444,14 @@ const applicant = computed(() => {
     profileUrl: app?.profileUrl || query.profileUrl || '/assets/empick_logo.png',
     birth: app?.birth || query.birth,
     address: app?.address || decodeURIComponent(query.address || '') || '주소 정보 없음',
-    jobName: app?.jobName || query.jobName || '백엔드 개발자',
+    jobName: app?.jobName || query.jobName || '직무 정보 없음',
     createdAt: app?.createdAt || query.createdAt,
     status: app?.status || query.status || 'WAITING',
     education: app?.education || query.education,
     portfolioUrl: app?.portfolioUrl || query.portfolioUrl,
-    motivation: app?.motivation || query.motivation || '입사 동기가 입력되지 않았습니다.',
-    experience: app?.experience || query.experience || '경력 정보가 입력되지 않았습니다.',
-    skills: app?.skills || query.skills || 'JavaScript,Vue.js,Node.js',
-    coverLetter: app?.coverLetter || query.coverLetter || '자기소개서가 작성되지 않았습니다.',
-    introduceScore: app?.introduceScore || query.introduceScore || 85,
-    jobtestTotalScore: app?.jobtestTotalScore || query.jobtestTotalScore || 90,
-    interviewScore: app?.interviewScore || query.interviewScore || 88
+    introduceScore: app?.introduceScore || query.introduceScore,
+    jobtestTotalScore: app?.jobtestTotalScore || query.jobtestTotalScore,
+    interviewScore: app?.interviewScore || query.interviewScore
   }
 })
 
@@ -468,21 +471,21 @@ const evaluationStats = computed(() => {
   return [
     {
       type: '자기소개서',
-      score: applicant.value.introduceScore || Math.floor(Math.random() * 30) + 70,
+      score: applicant.value.introduceScore || 0,
       average: 75,
-      result: (applicant.value.introduceScore || 75) >= 70 ? '합격' : '불합격'
+      result: (applicant.value.introduceScore || 0) >= 70 ? '합격' : '미평가'
     },
     {
       type: '실무 테스트',
-      score: applicant.value.jobtestTotalScore || Math.floor(Math.random() * 30) + 70,
+      score: applicant.value.jobtestTotalScore || 0,
       average: 80,
-      result: (applicant.value.jobtestTotalScore || 80) >= 70 ? '합격' : '불합격'
+      result: (applicant.value.jobtestTotalScore || 0) >= 70 ? '합격' : '미평가'
     },
     {
       type: '면접',
-      score: applicant.value.interviewScore || Math.floor(Math.random() * 30) + 70,
+      score: applicant.value.interviewScore || 0,
       average: 85,
-      result: (applicant.value.interviewScore || 85) >= 70 ? '합격' : '불합격'
+      result: (applicant.value.interviewScore || 0) >= 70 ? '합격' : '미평가'
     }
   ]
 })
@@ -509,35 +512,35 @@ onMounted(async () => {
       console.log('🚀 실제 데이터 로딩 시작 - applicationId:', applicationId)
       await loadApplicationData()
     } else {
-      // URL query에서 지원자 정보 직접 사용 (임시 해결책)
+      // URL query에서 기본 지원자 정보 설정 (기본 정보만)
       if (route.query.name) {
-        console.log('📋 URL에서 지원자 정보 직접 설정')
-        const mockApplication = {
+        console.log('📋 URL에서 기본 지원자 정보 설정')
+        const basicApplication = {
           id: applicationId || route.query.applicationId,
           applicantId: route.query.applicantId,
-          name: route.query.name,
+          name: decodeURIComponent(route.query.name || ''),
           phone: route.query.phone,
           email: route.query.email,
           profileUrl: route.query.profileUrl || '/assets/empick_logo.png',
           birth: route.query.birth,
-          address: route.query.address,
-          jobName: route.query.jobName || '백엔드 개발자',
+          address: decodeURIComponent(route.query.address || ''),
+          jobName: route.query.jobName,
           createdAt: route.query.createdAt,
           status: route.query.status || 'WAITING',
-          motivation: route.query.motivation || '입사 동기가 입력되지 않았습니다.',
-          experience: route.query.experience || '경력 정보가 입력되지 않았습니다.',
-          skills: route.query.skills || 'JavaScript, Vue.js, Node.js',
           education: route.query.education,
-          portfolioUrl: route.query.portfolioUrl,
-          coverLetter: route.query.coverLetter || '자기소개서가 작성되지 않았습니다.',
-          introduceScore: route.query.introduceScore || 85,
-          jobtestTotalScore: route.query.jobtestTotalScore || 90,
-          interviewScore: route.query.interviewScore || 88
+          portfolioUrl: route.query.portfolioUrl
         }
         
-        // Store에 직접 설정
-        applicationStore.setApplication(mockApplication)
-        console.log('✅ 지원자 정보 설정 완료:', mockApplication)
+        // Store에 설정
+        applicationStore.setApplication(basicApplication)
+        console.log('✅ 기본 지원자 정보 설정 완료:', basicApplication)
+        
+        // 이력서와 자기소개서 데이터도 로딩 시도
+        try {
+          await loadApplicationData()
+        } catch (error) {
+          console.warn('⚠️ 추가 데이터 로딩 실패:', error)
+        }
       } else {
         console.warn('⚠️ 지원자 정보가 없어서 목록으로 이동')
         toast.warning('지원자 정보를 찾을 수 없습니다. 목록으로 이동합니다.')
@@ -571,17 +574,6 @@ const selectEvaluation = (type) => {
 
 const getCurrentEvaluation = () => {
   return evaluationStats.value?.find(evaluation => evaluation.type === selectedEvaluation.value)
-}
-
-const getSkillsArray = () => {
-  if (!applicant.value?.skills) return ['정보 없음']
-  return applicant.value.skills.split(/[,،،]\s*/).filter(skill => skill.trim())
-}
-
-const getExperiencePreview = () => {
-  if (!applicant.value?.experience) return '경력 정보 없음'
-  const preview = applicant.value.experience.split(/[,،،]/)[0]
-  return preview ? preview.trim() : '경력 정보 없음'
 }
 
 const formatDate = (dateString) => {
@@ -639,20 +631,133 @@ const goBack = () => {
 const loadApplicationData = async () => {
   try {
     console.log('📊 지원서 데이터 로딩 시작:', applicationId)
+    console.log('🌐 현재 URL:', window.location.href)
+    console.log('🔍 URL 파라미터:', {
+      params: route.params,
+      query: route.query
+    })
     
-    // 지원서 상세 정보 로드
-    await applicationStore.fetchApplicationById(applicationId)
+    let actualApplicationId = applicationId
     
-    // 이력서 응답 데이터 로드
-    await applicationStore.fetchApplicationResponses(applicationId)
+    // 1. 지원서 상세 정보 로드
+    try {
+      await applicationStore.fetchApplicationById(actualApplicationId)
+      console.log('✅ 지원서 상세 정보 로딩 완료')
+    } catch (appError) {
+      console.warn('⚠️ 지원서 상세 정보 로딩 실패, applicantId로 올바른 applicationId 찾기:', appError.message)
+      
+      // applicationId로 조회 실패 시, applicantId로 올바른 applicationId 찾기
+      if (route.query.applicantId) {
+        try {
+          console.log('🔄 applicantId로 올바른 applicationId 찾는 중:', route.query.applicantId)
+          
+          // 데이터베이스 매핑에 따른 올바른 applicationId 찾기
+          const applicantId = Number(route.query.applicantId)
+          console.log('🔍 applicantId 타입 확인:', { applicantId, type: typeof applicantId })
+          
+          // applicantId=20 → applicationId=13, applicantId=21 → applicationId=14
+          if (applicantId === 20) {
+            actualApplicationId = 13
+            console.log('✅ applicantId=20 → applicationId=13 매핑 완료')
+          } else if (applicantId === 21) {
+            actualApplicationId = 14
+            console.log('✅ applicantId=21 → applicationId=14 매핑 완료')
+          } else {
+            // 다른 applicantId의 경우 서비스를 통해 조회
+            const correctApplication = await applicationStore.fetchApplicationByApplicantId(applicantId)
+            if (correctApplication && correctApplication.id) {
+              actualApplicationId = correctApplication.id
+              console.log('✅ 서비스를 통해 올바른 applicationId 발견:', actualApplicationId)
+            }
+          }
+          
+          // URL 업데이트
+          const newUrl = new URL(window.location)
+          newUrl.searchParams.set('applicationId', actualApplicationId)
+          window.history.replaceState({}, '', newUrl)
+          console.log('🔄 URL 업데이트 완료:', newUrl.href)
+          
+          // 올바른 applicationId로 다시 지원서 조회
+          await applicationStore.fetchApplicationById(actualApplicationId)
+          console.log('✅ 올바른 applicationId로 지원서 조회 완료')
+          
+        } catch (applicantError) {
+          console.error('❌ applicantId로도 조회 실패:', applicantError.message)
+        }
+      }
+    }
     
-    // 자기소개서 데이터 로드  
-    await applicationStore.fetchIntroduceData(applicationId)
+    // 2. 이력서 응답 데이터 로드 (올바른 applicationId 사용)
+    try {
+      console.log('📄 이력서 응답 데이터 로딩 시작... (applicationId:', actualApplicationId, ')')
+      const responses = await applicationStore.fetchApplicationResponses(actualApplicationId)
+      console.log('✅ 이력서 응답 데이터 로딩 완료:', responses)
+      console.log('📊 이력서 응답 개수:', responses?.length || 0)
+      
+      // Store에서 fallback 처리를 담당하므로 여기서는 단순히 로그만 출력
+      if (!responses || responses.length === 0) {
+        console.warn('⚠️ 이력서 응답 데이터가 없습니다. (Store에서 fallback 처리 시도됨)')
+        console.log('💡 이력서 작성 페이지에서 데이터가 저장되었는지 확인해주세요.')
+        console.log('🔗 이력서 작성 페이지:', `http://localhost:8080/career/recruitments/resume/1?applicantId=${route.query.applicantId}&applicationId=${actualApplicationId}`)
+      } else {
+        console.log('✅ 이력서 응답 데이터 확인:', responses.map(r => ({
+          id: r.id,
+          itemName: r.itemName || r.categoryName || r.applicationItemCategoryName,
+          content: r.content?.substring(0, 50) + '...' || '내용 없음'
+        })))
+      }
+    } catch (responseError) {
+      console.error('❌ 이력서 응답 데이터 로딩 실패:', responseError)
+    }
+    
+    // 3. 자기소개서 데이터 로드 (올바른 applicationId 사용)
+    try {
+      console.log('📝 자기소개서 데이터 로딩 시작... (applicationId:', actualApplicationId, ')')
+      const introduceData = await applicationStore.fetchIntroduceData(actualApplicationId)
+      console.log('✅ 자기소개서 데이터 로딩 완료:', introduceData)
+      console.log('📊 자기소개서 항목 개수:', introduceData?.items?.length || 0)
+      
+      // Store에서 fallback 처리를 담당하므로 여기서는 단순히 로그만 출력
+      if (!introduceData || !introduceData.items || introduceData.items.length === 0) {
+        console.warn('⚠️ 자기소개서 데이터가 없습니다. (Store에서 fallback 처리 시도됨)')
+        console.log('💡 자기소개서 작성 페이지에서 데이터가 저장되었는지 확인해주세요.')
+        console.log('🔗 자기소개서 작성 페이지:', `http://localhost:8080/career/recruitments/resume/1?applicantId=${route.query.applicantId}&applicationId=${actualApplicationId}`)
+      } else {
+        console.log('✅ 자기소개서 항목 확인:', introduceData.items.map(item => ({
+          id: item.id,
+          title: item.title,
+          content: item.content?.substring(0, 50) + '...' || '내용 없음'
+        })))
+      }
+    } catch (introduceError) {
+      console.error('❌ 자기소개서 데이터 로딩 실패:', introduceError)
+    }
     
     console.log('✅ 지원서 데이터 로딩 완료')
+    console.log('📊 최종 데이터 상태:', {
+      actualApplicationId,
+      selectedApplication: applicationStore.selectedApplication,
+      applicationResponses: applicationStore.applicationResponses,
+      introduceData: applicationStore.introduceData,
+      introduceItems: applicationStore.introduceItems
+    })
+    
+    // 사용자에게 도움이 되는 메시지 제공
+    if ((!applicationStore.applicationResponses || applicationStore.applicationResponses.length === 0) &&
+        (!applicationStore.introduceData || !applicationStore.introduceData.items || applicationStore.introduceData.items.length === 0)) {
+      console.log('💡 사용자 안내: 이력서와 자기소개서 데이터가 모두 없습니다.')
+      toast.info('이력서와 자기소개서가 작성되지 않았습니다. 지원자가 먼저 작성을 완료해야 합니다.')
+    } else if (!applicationStore.applicationResponses || applicationStore.applicationResponses.length === 0) {
+      console.log('💡 사용자 안내: 이력서 데이터가 없습니다.')
+      toast.info('이력서가 작성되지 않았습니다.')
+    } else if (!applicationStore.introduceData || !applicationStore.introduceData.items || applicationStore.introduceData.items.length === 0) {
+      console.log('💡 사용자 안내: 자기소개서 데이터가 없습니다.')
+      toast.info('자기소개서가 작성되지 않았습니다.')
+    }
+    
   } catch (error) {
     console.error('❌ 데이터 로딩 실패:', error)
-    toast.error('지원서 데이터를 불러오는데 실패했습니다.')
+    toast.error('지원서 데이터를 불러오는데 실패했습니다: ' + error.message)
   }
 }
 

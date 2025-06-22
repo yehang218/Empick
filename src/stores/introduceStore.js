@@ -155,7 +155,25 @@ export const useIntroduceStore = defineStore('introduce', () => {
     }
   }
 
-  return {
+  // 전체 자기소개서 조회
+  const getAllIntroduce = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      console.log('🔍 전체 자기소개서 조회')
+      const result = await getAllIntroduceService()
+      console.log('✅ 전체 자기소개서 조회 성공:', result)
+      return result
+    } catch (e) {
+      error.value = e.message
+      console.error('❌ 전체 자기소개서 조회 실패:', e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+      return {
     // 상태
     items,
     loading,
@@ -169,7 +187,8 @@ export const useIntroduceStore = defineStore('introduce', () => {
     fetchIntroduceById,
     getIntroduceByApplicationId,
     updateIntroduce,
-    createIntroduce
+    createIntroduce,
+    getAllIntroduce
   }
 })
 

@@ -80,7 +80,7 @@ import { createIntroduceTemplateItemResponse } from '@/services/introduceService
 import { useIntroduceStore } from '@/stores/introduceStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
 import { useApplicationStore } from '@/stores/applicationStore'
-import api from '@/apis/apiClient'
+// import api from '@/apis/apiClient' // 아키텍처 규칙 준수를 위해 제거
 
 const route = useRoute()
 const router = useRouter()
@@ -183,9 +183,8 @@ const handleSubmit = async () => {
     if (!duplicateCheck) {
       console.log('🔍 applicantId + templateId 조합으로 중복 확인...')
       try {
-        // 전체 자기소개서 목록에서 applicantId + templateId 조합 확인
-        const allRes = await api.get('/api/v1/employment/introduce')
-        const allIntroduces = allRes.data?.data || allRes.data || []
+        // Store를 통해 전체 자기소개서 목록 조회
+        const allIntroduces = await introduceStore.getAllIntroduce()
         console.log('📋 중복 체크용 전체 자기소개서:', allIntroduces)
         
         duplicateCheck = allIntroduces.find(item => 

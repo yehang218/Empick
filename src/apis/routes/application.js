@@ -61,3 +61,10 @@ export const ApplicationResponseAPI = {
     // 🔸 생성
     CREATE_APPLICATION_RESPONSE: '/api/v1/employment/application-response',
 };
+
+export const ApplicationItemAPI = {
+    // 🔹 조회
+    GET_APPLICATION_ITEM_BY_ID: (id) =>
+        `/api/v1/employment/application-item/${id}`,
+    GET_ALL_APPLICATION_ITEMS: '/api/v1/employment/application-item',
+};
