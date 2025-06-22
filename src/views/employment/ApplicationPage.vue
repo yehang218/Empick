@@ -349,9 +349,6 @@
 
           <!-- 우측 버튼 영역 -->
           <div class="d-flex gap-3">
-            <v-btn color="error" variant="outlined" prepend-icon="mdi-close" class="px-6">
-              불합격 처리
-            </v-btn>
             <v-btn color="success" variant="elevated" prepend-icon="mdi-check" class="px-6">
               다음 전형 진행
             </v-btn>

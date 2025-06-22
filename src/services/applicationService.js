@@ -135,7 +135,7 @@ export const updateApplicationIntroduceRatingResultService = async (applicationI
     };
     
     // PATCH 요청으로 application 업데이트
-    const response = await api.patch(`/api/v1/employment/application/${applicationId}`, updateData);
+    const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(applicationId), updateData);
     const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
     if (!apiResponse.success) {
