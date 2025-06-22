@@ -218,7 +218,12 @@ const onCategoryChange = async (categoryId) => {
         try {
             await approvalStore.fetchApprovalLine(categoryId, memberId.value);
             if (Array.isArray(approvalStore.approvalLine) && approvalStore.approvalLine.length > 0) {
-                form.value.approvers = approvalStore.approvalLine.map(line => ({
+                // 결재선 목록에서 현재 로그인한 사용자(작성자)를 제외
+                const filteredApprovers = approvalStore.approvalLine.filter(
+                    line => line.memberId !== memberId.value
+                );
+
+                form.value.approvers = filteredApprovers.map(line => ({
                     order: line.order,
                     memberId: line.memberId,
                     memberName: line.memberName,
