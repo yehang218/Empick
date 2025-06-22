@@ -61,10 +61,11 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
         }
     };
 
-    // 상세 불러오기
+    // 상세 정보 불러오기
     const loadRecruitmentRequestDetail = async (id) => {
         loadingDetail.value = true;
         detailError.value = null;
+
         try {
             const result = await fetchRecruitmentRequestDetail(id);
             recruitmentRequestDetail.value = result;
@@ -75,13 +76,14 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
         }
     };
 
-    // 등록 함수
-    const submitRecruitmentRequest = async (formDTO) => {
+    // 요청서 등록
+    const submitRecruitmentRequest = async (dto) => {
         submitting.value = true;
         submitError.value = null;
 
         try {
-            await createRecruitmentRequest(formDTO);
+            const result = await createRecruitmentRequest(dto);
+            return result;
         } catch (err) {
             submitError.value = err.message;
             throw err;
@@ -91,26 +93,22 @@ export const useRecruitmentRequestStore = defineStore('recruitmentRequest', () =
     };
 
     return {
-        // 목록 관련
+        // 상태
         recruitmentRequestList,
         loadingRecruitmentRequest,
         recruitmentRequestError,
-        loadRecruitmentRequestList,
-
-        // 상세 관련
         recruitmentRequestDetail,
         loadingDetail,
         detailError,
-        loadRecruitmentRequestDetail,
-
-        // 등록 관련
         submitting,
         submitError,
-        submitRecruitmentRequest,
-
-        // 직무, 부서
         jobList,
         departmentList,
+
+        // 액션
+        loadRecruitmentRequestList,
+        loadRecruitmentRequestDetail,
+        submitRecruitmentRequest,
         loadJobList,
         loadDepartmentList,
     };
