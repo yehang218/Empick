@@ -3,15 +3,28 @@
       <h2 class="page-title">자기소개서 기준표 항목 관리</h2>
   
       <v-card class="mb-6 pa-4">
-        <v-text-field
-          v-model="newCriteria"
-          label="새 기준표 항목 내용"
-          variant="outlined"
-          density="compact"
-          hide-details
-          class="mb-3"
-          @keyup.enter="addCriteria"
-        />
+        <div class="d-flex align-center" style="gap: 24px;">
+          <v-text-field
+            v-model="newCriteria"
+            label="새 기준표 항목 내용"
+            variant="outlined"
+            density="compact"
+            hide-details
+            class="flex-grow-1"
+            placeholder="예: 지원동기, 성장과정, 성격의 장단점 등"
+          />
+          <v-btn 
+            color="primary" 
+            variant="elevated"
+            prepend-icon="mdi-plus"
+            @click="addCriteria"
+            :disabled="!newCriteria.trim() || addingItem"
+            :loading="addingItem"
+            class="px-6"
+          >
+            추가하기
+          </v-btn>
+        </div>
       </v-card>
   
       <v-card>
@@ -41,14 +54,17 @@
   
   <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
-  import { useMemberStore } from '@/stores/memberStore'
+import { useRouter } from 'vue-router'
+import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
+import { useMemberStore } from '@/stores/memberStore'
+import { useToast } from 'vue-toastification'
   
   const store = useIntroduceStandardItemStore()
-  const memberStore = useMemberStore()
-  const newCriteria = ref('')
-  const router = useRouter()
+const memberStore = useMemberStore()
+const toast = useToast()
+const newCriteria = ref('')
+const router = useRouter()
+const addingItem = ref(false)
   
   onMounted(async () => {
     await Promise.all([
@@ -60,20 +76,39 @@
   const items = computed(() => store.items)
   
   const addCriteria = async () => {
-    if (!newCriteria.value.trim()) return
-    await store.addItem(newCriteria.value)
-    newCriteria.value = ''
+  if (!newCriteria.value.trim()) {
+    toast.warning('항목 내용을 입력해주세요.')
+    return
   }
+  
+  try {
+    addingItem.value = true
+    await store.addItem(newCriteria.value.trim())
+    toast.success('기준표 항목이 성공적으로 추가되었습니다.')
+    newCriteria.value = ''
+  } catch (error) {
+    console.error('항목 추가 실패:', error)
+    toast.error('항목 추가에 실패했습니다. 다시 시도해주세요.')
+  } finally {
+    addingItem.value = false
+  }
+}
   
   const goToCreateStandard = () => {
     router.push('/employment/introduce-standard/create')
   }
   
   const removeItem = async (id) => {
-    if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
+  if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
+    try {
       await store.removeItem(id)
+      toast.success('기준표 항목이 삭제되었습니다.')
+    } catch (error) {
+      console.error('항목 삭제 실패:', error)
+      toast.error('항목 삭제에 실패했습니다. 다시 시도해주세요.')
     }
   }
+}
   </script>
   
   <style scoped>
