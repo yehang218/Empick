@@ -59,7 +59,7 @@ export const createApplicationJobtestService = async (
     options = {}
 ) => {
     return withErrorHandling(async () => {
-        const response = await api.post(JobtestAPI.APPLICATION_JOBTESTS, dto);
+        const response = await api.post(JobtestAPI.APPLICATION_JOBTESTS, dto.toJSON());
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);

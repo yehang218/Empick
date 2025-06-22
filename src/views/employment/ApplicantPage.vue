@@ -29,7 +29,7 @@
           <!-- 📝 문제 할당 버튼 -->
           <v-btn color="secondary" variant="tonal" size="small" style="min-width: 90px" @click="handleAssignClick"
             :disabled="!selectedApplicants.length">
-            실무테스트 할당 ({{ selectedApplicants.length }}개 선택)
+            {{ getAssignButtonText() }}
           </v-btn>
 
           <!-- 📧 이메일 전송 버튼 -->
@@ -101,6 +101,32 @@
           <v-chip :color="getStatusColor(item.status)" variant="tonal" size="small">
             {{ getStatusText(item.status) }}
           </v-chip>
+        </template>
+
+        <!-- 실무테스트 상태 -->
+        <template #item.jobtestStatus="{ item }">
+          <div class="d-flex align-center justify-center">
+            <v-tooltip :text="getJobtestStatusTooltip(item)" location="top">
+              <template v-slot:activator="{ props }">
+                <div v-bind="props" class="d-flex align-center">
+                  <v-icon 
+                    :icon="getJobtestStatusIcon(item)" 
+                    :color="getJobtestStatusColor(item)"
+                    size="small"
+                    class="mr-1"
+                  />
+                  <v-chip 
+                    :color="getJobtestStatusColor(item)" 
+                    variant="tonal" 
+                    size="small"
+                    class="text-caption"
+                  >
+                    {{ getJobtestStatusText(item) }}
+                  </v-chip>
+                </div>
+              </template>
+            </v-tooltip>
+          </div>
         </template>
 
         <!-- 직무 -->
@@ -229,6 +255,7 @@ const tableHeaders = [
   { title: '전화번호', key: 'phone', sortable: true, align: 'start' },
   { title: '지원서', key: 'actions', sortable: false, align: 'center' },
   { title: '처리 상태', key: 'status', sortable: true, align: 'center' },
+  { title: '실무테스트', key: 'jobtestStatus', sortable: true, align: 'center', width: '120px' },
   { title: '지원공고', key: 'recruitmentTitle', sortable: true, align: 'start' }
 ]
 
@@ -281,6 +308,21 @@ const handleAssignClick = async () => {
     return
   }
 
+  // 이미 실무테스트가 할당된 지원자 확인
+  const alreadyAssignedApplicants = selectedApplicants.value.filter(
+    applicant => applicant.jobtestStatus && applicant.jobtestStatus !== 'WAITING'
+  )
+
+  if (alreadyAssignedApplicants.length > 0) {
+    const names = alreadyAssignedApplicants.map(a => a.name).join(', ')
+    const confirmed = confirm(
+      `다음 지원자들은 이미 실무테스트가 할당되어 있습니다:\n${names}\n\n계속 진행하시겠습니까?`
+    )
+    if (!confirmed) {
+      return
+    }
+  }
+
   try {
     await jobtestListStore.fetchJobtests()
     jobtestModal.value = true
@@ -293,14 +335,67 @@ const handleAssignClick = async () => {
 const handleJobtestSelected = async (jobtest) => {
   jobtestModal.value = false
 
-  const dtoList = selectedApplicants.value.map(selectedItem => {
-    return new ApplicationJobtestDTO(selectedItem.applicationId, jobtest.id)
-  })
+  // applicationId를 찾지 못한 경우를 위해 모든 지원서를 미리 가져오기
+  let allApplications = null;
+
+  const dtoList = [];
+  
+  for (const selectedItem of selectedApplicants.value) {
+    // id 필드를 우선적으로 사용 (대부분의 경우 id가 applicationId임)
+    let applicationId = selectedItem.id || selectedItem.applicationId;
+
+    console.log('🔍 찾은 applicationId:', applicationId, 'for applicant:', selectedItem.name);
+
+    // applicationId가 없으면 모든 지원서에서 applicantId로 매칭되는 것 찾기
+    if (!applicationId && selectedItem.applicantId) {
+      console.log('🔍 applicationId가 없어서 모든 지원서에서 applicantId로 매칭 시도:', selectedItem.applicantId);
+
+      // 모든 지원서를 한 번만 가져오기
+      if (!allApplications) {
+        try {
+          allApplications = await applicationStore.fetchAllApplications();
+          console.log('📋 모든 지원서 가져옴:', allApplications);
+        } catch (error) {
+          console.error('❌ 모든 지원서 조회 실패:', error);
+          allApplications = [];
+        }
+      }
+
+      // applicantId가 일치하는 지원서 찾기
+      const matchingApplication = allApplications.find(app =>
+        app.applicantId === selectedItem.applicantId ||
+        app.applicant_id === selectedItem.applicantId
+      );
+
+      if (matchingApplication) {
+        applicationId = matchingApplication.id || matchingApplication.applicationId;
+        console.log('🔍 매칭된 지원서 찾음:', matchingApplication);
+        console.log('🔍 찾은 applicationId:', applicationId);
+      } else {
+        console.error('❌ applicantId로 매칭되는 지원서를 찾을 수 없음:', selectedItem.applicantId);
+      }
+    }
+
+    if (!applicationId) {
+      console.error('❌ applicationId를 찾을 수 없음:', selectedItem);
+      continue;
+    }
+
+    dtoList.push(new ApplicationJobtestDTO(applicationId, jobtest.id));
+  }
+
+  if (dtoList.length === 0) {
+    toast.warning('할당할 수 있는 지원서가 없습니다.');
+    return;
+  }
 
   try {
     await applicationJobtestStore.assignJobtest(dtoList)
-    toast.success(`선택한 ${selectedApplicants.value.length}개 지원서에 실무테스트를 성공적으로 할당했습니다.`)
+    toast.success(`선택한 ${dtoList.length}개 지원서에 실무테스트를 성공적으로 할당했습니다.`)
     selectedApplicants.value = []
+    
+    // 지원자 목록 새로고침하여 실무테스트 상태 업데이트
+    await applicantStore.fetchApplicantFullInfoList()
   } catch (error) {
     console.error('실무테스트 할당 실패:', error)
     toast.error(applicationJobtestStore.errorMessage || '실무테스트 할당에 실패했습니다.')
@@ -572,6 +667,78 @@ const handleEmailPreviewCancel = () => {
   console.log('❌ 이메일 미리보기 취소');
   emailPreviewModal.value = false;
 };
+
+// 실무테스트 상태 관련 유틸리티 함수들
+const getJobtestStatusText = (item) => {
+  if (!item.jobtestStatus) {
+    return '미할당'
+  }
+  
+  switch (item.jobtestStatus) {
+    case 'WAITING':
+      return '대기중'
+    case 'IN_PROGRESS':
+      return '진행중'
+    case 'COMPLETED':
+      return '완료'
+    default:
+      return '할당됨'
+  }
+}
+
+const getJobtestStatusColor = (item) => {
+  if (!item.jobtestStatus) {
+    return 'grey'
+  }
+  
+  switch (item.jobtestStatus) {
+    case 'WAITING':
+      return 'orange'
+    case 'IN_PROGRESS':
+      return 'blue'
+    case 'COMPLETED':
+      return 'green'
+    default:
+      return 'purple'
+  }
+}
+
+const getJobtestStatusIcon = (item) => {
+  if (!item.jobtestStatus) {
+    return 'mdi-close-circle-outline'
+  }
+  
+  switch (item.jobtestStatus) {
+    case 'WAITING':
+      return 'mdi-clock-outline'
+    case 'IN_PROGRESS':
+      return 'mdi-play-circle-outline'
+    case 'COMPLETED':
+      return 'mdi-check-circle-outline'
+    default:
+      return 'mdi-checkbox-marked-circle-outline'
+  }
+}
+
+const getJobtestStatusTooltip = (item) => {
+  if (!item.jobtestStatus) {
+    return '실무테스트가 할당되지 않았습니다'
+  }
+  
+  const statusText = getJobtestStatusText(item)
+  const score = item.jobtestTotalScore ? ` (점수: ${item.jobtestTotalScore}점)` : ''
+  return `실무테스트 상태: ${statusText}${score}`
+}
+
+const getAssignButtonText = () => {
+  if (selectedApplicants.value.length === 0) {
+    return '실무테스트 할당'
+  } else if (selectedApplicants.value.length === 1) {
+    return '실무테스트 할당 (1개 선택)'
+  } else {
+    return '실무테스트 할당 (' + selectedApplicants.value.length + '개 선택)'
+  }
+}
 
 </script>
 

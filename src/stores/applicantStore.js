@@ -283,6 +283,30 @@ export const useApplicantStore = defineStore('applicant', () => {
         selectedApplicants.value = [];
     };
 
+    // 실무테스트 할당 정보 업데이트
+    const updateJobtestAssignment = (assignedResults) => {
+        assignedResults.forEach(result => {
+            const application = applicantList.value.find(
+                app => app.applicationId === result.applicationId
+            );
+            
+            if (application) {
+                application.applicationJobtestId = result.applicationJobtestId;
+                application.jobtestId = result.jobtestId;
+                application.jobtestAssignedAt = result.assignedAt;
+                application.hasJobtest = true;
+            }
+        });
+    };
+
+    // 실무테스트 할당 여부 확인
+    const hasJobtestAssignment = (applicationId) => {
+        const application = applicantList.value.find(
+            app => app.applicationId === applicationId
+        );
+        return application?.hasJobtest || false;
+    };
+
     return {
         // 상태
         applicantList,
@@ -313,6 +337,8 @@ export const useApplicantStore = defineStore('applicant', () => {
         setSelectedApplicants,
         addSelectedApplicant,
         removeSelectedApplicant,
-        clearSelectedApplicants
+        clearSelectedApplicants,
+        updateJobtestAssignment,
+        hasJobtestAssignment
     };
 });
