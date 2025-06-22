@@ -381,9 +381,9 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
       console.warn('⚠️ 새로운 API 조회 실패, 기존 방식으로 fallback:', directError.message)
       
       // Fallback: 기존 방식 (전체 조회 후 필터링)
-      const introduceRes = await api.get(`${IntroduceAPI.GET_ALL_INTRODUCE}`)
-      const allIntroduces = introduceRes.data?.data || introduceRes.data || []
-      
+    const introduceRes = await api.get(`${IntroduceAPI.GET_ALL_INTRODUCE}`)
+    const allIntroduces = introduceRes.data?.data || introduceRes.data || []
+    
       // 🔍 디버깅: 전체 자기소개서 데이터 구조 확인
       console.log('📊 Fallback - 전체 자기소개서 데이터:', allIntroduces)
       console.log('🔍 찾고 있는 applicationId:', applicationId, '(타입:', typeof applicationId, ')')
@@ -527,11 +527,11 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
         // Fallback: introduceTemplateId로 필터링 시도 (기존 방식)
         if (introduceTemplateId) {
           try {
-            const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
-            const allItems = itemsRes.data?.data || itemsRes.data || []
-            templateItems = allItems.filter(item => 
+          const itemsRes = await api.get(IntroduceAPI.GET_ALL_TEMPLATE_ITEMS)
+          const allItems = itemsRes.data?.data || itemsRes.data || []
+          templateItems = allItems.filter(item => 
               item.introduceTemplateId == introduceTemplateId
-            )
+          )
             console.log('✅ Fallback 템플릿 항목들:', templateItems)
           } catch (fallbackError) {
             console.warn('Fallback 템플릿 항목 조회도 실패:', fallbackError)

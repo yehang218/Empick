@@ -281,8 +281,9 @@ const handleFileChange = async (files) => {
     
     console.log('✅ S3 업로드 성공:', uploadResult)
     
-    // 기존 패턴: S3 key를 그대로 사용 (DB에 저장될 값)
+    // S3 key와 전체 URL 생성
     const s3Key = uploadResult.key || `profiles/${fileName}`
+    const s3FullUrl = `https://empick-bucket.s3.ap-northeast-2.amazonaws.com/${s3Key}`
     
     // 미리보기용 URL 생성 (FileReader 사용 - 기존 memberRegisterStore 패턴)
     const reader = new FileReader()
@@ -292,10 +293,10 @@ const handleFileChange = async (files) => {
     }
     reader.readAsDataURL(file)
     
-    // applicant 객체에 S3 key 저장 (DB 저장용)
-    applicant.value.profileImageKey = s3Key
+    // applicant 객체에 S3 전체 URL 저장 (DB 저장용)
+    applicant.value.profileImageKey = s3FullUrl
     
-    console.log('✅ 프로필 이미지 업로드 완료:', { s3Key, hasPreview: !!profileImageUrl.value })
+    console.log('✅ 프로필 이미지 업로드 완료:', { s3Key, s3FullUrl, hasPreview: !!profileImageUrl.value })
     toast.success('프로필 사진이 성공적으로 업로드되었습니다!')
     
   } catch (error) {
