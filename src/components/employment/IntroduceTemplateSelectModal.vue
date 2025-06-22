@@ -5,10 +5,8 @@
             <v-card-text>
                 <v-expansion-panels v-model="panel">
                     <v-expansion-panel v-for="template in templates" :key="template.id" :value="template.id">
-                        <v-expansion-panel-title>
-                             <v-radio-group v-model="selectedId" @click.stop>
-                                <v-radio :value="template.id" />
-                            </v-radio-group>
+                        <v-expansion-panel-title @click="selectedId = template.id"
+                            :class="{ 'bg-blue-lighten-5': selectedId === template.id }">
                             {{ template.title }}
                         </v-expansion-panel-title>
                         <v-expansion-panel-text>
@@ -86,9 +84,5 @@ const close = () => {
 .v-expansion-panel-title {
     display: flex;
     align-items: center;
-}
-.v-radio-group {
-    flex: 0 0 auto;
-    margin-right: 8px;
 }
 </style>
