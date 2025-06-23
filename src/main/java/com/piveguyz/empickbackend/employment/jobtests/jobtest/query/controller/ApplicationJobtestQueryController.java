@@ -38,6 +38,13 @@ public class ApplicationJobtestQueryController {
                 .body(CustomApiResponse.of(ResponseCode.SUCCESS, applicationJobtestList));
     }
 
+    // 특정 지원서에게 할당된 실무테스트 조회
+    @Operation(
+            summary = "특정 지원서에게 할당된 실무테스트 조회",
+            description = """
+                    특정 지원서에게 할당된 실무테스트를 조회합니다.
+                    """
+    )
     @GetMapping("/application/{applicationId}")
     public ResponseEntity<CustomApiResponse<ApplicationJobtestResponseDTO>> getApplicationJobtest(
             @PathVariable int applicationId

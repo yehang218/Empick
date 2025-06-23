@@ -10,4 +10,5 @@ public class ApplicationJobtestResponseDTO {
     private int applicationId;
     private int jobtestId;
     private String jobtestTitle;
+    private Double score;
 }
