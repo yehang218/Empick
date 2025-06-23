@@ -112,6 +112,7 @@ export const useAuthStore = defineStore('auth', () => {
             useMemberStore().reset();
             useApprovalStore().reset();
             localStorage.removeItem('auth-store');
+            localStorage.removeItem('empick-linked-approvals'); // 테스트시에는 연동 기록 삭제. 채용 요청서 연동 기록은 영구적으로 보존해야 하므로 삭제하지 않음
             useAttendanceStore().resetAllData();
 
             // 로그아웃 후 로그인 페이지로 이동
