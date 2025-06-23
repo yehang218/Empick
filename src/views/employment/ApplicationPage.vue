@@ -194,8 +194,20 @@
                   <v-progress-linear :model-value="evaluation.score" color="primary" height="6" rounded class="mb-2" />
                 </div>
 
-                <v-btn variant="tonal" size="small" block
-                  :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye">
+                <v-btn
+                  v-if="evaluation.type === '실무 테스트'"
+                  variant="tonal" size="small" block
+                  :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye"
+                  @click="goToJobtestAnswerDetail"
+                >
+                  답안 바로가기
+                </v-btn>
+                <v-btn
+                  v-else
+                  variant="tonal" size="small" block
+                  :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye"
+                  @click="selectEvaluation(evaluation.type)"
+                >
                   평가 자세히 보기
                 </v-btn>
               </div>
@@ -1324,6 +1336,15 @@ function getResultChipColor(evaluation) {
   }
   if (evaluation.result === '평가 완료' || evaluation.result === '합격') return 'success'
   return 'error'
+}
+
+function goToJobtestAnswerDetail() {
+  const applicationJobtestId = applicationJobtestStore.applicationJobtest?.id;
+  if (applicationJobtestId) {
+    router.push({ name: 'JobtestAnswerDetail', params: { applicationJobtestId } });
+  } else {
+    toast.error('실무테스트 정보가 없습니다.');
+  }
 }
 </script>
 
