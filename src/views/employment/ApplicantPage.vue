@@ -103,31 +103,7 @@
           </v-chip>
         </template>
 
-        <!-- 실무테스트 상태 -->
-        <template #item.jobtestStatus="{ item }">
-          <div class="d-flex align-center justify-center">
-            <v-tooltip :text="getJobtestStatusTooltip(item)" location="top">
-              <template v-slot:activator="{ props }">
-                <div v-bind="props" class="d-flex align-center">
-                  <v-icon 
-                    :icon="getJobtestStatusIcon(item)" 
-                    :color="getJobtestStatusColor(item)"
-                    size="small"
-                    class="mr-1"
-                  />
-                  <v-chip 
-                    :color="getJobtestStatusColor(item)" 
-                    variant="tonal" 
-                    size="small"
-                    class="text-caption"
-                  >
-                    {{ getJobtestStatusText(item) }}
-                  </v-chip>
-                </div>
-              </template>
-            </v-tooltip>
-          </div>
-        </template>
+
 
         <!-- 직무 -->
         <template #item.jobName="{ item }">
@@ -255,7 +231,7 @@ const tableHeaders = [
   { title: '전화번호', key: 'phone', sortable: true, align: 'start' },
   { title: '지원서', key: 'actions', sortable: false, align: 'center' },
   { title: '처리 상태', key: 'status', sortable: true, align: 'center' },
-  { title: '실무테스트', key: 'jobtestStatus', sortable: true, align: 'center', width: '120px' },
+  // { title: '실무테스트', key: 'jobtestStatus', sortable: true, align: 'center', width: '120px' },
   { title: '지원공고', key: 'recruitmentTitle', sortable: true, align: 'start' }
 ]
 
@@ -668,67 +644,6 @@ const handleEmailPreviewCancel = () => {
   emailPreviewModal.value = false;
 };
 
-// 실무테스트 상태 관련 유틸리티 함수들
-const getJobtestStatusText = (item) => {
-  if (!item.jobtestStatus) {
-    return '미할당'
-  }
-  
-  switch (item.jobtestStatus) {
-    case 'WAITING':
-      return '대기중'
-    case 'IN_PROGRESS':
-      return '진행중'
-    case 'COMPLETED':
-      return '완료'
-    default:
-      return '할당됨'
-  }
-}
-
-const getJobtestStatusColor = (item) => {
-  if (!item.jobtestStatus) {
-    return 'grey'
-  }
-  
-  switch (item.jobtestStatus) {
-    case 'WAITING':
-      return 'orange'
-    case 'IN_PROGRESS':
-      return 'blue'
-    case 'COMPLETED':
-      return 'green'
-    default:
-      return 'purple'
-  }
-}
-
-const getJobtestStatusIcon = (item) => {
-  if (!item.jobtestStatus) {
-    return 'mdi-close-circle-outline'
-  }
-  
-  switch (item.jobtestStatus) {
-    case 'WAITING':
-      return 'mdi-clock-outline'
-    case 'IN_PROGRESS':
-      return 'mdi-play-circle-outline'
-    case 'COMPLETED':
-      return 'mdi-check-circle-outline'
-    default:
-      return 'mdi-checkbox-marked-circle-outline'
-  }
-}
-
-const getJobtestStatusTooltip = (item) => {
-  if (!item.jobtestStatus) {
-    return '실무테스트가 할당되지 않았습니다'
-  }
-  
-  const statusText = getJobtestStatusText(item)
-  const score = item.jobtestTotalScore ? ` (점수: ${item.jobtestTotalScore}점)` : ''
-  return `실무테스트 상태: ${statusText}${score}`
-}
 
 const getAssignButtonText = () => {
   if (selectedApplicants.value.length === 0) {

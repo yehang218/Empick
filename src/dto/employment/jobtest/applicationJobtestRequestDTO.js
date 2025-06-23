@@ -1,4 +1,4 @@
-export default class CreateApplicationJobtestCommandDTO {
+export default class ApplicationJobtestRequestDTO {
     constructor(applicationId, jobtestId) {
         this.applicationId = applicationId;
         this.jobtestId = jobtestId;
@@ -12,9 +12,9 @@ export default class CreateApplicationJobtestCommandDTO {
     }
 
     static fromForm(json) {
-        return new CreateApplicationJobtestCommandDTO(
+        return new ApplicationJobtestRequestDTO(
             json.applicationId,
             json.jobtestId,
         );
     }
-}
+} 

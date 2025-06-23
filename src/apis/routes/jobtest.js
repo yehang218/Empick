@@ -38,6 +38,8 @@ export const JobtestAPI = {
     // 지원서별 실무테스트
     APPLICATION_JOBTESTS: '/api/v1/employment/application-jobtests',
     APPLICATION_JOBTEST_DETAIL: (id) => `/api/v1/employment/application-jobtests/${id}`,
+    APPLICATION_JOBTEST_BY_APPLICATION: (applicationId) =>
+        `/api/v1/employment/application-jobtests/application/${applicationId}`,
 
     // 답변
     ANSWERS: '/api/v1/employment/answers',
@@ -47,5 +49,4 @@ export const JobtestAPI = {
 
     // 실무테스트 응시
     JOBTEST_ENTER: (jobtestId) => `/api/v1/employment/jobtests/exam/enter/${jobtestId}`,
-    JOBTEST_: (jobtestId) => `/api/v1/employment/jobtests/exam/enter/${jobtestId}`,
 };

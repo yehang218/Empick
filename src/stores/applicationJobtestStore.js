@@ -10,8 +10,7 @@ export const useApplicationJobtestStore = defineStore('applicationJobtest', () =
         try {
             for (const dto of dtoList) {
                 console.log(dto.applicationId);
-                
-                await createApplicationJobtestService(dto, { showToast: false, redirect: false });
+                await createApplicationJobtestService(dto.applicationId, dto.jobtestId, { showToast: false, redirect: false });
             }
         } catch (e) {
             errorMessage.value = e?.message || '문제 할당 중 오류가 발생했습니다.';

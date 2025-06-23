@@ -2,9 +2,13 @@ import api from '@/apis/apiClient';
 import { JobtestAPI } from '@/apis/routes/jobtest';
 import { withErrorHandling, throwCustomApiError } from '@/utils/errorHandler';
 import ApiResponseDTO from '@/dto/common/apiResponseDTO';
+import ApplicationJobtestRequestDTO from '@/dto/employment/jobtest/applicationJobtestRequestDTO';
 
 import JobtestListResponseDTO from '@/dto/employment/jobtest/jobtestListResponseDTO';
 import JobtestDetailDTO from '@/dto/employment/jobtest/jobtestDetailDTO';
+import CreateApplicationJobtestDTO from '@/dto/employment/jobtest/createApplicationJobtestDTO';
+import ApplicationJobtestResponseDTO from '@/dto/employment/jobtest/applicationJobtestResponseDTO';
+
 
 // 실무테스트 목록 조회 서비스
 export const getJobtestListService = async (options = {}) => {
@@ -54,19 +58,20 @@ export const createJobtestService = async (
 }
 
 // 지원서에 실무테스트 할당
-export const createApplicationJobtestService = async (
-    dto,
-    options = {}
-) => {
+export const createApplicationJobtestService = async (applicationId, jobtestId, options = {}) => {
     return withErrorHandling(async () => {
-        const response = await api.post(JobtestAPI.APPLICATION_JOBTESTS, dto.toJSON());
+        const dto = new CreateApplicationJobtestDTO(applicationId, jobtestId);
+        const response = await api.post(
+            JobtestAPI.APPLICATION_JOBTESTS,
+            dto.toJSON()
+        );
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
         if (!apiResponse.success) {
             throwCustomApiError(apiResponse.code, apiResponse.message, 400);
         }
         return apiResponse.data;
     }, options);
-}
+};
 
 // applicationJobtest 상세 정보 조회
 export const getApplicationJobtestDetailService = async (applicationJobtestId, options = {}) => {
@@ -121,3 +126,18 @@ export const updateJobtestService = async (jobtestId, dto, options = {}) => {
         return apiResponse.message;
     }, options);
 }
+
+// 지원서별 실무테스트 할당 정보 조회
+export const getApplicationJobtestByApplicationIdService = async (applicationId, options = {}) => {
+    return withErrorHandling(async () => {
+        const response = await api.get(JobtestAPI.APPLICATION_JOBTEST_BY_APPLICATION(applicationId));
+        const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+        if (!apiResponse.success) {
+            throwCustomApiError(apiResponse.code, apiResponse.message, 400);
+        }
+
+        // data가 null이면 null 반환, 아니면 DTO로 변환
+        return ApplicationJobtestResponseDTO.fromJSON(apiResponse.data);
+    }, options);
+};
