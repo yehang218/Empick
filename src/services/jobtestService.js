@@ -130,7 +130,9 @@ export const updateJobtestService = async (jobtestId, dto, options = {}) => {
 // 지원서별 실무테스트 할당 정보 조회
 export const getApplicationJobtestByApplicationIdService = async (applicationId, options = {}) => {
     return withErrorHandling(async () => {
+
         const response = await api.get(JobtestAPI.APPLICATION_JOBTEST_BY_APPLICATION(applicationId));
+        console.log('🔍 실무테스트 할당 정보:', response.data);
         const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
         if (!apiResponse.success) {

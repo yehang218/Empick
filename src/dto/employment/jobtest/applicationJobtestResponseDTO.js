@@ -1,9 +1,11 @@
 export default class ApplicationJobtestResponseDTO {
-    constructor(id, applicationId, jobtestId, jobtestTitle) {
+    constructor(id, applicationId, jobtestId, jobtestTitle, score, status) {
         this.id = id;
         this.applicationId = applicationId;
         this.jobtestId = jobtestId;
         this.jobtestTitle = jobtestTitle;
+        this.score = score;
+        this.status = status;
     }
 
     toJSON() {
@@ -12,6 +14,8 @@ export default class ApplicationJobtestResponseDTO {
             applicationId: this.applicationId,
             jobtestId: this.jobtestId,
             jobtestTitle: this.jobtestTitle,
+            score: this.score,
+            status: this.status,
         };
     }
 
@@ -22,6 +26,8 @@ export default class ApplicationJobtestResponseDTO {
             json.applicationId,
             json.jobtestId,
             json.jobtestTitle,
+            json.score,
+            json.status,
         );
     }
 }

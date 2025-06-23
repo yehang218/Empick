@@ -1,9 +1,12 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { createApplicationJobtestService } from '@/services/jobtestService';
+import { createApplicationJobtestService, getApplicationJobtestByApplicationIdService } from '@/services/jobtestService';
 
 export const useApplicationJobtestStore = defineStore('applicationJobtest', () => {
     const errorMessage = ref('');
+    const applicationJobtest = ref(null);
+    const loading = ref(false);
+    const error = ref(null);
 
     const assignJobtest = async (dtoList) => {
         errorMessage.value = '';
@@ -18,8 +21,26 @@ export const useApplicationJobtestStore = defineStore('applicationJobtest', () =
         }
     };
 
+    const fetchApplicationJobtest = async (applicationId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const data = await getApplicationJobtestByApplicationIdService(applicationId);
+            console.log('API raw data:', data);
+            applicationJobtest.value = data;
+        } catch (err) {
+            error.value = err.message || '지원서에 할당된 실무테스트 불러오기 실패';
+        } finally {
+            loading.value = false;
+        }
+    };
+
     return {
         assignJobtest,
-        errorMessage
+        errorMessage,
+        applicationJobtest,
+        fetchApplicationJobtest,
+        loading,
+        error
     };
 });

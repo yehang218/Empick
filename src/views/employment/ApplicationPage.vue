@@ -177,11 +177,13 @@
                 @click="selectEvaluation(evaluation.type)">
                 <div class="d-flex justify-between align-center mb-2">
                   <h4 class="text-subtitle-2 font-weight-bold">{{ evaluation.type }}</h4>
-                  <v-chip
-                    :color="evaluation.result === '평가 완료' ? 'success' : (evaluation.result === '합격' ? 'success' : 'error')"
-                    size="x-small" variant="elevated">
-                    {{ evaluation.result }}
-                  </v-chip>
+                  <div class="d-flex align-center">
+                    <v-chip
+                      :color="getResultChipColor(evaluation)"
+                      size="x-small" variant="elevated">
+                      {{ evaluation.result }}
+                    </v-chip>
+                  </div>
                 </div>
 
                 <div class="score-section mb-3">
@@ -457,7 +459,8 @@ import {
 } from '@/services/introduceService'
 import { updateApplicationStatusService } from '@/services/applicationService'
 import { STATUS_OPTIONS, getStatusByCode, getStatusInfoByString } from '@/constants/employment/applicationStatus'
-
+import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore'
+import { getStatusLabel as getJobtestStatusLabel } from '@/constants/employment/jobtestStatus'
 
 const route = useRoute()
 const router = useRouter()
@@ -470,6 +473,7 @@ const interviewerStore = useInterviewerStore()
 const interviewScoreStore = useInterviewScoreStore()
 const interviewSheetStore = useInterviewSheetStore()
 const memberStore = useMemberStore()
+const applicationJobtestStore = useApplicationJobtestStore()
 const toast = useToast()
 let applicationId = Number(route.params.applicationId)
 console.log('🔍 받은 applicationId:', route.params.applicationId)
@@ -510,6 +514,9 @@ if (!applicationId || isNaN(applicationId) || applicationId <= 0) {
 const currentEvaluationData = ref({})
 const selectedEvaluation = ref('자기소개서')
 const introduceRatingScore = ref(null)
+
+// 실무테스트 점수 상태
+const jobtestScore = ref(null)
 
 // 면접 관련
 const selectedInterview = ref(null)
@@ -565,6 +572,12 @@ const introduceItems = computed(() => {
 const evaluationStats = computed(() => {
   if (!applicant.value) return []
 
+  // 실무테스트 상태 코드 추출 (0,1,2)
+  const jobtestStatusCode = applicationJobtestStore.applicationJobtest?.status ?? applicant.value.jobtestStatus;
+  const jobtestStatusLabel = getJobtestStatusLabel(jobtestStatusCode);
+
+  console.log('🔍 실무테스트 상태:', jobtestStatusLabel)
+
   return [
     {
       type: '자기소개서',
@@ -573,8 +586,9 @@ const evaluationStats = computed(() => {
     },
     {
       type: '실무 테스트',
-      score: applicant.value.jobtestTotalScore || 0,
-      result: (applicant.value.jobtestTotalScore || 0) >= 70 ? '합격' : '미평가'
+      score: jobtestScore.value ?? applicant.value.jobtestTotalScore ?? 0,
+      result: jobtestStatusLabel,
+      status: jobtestStatusLabel
     },
     {
       type: '면접',
@@ -661,6 +675,11 @@ onMounted(async () => {
     if (applicationId && !isNaN(applicationId) && applicationId > 0) {
       console.log('🚀 실제 데이터 로딩 시작 - applicationId:', applicationId)
       await loadApplicationData()
+      // 실무테스트 점수 fetch
+      await applicationJobtestStore.fetchApplicationJobtest(applicationId)
+      console.log('applicationJobtestStore.applicationJobtest:', applicationJobtestStore.applicationJobtest)
+      jobtestScore.value = applicationJobtestStore.applicationJobtest?.score ?? null
+      console.log('🔍 실무테스트 점수:', jobtestScore.value)
     } else {
       // URL query에서 기본 지원자 정보 설정 (기본 정보만)
       if (route.query.name) {
@@ -688,6 +707,9 @@ onMounted(async () => {
         // 이력서와 자기소개서 데이터도 로딩 시도
         try {
           await loadApplicationData()
+          // 실무테스트 점수 fetch
+          await applicationJobtestStore.fetchApplicationJobtest(applicationId)
+          jobtestScore.value = applicationJobtestStore.applicationJobtest?.score ?? null
         } catch (error) {
           console.warn('⚠️ 추가 데이터 로딩 실패:', error)
         }
@@ -1291,6 +1313,17 @@ const prevInterviewer = () => {
 
 const nextInterviewer = () => {
   if (currentInterviewerIndex.value < allInterviewerScores.value.length - 1) currentInterviewerIndex.value++
+}
+
+function getResultChipColor(evaluation) {
+  if (evaluation.type === '실무 테스트') {
+    if (evaluation.result === '완료') return 'success'
+    if (evaluation.result === '진행 중') return 'info'
+    if (evaluation.result === '대기중') return 'grey'
+    return 'error'
+  }
+  if (evaluation.result === '평가 완료' || evaluation.result === '합격') return 'success'
+  return 'error'
 }
 </script>
 
