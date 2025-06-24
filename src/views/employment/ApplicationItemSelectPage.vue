@@ -294,7 +294,7 @@ const submit = async () => {
 
     const applicationItems = selectedIds.value.map(id => ({
         applicationItemCategoryId: id,
-        isRequired: requiredIds.value.includes(id)
+        required: requiredIds.value.includes(id)
     }))
 
     const formData = {
