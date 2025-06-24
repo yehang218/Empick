@@ -49,7 +49,22 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
                                 "/webjars/**",
-                                "/api/v1/**"                // 테스트용으로 모든 경로 sequrity 처리 안되게
+                                "/api/v1/**",                // 테스트용으로 모든 경로 sequrity 처리 안되게
+                                "/api/v1/employment/recruitments",  // 채용 공고 목록 페이지
+                                "/api/v1/employment/recruitments{id}",  // 채용 공고 상세 목록 페이지
+                                "/api/v1/employment/recruitments/requests/{id}",
+                                "/api/v1/employment/recruitments/processes{id}",
+                                "/api/v1/employment/applicant/create",      // 지원자 인적 사항 등록 사이트  // post
+                                "/api/v1/employment/applicant",     // post
+                                "api/v1/employment/application",    // post
+                                "/api/v1/employment/applications/items/{id}",
+                                "/api/v1/employment/introduce-template/{id}"
+
+
+
+
+
+
                         ).permitAll()
                         // ✅ 로그인/회원가입 경로는 인증 필요 없음
                         .requestMatchers("/api/v1/auth/**").permitAll()
