@@ -230,7 +230,7 @@ onMounted(async () => {
                 };
                 
                 const selectedCategoryIds = selectedItems.map(getCategoryId).filter(id => id !== null);
-                const requiredCategoryIds = selectedItems.filter(item => item.isRequired).map(getCategoryId).filter(id => id !== null);
+                const requiredCategoryIds = selectedItems.filter(item => item.required).map(getCategoryId).filter(id => id !== null);
 
                 // 5. 올바른 ID 목록을 스토어에 저장
                 store.setDraftApplicationItems(selectedCategoryIds, requiredCategoryIds);

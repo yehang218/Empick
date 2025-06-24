@@ -14,13 +14,13 @@
                 <div class="font-weight-medium mb-2">
                   {{ item.categoryName }}
                   <span class="text-caption text-grey-darken-1">
-                    ({{ item.inputType === 0 ? '텍스트' : '기타' }} / 필수: {{ item.isRequired ? 'O' : 'X' }})
+                    ({{ item.inputType === 0 ? '텍스트' : '기타' }} / 필수: {{ item.required ? 'O' : 'X' }})
                   </span>
                 </div>
                 <v-textarea
                   v-model="applicationAnswers[item.id]"
                   :label="item.categoryName"
-                  :required="item.isRequired"
+                  :required="item.required"
                   variant="outlined"
                   rows="4"
                   auto-grow
