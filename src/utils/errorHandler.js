@@ -45,16 +45,21 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
     if (redirect && error.response) {
         switch (error.response.status) {
             case 401:
-                // 로그아웃 중이거나 이미 로그인 페이지에 있을 때는 추가 처리하지 않음
+                // 인증 오류 → 로그인 페이지로 이동
                 if (!isLoggingOut && !isLoginPage) {
+                    setLoggingOut(true);
                     import('@/stores/authStore').then(({ useAuthStore }) => useAuthStore().logout());
-                    router.push('/login');
+                    router.push({ name: 'LoginPage', query: { redirect: currentPath } });
+                }
+                return;
+            case 403:
+                // 인가 오류 → 권한 없음 페이지로 이동
+                if (router.currentRoute.value.name !== 'Forbidden') {
+                    router.push({ name: 'Forbidden' });
                 }
                 break;
-            case 403:
-                router.push('/access-denied');
             case 404:
-                router.push('/not-found');
+                router.push({ name: 'NotFound' });
                 break;
         }
     }

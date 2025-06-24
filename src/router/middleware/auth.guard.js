@@ -17,9 +17,9 @@ export const authGuard = (to, from, next) => {
     if (requiredRoles.length > 0 && isAuthenticated) {
         const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
         if (!hasRequiredRole) {
-            // 권한 없음 - 메인 페이지로 리다이렉트 또는 403 페이지
+            // 권한 없음 페이지로 이동
             console.warn('접근 권한이 없습니다. 필요 권한:', requiredRoles, '사용자 권한:', userRoles);
-            next('/login'); // 또는 next('/403') 
+            next({ name: 'Forbidden' });
             return;
         }
     }
