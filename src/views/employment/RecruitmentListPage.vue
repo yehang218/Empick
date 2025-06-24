@@ -31,14 +31,16 @@
         </v-row>
 
          <!-- 채용 공고 목록 -->
-        <v-data-table
-            :headers="headers"
-            :items="pagedRecruitments"
-            @click:row="handleRowClick"
-            class="elevation-1 list-item-hover"
-            item-value="id"
-            hide-default-footer
-        >
+<v-data-table
+  :headers="headers"
+  :items="pagedRecruitments"
+  :loading="store.loadingList"
+  loading-text="채용공고를 불러오는 중입니다..."
+  @click:row="handleRowClick"
+  class="elevation-1 list-item-hover"
+  item-value="id"
+  hide-default-footer
+>
              <template v-slot:item.status="{ item }">
                 <v-chip size="small">{{ item.status }}</v-chip>
             </template>
@@ -92,14 +94,20 @@ watch(page, (newPage) => {
     router.replace({ query: { ...route.query, page: newPage } });
 });
 
-onMounted(() => {
+onMounted(async () => {
     page.value = Number(route.query.page) || 1;
-    store.loadRecruitmentList()
-    if (route.query.toast === 'deleted') {
-        toast.success('채용공고가 삭제되었습니다.')
-        router.replace({ query: { ...route.query, toast: undefined } })
+
+    try {
+        await store.loadRecruitmentList();
+    } catch (e) {
+        toast.error('채용공고 목록 로딩 중 오류가 발생했습니다.');
     }
-})
+
+    if (route.query.toast === 'deleted') {
+        toast.success('채용공고가 삭제되었습니다.');
+        router.replace({ query: { ...route.query, toast: undefined } });
+    }
+});
 
 const handleRowClick = (event, { item }) => {
     if (item?.id) {
