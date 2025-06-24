@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { handleApiError } from '@/utils/errorHandler';
+
 import { authRoutes } from './auth.routes';
 import { employmentRoutes } from './employment.routes';
 import { orgstructureRoutes } from './orgstructure.routes';
@@ -60,6 +62,13 @@ const router = createRouter({
 });
 
 // 인증 미들웨어 적용
-router.beforeEach(authGuard);
+router.beforeEach(async (to, from, next) => {
+    try {
+        await authGuard(to, from, next); // 기존 guard 실행
+    } catch (err) {
+        handleApiError(err, { showToast: true, redirect: true });
+        next(false); // 라우팅 중단
+    }
+});
 
 export default router;

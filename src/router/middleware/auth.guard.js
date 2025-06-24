@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/stores/authStore';
+import { throwCustomApiError } from '@/utils/errorHandler';
 
 export const authGuard = (to, from, next) => {
     const authStore = useAuthStore();
@@ -9,7 +10,7 @@ export const authGuard = (to, from, next) => {
 
     // 🔐 인증 체크
     if (requiresAuth && !isAuthenticated) {
-        next('/login');
+        throwCustomApiError('UNAUTHORIZED', '로그인이 필요합니다.', 401);
         return;
     }
 
@@ -19,7 +20,7 @@ export const authGuard = (to, from, next) => {
         if (!hasRequiredRole) {
             // 권한 없음 페이지로 이동
             console.warn('접근 권한이 없습니다. 필요 권한:', requiredRoles, '사용자 권한:', userRoles);
-            next({ name: 'Forbidden' });
+            throwCustomApiError('FORBIDDEN', '접근 권한이 없습니다.', 403);
             return;
         }
     }
