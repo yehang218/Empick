@@ -53,7 +53,9 @@ api.interceptors.response.use(
         const authStore = useAuthStore();
 
         // 토큰 만료 에러이고, 재시도하지 않은 요청인 경우
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry
+            && !originalRequest.url.includes('/api/v1/auth/refresh')
+        ) {
             originalRequest._retry = true;
 
             try {
