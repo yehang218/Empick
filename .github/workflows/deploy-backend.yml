@@ -2,7 +2,7 @@ name: Deploy Backend to VPC2 (Simple Strategy)
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
     paths:
       - "src/**"
       - "build.gradle"
