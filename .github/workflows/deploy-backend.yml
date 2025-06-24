@@ -59,43 +59,43 @@ jobs:
           aws s3 cp "$JAR_FILE" s3://${{ env.S3_BUCKET }}/${{ env.S3_KEY }}
           echo "✅ JAR uploaded successfully"
 
-      - name: 🚀 Deploy to Both Instances (Simple Strategy)
+      - name: 🔑 Setup SSH Key
+        run: |
+          echo "🔑 Setting up SSH key for deployment..."
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/camp.pem
+          chmod 600 ~/.ssh/camp.pem
+          ssh-keyscan -H ${{ secrets.BASTION_IP }} >> ~/.ssh/known_hosts
+
+      - name: 🚀 Deploy to Both Instances (SSH Strategy)
         run: |
           echo "🔄 Starting deployment to both Blue and Green instances..."
 
           # Deploy to Blue Instance (AZ-A)
           echo "📦 Deploying to Blue Instance..."
-          aws ssm send-command \
-            --instance-ids ${{ secrets.BLUE_INSTANCE_ID }} \
-            --document-name "AWS-RunShellScript" \
-            --parameters 'commands=[
-              "echo \"🔄 Starting deployment on Blue instance...\"",
-              "sudo systemctl stop empick-backend || true",
-              "cd /opt/empick",
-              "sudo -u springboot wget -O empick-backend.jar https://empick-bucket.s3.ap-northeast-2.amazonaws.com/releases/empick-backend-latest.jar",
-              "sudo chown springboot:springboot empick-backend.jar",
-              "sudo chmod +x empick-backend.jar",
-              "sudo systemctl start empick-backend",
-              "echo \"✅ Deployment completed on Blue instance\""
-            ]' \
-            --region ${{ env.AWS_REGION }}
+          ssh -i ~/.ssh/camp.pem -o ProxyJump=ec2-user@${{ secrets.BASTION_IP }} ec2-user@10.0.11.105 '
+            echo "🔄 Starting deployment on Blue instance..."
+            sudo systemctl stop empick-backend || true
+            cd /opt/empick
+            sudo -u springboot wget -O empick-backend.jar https://empick-bucket.s3.ap-northeast-2.amazonaws.com/releases/empick-backend-latest.jar
+            sudo chown springboot:springboot empick-backend.jar
+            sudo chmod +x empick-backend.jar
+            sudo systemctl start empick-backend
+            echo "✅ Deployment completed on Blue instance"
+          '
 
           # Deploy to Green Instance (AZ-C)  
           echo "📦 Deploying to Green Instance..."
-          aws ssm send-command \
-            --instance-ids ${{ secrets.GREEN_INSTANCE_ID }} \
-            --document-name "AWS-RunShellScript" \
-            --parameters 'commands=[
-              "echo \"🔄 Starting deployment on Green instance...\"",
-              "sudo systemctl stop empick-backend || true", 
-              "cd /opt/empick",
-              "sudo -u springboot wget -O empick-backend.jar https://empick-bucket.s3.ap-northeast-2.amazonaws.com/releases/empick-backend-latest.jar",
-              "sudo chown springboot:springboot empick-backend.jar",
-              "sudo chmod +x empick-backend.jar", 
-              "sudo systemctl start empick-backend",
-              "echo \"✅ Deployment completed on Green instance\""
-            ]' \
-            --region ${{ env.AWS_REGION }}
+          ssh -i ~/.ssh/camp.pem -o ProxyJump=ec2-user@${{ secrets.BASTION_IP }} ec2-user@10.0.12.150 '
+            echo "🔄 Starting deployment on Green instance..."
+            sudo systemctl stop empick-backend || true
+            cd /opt/empick
+            sudo -u springboot wget -O empick-backend.jar https://empick-bucket.s3.ap-northeast-2.amazonaws.com/releases/empick-backend-latest.jar
+            sudo chown springboot:springboot empick-backend.jar
+            sudo chmod +x empick-backend.jar
+            sudo systemctl start empick-backend
+            echo "✅ Deployment completed on Green instance"
+          '
 
       - name: ⏰ Wait for services to start
         run: |
