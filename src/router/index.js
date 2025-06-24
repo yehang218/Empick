@@ -62,13 +62,6 @@ const router = createRouter({
 });
 
 // 인증 미들웨어 적용
-router.beforeEach(async (to, from, next) => {
-    try {
-        await authGuard(to, from, next); // 기존 guard 실행
-    } catch (err) {
-        handleApiError(err, { showToast: true, redirect: true });
-        next(false); // 라우팅 중단
-    }
-});
+router.beforeEach(authGuard);
 
 export default router;

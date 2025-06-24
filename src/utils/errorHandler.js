@@ -49,7 +49,7 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
                 if (!isLoggingOut && !isLoginPage) {
                     setLoggingOut(true);
                     import('@/stores/authStore').then(({ useAuthStore }) => useAuthStore().logout());
-                    router.push({ name: 'LoginPage', query: { redirect: currentPath } });
+                    router.push({ name: 'LoginPage' });
                 }
                 return;
             case 403:
