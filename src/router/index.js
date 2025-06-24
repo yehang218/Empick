@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { handleApiError } from '@/utils/errorHandler';
+
 import { authRoutes } from './auth.routes';
 import { employmentRoutes } from './employment.routes';
 import { orgstructureRoutes } from './orgstructure.routes';
