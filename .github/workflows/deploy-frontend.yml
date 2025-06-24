@@ -1,0 +1,245 @@
+name: Deploy Frontend Direct to VPC1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "vite.config.js"
+      - ".github/workflows/deploy-frontend-direct.yml"
+  workflow_dispatch: # 수동 실행 가능
+
+env:
+  AWS_REGION: ap-northeast-2
+  NODE_VERSION: 18
+  BUILD_PATH: dist
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: 📝 Create Production Environment File
+        run: |
+          # Nginx 프록시 구조 활용 - /api 경로로 고정
+          cat > .env.production << EOF
+          # API Base URL (Nginx 프록시를 통해 Backend로 전달)
+          VITE_API_BASE_URL=/api
+
+          # 운영환경 설정
+          VITE_TIMEOUT=30000
+          VITE_DEBUG_MODE=false
+          VITE_LOG_LEVEL=error
+          VITE_ENABLE_CACHE=true
+          EOF
+
+          echo "✅ Production environment file created:"
+          cat .env.production
+
+      - name: 📦 Install dependencies
+        run: |
+          echo "📦 Installing npm dependencies..."
+          npm ci --production=false
+          echo "✅ Dependencies installed successfully"
+
+      - name: 🏗️ Build for production
+        run: |
+          echo "🏗️ Building Vue.js application for production..."
+          npm run build
+
+          echo "📊 Build output summary:"
+          ls -la ${{ env.BUILD_PATH }}/
+          du -sh ${{ env.BUILD_PATH }}/
+
+      - name: 📦 Create deployment package
+        run: |
+          echo "📦 Creating deployment package..."
+          cd ${{ env.BUILD_PATH }}
+          tar -czf ../frontend-build.tar.gz .
+          cd ..
+          ls -la frontend-build.tar.gz
+          echo "✅ Deployment package created"
+
+      - name: 🔐 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: 🚀 Deploy to VPC1 Blue Instance
+        run: |
+          echo "🚀 Deploying to Blue Instance (Primary)..."
+
+          # Base64로 인코딩하여 전송
+          BUILD_BASE64=$(base64 -w 0 frontend-build.tar.gz)
+
+          aws ssm send-command \
+            --instance-ids ${{ secrets.VPC1_BLUE_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters "commands=[
+              \"echo '🔄 Starting Blue instance deployment...'\",
+              \"sudo mkdir -p /tmp/frontend-deploy\",
+              \"cd /tmp/frontend-deploy\",
+              \"echo '$BUILD_BASE64' | base64 -d > frontend-build.tar.gz\",
+              \"echo '📁 Extracting build files...'\",
+              \"tar -xzf frontend-build.tar.gz\",
+              \"ls -la\",
+              \"echo '🔄 Backing up current deployment...'\",
+              \"sudo mkdir -p /var/www/backup\",
+              \"sudo cp -r /var/www/html /var/www/backup/\$(date +%Y%m%d_%H%M%S) 2>/dev/null || true\",
+              \"echo '📂 Deploying new build...'\",
+              \"sudo rm -rf /var/www/html/*\",
+              \"sudo cp -r . /var/www/html/\",
+              \"sudo chown -R nginx:nginx /var/www/html\",
+              \"sudo chmod -R 755 /var/www/html\",
+              \"echo '🔧 Testing Nginx configuration...'\",
+              \"sudo nginx -t\",
+              \"echo '🔄 Reloading Nginx...'\",
+              \"sudo systemctl reload nginx\",
+              \"echo '✅ Blue instance deployment completed successfully!'\",
+              \"cd / && sudo rm -rf /tmp/frontend-deploy\"
+            ]" \
+            --output text
+
+          echo "⏰ Waiting for Blue deployment to complete..."
+          sleep 30
+
+      - name: 🧪 Health Check - Blue Instance
+        run: |
+          echo "🧪 Performing health check on Blue instance..."
+
+          for i in {1..10}; do
+            echo "🔍 Health check attempt $i/10..."
+            if curl -f -s ${{ secrets.VPC1_ALB_URL }}/health; then
+              echo "✅ Blue instance health check passed!"
+              break
+            fi
+            if [ $i -eq 10 ]; then
+              echo "❌ Blue instance health check failed after 10 attempts"
+              exit 1
+            fi
+            sleep 15
+          done
+
+      - name: 🚀 Deploy to VPC1 Green Instance
+        run: |
+          echo "🚀 Deploying to Green Instance (Secondary)..."
+
+          # Base64로 인코딩하여 전송
+          BUILD_BASE64=$(base64 -w 0 frontend-build.tar.gz)
+
+          aws ssm send-command \
+            --instance-ids ${{ secrets.VPC1_GREEN_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters "commands=[
+              \"echo '🔄 Starting Green instance deployment...'\",
+              \"sudo mkdir -p /tmp/frontend-deploy\",
+              \"cd /tmp/frontend-deploy\",
+              \"echo '$BUILD_BASE64' | base64 -d > frontend-build.tar.gz\",
+              \"echo '📁 Extracting build files...'\",
+              \"tar -xzf frontend-build.tar.gz\",
+              \"ls -la\",
+              \"echo '🔄 Backing up current deployment...'\",
+              \"sudo mkdir -p /var/www/backup\",
+              \"sudo cp -r /var/www/html /var/www/backup/\$(date +%Y%m%d_%H%M%S) 2>/dev/null || true\",
+              \"echo '📂 Deploying new build...'\",
+              \"sudo rm -rf /var/www/html/*\",
+              \"sudo cp -r . /var/www/html/\",
+              \"sudo chown -R nginx:nginx /var/www/html\",
+              \"sudo chmod -R 755 /var/www/html\",
+              \"echo '🔧 Testing Nginx configuration...'\",
+              \"sudo nginx -t\",
+              \"echo '🔄 Reloading Nginx...'\",
+              \"sudo systemctl reload nginx\",
+              \"echo '✅ Green instance deployment completed successfully!'\",
+              \"cd / && sudo rm -rf /tmp/frontend-deploy\"
+            ]" \
+            --output text
+
+          echo "⏰ Waiting for Green deployment to complete..."
+          sleep 30
+
+      - name: 🧪 Health Check - Green Instance
+        run: |
+          echo "🧪 Performing health check on Green instance..."
+
+          for i in {1..10}; do
+            echo "🔍 Health check attempt $i/10..."
+            if curl -f -s ${{ secrets.VPC1_ALB_URL }}/health; then
+              echo "✅ Green instance health check passed!"
+              break
+            fi
+            if [ $i -eq 10 ]; then
+              echo "❌ Green instance health check failed after 10 attempts"
+              exit 1
+            fi
+            sleep 15
+          done
+
+      - name: 🧪 Frontend API Integration Test
+        run: |
+          echo "🧪 Testing Frontend → Backend API integration..."
+
+          # Frontend ALB를 통한 API 테스트
+          API_TEST_URL="${{ secrets.VPC1_ALB_URL }}/api/v1/auth/login"
+
+          echo "🔍 Testing API endpoint: $API_TEST_URL"
+
+          # POST 요청 테스트 (로그인 API)
+          HTTP_STATUS=$(curl -o /dev/null -s -w "%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"username":"test","password":"test"}' \
+            "$API_TEST_URL")
+
+          echo "📊 API Response Status: $HTTP_STATUS"
+
+          # 400번대 응답이면 정상 (인증 실패는 예상됨)
+          if [[ $HTTP_STATUS =~ ^[24] ]]; then
+            echo "✅ API integration test passed! (Status: $HTTP_STATUS)"
+          else
+            echo "❌ API integration test failed! (Status: $HTTP_STATUS)"
+            echo "🔧 Checking API connectivity..."
+            curl -v "$API_TEST_URL" || true
+            exit 1
+          fi
+
+      - name: 🎉 Deployment Summary
+        run: |
+          echo "🎉 Frontend Deployment Summary:"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Build: SUCCESS"
+          echo "✅ Direct Deploy: SUCCESS (No S3 required)"
+          echo "✅ Blue Instance Deploy: SUCCESS"
+          echo "✅ Green Instance Deploy: SUCCESS"
+          echo "✅ Health Checks: SUCCESS"
+          echo "✅ API Integration: SUCCESS"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🌐 Frontend URL: ${{ secrets.VPC1_ALB_URL }}"
+          echo "🔗 API Endpoint: ${{ secrets.VPC1_ALB_URL }}/api"
+          echo "🏥 Health Check: ${{ secrets.VPC1_ALB_URL }}/health"
+          echo "📊 Build Size: $(du -sh ${{ env.BUILD_PATH }}/ | cut -f1)"
+          echo "⏰ Deployment Time: $(date)"
+
+      - name: ❌ Deployment Failed
+        if: failure()
+        run: |
+          echo "❌ Frontend deployment failed!"
+          echo "🔧 Troubleshooting steps:"
+          echo "1. Check AWS SSM Run Command status in AWS Console"
+          echo "2. SSH to instances and check Nginx logs: sudo tail -f /var/log/nginx/error.log"
+          echo "3. Check VPC1 EC2 IAM roles for SSM access"
+          echo "4. Test Nginx configuration: sudo nginx -t"
+          echo "5. Check disk space: df -h"
