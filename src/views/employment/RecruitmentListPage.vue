@@ -30,40 +30,24 @@
             </v-col>
         </v-row>
 
-         <!-- 채용 공고 목록 -->
-<v-data-table
-  :headers="headers"
-  :items="pagedRecruitments"
-  :loading="store.loadingList"
-  loading-text="채용공고를 불러오는 중입니다..."
-  @click:row="handleRowClick"
-  class="elevation-1 list-item-hover"
-  item-value="id"
-  hide-default-footer
->
-             <template v-slot:item.status="{ item }">
+        <!-- 채용 공고 목록 -->
+        <v-data-table :headers="headers" :items="pagedRecruitments" :loading="store.loadingList"
+            loading-text="채용공고를 불러오는 중입니다..." @click:row="handleRowClick" class="elevation-1 list-item-hover"
+            item-value="id" hide-default-footer>
+            <template v-slot:item.status="{ item }">
                 <v-chip size="small">{{ item.status }}</v-chip>
             </template>
         </v-data-table>
         <div class="d-flex justify-end align-center mt-4 pa-2">
             <span class="text-caption mr-4">Items per page:</span>
             <div style="width: 80px;">
-                <v-select
-                    v-model="itemsPerPage"
-                    :items="[10, 25, 50, 100]"
-                    dense
-                    hide-details
-                    variant="underlined"
-                ></v-select>
+                <v-select v-model="itemsPerPage" :items="[10, 25, 50, 100]" dense hide-details
+                    variant="underlined"></v-select>
             </div>
 
             <span class="text-caption mx-4">{{ pageText }}</span>
 
-            <Pagination
-                :model-value="page"
-                @update:model-value="page = $event"
-                :length="totalPages"
-            />
+            <Pagination :model-value="page" @update:model-value="page = $event" :length="totalPages" />
         </div>
     </v-container>
 </template>
