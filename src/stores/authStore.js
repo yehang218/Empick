@@ -77,7 +77,8 @@ export const useAuthStore = defineStore('auth', () => {
             useAttendanceStore().resetAllData();
 
             // 로그인 성공 후 대시보드로 이동
-            router.push('/dashboard');
+            router.push({name : 'MainPage'});
+            setLoggingOut(false);
         } catch (err) {
             console.error('로그인 에러:', err);
             error.value = err?.response?.data?.message || '로그인 실패';
