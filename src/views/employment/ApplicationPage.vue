@@ -579,7 +579,7 @@ const evaluationStats = computed(() => {
     {
       type: '면접',
       score: selectedInterview.value?.score || applicant.value.interviewScore || 0,
-      result: (selectedInterview.value?.score || applicant.value.interviewScore || 0) >= 70 ? '합격' : '미평가'
+      result: (selectedInterview.value?.score || applicant.value.interviewScore || 0) ? '평가 완료' : '미평가'
     }
   ]
 })
