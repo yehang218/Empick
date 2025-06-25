@@ -35,7 +35,7 @@ const error = computed(() => store.detailError)
 const deleteDialog = ref(false)
 
 const selectedApplicationCategories = computed(() => {
-    // applicationItems: [{ applicationItemCategoryId, isRequired } ...]
+    // applicationItems: [{ applicationItemCategoryId, required } ...]
     const selectedIds = detail.value?.recruitment?.applicationItems?.map(item => item.applicationItemCategoryId) || []
     // applicationItemStore.items: 전체 카테고리 리스트
     return applicationItemStore.items.filter(cat => selectedIds.includes(cat.id))
@@ -249,7 +249,7 @@ const goToEditPage = () => {
                         <div class="font-weight-medium mb-2">
                             {{ item.categoryName }}
                             <span class="text-caption text-grey-darken-1">
-                                ({{ getInputTypeLabel(item.inputType) }} / 필수: {{ item.isRequired ? 'O' : 'X' }})
+                                ({{ getInputTypeLabel(item.inputType) }} / 필수: {{ item.required ? 'O' : 'X' }})
                             </span>
                         </div>
                         <component :is="getInputComponent(item.inputType)" :label="item.categoryName" :readonly="true"

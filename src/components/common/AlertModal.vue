@@ -9,8 +9,12 @@
           {{ message }}
         </p>
         <div class="modal-buttons">
-          <button class="cancel" @click="$emit('cancel')">취소</button>
-          <button class="confirm" @click="$emit('confirm')">확인</button>
+          <button v-if="showCancel" class="cancel" @click="$emit('cancel')">
+            {{ cancelText }}
+          </button>
+          <button class="confirm" @click="$emit('confirm')">
+            {{ confirmText }}
+          </button>
         </div>
       </div>
     </div>
@@ -22,6 +26,18 @@ defineProps({
   message: {
     type: String,
     required: true
+  },
+  showCancel: {
+    type: Boolean,
+    default: true
+  },
+  confirmText: {
+    type: String,
+    default: '확인'
+  },
+  cancelText: {
+    type: String,
+    default: '취소'
   }
 })
 
