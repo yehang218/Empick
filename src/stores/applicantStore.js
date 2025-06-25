@@ -312,9 +312,9 @@ export const useApplicantStore = defineStore('applicant', () => {
                 portfolioUrl: applicant.portfolioUrl,
                 introduceScore: applicant.introduceScore,
                 introduceStatus: applicant.introduceStatus,
+                applicationJobtestTitle: applicant.applicationJobtestTitle,
                 jobtestTotalScore: applicant.jobtestTotalScore,
                 jobtestEvaluationScore: applicant.jobtestEvaluationScore,
-                jobtestStatus: applicant.jobtestStatus,
                 interviewScore: applicant.interviewScore,
                 interviewAddress: applicant.interviewAddress,
                 interviewDatetime: applicant.interviewDatetime
