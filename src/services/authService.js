@@ -65,18 +65,38 @@ export const loginService = async (loginRequest) => {
  * @returns {Promise<boolean>} 로그아웃 성공 여부
  */
 export const logoutService = async () => {
+    console.log('로그아웃 서비스 시작');
+
+    // 이미 로그아웃 중인지 확인
+    const isLoggingOut = localStorage.getItem('isLoggingOut');
+    if (isLoggingOut === 'true') {
+        console.log('이미 로그아웃 중입니다. 중복 요청 방지.');
+        return true;
+    }
+
     try {
+        console.log('서버에 로그아웃 요청 전송');
         // 서버에 로그아웃 요청
         await api.post(API.AUTH.LOGOUT);
+        console.log('서버 로그아웃 성공');
 
         // 로컬 스토리지의 토큰 제거
         localStorage.removeItem('auth_tokens');
 
         return true;
     } catch (error) {
-        console.error('Logout failed:', error);
-        // 서버 요청이 실패하더라도 로컬 토큰은 제거
+        console.error('로그아웃 API 실패:', error);
+
+        // 네트워크 오류나 서버 오류인 경우에도 로컬 토큰은 제거
+        console.log('서버 요청 실패했지만 로컬 토큰 제거');
         localStorage.removeItem('auth_tokens');
+
+        // 401, 403 등의 인증 관련 오류는 성공으로 처리 (이미 로그아웃된 상태)
+        if (error.response?.status === 401 || error.response?.status === 403) {
+            console.log('인증 오류로 인한 로그아웃 - 이미 로그아웃된 상태로 간주');
+            return true;
+        }
+
         return false;
     }
 };
