@@ -2,7 +2,7 @@
   <v-container class="template-create-container">
     <div class="d-flex justify-space-between align-center mb-6">
       <h2 class="page-title">자기소개서 템플릿 작성</h2>
-      <v-btn color="primary" @click="goToManage">항목 관리로 이동</v-btn>
+      <v-btn color="success" @click="submit">템플릿 등록</v-btn>
     </div>
 
     <v-card class="mb-6 pa-4">
@@ -39,9 +39,8 @@
     </v-card>
 
     <div class="d-flex justify-end mt-6">
-      <v-btn color="grey" variant="outlined" class="mr-3" @click="router.back()">취소</v-btn>
-      <v-btn color="info" variant="outlined" class="mr-3" @click="goToTemplateList">템플릿 목록으로 이동</v-btn>
-      <v-btn color="success" @click="submit">템플릿 등록</v-btn>
+      <v-btn color="primary" class="mr-3" @click="goToManage">항목 관리로 이동</v-btn>
+      <v-btn color="info" variant="outlined" @click="goToTemplateList">템플릿 목록으로 이동</v-btn>
     </div>
   </v-container>
 </template>
