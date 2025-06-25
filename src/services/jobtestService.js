@@ -8,6 +8,7 @@ import JobtestListResponseDTO from '@/dto/employment/jobtest/jobtestListResponse
 import JobtestDetailDTO from '@/dto/employment/jobtest/jobtestDetailDTO';
 import CreateApplicationJobtestDTO from '@/dto/employment/jobtest/createApplicationJobtestDTO';
 import ApplicationJobtestResponseDTO from '@/dto/employment/jobtest/applicationJobtestResponseDTO';
+import AnswerResponseDTO from '@/dto/employment/jobtest/answerResponseDTO';
 
 
 // 실무테스트 목록 조회 서비스
@@ -143,3 +144,8 @@ export const getApplicationJobtestByApplicationIdService = async (applicationId,
         return ApplicationJobtestResponseDTO.fromJSON(apiResponse.data);
     }, options);
 };
+
+export async function fetchAnswers(applicationJobtestId) {
+  const res = await api.get(`/api/v1/employment/application-jobtests/${applicationJobtestId}/answers`);
+  return res.data.data.map(item => AnswerResponseDTO.fromForm(item));
+}

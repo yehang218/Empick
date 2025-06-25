@@ -136,27 +136,26 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import AnswerResponseDTO from '@/dto/employment/jobtest/answerResponseDTO';
 import { useAnswerStore } from '@/stores/answerStore';
 import { getDifficultyLabel, getDifficultyColors } from '@/constants/employment/difficulty.js';
 import { getQuestionTypeLabel, getQuestionTypeColors } from '@/constants/employment/questionTypes.js';
 import { getApplicationJobtestDetailService } from '@/services/jobtestService';
 import { getApplicationByIdService } from '@/services/applicationService';
 import { getApplicantByIdService } from '@/services/applicantService';
+import { useApplicationStore } from '@/stores/applicationStore'
 
 const router = useRouter();
 const route = useRoute();
 const props = defineProps(['applicationJobtestId']);
 const answerStore = useAnswerStore();
+const applicationStore = useApplicationStore();
 
 // 지원자 정보 상태
 const applicantInfo = ref(null);
 const applicationInfo = ref(null);
 const loadingApplicantInfo = ref(false);
 
-const answers = computed(() =>
-  answerStore.answers.map(AnswerResponseDTO.fromJSON)
-);
+const answers = computed(() => answerStore.answers);
 
 // DESCRIPTIVE가 아닌 것만
 const filteredAnswers = computed(() =>
@@ -166,66 +165,6 @@ const filteredAnswers = computed(() =>
 const totalScore = computed(() =>
   filteredAnswers.value.reduce((sum, a) => sum + (a.score || 0), 0)
 );
-
-// 쿼리 파라미터에서 지원자 정보 확인
-const hasQueryApplicantInfo = computed(() => {
-  return route.query.applicantName && route.query.recruitmentTitle;
-});
-
-// 지원자 정보 가져오기
-const fetchApplicantInfo = async () => {
-  loadingApplicantInfo.value = true;
-  try {
-    // 쿼리 파라미터에 지원자 정보가 있으면 우선 사용
-    if (hasQueryApplicantInfo.value) {
-      applicantInfo.value = {
-        applicantName: route.query.applicantName,
-        recruitmentTitle: route.query.recruitmentTitle,
-        applicantId: route.query.applicantId,
-        applicationId: route.query.applicationId,
-        jobtestTitle: route.query.jobtestTitle || '실무 테스트',
-        submittedAt: null
-      };
-      console.log('Using query applicant info:', applicantInfo.value);
-      return;
-    }
-
-    // 쿼리 파라미터에 정보가 없으면 API 호출
-    // 1. applicationJobtest 상세 정보 가져오기
-    const applicationJobtestData = await getApplicationJobtestDetailService(Number(props.applicationJobtestId));
-    console.log('ApplicationJobtest data:', applicationJobtestData);
-    
-    // 2. applicationId를 통해 지원서 정보 가져오기
-    if (applicationJobtestData.applicationId) {
-      const applicationData = await getApplicationByIdService(applicationJobtestData.applicationId);
-      applicationInfo.value = applicationData;
-      console.log('Application data:', applicationData);
-      
-      // 3. applicantId를 통해 지원자 정보 가져오기
-      if (applicationData.applicantId) {
-        const applicantData = await getApplicantByIdService(applicationData.applicantId);
-        console.log('Applicant data:', applicantData);
-        
-        // 4. 모든 정보를 합쳐서 applicantInfo에 저장
-        applicantInfo.value = {
-          ...applicationJobtestData,
-          applicantName: applicantData.name,
-          applicantEmail: applicantData.email,
-          applicantPhone: applicantData.phone,
-          recruitmentTitle: applicationJobtestData.recruitmentTitle || '채용 공고 정보 없음',
-          jobtestTitle: applicationJobtestData.jobtestTitle || '실무 테스트',
-          submittedAt: applicationJobtestData.submittedAt,
-          applicationId: applicationJobtestData.applicationId,
-          applicantId: applicationData.applicantId
-        };
-      }
-    }
-  } catch (error) {
-    console.error('Failed to fetch applicant info:', error);
-  } finally {
-    loadingApplicantInfo.value = false;
-  }
-};
 
 function hasOptions(answer) {
   return answer.question.options && answer.question.options.length > 0;
@@ -301,14 +240,50 @@ const getDifficultyStyle = (difficulty) => {
 };
 
 const goBack = () => {
+  applicationStore.clearSelectedJobtestInfo();
   router.go(-1);
+};
+
+// 지원자 정보 가져오기 (쿼리 사용 X, 무조건 service)
+const fetchApplicantInfo = async () => {
+  loadingApplicantInfo.value = true;
+  try {
+    const applicationJobtestData = await getApplicationJobtestDetailService(Number(props.applicationJobtestId));
+    if (!applicationJobtestData) {
+      console.error('applicationJobtestData is null or undefined');
+      return;
+    }
+    // 2. applicationId를 통해 지원서 정보 가져오기
+    if (applicationJobtestData.applicationId) {
+      const applicationData = await getApplicationByIdService(applicationJobtestData.applicationId);
+      applicationInfo.value = applicationData;
+      // 3. applicantId를 통해 지원자 정보 가져오기
+      if (applicationData.applicantId) {
+        const applicantData = await getApplicantByIdService(applicationData.applicantId);
+        // 4. 모든 정보를 합쳐서 applicantInfo에 저장
+        applicantInfo.value = {
+          ...applicationJobtestData,
+          applicantName: applicantData.name,
+          applicantEmail: applicantData.email,
+          applicantPhone: applicantData.phone,
+          recruitmentTitle: applicationJobtestData.recruitmentTitle || '채용 공고 정보 없음',
+          jobtestTitle: applicationJobtestData.jobtestTitle || '실무 테스트',
+          submittedAt: applicationJobtestData.submittedAt,
+          applicationId: applicationJobtestData.applicationId,
+          applicantId: applicationData.applicantId
+        };
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch applicant info:', error);
+  } finally {
+    loadingApplicantInfo.value = false;
+  }
 };
 
 onMounted(async () => {
   try {
-    // 페이지 로드 시 스크롤을 맨 위로 이동
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     await Promise.all([
       answerStore.fetchAnswers(Number(props.applicationJobtestId)),
       fetchApplicantInfo()

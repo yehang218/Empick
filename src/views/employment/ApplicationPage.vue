@@ -1398,15 +1398,23 @@ function getResultChipColor(evaluation) {
   return 'error'
 }
 
+// goToJobtestAnswerDetail 함수 수정
 function goToJobtestAnswerDetail() {
-  // 접근 가능 여부 먼저 확인
   if (!canAccessJobtestAnswer.value) {
     toast.warning('아직 실무테스트가 수행되지 않았습니다.');
     return;
   }
-
   const applicationJobtestId = applicant.value.applicationJobtestId;
   if (applicationJobtestId) {
+    // 필요한 정보 저장
+    applicationStore.setSelectedJobtestInfo({
+      applicantName: applicant.value.name,
+      recruitmentTitle: applicant.value.jobName,
+      applicantId: applicant.value.applicantId,
+      applicationId: applicant.value.id,
+      jobtestTitle: '실무 테스트', // 필요시 실제 값으로
+      submittedAt: null // 필요시 실제 값으로
+    });
     router.push({ name: 'JobtestAnswerDetail', params: { applicationJobtestId } });
   } else {
     toast.error('실무테스트 정보가 없습니다.');

@@ -119,6 +119,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useJobtestDetailStore } from '@/stores/jobtestDetailStore'
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
+import { useApplicationStore } from '@/stores/applicationStore'
 
 import JobtestSummaryCard from '@/components/employment/JobtestSummaryCard.vue'
 import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
@@ -132,6 +133,7 @@ const props = defineProps(['jobtestId'])
 
 const jobtestDetailStore = useJobtestDetailStore()
 const jobtestQuestionStore = useJobtestQuestionStore()
+const applicationStore = useApplicationStore()
 
 // 모달 관련 상태
 const detailDialogVisible = ref(false)
@@ -181,25 +183,20 @@ const goEditJobtest = () => {
 }
 
 const goToJobtestAnswers = (applicationJobtestId, applicantData = null) => {
-    const query = {};
-    
-    // 지원자 정보가 있으면 쿼리 파라미터로 전달
+    // 지원자 정보 store에 저장
     if (applicantData) {
-        query.applicantName = applicantData.applicantName;
-        query.recruitmentTitle = applicantData.recruitmentTitle;
-        query.applicantId = applicantData.applicantId;
-        query.applicationId = applicantData.applicationId;
+        applicationStore.setSelectedJobtestInfo({
+            applicantName: applicantData.applicantName,
+            recruitmentTitle: applicantData.recruitmentTitle,
+            applicantId: applicantData.applicantId,
+            applicationId: applicantData.applicationId,
+            jobtestTitle: jobtest.value?.title || '실무 테스트',
+            submittedAt: applicantData.submittedAt || null
+        });
     }
-    
-    // 실무테스트 제목도 함께 전달
-    if (jobtest.value?.title) {
-        query.jobtestTitle = jobtest.value.title;
-    }
-    
     router.push({ 
         name: 'JobtestAnswerDetail',
-        params: { applicationJobtestId },
-        query
+        params: { applicationJobtestId }
     });
 }
 
