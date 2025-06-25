@@ -1,6 +1,6 @@
 export default class ApplicationResponseDTO {
 
-    constructor(id, recruitmentId, createdAt, status, applicantId, introduceRatingResultId, updatedAt, updatedBy) {
+    constructor(id, recruitmentId, createdAt, status, applicantId, introduceRatingResultId, updatedAt, updatedBy, applicationJobtestId, jobtestGradingScore, jobtestGradingStatus) {
         this.id = id;
         this.recruitmentId = recruitmentId;
         this.createdAt = createdAt;
@@ -9,6 +9,9 @@ export default class ApplicationResponseDTO {
         this.introduceRatingResultId = introduceRatingResultId;
         this.updatedAt = updatedAt;
         this.updatedBy = updatedBy;
+        this.applicationJobtestId = applicationJobtestId;
+        this.jobtestGradingScore = jobtestGradingScore;
+        this.jobtestGradingStatus = jobtestGradingStatus;
     }
 
     static fromJSON(json) {
@@ -27,7 +30,10 @@ export default class ApplicationResponseDTO {
                 json.applicantId || null,
                 json.introduceRatingResultId || null,
                 json.updatedAt || null,
-                json.updatedBy || null
+                json.updatedBy || null,
+                json.applicationJobtestId || null,
+                json.jobtestGradingScore,
+                json.jobtestGradingStatus || null
             );
         } catch (error) {
             console.error('❌ ApplicationResponseDTO.fromJSON 변환 실패:', error, json);
@@ -44,7 +50,10 @@ export default class ApplicationResponseDTO {
             profileUrl: this.applicantId,
             introduceRatingResultId: this.introduceRatingResultId,
             updatedAt: this.updatedAt,
-            updatedBy: this.updatedBy
+            updatedBy: this.updatedBy,
+            applicationJobtestId: this.applicationJobtestId,
+jobtestGradingScore: this.jobtestGradingScore,
+jobtestGradingStatus: this.jobtestGradingStatus
         };
     }
 }

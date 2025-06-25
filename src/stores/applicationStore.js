@@ -20,6 +20,7 @@ export const useApplicationStore = defineStore('application', () => {
   const introduceData = ref(null); // 자기소개서 데이터
   const loading = ref(false);
   const error = ref(null);
+  const selectedJobtestInfo = ref(null);
 
   // ===== ViewModel (computed properties) =====
   // 현재 지원서의 평가 통계
@@ -35,9 +36,9 @@ export const useApplicationStore = defineStore('application', () => {
       },
       {
         type: '실무 테스트',
-        score: selectedApplication.value?.jobtestTotalScore || 0,
+        score: selectedApplication.value?.jobtestGradingScore || 0,
         average: 80,
-        result: (selectedApplication.value?.jobtestTotalScore || 0) >= 70 ? '합격' : '불합격'
+        result: (selectedApplication.value?.jobtestGradingScore || 0) >= 70 ? '합격' : '불합격'
       },
       {
         type: '면접',
@@ -340,6 +341,14 @@ export const useApplicationStore = defineStore('application', () => {
     console.log('🧹 ApplicationStore: 데이터 초기화 완료')
   };
 
+  const setSelectedJobtestInfo = (info) => {
+    selectedJobtestInfo.value = info;
+  };
+
+  const clearSelectedJobtestInfo = () => {
+    selectedJobtestInfo.value = null;
+  };
+
   return {
     // ===== Model (상태) =====
     applicationList,
@@ -348,6 +357,7 @@ export const useApplicationStore = defineStore('application', () => {
     introduceData,
     loading,
     error,
+    selectedJobtestInfo,
 
     // ===== ViewModel (computed) =====
     evaluationStats,
@@ -369,5 +379,7 @@ export const useApplicationStore = defineStore('application', () => {
     setIntroduceData,
     setApplication,
     resetApplicationData,
+    setSelectedJobtestInfo,
+    clearSelectedJobtestInfo,
   };
 });
