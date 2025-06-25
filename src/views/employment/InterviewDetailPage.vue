@@ -337,16 +337,19 @@ const fetchAll = async () => {
 
         // 면접관별 점수 가져오기
         const scorePromises = InterviewerList.value.map(async (interviewer) => {
-            await interviewScoreStore.fetchScoresByInterviewerId(interviewer.id)
+            const member = await memberStore.fetchMemberById(interviewer.memberId);
+            console.log('[디버그] interviewer:', interviewer, 'member:', member);
+            await interviewScoreStore.fetchScoresByInterviewerId(interviewer.id);
             return {
                 interviewerId: interviewer.id,
                 memberId: interviewer.memberId,
-                name: interviewer.name,
+                name: member?.name ?? '이름 없음',
                 review: interviewer.review,
                 scores: [...interviewScoreStore.scoreList]
             }
-        })
-        allScores.value = await Promise.all(scorePromises)
+        });
+        allScores.value = await Promise.all(scorePromises);
+        console.log('[디버그] allScores:', allScores.value);
 
     } catch (err) {
         console.warn('지원자 정보 없음 or 에러 발생', err);
