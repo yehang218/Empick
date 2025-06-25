@@ -99,7 +99,12 @@
           </v-chip>
         </template>
 
-
+        <!-- 실무테스트 상태 -->
+        <template #item.jobtestStatus="{ item }">
+          <v-chip :color="item.applicationJobtestTitle ? 'primary' : 'grey'" variant="tonal" size="small">
+            {{ item.applicationJobtestTitle ? '할당됨' : '할당안됨' }}
+          </v-chip>
+        </template>
 
         <!-- 직무 -->
         <template #item.jobName="{ item }">
@@ -227,7 +232,7 @@ const tableHeaders = [
   { title: '전화번호', key: 'phone', sortable: true, align: 'start' },
   { title: '지원서', key: 'actions', sortable: false, align: 'center' },
   { title: '처리 상태', key: 'status', sortable: true, align: 'center' },
-  // { title: '실무테스트', key: 'jobtestStatus', sortable: true, align: 'center', width: '120px' },
+  { title: '실무테스트', key: 'jobtestStatus', sortable: true, align: 'center', width: '120px' },
   { title: '지원공고', key: 'recruitmentTitle', sortable: true, align: 'start' }
 ]
 
@@ -453,7 +458,7 @@ onMounted(async () => {
       console.log(`   📞 전화번호: ${applicant.phone || '전화번호 없음'}`)
       console.log(`   💼 직무: ${applicant.jobName || '직무 미지정'}`)
       console.log(`   📈 지원서 상태: ${applicant.status || '상태 없음'}`)
-      console.log(`   🧪 실무테스트 상태: ${applicant.jobtestStatus || '미할당'}`)
+      console.log(`   🧪 실무테스트 : ${applicant.applicationJobtestTitle || '미할당'}`)
       console.log('   ─────────────────────────────────')
     })
     

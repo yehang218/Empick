@@ -36,7 +36,6 @@ class ApplicantFullInfoListDTO {
         applicationJobtestTitle,
         jobtestTotalScore,
         jobtestEvaluationScore,
-        jobtestStatus,
     ) {
         // 기존 필드들
         this.applicantId = applicantId;
@@ -71,10 +70,9 @@ class ApplicantFullInfoListDTO {
         this.interviewAddress = interviewAddress;
         this.interviewDatetime = interviewDatetime;
 
+        this.applicationJobtestId = applicationJobtestId;
         this.jobtestTotalScore = jobtestTotalScore;
         this.jobtestEvaluationScore = jobtestEvaluationScore;
-        this.jobtestStatus = jobtestStatus;
-        this.applicationJobtestId = applicationJobtestId;
         this.applicationJobtestTitle = applicationJobtestTitle;
     }
 
@@ -112,11 +110,10 @@ class ApplicantFullInfoListDTO {
             json.interviewDatetime,
             
             // 실무테스트
-            json.jobtestTotalScore,
-            json.jobtestEvaluationScore,
-            json.jobtestStatus,
             json.applicationJobtestId,
-            json.applicationJobtestTitle
+            json.applicationJobtestTitle,
+            json.jobtestTotalScore,
+            json.jobtestEvaluationScore
         );
     }
 }
