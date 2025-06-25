@@ -174,15 +174,29 @@ watch([currentYear, currentMonth], () => {
 
 // 사용자 변경 감지 (로그인/로그아웃 시)
 watch(() => authStore.userInfo, async (newUser, oldUser) => {
+    // 로그아웃으로 인해 사용자가 null이 된 경우는 무시
+    if (!newUser && oldUser) {
+        console.log('사용자 로그아웃 감지, API 호출 생략');
+        return;
+    }
+
     // 사용자가 변경되었을 때 (로그인 또는 다른 사용자로 변경)
-    if (newUser !== oldUser) {
-        await Promise.all([
-            memberStore.getMyInfo(), // 사용자 정보 다시 로드
-            loadAttendanceData(),
-            updateTargetHours(),
-            updateRemainingWorkDays(),
-            updateWorkingHours()
-        ])
+    // 그리고 인증된 상태인 경우에만 API 호출
+    if (newUser !== oldUser && newUser && authStore.isAuthenticated) {
+        try {
+            console.log('사용자 정보 변경 감지, 데이터 재로드 시작');
+            await Promise.all([
+                memberStore.getMyInfo(), // 사용자 정보 다시 로드
+                loadAttendanceData(),
+                updateTargetHours(),
+                updateRemainingWorkDays(),
+                updateWorkingHours()
+            ]);
+            console.log('사용자 정보 변경에 따른 데이터 재로드 완료');
+        } catch (error) {
+            console.error('사용자 정보 변경 시 데이터 로드 실패:', error);
+            // 오류가 발생해도 계속 진행 (사용자 경험 향상)
+        }
     }
 }, { deep: true })
 
