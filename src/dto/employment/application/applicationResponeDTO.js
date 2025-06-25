@@ -32,7 +32,7 @@ export default class ApplicationResponseDTO {
                 json.updatedAt || null,
                 json.updatedBy || null,
                 json.applicationJobtestId || null,
-                json.jobtestGradingScore || null,
+                json.jobtestGradingScore,
                 json.jobtestGradingStatus || null
             );
         } catch (error) {
