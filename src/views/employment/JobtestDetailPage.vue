@@ -10,9 +10,9 @@
             <v-btn prepend-icon="mdi-arrow-left" variant="tonal" @click="goJobtestList" class="list-btn">
                 목록으로
             </v-btn>
-            <!-- <v-btn color="primary" variant="tonal" prepend-icon="mdi-pencil" @click="goEditJobtest">
+            <v-btn color="primary" variant="tonal" prepend-icon="mdi-pencil" @click="goEditJobtest">
                 수정하기
-            </v-btn> -->
+            </v-btn>
         </div>
 
         <!-- 요약 카드 -->
@@ -86,11 +86,11 @@
                 </template>
 
                 <!-- 평가 상태 -->
-                <template #item.evaluationStatus="{ item }">
+                <!-- <template #item.evaluationStatus="{ item }">
                     <span class="status-tag" :style="getStatusStyle(item.evaluationStatus)">
                         {{ getStatusLabel(item.evaluationStatus) }}
                     </span>
-                </template>
+                </template> -->
 
                 <template #footer="{ page, pageCount, setPage }">
                     <Pagination :model-value="page" :length="pageCount" :total-visible="5"
@@ -119,6 +119,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useJobtestDetailStore } from '@/stores/jobtestDetailStore'
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
+import { useApplicationStore } from '@/stores/applicationStore'
 
 import JobtestSummaryCard from '@/components/employment/JobtestSummaryCard.vue'
 import QuestionDetailModal from '@/components/employment/JobtestQuestionDetailModal.vue'
@@ -132,6 +133,7 @@ const props = defineProps(['jobtestId'])
 
 const jobtestDetailStore = useJobtestDetailStore()
 const jobtestQuestionStore = useJobtestQuestionStore()
+const applicationStore = useApplicationStore()
 
 // 모달 관련 상태
 const detailDialogVisible = ref(false)
@@ -159,12 +161,12 @@ const applicantHeaders = [
     { title: 'No', key: 'index', sortable: false, width: '60px' },
     { title: '지원자', key: 'applicantName', align: 'start' },
     { title: '채용 공고', key: 'recruitmentTitle', align: 'start' },
-    { title: '채점 상태', key: 'gradingStatus', align: 'center', width: '120px' },
     { title: '채점 점수', key: 'gradingScore', align: 'center', width: '100px' },
-    { title: '채점자', key: 'gradingMemberName', align: 'start', width: '120px' },
-    { title: '평가 상태', key: 'evaluationStatus', align: 'center', width: '120px' },
-    { title: '평가 점수', key: 'evaluationScore', align: 'center', width: '100px' },
-    { title: '평가자', key: 'evaluationMemberName', align: 'start', width: '120px' }
+    { title: '채점 상태', key: 'gradingStatus', align: 'center', width: '120px' },
+    // { title: '채점자', key: 'gradingMemberName', align: 'start', width: '120px' },
+    // { title: '평가 상태', key: 'evaluationStatus', align: 'center', width: '120px' },
+    // { title: '평가 점수', key: 'evaluationScore', align: 'center', width: '100px' },
+    // { title: '평가자', key: 'evaluationMemberName', align: 'start', width: '120px' }
 ]
 
 // 유효한 문제들만 필터링
@@ -181,25 +183,20 @@ const goEditJobtest = () => {
 }
 
 const goToJobtestAnswers = (applicationJobtestId, applicantData = null) => {
-    const query = {};
-    
-    // 지원자 정보가 있으면 쿼리 파라미터로 전달
+    // 지원자 정보 store에 저장
     if (applicantData) {
-        query.applicantName = applicantData.applicantName;
-        query.recruitmentTitle = applicantData.recruitmentTitle;
-        query.applicantId = applicantData.applicantId;
-        query.applicationId = applicantData.applicationId;
+        applicationStore.setSelectedJobtestInfo({
+            applicantName: applicantData.applicantName,
+            recruitmentTitle: applicantData.recruitmentTitle,
+            applicantId: applicantData.applicantId,
+            applicationId: applicantData.applicationId,
+            jobtestTitle: jobtest.value?.title || '실무 테스트',
+            submittedAt: applicantData.submittedAt || null
+        });
     }
-    
-    // 실무테스트 제목도 함께 전달
-    if (jobtest.value?.title) {
-        query.jobtestTitle = jobtest.value.title;
-    }
-    
     router.push({ 
         name: 'JobtestAnswerDetail',
-        params: { applicationJobtestId },
-        query
+        params: { applicationJobtestId }
     });
 }
 

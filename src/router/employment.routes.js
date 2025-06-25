@@ -292,6 +292,15 @@ export const employmentRoutes = [
             requiredRoles: ['ROLE_HR_ACCESS']
         }
     },
+    {
+        path: '/employment/mailmail',
+        name: 'MailPage',
+        component: () => import('@/views/employment/MailPage.vue'),
+        meta: {
+            requiresAuth: true,
+            requiredRoles: ['ROLE_HR_ACCESS']
+        }
+    },
 
     // <---------- 지원서 / 지원자 ---------->
     {

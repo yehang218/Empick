@@ -6,7 +6,8 @@ import {
     profileImageUploadService,
     getMyRoleService,
     getMemberRoleService,
-    findMembersService
+    findMembersService,
+    findMemberByIdService
 } from '@/services/memberService';
 import MemberRoleDTO from '@/dto/member/memberRoleDTO';
 import { MemberResponseDTO } from '@/dto/member/memberResponseDTO';
@@ -61,6 +62,11 @@ export const useMemberStore = defineStore('member', {
         membersCache: [],
         membersCacheTimestamp: null,
         cacheExpiryTime: 5 * 60 * 1000, // 5분
+
+        // 단일 멤버 조회용
+        selected: null,
+        selectedLoading: false,
+        selectedError: null,
     }),
 
     getters: {
@@ -340,6 +346,32 @@ export const useMemberStore = defineStore('member', {
             console.log('사원 목록 캐시 무효화');
             this.membersCache = [];
             this.membersCacheTimestamp = null;
+        },
+
+        /**
+         * 단일 멤버 조회
+         * @param {string|number} id
+         * @returns {Promise<MemberResponseDTO|null>}
+         */
+        async fetchMemberById(id) {
+            this.selectedLoading = true;
+            this.selectedError = null;
+            try {
+                const data = await findMemberByIdService(id);
+                if (data) {
+                    this.selected = MemberResponseDTO.fromJSON(data);
+                    return this.selected;
+                } else {
+                    this.selected = null;
+                    return null;
+                }
+            } catch (err) {
+                this.selectedError = err.message || '멤버 조회 중 오류가 발생했습니다.';
+                this.selected = null;
+                throw err;
+            } finally {
+                this.selectedLoading = false;
+            }
         }
     },
 }, {
