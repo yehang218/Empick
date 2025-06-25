@@ -1,5 +1,37 @@
 <template>
   <v-container fluid style="margin-top: 70px;">
+    <!-- 이메일 발송 로딩 화면 -->
+    <transition name="fade">
+      <div v-if="emailLoadingScreen" class="loading-overlay">
+        <div class="plane-animation">
+          <div class="plane-body">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <polygon points="10,40 70,10 55,40 70,70" fill="#42a5f5" stroke="#1976d2"
+                stroke-width="3" />
+              <polygon points="10,40 55,40 70,70 40,55" fill="#90caf9" stroke="#1976d2"
+                stroke-width="2" />
+            </svg>
+          </div>
+          <div class="plane-trail"></div>
+          <div class="plane-progress">
+            <v-progress-linear indeterminate color="blue lighten-2" height="8"
+              rounded></v-progress-linear>
+          </div>
+          <div class="plane-text">메일을 발송 중입니다...</div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- 이메일 발송 성공 모달 -->
+    <transition name="fade">
+      <div v-if="emailSuccessModal" class="center-success-modal">
+        <div class="center-success-content">
+          <span class="emoji">🎉</span>
+          <div class="center-success-text">메일이 성공적으로 발송되었습니다!</div>
+        </div>
+      </div>
+    </transition>
+
     <v-card>
       <!-- 상단 타이틀 + 검색/버튼 영역 -->
       <v-card-title class="d-flex justify-between align-center flex-wrap">
@@ -222,6 +254,8 @@ const emailTypeModal = ref(false);
 const emailPreviewModal = ref(false);
 const selectedEmailType = ref('');
 const sendingEmail = ref(false);
+const emailLoadingScreen = ref(false);
+const emailSuccessModal = ref(false);
 
 // ===== View 데이터 (상수) =====
 const tableHeaders = [
@@ -518,8 +552,12 @@ const handleSendEmail = async () => {
   console.log('📧 첫 번째 선택된 항목의 모든 키:', Object.keys(selectedApplicants.value[0]));
 
   sendingEmail.value = true;
+  emailLoadingScreen.value = true;
 
   try {
+    // 애니메이션용 딜레이
+    await new Promise(res => setTimeout(res, 1200));
+
     const emailData = [];
 
     // applicationId를 찾지 못한 경우를 위해 모든 지원서를 미리 가져오기
@@ -651,11 +689,21 @@ const handleSendEmail = async () => {
 
     emailPreviewModal.value = false;
     selectedEmailType.value = '';
+    
+    // 성공 모달 표시
+    emailSuccessModal.value = true;
+    setTimeout(() => {
+      emailSuccessModal.value = false;
+    }, 2200);
+    
   } catch (error) {
     console.error('❌ 이메일 발송 실패:', error);
     toast.error('이메일 발송에 실패했습니다: ' + error.message);
   } finally {
     sendingEmail.value = false;
+    setTimeout(() => {
+      emailLoadingScreen.value = false;
+    }, 900);
   }
 };
 
@@ -680,5 +728,157 @@ const getAssignButtonText = () => {
 <style scoped>
 .v-data-table {
   margin-top: 20px;
+}
+
+.loading-overlay {
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadein 0.5s;
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.plane-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.plane-body {
+  animation: plane-fly 1.2s infinite alternate cubic-bezier(.4, 2, .6, 1);
+}
+
+@keyframes plane-fly {
+  0% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  100% {
+    transform: translateY(-24px) rotate(8deg);
+  }
+}
+
+.plane-trail {
+  width: 80px;
+  height: 12px;
+  margin-top: -10px;
+  background: linear-gradient(90deg, #42a5f5 0%, #fff 100%);
+  border-radius: 8px;
+  filter: blur(2px);
+  opacity: 0.5;
+  animation: trail-move 1.2s infinite alternate;
+}
+
+@keyframes trail-move {
+  0% {
+    width: 80px;
+    opacity: 0.5;
+  }
+  100% {
+    width: 120px;
+    opacity: 0.8;
+  }
+}
+
+.plane-progress {
+  width: 180px;
+  margin: 32px 0 8px 0;
+}
+
+.plane-text {
+  font-size: 1.2rem;
+  color: #1976d2;
+  font-weight: 600;
+  margin-top: 8px;
+  letter-spacing: 0.01em;
+}
+
+.center-success-modal {
+  position: fixed;
+  z-index: 20000;
+  left: 0; top: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.55);
+  animation: fadein 0.3s;
+}
+
+.center-success-content {
+  background: rgba(255,255,255,0.98);
+  border-radius: 32px;
+  box-shadow: 0 8px 32px 0 rgba(80,120,200,0.18);
+  padding: 3rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: alert-pop 0.7s;
+}
+
+@keyframes alert-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.center-success-text {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin-top: 1.2rem;
+  text-align: center;
+}
+
+.emoji {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .center-success-content {
+    padding: 1.2rem 1rem;
+    border-radius: 18px;
+  }
+  .center-success-text {
+    font-size: 1.1rem;
+  }
+  .plane-progress {
+    width: 120px;
+  }
+  .plane-text {
+    font-size: 1rem;
+  }
 }
 </style>
