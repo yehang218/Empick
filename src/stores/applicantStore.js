@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
+import { getCodeByStringStatus } from '@/constants/employment/applicationStatus';
 
 import {
     getAllApplicantsService,
@@ -72,6 +73,11 @@ export const useApplicantStore = defineStore('applicant', () => {
         }
     };
 
+    // 필터 상태
+    const statusFilter = ref(null)
+    const jobtestFilter = ref(null)
+    const recruitmentFilter = ref(null)
+
     // 필터링 및 정렬된 지원자 목록
     const filteredAndSortedApplicants = computed(() => {
         let result = [...applicantList.value];
@@ -85,6 +91,37 @@ export const useApplicantStore = defineStore('applicant', () => {
                 applicant.phone?.toLowerCase().includes(query) ||
                 applicant.jobName?.toLowerCase().includes(query)
             );
+        }
+
+        // 처리 상태 필터링
+        if (statusFilter.value !== null && statusFilter.value !== undefined) {
+            result = result.filter(applicant => {
+                const applicantStatus = typeof applicant.status === 'number' 
+                    ? applicant.status 
+                    : getCodeByStringStatus(applicant.status || 'WAITING')
+                console.log('🔍 상태 필터링:', {
+                    applicantName: applicant.name,
+                    applicantStatus,
+                    filterValue: statusFilter.value,
+                    matches: applicantStatus === statusFilter.value
+                })
+                return applicantStatus === statusFilter.value
+            })
+        }
+
+        // 실무테스트 상태 필터링
+        if (jobtestFilter.value !== null && jobtestFilter.value !== undefined) {
+            if (jobtestFilter.value === 'UNASSIGNED') {
+                // "미할당" 선택 시
+                result = result.filter(applicant => !applicant.jobtestStatus)
+            } else {
+                result = result.filter(applicant => applicant.jobtestStatus === jobtestFilter.value)
+            }
+        }
+
+        // 지원공고 필터링
+        if (recruitmentFilter.value !== null && recruitmentFilter.value !== undefined) {
+            result = result.filter(applicant => applicant.recruitmentId === recruitmentFilter.value)
         }
 
         // 정렬
@@ -145,6 +182,28 @@ export const useApplicantStore = defineStore('applicant', () => {
         }
         console.log('정렬 설정:', { sortKey: sortKey.value, sortOrder: sortOrder.value });
     };
+
+    // 필터 설정 함수들
+    const setStatusFilter = (status) => {
+        console.log('🎯 Store에서 statusFilter 설정:', status)
+        statusFilter.value = status
+    }
+
+    const setJobtestFilter = (jobtest) => {
+        console.log('🎯 Store에서 jobtestFilter 설정:', jobtest)
+        jobtestFilter.value = jobtest
+    }
+
+    const setRecruitmentFilter = (recruitment) => {
+        console.log('🎯 Store에서 recruitmentFilter 설정:', recruitment)
+        recruitmentFilter.value = recruitment
+    }
+
+    const clearFilters = () => {
+        statusFilter.value = null
+        jobtestFilter.value = null
+        recruitmentFilter.value = null
+    }
 
     // 🔍 지원자 ID로 단일 조회
     const fetchApplicantById = async (id) => {
@@ -214,6 +273,9 @@ export const useApplicantStore = defineStore('applicant', () => {
         searchQuery.value = '';
         sortKey.value = '';
         sortOrder.value = 'asc';
+        statusFilter.value = null;
+        jobtestFilter.value = null;
+        recruitmentFilter.value = null;
     };
 
     // 선택된 지원자 데이터 가공
@@ -319,6 +381,9 @@ export const useApplicantStore = defineStore('applicant', () => {
         sortOrder,
         filteredAndSortedApplicants,
         selectedApplicants,
+        statusFilter,
+        jobtestFilter,
+        recruitmentFilter,
 
         // 액션
         fetchAllApplicants,
@@ -332,6 +397,10 @@ export const useApplicantStore = defineStore('applicant', () => {
         isBookmarked,
         setSearchQuery,
         setSort,
+        setStatusFilter,
+        setJobtestFilter,
+        setRecruitmentFilter,
+        clearFilters,
         resetState,
         getSelectedApplicantsData,
         setSelectedApplicants,
