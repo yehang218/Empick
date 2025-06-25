@@ -17,15 +17,9 @@
                 <h3 class="card-title">기본 정보</h3>
                 <v-icon class="card-icon">mdi-information-outline</v-icon>
             </div>
-            
-            <v-text-field 
-                v-model="jobtestTitle" 
-                label="실무 테스트 이름" 
-                placeholder="실무 테스트 이름을 입력해주세요."
-                class="mb-4" 
-                variant="outlined" 
-                prepend-inner-icon="mdi-format-title"
-            />
+
+            <v-text-field v-model="jobtestTitle" label="실무 테스트 이름" placeholder="실무 테스트 이름을 입력해주세요." class="mb-4"
+                variant="outlined" prepend-inner-icon="mdi-format-title" />
 
             <v-row class="align-center" dense>
                 <v-col cols="12" md="3" class="mb-4 mb-md-0">
@@ -33,54 +27,32 @@
                         <v-icon class="label-icon">mdi-calendar-start</v-icon>
                         시험 시작 일정
                     </div>
-                    <v-text-field 
-                        v-model="startedAt" 
-                        type="datetime-local" 
-                        variant="outlined" 
-                        density="comfortable"
-                        hide-details 
-                    />
+                    <v-text-field v-model="startedAt" type="datetime-local" variant="outlined" density="comfortable"
+                        hide-details />
                 </v-col>
                 <v-col cols="12" md="3" class="mb-4 mb-md-0">
                     <div class="form-label">
                         <v-icon class="label-icon">mdi-calendar-end</v-icon>
                         시험 종료 일정
                     </div>
-                    <v-text-field 
-                        v-model="endedAt" 
-                        type="datetime-local" 
-                        variant="outlined" 
-                        density="comfortable"
-                        hide-details 
-                    />
+                    <v-text-field v-model="endedAt" type="datetime-local" variant="outlined" density="comfortable"
+                        hide-details />
                 </v-col>
                 <v-col cols="12" md="2" class="mb-4 mb-md-0">
                     <div class="form-label">
                         <v-icon class="label-icon">mdi-trending-up</v-icon>
                         난이도
                     </div>
-                    <v-select 
-                        v-model="difficulty" 
-                        :items="difficultyOptions" 
-                        item-title="title" 
-                        item-value="value"
-                        variant="outlined" 
-                        density="comfortable" 
-                        hide-details 
-                    />
+                    <v-select v-model="difficulty" :items="difficultyOptions" item-title="title" item-value="value"
+                        variant="outlined" density="comfortable" hide-details />
                 </v-col>
                 <v-col cols="12" md="2">
                     <div class="form-label">
                         <v-icon class="label-icon">mdi-clock-outline</v-icon>
                         시험 시간 (분)
                     </div>
-                    <v-text-field 
-                        v-model="testTime" 
-                        type="number" 
-                        variant="outlined" 
-                        density="comfortable"
-                        hide-details 
-                    />
+                    <v-text-field v-model="testTime" type="number" variant="outlined" density="comfortable"
+                        hide-details />
                 </v-col>
             </v-row>
         </v-card>
@@ -95,22 +67,12 @@
             <div class="table-header-actions">
                 <v-row class="align-center" no-gutters>
                     <v-col cols="12" md="6" class="d-flex align-center">
-                        <Search 
-                            v-model="search" 
-                            placeholder="문제 검색" 
-                            @clear="clearSearch" 
-                            @search="handleSearch"
-                            class="search-bar" 
-                        />
+                        <Search v-model="search" placeholder="문제 검색" @clear="clearSearch" @search="handleSearch"
+                            class="search-bar" />
                     </v-col>
                     <v-col cols="12" md="6" class="d-flex justify-end">
-                        <v-btn 
-                            color="primary" 
-                            variant="tonal" 
-                            prepend-icon="mdi-plus" 
-                            @click="dialog = true"
-                            class="add-question-btn"
-                        >
+                        <v-btn color="primary" variant="tonal" prepend-icon="mdi-plus" @click="dialog = true"
+                            class="add-question-btn">
                             문제 등록하기
                         </v-btn>
                     </v-col>
@@ -118,35 +80,18 @@
             </div>
 
             <!-- 문제 리스트 테이블 -->
-            <v-data-table 
-                :headers="questionTableHeaders" 
-                :items="filteredQuestions" 
-                item-key="id" 
-                class="question-table elevation-1 mb-4"
-                :items-per-page="10" 
-                return-object 
-                @click:row="handleQuestionRowClick"
-                hover
-            >
+            <v-data-table :headers="questionTableHeaders" :items="filteredQuestions" item-key="id"
+                class="question-table elevation-1 mb-4" :items-per-page="10" return-object
+                @click:row="handleQuestionRowClick" hover>
                 <!-- 선택 체크박스 헤더 -->
                 <template #header.select>
-                    <v-checkbox 
-                        :model-value="isAllSelected" 
-                        :indeterminate="isIndeterminate"
-                        @update:model-value="toggleSelectAll" 
-                        hide-details 
-                        density="compact" 
-                    />
+                    <v-checkbox :model-value="isAllSelected" :indeterminate="isIndeterminate"
+                        @update:model-value="toggleSelectAll" hide-details density="compact" />
                 </template>
                 <!-- 체크박스 컬럼 -->
                 <template #item.select="{ item }">
-                    <v-checkbox 
-                        :model-value="isSelected(item)" 
-                        @update:model-value="() => toggle(item)" 
-                        hide-details
-                        density="compact" 
-                        @click.stop 
-                    />
+                    <v-checkbox :model-value="isSelected(item)" @update:model-value="() => toggle(item)" hide-details
+                        density="compact" @click.stop />
                 </template>
                 <!-- 문제 유형 -->
                 <template #item.type="{ item }">
@@ -162,16 +107,9 @@
                 </template>
                 <!-- 점수 입력 -->
                 <template #item.score="{ item }">
-                    <v-text-field 
-                        :model-value="item.score" 
-                        @update:model-value="val => item.score = Number(val)"
-                        type="number" 
-                        variant="underlined" 
-                        density="compact" 
-                        hide-details 
-                        style="width: 80px;"
-                        @click.stop 
-                    />
+                    <v-text-field :model-value="item.score" @update:model-value="val => item.score = Number(val)"
+                        type="number" variant="underlined" density="compact" hide-details style="width: 80px;"
+                        @click.stop />
                 </template>
                 <!-- 문제 내용 -->
                 <template #item.content="{ item }">
@@ -184,28 +122,18 @@
                 <div class="total-score-card">
                     <v-icon class="score-icon">mdi-calculator</v-icon>
                     <span class="score-label">선택된 문제 총점:</span>
-                    <span class="score-value">{{selectedQuestions.reduce((sum, q) => sum + Number(q.score ?? 0), 0)}}점</span>
+                    <span class="score-value">{{selectedQuestions.reduce((sum, q) => sum + Number(q.score ?? 0),
+                        0)}}점</span>
                 </div>
             </div>
         </v-card>
 
         <!-- 액션 버튼 -->
         <div class="action-buttons">
-            <v-btn 
-                variant="tonal" 
-                color="grey" 
-                class="cancel-btn" 
-                @click="cancel"
-                prepend-icon="mdi-close"
-            >
+            <v-btn variant="tonal" color="grey" class="cancel-btn" @click="cancel" prepend-icon="mdi-close">
                 취소하기
             </v-btn>
-            <v-btn 
-                color="primary" 
-                class="submit-btn" 
-                @click="register"
-                prepend-icon="mdi-check"
-            >
+            <v-btn color="primary" class="submit-btn" @click="register" prepend-icon="mdi-check">
                 {{ isEdit ? '수정하기' : '등록하기' }}
             </v-btn>
         </div>
@@ -217,26 +145,14 @@
             </v-card>
         </v-dialog>
 
-        <SuccessModal 
-            v-if="showSuccessModal" 
-            message="실무 테스트가 등록되었습니다." 
-            @confirm="handleSuccessConfirm"
-            @cancel="showSuccessModal = false" 
-        />
+        <SuccessModal v-if="showSuccessModal" message="실무 테스트가 등록되었습니다." @confirm="handleSuccessConfirm"
+            @cancel="showSuccessModal = false" />
 
-        <Modal 
-            v-if="showCancelModal" 
-            message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." 
-            @confirm="handleCancelConfirm"
-            @cancel="handleCancelClose" 
-        />
+        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm"
+            @cancel="handleCancelClose" />
 
-        <JobtestQuestionDetailModal 
-            v-model="detailDialogVisible" 
-            :question="selectedQuestionDetail" 
-            :showDelete="false"
-            :showEdit="false" 
-        />
+        <JobtestQuestionDetailModal v-model="detailDialogVisible" :question="selectedQuestionDetail" :showDelete="false"
+            :showEdit="false" />
     </v-container>
 </template>
 
@@ -781,42 +697,42 @@ onMounted(async () => {
     .jobtest-create-page {
         padding: 16px;
     }
-    
+
     .page-title {
         font-size: 1.5rem;
     }
-    
+
     .card-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
     }
-    
+
     .table-header-actions {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
-    
+
     .search-bar {
         max-width: none;
     }
-    
+
     .add-question-btn {
         align-self: flex-end;
     }
-    
+
     .action-buttons {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
     }
-    
+
     .cancel-btn,
     .submit-btn {
         min-width: auto;
     }
-    
+
     .truncate-text {
         max-width: 250px;
     }
@@ -826,39 +742,39 @@ onMounted(async () => {
     .jobtest-create-page {
         padding: 12px;
     }
-    
+
     .page-title {
         font-size: 1.3rem;
     }
-    
+
     .page-description {
         font-size: 0.9rem;
     }
-    
+
     .info-card,
     .question-card {
         border-radius: 12px;
         padding: 20px;
     }
-    
+
     .form-label {
         font-size: 0.9rem;
         margin-bottom: 6px;
     }
-    
+
     .card-title {
         font-size: 1.1rem;
     }
-    
+
     .total-score-card {
         padding: 10px 16px;
         font-size: 0.9rem;
     }
-    
+
     .truncate-text {
         max-width: 200px;
     }
-    
+
     .action-buttons {
         padding: 16px;
         border-radius: 12px;
