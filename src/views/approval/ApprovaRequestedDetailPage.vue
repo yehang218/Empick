@@ -126,9 +126,11 @@ const isAlreadyLinked = ref(false);
 const isRecruitmentRequest = computed(() => approvalDetail.value?.categoryId === 401);
 const isApproved = computed(() => approvalDetail.value?.status === 'APPROVED');
 
+const LINKED_APPROVALS_KEY = 'empick-linked-approvals';
+
 watch(approvalDetail, (newDetail) => {
     if (newDetail && newDetail.approvalId) {
-        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
+        const linkedApprovals = JSON.parse(localStorage.getItem(LINKED_APPROVALS_KEY) || '[]');
         if (linkedApprovals.includes(newDetail.approvalId)) {
             isAlreadyLinked.value = true;
         }
@@ -157,9 +159,9 @@ const handleLinkRecruitmentRequest = async () => {
 
         await recruitmentRequestStore.submitRecruitmentRequest(dto);
         
-        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
+        const linkedApprovals = JSON.parse(localStorage.getItem(LINKED_APPROVALS_KEY) || '[]');
         linkedApprovals.push(approvalDetail.value.approvalId);
-        localStorage.setItem('empick-linked-approvals', JSON.stringify(linkedApprovals));
+        localStorage.setItem(LINKED_APPROVALS_KEY, JSON.stringify(linkedApprovals));
         isAlreadyLinked.value = true;
         
         alert('채용 요청서가 성공적으로 생성되었습니다.');

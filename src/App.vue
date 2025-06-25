@@ -50,8 +50,11 @@ watch(
         await memberStore.getMyInfo();
       } catch (e) {
         console.error('멤버 정보 조회 실패', e);
+        // 토큰이 만료되었거나 기타 오류인 경우, authStore에서 이미 처리됨
       }
     } else {
+      // 로그아웃 시에는 API 호출 없이 스토어만 리셋
+      console.log('로그아웃 감지, 멤버 스토어 리셋');
       memberStore.reset();
     }
   },

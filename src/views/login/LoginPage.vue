@@ -150,8 +150,8 @@ const handleLogin = async () => {
     });
     console.log('로그인 성공');
 
-    // 로그인 성공 시 메인 페이지로 이동
-    router.push('/');
+    // 로그인 성공 시 메인 페이지 & 그전 페이지로 이동
+    router.push({name : 'MainPage'});
   } catch (error) {
     console.error('로그인 실패:', error);
     // 에러는 authStore에서 처리됨

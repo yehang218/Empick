@@ -17,15 +17,15 @@
             </div>
             <div class="action-buttons">
                 <v-btn
-                    v-if="isRecruitmentRequest && isApproved"
+                    v-if="isRecruitmentRequest"
                     @click="handleLinkRecruitmentRequest"
                     color="primary"
                     variant="flat"
                     class="mr-4"
                     :loading="linking"
-                    :disabled="isAlreadyLinked"
+                    :disabled="!isApproved || isAlreadyLinked"
                 >
-                    {{ isAlreadyLinked ? '생성 완료' : '채용 요청서로 생성' }}
+                    {{ isAlreadyLinked ? '연동 완료' : '채용 요청서 연동' }}
                 </v-btn>
                 <button class="btn approve" @click="handleApprove" :disabled="!canApprove">
                     승인
@@ -139,16 +139,28 @@ const { loadJobList } = jobStore;
 
 const linking = ref(false);
 const isAlreadyLinked = ref(false);
+const isRecruitmentRequest = ref(false);
+const isApproved = ref(false);
 
-const isRecruitmentRequest = computed(() => approvalDetail.value?.categoryId === 401);
-const isApproved = computed(() => approvalDetail.value?.status === 'APPROVED');
+const LINKED_APPROVALS_KEY = 'empick-linked-approvals';
 
 watch(approvalDetail, (newDetail) => {
-    if (newDetail && newDetail.approvalId) {
-        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
-        if (linkedApprovals.includes(newDetail.approvalId)) {
+    if (newDetail) {
+        // 데이터가 로드되면, 관련 상태를 직접 갱신합니다.
+        isRecruitmentRequest.value = newDetail.categoryId === 401;
+        isApproved.value = newDetail.status === 'APPROVED';
+
+        const linkedApprovals = JSON.parse(localStorage.getItem(LINKED_APPROVALS_KEY) || '[]');
+        if (newDetail.approvalId && linkedApprovals.includes(newDetail.approvalId)) {
             isAlreadyLinked.value = true;
+        } else {
+            isAlreadyLinked.value = false;
         }
+    } else {
+        // 데이터가 없으면 모든 상태를 초기화합니다.
+        isRecruitmentRequest.value = false;
+        isApproved.value = false;
+        isAlreadyLinked.value = false;
     }
 }, { deep: true });
 
@@ -323,9 +335,9 @@ const handleLinkRecruitmentRequest = async () => {
 
         await recruitmentRequestStore.submitRecruitmentRequest(dto);
         
-        const linkedApprovals = JSON.parse(localStorage.getItem('empick-linked-approvals') || '[]');
+        const linkedApprovals = JSON.parse(localStorage.getItem(LINKED_APPROVALS_KEY) || '[]');
         linkedApprovals.push(approvalDetail.value.approvalId);
-        localStorage.setItem('empick-linked-approvals', JSON.stringify(linkedApprovals));
+        localStorage.setItem(LINKED_APPROVALS_KEY, JSON.stringify(linkedApprovals));
         isAlreadyLinked.value = true;
         
         alert('채용 요청서가 성공적으로 생성되었습니다.');
@@ -340,14 +352,20 @@ const handleLinkRecruitmentRequest = async () => {
 };
 
 onMounted(async () => {
+    isAlreadyLinked.value = false; // 페이지 진입 시 초기화
+
     const id = route.params.id;
+
     if (!memberStore.form.id) {
         await memberStore.getMyInfo();
     }
     const memberId = memberStore.form.id;
-
+    
     if (id && memberId) {
         await fetchReceivedApprovalDetail(id, memberId);
+        console.log('✅[ApprovalReceivedDetailPage] 상세 데이터:', approvalDetail.value);
+        console.log(`isRecruitmentRequest: ${isRecruitmentRequest.value} (categoryId: ${approvalDetail.value?.categoryId})`);
+        console.log(`isAlreadyLinked: ${isAlreadyLinked.value}`);
     }
     
     await loadDepartmentList();

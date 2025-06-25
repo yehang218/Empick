@@ -52,11 +52,7 @@
             사원 등록 ({{ selectedApplicants.length }}개 선택)
           </v-btn>
 
-          <!-- ➕ 지원자 추가 버튼 (새로 추가) -->
-          <v-btn color="primary" variant="tonal" size="small" style="min-width: 90px"
-            @click="goToApplicantRegistration">
-            지원자 추가
-          </v-btn>
+
 
           <!-- 📝 문제 할당 버튼 -->
           <v-btn color="secondary" variant="tonal" size="small" style="min-width: 90px" @click="handleAssignClick"
@@ -499,8 +495,30 @@ const toggleSelectAll = (selectAll) => {
 onMounted(async () => {
   try {
     await applicantStore.fetchApplicantFullInfoList()
+    
+    // 🎯 지원자 정보 및 application_id 로그 출력
+    console.log('🎉 ====== 지원자 목록 로드 완료 ======')
+    console.log(`📊 총 지원자 수: ${applicantStore.applicantList.length}명`)
+    
+    applicantStore.applicantList.forEach((applicant, index) => {
+      const applicationId = applicant.id || applicant.applicationId || 'ID 없음'
+      const applicantId = applicant.applicantId || 'applicantId 없음'
+      
+      console.log(`👤 [${index + 1}] 지원자: ${applicant.name || '이름 없음'}`)
+      console.log(`   📋 Application ID: ${applicationId}`)
+      console.log(`   🆔 Applicant ID: ${applicantId}`)
+      console.log(`   📧 이메일: ${applicant.email || '이메일 없음'}`)
+      console.log(`   📞 전화번호: ${applicant.phone || '전화번호 없음'}`)
+      console.log(`   💼 직무: ${applicant.jobName || '직무 미지정'}`)
+      console.log(`   📈 지원서 상태: ${applicant.status || '상태 없음'}`)
+      console.log(`   🧪 실무테스트 상태: ${applicant.jobtestStatus || '미할당'}`)
+      console.log('   ─────────────────────────────────')
+    })
+    
+    console.log('🎉 ====== 지원자 정보 로그 출력 완료 ======')
+    
   } catch (error) {
-    console.error('지원자 목록 조회 실패:', error)
+    console.error('❌ 지원자 목록 조회 실패:', error)
     toast.error('지원자 목록을 불러오는 데 실패했습니다.')
   }
 })
@@ -520,10 +538,7 @@ watch(selectedApplicants, (newValue) => {
   }
 }, { deep: true })
 
-// 지원자 등록 페이지로 이동
-const goToApplicantRegistration = () => {
-  router.push({name: 'ApplicantRegistrationPage'});
-};
+
 
 const handleEmailClick = () => {
   console.log('📧 이메일 전송 클릭, 선택된 항목:', selectedApplicants.value);

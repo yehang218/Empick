@@ -53,7 +53,10 @@ api.interceptors.response.use(
         const authStore = useAuthStore();
 
         // 토큰 만료 에러이고, 재시도하지 않은 요청인 경우
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry
+            && !originalRequest.url.includes('/api/v1/auth/refresh')
+            && !originalRequest.url.includes('/api/v1/auth/logout') // 로그아웃 API는 제외
+        ) {
             originalRequest._retry = true;
 
             try {
@@ -79,8 +82,11 @@ api.interceptors.response.use(
                 return api(originalRequest);
             } catch (refreshError) {
                 // 토큰 갱신 실패 시 로그아웃 (플래그 설정)
+                console.error('토큰 갱신 실패, 로그아웃 처리:', refreshError);
                 setLoggingOut(true);
-                authStore.logout();
+
+                // 로그아웃 API 호출 없이 로컬 상태만 정리
+                authStore.logoutLocal();
                 return Promise.reject(refreshError);
             }
         }

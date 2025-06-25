@@ -1,5 +1,5 @@
 export default class ApplicationItemResponseDTO {
-  constructor(id, applicationId, applicationItemId, content, createdAt, updatedAt, categoryName, inputType, isRequired) {
+  constructor(id, applicationId, applicationItemId, content, createdAt, updatedAt, categoryName, inputType, required) {
     this.id = id;
     this.applicationId = applicationId;
     this.applicationItemId = applicationItemId;
@@ -8,7 +8,7 @@ export default class ApplicationItemResponseDTO {
     this.updatedAt = updatedAt;
     this.categoryName = categoryName;
     this.inputType = inputType;
-    this.isRequired = isRequired;
+    this.required = required;
   }
 
   static fromJSON(json) {
@@ -26,7 +26,7 @@ export default class ApplicationItemResponseDTO {
       json.updatedAt || json.updated_at,
       json.categoryName || json.category_name,
       json.inputType || json.input_type,
-      json.isRequired || json.is_required
+      json.required
     );
   }
 
@@ -40,7 +40,7 @@ export default class ApplicationItemResponseDTO {
       updatedAt: this.updatedAt,
       categoryName: this.categoryName,
       inputType: this.inputType,
-      isRequired: this.isRequired
+      required: this.required
     };
   }
 } 
