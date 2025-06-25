@@ -357,9 +357,10 @@ export const useMemberStore = defineStore('member', {
             this.selectedLoading = true;
             this.selectedError = null;
             try {
-                const data = await findMemberByIdService(id);
-                if (data) {
-                    this.selected = MemberResponseDTO.fromJSON(data);
+                const apiResult = await findMemberByIdService(id);
+                const memberData = apiResult?.data; // 실제 멤버 정보만 추출
+                if (memberData) {
+                    this.selected = MemberResponseDTO.fromJSON(memberData);
                     return this.selected;
                 } else {
                     this.selected = null;
