@@ -268,3 +268,13 @@ export const findMembersPaginatedService = async (page = 0, size = 10, sortBy = 
         throw error;
     }
 };
+
+export const findMemberByIdService = async (id) => {
+    try {
+        const response = await api.get(API.MEMBER.FIND_MEMBER_BY_ID(id));
+        return response.data;
+    } catch (error) {
+        console.error('회원 조회 API 오류:', error)
+        throw error;
+    }
+};
