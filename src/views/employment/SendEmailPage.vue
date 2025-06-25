@@ -29,17 +29,95 @@
                     </div>
                 </div>
             </transition>
+            
+            <!-- 제목을 창 밖으로 이동 -->
+            <div class="page-title-container">
+                <h2 class="email-title text-h4 font-weight-bold animated-title">📨 안내 메일 발송</h2>
+            </div>
+            
             <v-card class="glass-card pa-12 email-card-big d-flex flex-column align-center justify-center" elevation="12">
-                <h2 class="email-title text-h4 font-weight-bold mb-8 animated-title">📨 안내 메일 발송</h2>
                 <v-form v-model="isValid" ref="formRef" class="animated-form w-100">
-                    <v-text-field v-model="email" label="받는 사람 이메일" :rules="[rules.required, rules.email]"
-                        prepend-icon="mdi-email" clearable class="animated-input email-input mb-6" />
+                    <!-- 수신자 추가 섹션 -->
+                    <div class="recipient-section mb-6">
+                        <v-card class="recipient-card" elevation="4">
+                            <v-card-title class="recipient-title">
+                                <v-icon class="mr-2">mdi-account-multiple</v-icon>
+                                수신자 추가
+                            </v-card-title>
+                            <v-card-text>
+                                <v-row>
+                                    <v-col cols="8">
+                                        <v-text-field 
+                                            v-model="newRecipient.email" 
+                                            label="이메일 주소" 
+                                            :rules="[rules.required, rules.email]"
+                                            prepend-icon="mdi-email"
+                                            clearable
+                                            class="animated-input"
+                                            @keyup.enter="addRecipient"
+                                        />
+                                    </v-col>
+                                    <v-col cols="4">
+                                        <v-btn 
+                                            color="success" 
+                                            @click="addRecipient"
+                                            :disabled="!newRecipient.email || !isValidEmail(newRecipient.email)"
+                                            class="add-btn"
+                                            block
+                                        >
+                                            <v-icon>mdi-plus</v-icon>
+                                            추가
+                                        </v-btn>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+                        </v-card>
+                    </div>
+
+                    <!-- 수신자 목록 -->
+                    <div class="recipient-list-section mb-6" v-if="recipients.length > 0">
+                        <v-card class="recipient-list-card" elevation="4">
+                            <v-card-title class="recipient-title">
+                                <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
+                                수신자 목록 ({{ recipients.length }}명)
+                            </v-card-title>
+                            <v-card-text>
+                                <v-list class="recipient-list">
+                                    <v-list-item 
+                                        v-for="(recipient, index) in recipients" 
+                                        :key="index"
+                                        class="recipient-item"
+                                    >
+                                        <v-list-item-content class="recipient-content">
+                                            <div class="recipient-email-container">
+                                                <span class="recipient-email">{{ recipient.email }}</span>
+                                                <span 
+                                                    @click="removeRecipient(index)"
+                                                    class="remove-x"
+                                                >
+                                                    ×
+                                                </span>
+                                            </div>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list>
+                            </v-card-text>
+                        </v-card>
+                    </div>
+
                     <v-text-field v-model="title" label="제목" :rules="[rules.required]" prepend-icon="mdi-format-title"
                         clearable class="animated-input email-input mb-6" />
                     <v-textarea v-model="content" label="본문 내용" :rules="[rules.required]" prepend-icon="mdi-text"
                         auto-grow rows="10" clearable class="animated-input email-textarea mb-8" />
-                    <v-btn :loading="sending" color="primary" class="mt-6 animated-btn email-btn" block @click="sendMail">
-                        <span v-if="!sending">📤 메일 발송</span>
+                    <v-btn 
+                        :loading="sending" 
+                        color="primary" 
+                        class="mt-6 animated-btn email-btn" 
+                        block 
+                        @click="sendMail"
+                        :disabled="recipients.length === 0"
+                    >
+                        <span v-if="!sending">📤 메일 발송 ({{ recipients.length }}명)</span>
                         <span v-else>발송 중...</span>
                     </v-btn>
                 </v-form>
@@ -58,7 +136,6 @@ import { ref, onMounted } from 'vue'
 import { useMailStore } from '@/stores/mailStore'
 import { useMemberStore } from '@/stores/memberStore'
 
-const email = ref('')
 const title = ref('')
 const content = ref('')
 const isValid = ref(false)
@@ -69,6 +146,10 @@ const snackbar = ref(false)
 const errorMessage = ref('')
 const loadingScreen = ref(false)
 
+// 수신자 관련 상태
+const newRecipient = ref({ email: '' })
+const recipients = ref([])
+
 const mailStore = useMailStore()
 const memberStore = useMemberStore()
 
@@ -77,28 +158,71 @@ const rules = {
     email: value => /.+@.+\..+/.test(value) || '유효한 이메일 주소를 입력하세요.',
 }
 
+// 이메일 유효성 검사
+const isValidEmail = (email) => {
+    return /.+@.+\..+/.test(email)
+}
+
+// 수신자 추가
+const addRecipient = () => {
+    if (newRecipient.value.email && isValidEmail(newRecipient.value.email)) {
+        // 중복 체크
+        const isDuplicate = recipients.value.some(r => r.email === newRecipient.value.email)
+        if (isDuplicate) {
+            errorMessage.value = '이미 추가된 이메일입니다.'
+            setTimeout(() => { errorMessage.value = '' }, 3000)
+            return
+        }
+        
+        recipients.value.push({ email: newRecipient.value.email })
+        newRecipient.value.email = ''
+        errorMessage.value = ''
+    }
+}
+
+// 수신자 삭제
+const removeRecipient = (index) => {
+    recipients.value.splice(index, 1)
+}
+
+// 메일 발송
 const sendMail = async () => {
+    if (recipients.value.length === 0) {
+        errorMessage.value = '최소 한 명의 수신자를 추가해주세요.'
+        return
+    }
+    
     if (!(await formRef.value.validate())) return
+    
     sending.value = true
     errorMessage.value = ''
     loadingScreen.value = true
-    const dto = {
-        id: null, // 서버에서 자동 생성
-        applicantId: null, // 안내 메일이므로 특정 지원자 ID는 null
-        email: email.value,
-        title: title.value,
-        content: content.value,
-        senderId: memberStore.form.id ?? 1, // memberStore에서 현재 사용자 ID 가져오기
-        sendedAt: new Date().toISOString(),
-    }
+    
     try {
         await new Promise(res => setTimeout(res, 1200)) // 애니메이션용 딜레이
-        await mailStore.sendMail(dto)
+        
+        // 모든 수신자에게 메일 발송
+        const sendPromises = recipients.value.map(recipient => {
+            const dto = {
+                id: null,
+                applicantId: null,
+                email: recipient.email,
+                title: title.value,
+                content: content.value,
+                senderId: memberStore.form.id ?? 1,
+                sendedAt: new Date().toISOString(),
+            }
+            return mailStore.sendMail(dto)
+        })
+        
+        await Promise.all(sendPromises)
+        
         snackbar.value = true
         // 입력 초기화
-        email.value = ''
         title.value = ''
         content.value = ''
+        recipients.value = []
+        newRecipient.value.email = ''
         formRef.value.resetValidation()
         setTimeout(() => { snackbar.value = false }, 2200)
     } catch (e) {
@@ -326,11 +450,43 @@ onMounted(async () => {
     letter-spacing: 0.01em;
 }
 
+.email-center-container {
+    min-height: 100vh;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    position: relative;
+}
+
+.page-title-container {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 100%;
+    padding-bottom: 20px;
+}
+
+.email-title {
+    font-size: 2.6rem;
+    letter-spacing: 0.01em;
+    text-align: center;
+    background: linear-gradient(90deg, #42a5f5 30%, #ab47bc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: title-fade 1.2s;
+    margin: 0;
+}
+
 .glass-card.email-card-big {
-    width: 80vw;
-    height: 80vh;
-    max-width: 1200px;
-    max-height: 900px;
+    width: 90vw;
+    height: auto;
+    max-width: 800px;
+    max-height: 90vh;
     min-width: 320px;
     min-height: 400px;
     display: flex;
@@ -338,20 +494,9 @@ onMounted(async () => {
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-}
-
-.email-center-container {
-    min-height: 100vh;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.email-title {
-    font-size: 2.6rem;
-    letter-spacing: 0.01em;
-    margin-bottom: 2.5rem !important;
-    text-align: center;
+    overflow-y: auto;
+    margin: 0 auto;
+    margin-top: 120px;
 }
 
 .animated-form {
@@ -378,6 +523,86 @@ onMounted(async () => {
     font-size: 1.3rem;
     height: 60px;
     border-radius: 18px;
+}
+
+/* 수신자 관련 스타일 */
+.recipient-section {
+    width: 100%;
+}
+
+.recipient-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+}
+
+.recipient-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1976d2;
+    padding: 16px 20px 8px 20px;
+}
+
+.add-btn {
+    height: 56px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.recipient-list-section {
+    width: 100%;
+}
+
+.recipient-list-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+}
+
+.recipient-list {
+    max-height: 150px;
+    overflow-y: auto;
+    background: transparent;
+}
+
+.recipient-item {
+    border-radius: 8px;
+    margin-bottom: 4px;
+    background: rgba(240, 248, 255, 0.5);
+    transition: background 0.2s;
+}
+
+.recipient-item:hover {
+    background: rgba(240, 248, 255, 0.8);
+}
+
+.recipient-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.recipient-email-container {
+    display: flex;
+    align-items: center;
+}
+
+.recipient-email {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1976d2;
+}
+
+.remove-x {
+    color: red;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
+
+.remove-x:hover {
+    transform: scale(1.2);
 }
 
 @media (max-width: 900px) {
