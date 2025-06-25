@@ -308,9 +308,9 @@ const register = async () => {
         toast.error(`선택된 문제의 총점이 ${sum}점입니다. 정확히 100점이 되도록 입력해주세요.`)
         return
     }
-    const invalid = selected.find(q => q.score < 0)
+    const invalid = selected.find(q => (q.score ?? 0) <= 0)
     if (invalid) {
-        toast.error(`"${invalid.content}" 문제의 점수가 0보다 작습니다.`)
+        toast.error(`"${invalid.content}" 문제의 점수는 0보다 커야 합니다.`)
         return
     }
     if (!startedAt.value) {
@@ -356,7 +356,7 @@ const register = async () => {
             showSuccessModal.value = true
         }
     } catch (e) {
-        toast.error('등록 중 오류가 발생했습니다.')
+        // toast.error('등록 중 오류가 발생했습니다.')
     }
 }
 

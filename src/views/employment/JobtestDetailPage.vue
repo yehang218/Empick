@@ -86,11 +86,11 @@
                 </template>
 
                 <!-- 평가 상태 -->
-                <template #item.evaluationStatus="{ item }">
+                <!-- <template #item.evaluationStatus="{ item }">
                     <span class="status-tag" :style="getStatusStyle(item.evaluationStatus)">
                         {{ getStatusLabel(item.evaluationStatus) }}
                     </span>
-                </template>
+                </template> -->
 
                 <template #footer="{ page, pageCount, setPage }">
                     <Pagination :model-value="page" :length="pageCount" :total-visible="5"
@@ -159,12 +159,12 @@ const applicantHeaders = [
     { title: 'No', key: 'index', sortable: false, width: '60px' },
     { title: '지원자', key: 'applicantName', align: 'start' },
     { title: '채용 공고', key: 'recruitmentTitle', align: 'start' },
-    { title: '채점 상태', key: 'gradingStatus', align: 'center', width: '120px' },
     { title: '채점 점수', key: 'gradingScore', align: 'center', width: '100px' },
-    { title: '채점자', key: 'gradingMemberName', align: 'start', width: '120px' },
-    { title: '평가 상태', key: 'evaluationStatus', align: 'center', width: '120px' },
-    { title: '평가 점수', key: 'evaluationScore', align: 'center', width: '100px' },
-    { title: '평가자', key: 'evaluationMemberName', align: 'start', width: '120px' }
+    { title: '채점 상태', key: 'gradingStatus', align: 'center', width: '120px' },
+    // { title: '채점자', key: 'gradingMemberName', align: 'start', width: '120px' },
+    // { title: '평가 상태', key: 'evaluationStatus', align: 'center', width: '120px' },
+    // { title: '평가 점수', key: 'evaluationScore', align: 'center', width: '100px' },
+    // { title: '평가자', key: 'evaluationMemberName', align: 'start', width: '120px' }
 ]
 
 // 유효한 문제들만 필터링
