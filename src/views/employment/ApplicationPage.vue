@@ -170,7 +170,7 @@
           <v-card-text>
             <div class="evaluation-grid">
               <div v-for="evaluation in evaluationStats" :key="evaluation.type" class="evaluation-card"
-                @click="selectEvaluation(evaluation.type)">
+                @click="evaluation.type === '실무 테스트' ? handleJobtestCardClick() : selectEvaluation(evaluation.type)">
                 <div class="d-flex justify-between align-center mb-2">
                   <h4 class="text-subtitle-2 font-weight-bold">{{ evaluation.type }}</h4>
                   <div class="d-flex align-center">
@@ -183,14 +183,16 @@
                 <div class="score-section mb-3">
                   <div class="d-flex justify-between text-body-2 mb-1">
                     <span>개인 점수</span>
-                    <span class="font-weight-bold" v-if="evaluation.type === '실무 테스트' && (applicant?.jobtestGradingScore === null || applicant?.jobtestGradingScore === undefined || applicant?.jobtestGradingStatus === 0)">
+                    <span class="font-weight-bold"
+                      v-if="evaluation.type === '실무 테스트' && (applicant?.jobtestGradingScore === null || applicant?.jobtestGradingScore === undefined || applicant?.jobtestGradingStatus === 0)">
                       미수행
                     </span>
                     <span class="font-weight-bold" v-else>
                       {{ evaluation.score }}점
                     </span>
                   </div>
-                  <v-progress-linear v-if="evaluation.type !== '실무 테스트' || (applicant?.jobtestGradingScore !== null && applicant?.jobtestGradingScore !== undefined && applicant?.jobtestGradingStatus !== 0)" 
+                  <v-progress-linear
+                    v-if="evaluation.type !== '실무 테스트' || (applicant?.jobtestGradingScore !== null && applicant?.jobtestGradingScore !== undefined && applicant?.jobtestGradingStatus !== 0)"
                     :model-value="evaluation.score" color="primary" height="6" rounded class="mb-2" />
                   <div v-else class="text-center text-grey text-caption py-2">
                     실무테스트가 아직 수행되지 않았습니다
@@ -199,8 +201,7 @@
 
                 <v-btn v-if="evaluation.type === '실무 테스트'" variant="tonal" size="small" block
                   :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye"
-                  :disabled="!canAccessJobtestAnswer"
-                  @click="goToJobtestAnswerDetail">
+                  @click="handleJobtestButtonClick">
                   {{ getJobtestButtonText() }}
                 </v-btn>
                 <v-btn v-else variant="tonal" size="small" block
@@ -302,6 +303,53 @@
           </v-card>
         </div>
 
+        <!-- 실무테스트 답안 바로가기 (실무테스트가 선택되고 응시한 경우) -->
+        <v-card v-else-if="selectedEvaluation === '실무 테스트' && canAccessJobtestAnswer" class="mb-4" elevation="2"
+          style="min-height: 400px;">
+          <v-card-title class="d-flex align-center justify-center py-6">
+            <v-icon class="mr-3" color="green" size="32">mdi-clipboard-check</v-icon>
+            <span class="text-h4 font-weight-bold">실무테스트 답안</span>
+          </v-card-title>
+          <v-card-text>
+            <div class="text-center py-12">
+              <v-icon class="mb-6" size="120" color="green-lighten-1">mdi-clipboard-text-outline</v-icon>
+              <h2 class="text-h3 font-weight-bold mb-6 text-grey-darken-1">실무테스트 답안 확인</h2>
+              <p class="text-h6 text-grey mb-8">지원자가 실무테스트를 완료했습니다.</p>
+              <v-divider class="my-8 mx-auto" style="max-width: 400px;"></v-divider>
+              <div class="mb-8">
+                <p class="text-body-1 text-grey mb-4">실무테스트 점수: <span class="font-weight-bold text-primary">{{
+                  applicant?.jobtestGradingScore }}점</span></p>
+                <p class="text-body-1 text-grey">상태: <span class="font-weight-bold text-success">{{
+                  getJobtestStatusLabel(applicant?.jobtestGradingStatus) }}</span></p>
+              </div>
+              <v-btn color="primary" variant="elevated" size="x-large" prepend-icon="mdi-eye"
+                @click="goToJobtestAnswerDetail" class="px-8 py-4">
+                답안 바로가기
+              </v-btn>
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- 실무테스트 응시하지 않은 지원자 메시지 (실무테스트가 선택된 경우에만 표시) -->
+        <v-card v-else-if="selectedEvaluation === '실무 테스트' && !canAccessJobtestAnswer" class="mb-4" elevation="2"
+          style="min-height: 400px;">
+          <v-card-title class="d-flex align-center justify-center py-6">
+            <v-icon class="mr-3" color="orange" size="32">mdi-alert-circle</v-icon>
+            <span class="text-h4 font-weight-bold">실무테스트 미응시</span>
+          </v-card-title>
+          <v-card-text>
+            <div class="text-center py-12">
+              <v-icon class="mb-6" size="120" color="orange-lighten-1">mdi-clipboard-remove-outline</v-icon>
+              <h2 class="text-h3 font-weight-bold mb-6 text-grey-darken-1">실무테스트 미응시</h2>
+              <p class="text-h6 text-grey mb-8">이 지원자는 아직 실무테스트를 응시하지 않았습니다.</p>
+              <v-divider class="my-8 mx-auto" style="max-width: 400px;"></v-divider>
+              <p class="text-body-1 text-grey">
+                실무테스트 응시 후 답안을 확인할 수 있습니다.
+              </p>
+            </div>
+          </v-card-text>
+        </v-card>
+
         <!-- 자기소개서 카드 (면접이 선택되지 않은 경우) -->
         <v-card v-else class="mb-4" elevation="2">
           <v-card-title class="d-flex align-center justify-between">
@@ -352,8 +400,8 @@
               </p>
             </div>
 
-            <!-- 자기소개서 평가 입력 영역 (항상 표시) -->
-            <div v-if="introduceItems && introduceItems.length > 0" class="mt-6">
+            <!-- 자기소개서 평가 입력 영역 (자기소개서가 선택된 경우에만 표시) -->
+            <div v-if="selectedEvaluation === '자기소개서' && introduceItems && introduceItems.length > 0" class="mt-6">
               <v-divider class="mb-4" />
               <div class="evaluation-section">
                 <h4 class="text-h6 mb-4 d-flex align-center">
@@ -652,7 +700,7 @@ const hasAnyInterviewScore = computed(() => {
 const canAccessJobtestAnswer = computed(() => {
   const score = applicant.value?.jobtestGradingScore;
   const status = applicant.value?.jobtestGradingStatus;
-  
+
   // 점수가 있고 상태가 0이 아닌 경우에만 접근 가능
   return score !== null && score !== undefined && status !== 0;
 })
@@ -661,11 +709,11 @@ const canAccessJobtestAnswer = computed(() => {
 const getJobtestButtonText = () => {
   const score = applicant.value?.jobtestGradingScore;
   const status = applicant.value?.jobtestGradingStatus;
-  
+
   if (score === null || score === undefined || status === 0) {
     return '실무테스트 수행 전';
   }
-  
+
   return '답안 바로가기';
 }
 
@@ -1356,12 +1404,37 @@ function goToJobtestAnswerDetail() {
     toast.warning('아직 실무테스트가 수행되지 않았습니다.');
     return;
   }
-  
+
   const applicationJobtestId = applicant.value.applicationJobtestId;
   if (applicationJobtestId) {
     router.push({ name: 'JobtestAnswerDetail', params: { applicationJobtestId } });
   } else {
     toast.error('실무테스트 정보가 없습니다.');
+  }
+}
+
+// 실무테스트 버튼 클릭 핸들러
+function handleJobtestButtonClick() {
+  // 실무테스트 선택
+  selectEvaluation('실무 테스트')
+
+  // 접근 가능한 경우에만 답안 페이지로 이동
+  if (canAccessJobtestAnswer.value) {
+    goToJobtestAnswerDetail()
+  } else {
+    // 실무테스트 미응시인 경우 토스트 메시지 표시
+    toast.info('실무테스트가 아직 수행되지 않았습니다.')
+  }
+}
+
+// 실무테스트 카드 클릭 핸들러
+function handleJobtestCardClick() {
+  // 실무테스트 선택
+  selectEvaluation('실무 테스트')
+
+  // 실무테스트 미응시인 경우 토스트 메시지 표시
+  if (!canAccessJobtestAnswer.value) {
+    toast.info('실무테스트가 아직 수행되지 않았습니다.')
   }
 }
 </script>
