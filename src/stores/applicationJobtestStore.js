@@ -21,11 +21,11 @@ export const useApplicationJobtestStore = defineStore('applicationJobtest', () =
         }
     };
 
-    const fetchApplicationJobtest = async (applicationId) => {
+    const fetchApplicationJobtest = async (applicationJobtestId) => {
         loading.value = true;
         error.value = null;
         try {
-            const data = await getApplicationJobtestByApplicationIdService(applicationId);
+            const data = await getApplicationJobtestByApplicationIdService(applicationJobtestId);
             console.log('API raw data:', data);
             applicationJobtest.value = data;
         } catch (err) {

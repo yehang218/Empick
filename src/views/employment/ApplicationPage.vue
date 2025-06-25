@@ -35,12 +35,8 @@
           <v-card-text>
             <div class="d-flex align-start mb-4">
               <v-avatar size="80" class="mr-4">
-                <v-img 
-                  :src="getFullImageUrl(applicant?.profileUrl)" 
-                  alt="프로필 사진"
-                  @error="handleImageError"
-                  @load="handleImageLoad"
-                />
+                <v-img :src="getFullImageUrl(applicant?.profileUrl)" alt="프로필 사진" @error="handleImageError"
+                  @load="handleImageLoad" />
               </v-avatar>
 
               <div class="flex-grow-1">
@@ -178,9 +174,7 @@
                 <div class="d-flex justify-between align-center mb-2">
                   <h4 class="text-subtitle-2 font-weight-bold">{{ evaluation.type }}</h4>
                   <div class="d-flex align-center">
-                    <v-chip
-                      :color="getResultChipColor(evaluation)"
-                      size="x-small" variant="elevated">
+                    <v-chip :color="getResultChipColor(evaluation)" size="x-small" variant="elevated">
                       {{ evaluation.result }}
                     </v-chip>
                   </div>
@@ -189,25 +183,29 @@
                 <div class="score-section mb-3">
                   <div class="d-flex justify-between text-body-2 mb-1">
                     <span>개인 점수</span>
-                    <span class="font-weight-bold">{{ evaluation.score }}점</span>
+                    <span class="font-weight-bold" v-if="evaluation.type === '실무 테스트' && (applicant?.jobtestGradingScore === null || applicant?.jobtestGradingScore === undefined || applicant?.jobtestGradingStatus === 0)">
+                      미수행
+                    </span>
+                    <span class="font-weight-bold" v-else>
+                      {{ evaluation.score }}점
+                    </span>
                   </div>
-                  <v-progress-linear :model-value="evaluation.score" color="primary" height="6" rounded class="mb-2" />
+                  <v-progress-linear v-if="evaluation.type !== '실무 테스트' || (applicant?.jobtestGradingScore !== null && applicant?.jobtestGradingScore !== undefined && applicant?.jobtestGradingStatus !== 0)" 
+                    :model-value="evaluation.score" color="primary" height="6" rounded class="mb-2" />
+                  <div v-else class="text-center text-grey text-caption py-2">
+                    실무테스트가 아직 수행되지 않았습니다
+                  </div>
                 </div>
 
-                <v-btn
-                  v-if="evaluation.type === '실무 테스트'"
-                  variant="tonal" size="small" block
+                <v-btn v-if="evaluation.type === '실무 테스트'" variant="tonal" size="small" block
                   :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye"
-                  @click="goToJobtestAnswerDetail"
-                >
-                  답안 바로가기
+                  :disabled="!canAccessJobtestAnswer"
+                  @click="goToJobtestAnswerDetail">
+                  {{ getJobtestButtonText() }}
                 </v-btn>
-                <v-btn
-                  v-else
-                  variant="tonal" size="small" block
+                <v-btn v-else variant="tonal" size="small" block
                   :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye"
-                  @click="selectEvaluation(evaluation.type)"
-                >
+                  @click="selectEvaluation(evaluation.type)">
                   평가 자세히 보기
                 </v-btn>
               </div>
@@ -235,7 +233,8 @@
                     <v-icon>mdi-chevron-left</v-icon>
                   </v-btn>
                   <span class="mx-4">{{ currentInterviewerName }}</span>
-                  <v-btn icon @click="nextInterviewer" :disabled="allInterviewerScores.length === 0 || currentInterviewerIndex === allInterviewerScores.length - 1">
+                  <v-btn icon @click="nextInterviewer"
+                    :disabled="allInterviewerScores.length === 0 || currentInterviewerIndex === allInterviewerScores.length - 1">
                     <v-icon>mdi-chevron-right</v-icon>
                   </v-btn>
                 </div>
@@ -249,7 +248,7 @@
                 <template v-if="!hasAnyInterviewScore">
                   <div class="text-center py-8 text-grey font-weight-bold">입력된 평가 점수가 없습니다.</div>
                 </template>
-                
+
                 <template v-else>
                   <v-row v-for="(item, index) in evaluationItems" :key="index" class="py-4">
                     <v-col cols="12">
@@ -471,7 +470,6 @@ import {
 } from '@/services/introduceService'
 import { updateApplicationStatusService } from '@/services/applicationService'
 import { STATUS_OPTIONS, getStatusByCode, getStatusInfoByString } from '@/constants/employment/applicationStatus'
-import { useApplicationJobtestStore } from '@/stores/applicationJobtestStore'
 import { getStatusLabel as getJobtestStatusLabel } from '@/constants/employment/jobtestStatus'
 
 const route = useRoute()
@@ -485,7 +483,6 @@ const interviewerStore = useInterviewerStore()
 const interviewScoreStore = useInterviewScoreStore()
 const interviewSheetStore = useInterviewSheetStore()
 const memberStore = useMemberStore()
-const applicationJobtestStore = useApplicationJobtestStore()
 const toast = useToast()
 let applicationId = Number(route.params.applicationId)
 console.log('🔍 받은 applicationId:', route.params.applicationId)
@@ -527,9 +524,6 @@ const currentEvaluationData = ref({})
 const selectedEvaluation = ref('자기소개서')
 const introduceRatingScore = ref(null)
 
-// 실무테스트 점수 상태
-const jobtestScore = ref(null)
-
 // 면접 관련
 const selectedInterview = ref(null)
 const interviewCriteriaList = ref([])
@@ -566,7 +560,9 @@ const applicant = computed(() => {
     education: app?.education || query.education,
     portfolioUrl: app?.portfolioUrl || query.portfolioUrl,
     introduceScore: app?.introduceScore || query.introduceScore,
-    jobtestTotalScore: app?.jobtestTotalScore || query.jobtestTotalScore,
+    applicationJobtestId: app?.applicationJobtestId,
+    jobtestGradingScore: app?.jobtestGradingScore,
+    jobtestGradingStatus: app?.jobtestGradingStatus,
     interviewScore: app?.interviewScore || query.interviewScore
   }
 })
@@ -585,10 +581,12 @@ const evaluationStats = computed(() => {
   if (!applicant.value) return []
 
   // 실무테스트 상태 코드 추출 (0,1,2)
-  const jobtestStatusCode = applicationJobtestStore.applicationJobtest?.status ?? applicant.value.jobtestStatus;
+  const jobtestStatusCode = applicant.value.jobtestGradingStatus;
+  const jobtestScore = applicant.value.jobtestGradingScore;
   const jobtestStatusLabel = getJobtestStatusLabel(jobtestStatusCode);
 
   console.log('🔍 실무테스트 상태:', jobtestStatusLabel)
+  console.log('🔍 실무테스트 점수:', jobtestScore)
 
   return [
     {
@@ -598,8 +596,8 @@ const evaluationStats = computed(() => {
     },
     {
       type: '실무 테스트',
-      score: jobtestScore.value ?? applicant.value.jobtestTotalScore ?? 0,
-      result: jobtestStatusLabel,
+      score: jobtestScore ?? 0,
+      result: (jobtestScore === null || jobtestScore === undefined || jobtestStatusCode === 0) ? '미수행' : jobtestStatusLabel,
       status: jobtestStatusLabel
     },
     {
@@ -650,6 +648,27 @@ const hasAnyInterviewScore = computed(() => {
   return scoreData.some(s => s.score > 0 || (s.review && s.review !== '평가 없음'));
 })
 
+// 실무테스트 답안 접근 가능 여부
+const canAccessJobtestAnswer = computed(() => {
+  const score = applicant.value?.jobtestGradingScore;
+  const status = applicant.value?.jobtestGradingStatus;
+  
+  // 점수가 있고 상태가 0이 아닌 경우에만 접근 가능
+  return score !== null && score !== undefined && status !== 0;
+})
+
+// 실무테스트 버튼 텍스트 결정
+const getJobtestButtonText = () => {
+  const score = applicant.value?.jobtestGradingScore;
+  const status = applicant.value?.jobtestGradingStatus;
+  
+  if (score === null || score === undefined || status === 0) {
+    return '실무테스트 수행 전';
+  }
+  
+  return '답안 바로가기';
+}
+
 const formatScore = (score) => {
   if (typeof score === 'number') {
     return score.toFixed(1);
@@ -687,11 +706,6 @@ onMounted(async () => {
     if (applicationId && !isNaN(applicationId) && applicationId > 0) {
       console.log('🚀 실제 데이터 로딩 시작 - applicationId:', applicationId)
       await loadApplicationData()
-      // 실무테스트 점수 fetch
-      await applicationJobtestStore.fetchApplicationJobtest(applicationId)
-      console.log('applicationJobtestStore.applicationJobtest:', applicationJobtestStore.applicationJobtest)
-      jobtestScore.value = applicationJobtestStore.applicationJobtest?.score ?? null
-      console.log('🔍 실무테스트 점수:', jobtestScore.value)
     } else {
       // URL query에서 기본 지원자 정보 설정 (기본 정보만)
       if (route.query.name) {
@@ -719,9 +733,6 @@ onMounted(async () => {
         // 이력서와 자기소개서 데이터도 로딩 시도
         try {
           await loadApplicationData()
-          // 실무테스트 점수 fetch
-          await applicationJobtestStore.fetchApplicationJobtest(applicationId)
-          jobtestScore.value = applicationJobtestStore.applicationJobtest?.score ?? null
         } catch (error) {
           console.warn('⚠️ 추가 데이터 로딩 실패:', error)
         }
@@ -740,7 +751,7 @@ onMounted(async () => {
 const selectEvaluation = (type) => {
   selectedEvaluation.value = type
   console.log('선택된 평가 유형:', type)
-  
+
   // 면접이 선택된 경우 면접 상세 정보 표시
   if (type === '면접') {
     showInterviewDetail.value = true
@@ -915,22 +926,22 @@ const loadApplicationData = async () => {
       }
     }
 
-    
+
     // 1.5. applicant 정보 별도 조회 (profileUrl 포함)
     try {
       const applicantId = Number(route.query.applicantId)
       if (applicantId) {
         console.log('👤 applicant 정보 별도 조회 시작... (applicantId:', applicantId, ')')
-        
+
         // applicant API 직접 호출
         const { default: api } = await import('@/apis/apiClient')
         const applicantResponse = await api.get(`/api/v1/employment/applicant/${applicantId}`)
         console.log('✅ applicant API 응답:', applicantResponse.data)
-        
+
         if (applicantResponse.data?.data) {
           const applicantData = applicantResponse.data.data
           console.log('👤 applicant 데이터:', applicantData)
-          
+
           // 현재 application 데이터에 applicant 정보 병합
           if (applicationStore.selectedApplication) {
             applicationStore.selectedApplication.profileUrl = applicantData.profileUrl || applicantData.pictureUrl
@@ -941,7 +952,7 @@ const loadApplicationData = async () => {
     } catch (applicantError) {
       console.error('❌ applicant 정보 조회 실패:', applicantError)
     }
-    
+
     // 2. 이력서 응답 데이터 로드 (올바른 applicationId 사용)
     try {
       console.log('📄 이력서 응답 데이터 로딩 시작... (applicationId:', actualApplicationId, ')')
@@ -1173,29 +1184,29 @@ const loadEvaluationStandards = async () => {
 // 프로필 URL을 표시 가능한 이미지 URL로 변환하는 함수
 const getFullImageUrl = (profileUrl) => {
   console.log('🔍 getFullImageUrl 호출됨:', profileUrl)
-  
+
   if (!profileUrl || typeof profileUrl !== 'string') {
     console.log('🚫 프로필 URL이 없거나 유효하지 않음:', profileUrl)
     // 기본 아바타 이미지 반환
     return 'https://picsum.photos/seed/default/200'
   }
-  
+
   // 이미 완전한 URL인 경우 (http:// 또는 https://로 시작)
   if (profileUrl.startsWith('http://') || profileUrl.startsWith('https://')) {
     console.log('🌐 완전한 URL 사용:', profileUrl)
     return profileUrl
   }
-  
+
   // 임시로 테스트 이미지 사용 (백엔드 API 문제 확인용)
   console.log('⚠️ 임시 테스트: 백엔드 API 대신 랜덤 이미지 사용')
   const testUrl = `https://picsum.photos/seed/${profileUrl.replace(/[^a-zA-Z0-9]/g, '')}/200`
   console.log('🔗 테스트 이미지 URL:', testUrl)
-  
+
   // 실제 백엔드 다운로드 API URL도 출력 (디버깅용)
   const downloadUrl = `http://localhost:8080/api/v1/files/download?key=${encodeURIComponent(profileUrl)}`
   console.log('🔗 백엔드 다운로드 API (테스트용):', downloadUrl)
   console.log('🌐 브라우저에서 백엔드 API 테스트:', downloadUrl)
-  
+
   return testUrl
 }
 
@@ -1217,7 +1228,7 @@ const handleImageError = async (event) => {
     profileUrl: applicant.value?.profileUrl || 'unknown'
   }
   console.error('❌ 프로필 이미지 로딩 실패:', errorInfo)
-  
+
   // 백엔드 다운로드 API가 실패했으므로 기본 아이콘으로 표시
   if (applicant.value) {
     const originalUrl = applicant.value.profileUrl
@@ -1268,23 +1279,23 @@ const handleEvaluationSave = async (evaluationData) => {
 const loadInterviewData = async () => {
   try {
     console.log('🎤 면접 데이터 로딩 시작... (applicationId:', applicationId, ')')
-    
+
     // 1. 면접 정보 조회
     await interviewStore.fetchInterviewByApplicationId(applicationId)
     selectedInterview.value = interviewStore.selectedInterview
-    
+
     if (!selectedInterview.value) {
       console.log('ℹ️ 면접 정보가 없습니다.')
       return
     }
-    
+
     console.log('✅ 면접 정보 로딩 완료:', selectedInterview.value)
-    
+
     // 2. 면접 평가표 정보 조회
     if (selectedInterview.value.sheetId) {
       await interviewSheetStore.fetchSheetById(selectedInterview.value.sheetId)
       const selectedSheet = interviewSheetStore.selectedSheet
-      
+
       if (selectedSheet) {
         // 3. 평가 기준 조회
         await interviewCriteriaStore.fetchCriteriaBySheetId(selectedSheet.id)
@@ -1292,12 +1303,12 @@ const loadInterviewData = async () => {
         console.log('✅ 평가 기준 로딩 완료:', interviewCriteriaList.value)
       }
     }
-    
+
     // 4. 면접관 목록 조회
     await interviewerStore.fetchInterviewersByInterviewId(selectedInterview.value.id)
     const interviewerList = interviewerStore.interviewerList
     console.log('✅ 면접관 목록 로딩 완료:', interviewerList)
-    
+
     // 5. 면접관별 점수 조회
     const scorePromises = interviewerList.map(async (interviewer) => {
       await interviewScoreStore.fetchScoresByInterviewerId(interviewer.id)
@@ -1309,10 +1320,10 @@ const loadInterviewData = async () => {
         scores: [...interviewScoreStore.scoreList]
       }
     })
-    
+
     allInterviewerScores.value = await Promise.all(scorePromises)
     console.log('✅ 면접관별 점수 로딩 완료:', allInterviewerScores.value)
-    
+
   } catch (error) {
     console.error('❌ 면접 데이터 로딩 실패:', error)
   }
@@ -1329,6 +1340,7 @@ const nextInterviewer = () => {
 
 function getResultChipColor(evaluation) {
   if (evaluation.type === '실무 테스트') {
+    if (evaluation.result === '미수행') return 'grey'
     if (evaluation.result === '완료') return 'success'
     if (evaluation.result === '진행 중') return 'info'
     if (evaluation.result === '대기중') return 'grey'
@@ -1339,7 +1351,13 @@ function getResultChipColor(evaluation) {
 }
 
 function goToJobtestAnswerDetail() {
-  const applicationJobtestId = applicationJobtestStore.applicationJobtest?.id;
+  // 접근 가능 여부 먼저 확인
+  if (!canAccessJobtestAnswer.value) {
+    toast.warning('아직 실무테스트가 수행되지 않았습니다.');
+    return;
+  }
+  
+  const applicationJobtestId = applicant.value.applicationJobtestId;
   if (applicationJobtestId) {
     router.push({ name: 'JobtestAnswerDetail', params: { applicationJobtestId } });
   } else {

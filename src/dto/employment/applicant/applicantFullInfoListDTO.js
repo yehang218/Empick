@@ -27,12 +27,16 @@ class ApplicantFullInfoListDTO {
         education,
         portfolioUrl,
         coverLetter,
+        interviewScore,
+        interviewAddress,
+        interviewDatetime,
+        
+        // 실무테스트 관련
+        applicationJobtestId,
+        applicationJobtestTitle,
         jobtestTotalScore,
         jobtestEvaluationScore,
         jobtestStatus,
-        interviewScore,
-        interviewAddress,
-        interviewDatetime
     ) {
         // 기존 필드들
         this.applicantId = applicantId;
@@ -63,12 +67,15 @@ class ApplicantFullInfoListDTO {
         this.education = education;
         this.portfolioUrl = portfolioUrl;
         this.coverLetter = coverLetter;
-        this.jobtestTotalScore = jobtestTotalScore;
-        this.jobtestEvaluationScore = jobtestEvaluationScore;
-        this.jobtestStatus = jobtestStatus;
         this.interviewScore = interviewScore;
         this.interviewAddress = interviewAddress;
         this.interviewDatetime = interviewDatetime;
+
+        this.jobtestTotalScore = jobtestTotalScore;
+        this.jobtestEvaluationScore = jobtestEvaluationScore;
+        this.jobtestStatus = jobtestStatus;
+        this.applicationJobtestId = applicationJobtestId;
+        this.applicationJobtestTitle = applicationJobtestTitle;
     }
 
     static fromJSON(json) {
@@ -100,12 +107,16 @@ class ApplicantFullInfoListDTO {
             json.education,
             json.portfolioUrl,
             json.coverLetter,
+            json.interviewScore,
+            json.interviewAddress,
+            json.interviewDatetime,
+            
+            // 실무테스트
             json.jobtestTotalScore,
             json.jobtestEvaluationScore,
             json.jobtestStatus,
-            json.interviewScore,
-            json.interviewAddress,
-            json.interviewDatetime
+            json.applicationJobtestId,
+            json.applicationJobtestTitle
         );
     }
 }

@@ -35,9 +35,9 @@ export const useApplicationStore = defineStore('application', () => {
       },
       {
         type: '실무 테스트',
-        score: selectedApplication.value?.jobtestTotalScore || 0,
+        score: selectedApplication.value?.jobtestGradingScore || 0,
         average: 80,
-        result: (selectedApplication.value?.jobtestTotalScore || 0) >= 70 ? '합격' : '불합격'
+        result: (selectedApplication.value?.jobtestGradingScore || 0) >= 70 ? '합격' : '불합격'
       },
       {
         type: '면접',
