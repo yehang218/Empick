@@ -8,14 +8,14 @@
     <v-card>
       <v-list lines="two">
         <template v-for="(template, index) in templates" :key="template.id">
-          <v-list-item
-            @click="goDetail(template.id)"
-            style="cursor:pointer"
-          >
+          <v-list-item>
             <v-list-item-title class="template-title-text">{{ template.title }}</v-list-item-title>
             <template v-slot:append>
-              <v-btn icon @click.stop="removeTemplate(template.id)" size="small" color="red-darken-2" variant="text">
+              <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeTemplate(template.id)">
                 <v-icon>mdi-delete</v-icon>
+              </v-btn>
+              <v-btn size="small" color="primary" variant="text" @click="goDetail(template.id)">
+                상세보기
               </v-btn>
             </template>
           </v-list-item>
@@ -59,7 +59,18 @@ const removeTemplate = async (id) => {
       // await introduceTemplateStore.loadTemplates() // store에서 이미 반영됨
     } catch (error) {
       console.error('템플릿 삭제 실패:', error)
-      alert('템플릿 삭제에 실패했습니다. 서버 오류일 수 있습니다.')
+      console.log('에러 상세:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      })
+      
+      // 500 에러이거나 FK 제약 조건 관련 에러인 경우
+      if (error.response?.status === 500 || error.response?.status === 503) {
+        alert('이미 사용 중인 템플릿은 삭제할 수 없습니다.\n\n연관된 항목들이 있는 템플릿입니다.')
+      } else {
+        alert('템플릿 삭제에 실패했습니다. 서버 오류일 수 있습니다.')
+      }
     }
   }
 }
