@@ -266,6 +266,10 @@ onMounted(() => sheetStore.fetchAllSheets())
     border-radius: 12px;
     font-weight: 600;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .confirm-btn:hover:not(:disabled) {
