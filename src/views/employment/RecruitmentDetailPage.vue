@@ -126,6 +126,16 @@ const getStatusColor = (status) => {
 const goToEditPage = () => {
     router.push(`/employment/recruitments/edit/${detail.value.recruitment.id}`);
 };
+
+// 단계별 색상 매핑 함수 추가
+const stepColor = (stepType) => {
+    switch (stepType) {
+        case 'DOCUMENT': return 'primary';
+        case 'PRACTICAL': return 'success';
+        case 'INTERVIEW': return 'purple';
+        default: return 'grey-lighten-2';
+    }
+}
 </script>
 
 <template>
@@ -216,12 +226,18 @@ const goToEditPage = () => {
 
             <v-card v-if="processList.length" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">채용 프로세스</div>
-                <div>
-                    <span v-for="(p, index) in processList.slice().sort((a, b) => a.displayOrder - b.displayOrder)"
-                        :key="p.id">
-                        <span>{{ getStepTypeLabel(p.stepType) }}</span>
-                        <span v-if="index !== processList.length - 1"> → </span>
-                    </span>
+                <div class="process-chip-list">
+                    <template v-for="(p, idx) in processList.slice().sort((a, b) => a.displayOrder - b.displayOrder)" :key="p.id">
+                        <v-chip
+                            :color="stepColor(p.stepType)"
+                            class="mr-2 mb-2"
+                            size="small"
+                            label
+                        >
+                            {{ getStepTypeLabel(p.stepType) }}
+                        </v-chip>
+                        <span v-if="idx < processList.length - 1" class="mx-1" style="font-size:1.2em;">&gt;</span>
+                    </template>
                 </div>
             </v-card>
 
@@ -288,5 +304,11 @@ const goToEditPage = () => {
 <style scoped>
 .white-space-pre-line {
     white-space: pre-line;
+}
+
+.process-chip-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 </style>
