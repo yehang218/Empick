@@ -246,10 +246,17 @@ const onStandardSelect = async (standard) => {
       itemsCount: localStandardItems.value.length,
       items: localStandardItems.value.map(item => ({ id: item.id, content: item.content }))
     })
+    
+    // 기준표 설정 완료 토스트
+    toast.success(`기준표 "${standard.content}"가 등록되었습니다. (${localStandardItems.value.length}개 항목)`)
+    
   } catch (itemsError) {
     console.warn('⚠️ 기준표 항목 조회 실패, fallback 사용:', itemsError)
     // Fallback: 기존 방식 (standard.items가 있는 경우)
     localStandardItems.value = standard.items || []
+    
+    // 에러가 발생했지만 기준표는 선택되었으므로 토스트 표시
+    toast.success(`기준표 "${standard.content}"가 등록되었습니다.`)
   }
 }
 
