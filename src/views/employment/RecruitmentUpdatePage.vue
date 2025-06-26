@@ -87,7 +87,7 @@
                                 placeholder="채용 공고 내용을 입력하세요" class="editor" />
                         </div>
                     </v-col>
-                    <v-col cols="12">
+                    <v-col cols="8">
                         <label class="font-weight-medium mb-1 d-block">채용 프로세스</label>
                         <v-row align="center" dense>
                             <v-col cols="12" md="6">
@@ -95,27 +95,27 @@
                                     item-title="label" item-value="value" />
                             </v-col>
                             <v-col cols="12" md="3">
-                                <v-text-field v-model="newStep.displayOrder" type="number" label="표시 순서" />
-                            </v-col>
-                            <v-col cols="12" md="3">
-                                <v-btn @click="addStep" color="primary"
-                                    :disabled="!newStep.stepType || newStep.displayOrder === null">
+                                <v-btn @click="addStep" color="primary" :disabled="!newStep.stepType">
                                     단계 추가
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <v-list two-line>
-                            <v-col cols="12" v-for="(step, index) in form.recruitmentProcesses" :key="index">
-                                <v-row justify="space-between" align="center">
-                                    <div>
-                                        {{ getStepTypeLabel(step.stepType) }} / 순서: {{ step.displayOrder }}
-                                    </div>
-                                    <v-btn icon @click="removeStep(index)" size="small" variant="text">
-                                        <v-icon size="small">mdi-delete</v-icon>
+                        <div class="process-chip-list mt-2 mb-4">
+                            <template v-for="(step, idx) in form.recruitmentProcesses" :key="idx">
+                                <v-chip
+                                    :color="stepColor(step.stepType)"
+                                    class="mr-2 mb-2"
+                                    size="small"
+                                    label
+                                >
+                                    {{ getStepTypeLabel(step.stepType) }}
+                                    <v-btn icon size="x-small" variant="text" @click.stop="removeStep(idx)">
+                                        <v-icon size="x-small">mdi-close</v-icon>
                                     </v-btn>
-                                </v-row>
-                            </v-col>
-                        </v-list>
+                                </v-chip>
+                                <span v-if="idx < form.recruitmentProcesses.length - 1" class="mx-1" style="font-size:1.2em;">&gt;</span>
+                            </template>
+                        </div>
                     </v-col>
                 </v-row>
             </v-form>
@@ -166,10 +166,7 @@ const form = ref({
     introduceTemplateId: null,
 });
 
-const newStep = ref({
-    stepType: '',
-    displayOrder: null
-});
+const newStep = ref({ stepType: '' });
 
 const formatDateForInput = (dateString) => {
     if (!dateString) return '';
@@ -259,10 +256,13 @@ const goToApplicationItem = () => {
 };
 
 const addStep = () => {
-    if (newStep.value.stepType && newStep.value.displayOrder) {
-        form.value.recruitmentProcesses.push({ ...newStep.value });
-        newStep.value = { stepType: '', displayOrder: null };
-    }
+    if (!newStep.value.stepType) return;
+    const nextOrder = form.value.recruitmentProcesses.length + 1;
+    form.value.recruitmentProcesses.push({
+        stepType: newStep.value.stepType,
+        displayOrder: nextOrder
+    });
+    newStep.value = { stepType: '' };
 };
 
 const removeStep = (index) => {
@@ -282,6 +282,15 @@ const rules = {
     required: v => !!v || '필수 입력 항목입니다.',
 };
 
+const stepColor = (stepType) => {
+    switch (stepType) {
+        case 'DOCUMENT': return 'primary';
+        case 'PRACTICAL': return 'success';
+        case 'INTERVIEW': return 'purple';
+        default: return 'grey-lighten-2';
+    }
+}
+
 onBeforeRouteLeave((to) => {
     if (to.name !== 'ApplicationItemSelectPage') {
         store.clearAllDrafts();
@@ -298,5 +307,11 @@ onBeforeRouteLeave((to) => {
 
 .editor {
     height: 300px;
+}
+
+.process-chip-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 </style> 

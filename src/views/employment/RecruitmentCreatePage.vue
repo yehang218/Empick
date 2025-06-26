@@ -109,7 +109,7 @@
                 </v-col>
 
                 <!-- 채용 프로세스 -->
-                <v-col cols="12">
+                <v-col cols="8">
                     <label class="font-weight-medium mb-1 d-block">채용 프로세스</label>
 
                     <!-- 입력 필드 -->
@@ -119,30 +119,31 @@
                                 item-title="label" item-value="value" />
                         </v-col>
                         <v-col cols="12" md="3">
-                            <v-text-field v-model="newStep.displayOrder" type="number" label="표시 순서" />
-                        </v-col>
-                        <v-col cols="12" md="3">
                             <v-btn @click="addStep" color="primary"
-                                :disabled="!newStep.stepType || newStep.displayOrder === null">
+                                :disabled="!newStep.stepType">
                                 단계 추가
                             </v-btn>
                         </v-col>
                     </v-row>
 
 
-                    <!-- 등록된 프로세스 리스트 -->
-                    <v-list two-line>
-                        <v-col cols="12" v-for="(step, index) in form.recruitmentProcesses" :key="index">
-                            <v-row justify="space-between" align="center">
-                                <div>
-                                    {{ getStepTypeLabel(step.stepType) }} / 순서: {{ step.displayOrder }}
-                                </div>
-                                <v-btn icon @click="removeStep(index)" size="small" variant="text">
-                                    <v-icon size="small">mdi-delete</v-icon>
+                    <!-- 등록된 프로세스 칩 나열 -->
+                    <div class="process-chip-list">
+                        <template v-for="(step, idx) in form.recruitmentProcesses" :key="idx">
+                            <v-chip
+                                :color="stepColor(step.stepType)"
+                                class="mr-2 mb-2"
+                                size="small"
+                                label
+                            >
+                                {{ getStepTypeLabel(step.stepType) }}
+                                <v-btn icon size="x-small" variant="text" @click.stop="removeStep(idx)">
+                                    <v-icon size="x-small">mdi-close</v-icon>
                                 </v-btn>
-                            </v-row>
-                        </v-col>
-                    </v-list>
+                            </v-chip>
+                            <span v-if="idx < form.recruitmentProcesses.length - 1" class="mx-1" style="font-size:1.2em;">&gt;</span>
+                        </template>
+                    </div>
                 </v-col>
 
             </v-row>
@@ -175,8 +176,7 @@ const showCancelConfirm = ref(false)
 const requestDetail = ref(null)
 
 const newStep = ref({
-    stepType: '',
-    displayOrder: null
+    stepType: ''
 })
 
 const form = ref({
@@ -252,15 +252,27 @@ const goToApplicationItem = () => {
 
 // 채용 프로세스 추가
 const addStep = () => {
-    if (!newStep.value.stepType || !newStep.value.displayOrder) return
-
-    form.value.recruitmentProcesses.push({ ...newStep.value })
-    newStep.value = { stepType: '', displayOrder: null }
-}
+    if (!newStep.value.stepType) return;
+    const nextOrder = form.value.recruitmentProcesses.length + 1;
+    form.value.recruitmentProcesses.push({
+        stepType: newStep.value.stepType,
+        displayOrder: nextOrder
+    });
+    newStep.value = { stepType: '' };
+};
 
 // 채용 프로세스 제거
 const removeStep = (index) => {
     form.value.recruitmentProcesses.splice(index, 1)
+}
+
+const stepColor = (stepType) => {
+    switch (stepType) {
+        case 'DOCUMENT': return 'primary';      // 서류전형
+        case 'PRACTICAL': return 'success'; // 실무테스트
+        case 'INTERVIEW': return 'purple';  // 면접
+        default: return 'grey-lighten-2';
+    }
 }
 
 onBeforeRouteLeave((to) => {
@@ -281,5 +293,11 @@ onBeforeRouteLeave((to) => {
 ::v-deep(.ql-container) {
     min-height: 500px;
     padding: 16px;
+}
+
+.process-chip-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 </style>
