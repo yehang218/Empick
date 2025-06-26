@@ -105,7 +105,18 @@ const addingItem = ref(false)
       toast.success('기준표 항목이 삭제되었습니다.')
     } catch (error) {
       console.error('항목 삭제 실패:', error)
-      toast.error('항목 삭제에 실패했습니다. 다시 시도해주세요.')
+      console.log('에러 상세:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      })
+      
+      // 500 에러이거나 FK 제약 조건 관련 에러인 경우
+      if (error.response?.status === 500 || error.response?.status === 503) {
+        toast.error('이미 사용 중인 항목은 삭제할 수 없습니다.\n\n기준표나 템플릿에서 사용 중인 항목입니다.')
+      } else {
+        toast.error('항목 삭제에 실패했습니다. 다시 시도해주세요.')
+      }
     }
   }
 }

@@ -59,7 +59,19 @@ async function removeStandard(id) {
       await deleteIntroduceStandard(id)
       await store.fetchStandards()
     } catch (e) {
-      alert('삭제에 실패했습니다.')
+      console.error('기준표 삭제 실패:', e)
+      console.log('에러 상세:', {
+        status: e.response?.status,
+        data: e.response?.data,
+        message: e.message
+      })
+      
+      // 500 에러이거나 FK 제약 조건 관련 에러인 경우
+      if (e.response?.status === 500 || e.response?.status === 503) {
+        alert('이미 사용 중인 기준표는 삭제할 수 없습니다.\n\n연관된 항목들이 있는 기준표입니다.')
+      } else {
+        alert('삭제에 실패했습니다.')
+      }
     }
   }
 }

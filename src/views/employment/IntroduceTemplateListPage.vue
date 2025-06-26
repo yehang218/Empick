@@ -1,28 +1,31 @@
 <template>
   <v-container class="template-list-container">
-    <div class="d-flex justify-space-between align-center mb-6">
-      <h2 class="page-title">자기소개서 템플릿 목록</h2>
-      <v-btn color="primary" @click="goCreate">템플릿 작성</v-btn>
-    </div>
+    <h2 class="page-title">자기소개서 템플릿 목록</h2>
+
+    <v-card class="mb-6 pa-4">
+      <v-btn color="primary" @click="goCreate">새 템플릿 생성</v-btn>
+    </v-card>
 
     <v-card>
       <v-list lines="two">
         <template v-for="(template, index) in templates" :key="template.id">
-          <v-list-item
-            @click="goDetail(template.id)"
-            style="cursor:pointer"
-          >
-            <v-list-item-title class="template-title-text">{{ template.title }}</v-list-item-title>
+          <v-list-item>
+            <v-list-item-title class="item-title-text">
+              {{ template.title }}
+            </v-list-item-title>
             <template v-slot:append>
-              <v-btn icon @click.stop="removeTemplate(template.id)" size="small" color="red-darken-2" variant="text">
+              <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeTemplate(template.id)">
                 <v-icon>mdi-delete</v-icon>
+              </v-btn>
+              <v-btn size="small" color="primary" variant="text" @click="goDetail(template.id)">
+                상세보기
               </v-btn>
             </template>
           </v-list-item>
           <v-divider v-if="index < templates.length - 1" inset></v-divider>
         </template>
         <v-list-item v-if="templates.length === 0">
-          <v-list-item-title>등록된 자기소개서 템플릿이 없습니다.</v-list-item-title>
+          <v-list-item-title>등록된 템플릿이 없습니다.</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-card>
@@ -59,7 +62,18 @@ const removeTemplate = async (id) => {
       // await introduceTemplateStore.loadTemplates() // store에서 이미 반영됨
     } catch (error) {
       console.error('템플릿 삭제 실패:', error)
-      alert('템플릿 삭제에 실패했습니다. 서버 오류일 수 있습니다.')
+      console.log('에러 상세:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      })
+      
+      // 500 에러이거나 FK 제약 조건 관련 에러인 경우
+      if (error.response?.status === 500 || error.response?.status === 503) {
+        alert('이미 사용 중인 템플릿은 삭제할 수 없습니다.\n\n연관된 항목들이 있는 템플릿입니다.')
+      } else {
+        alert('템플릿 삭제에 실패했습니다. 서버 오류일 수 있습니다.')
+      }
     }
   }
 }
@@ -76,9 +90,11 @@ const removeTemplate = async (id) => {
   font-size: 1.8rem;
   font-weight: bold;
   color: #333;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
-.template-title-text {
+.item-title-text {
   font-size: 1.1rem;
   font-weight: 500;
   color: #555;
