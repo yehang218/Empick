@@ -882,19 +882,28 @@ const confirmStatusChange = async () => {
 
     console.log('✅ 지원서 상태 변경 성공:', updatedApplication)
 
-    // Store의 데이터 업데이트
-    applicationStore.updateApplicationStatus(applicant.value.id, selectedNewStatus.value)
-
     // 성공 메시지
     const newStatusInfo = getStatusByCode(selectedNewStatus.value)
-    toast.success(`지원서 상태가 "${newStatusInfo.label}"로 변경되었습니다.`)
+    toast.success(`지원자 상태가 "${newStatusInfo.label}"로 변경되었습니다.`)
 
     // 모달 닫기
     statusChangeDialog.value = false
 
+    // 페이지 데이터 새로고침 (최신 상태 반영)
+    await loadApplicationData()
+
   } catch (error) {
     console.error('❌ 지원서 상태 변경 실패:', error)
-    toast.error('상태 변경에 실패했습니다. 다시 시도해주세요.')
+    
+    // JWT 토큰 만료 에러인 경우
+    if (error.response?.status === 401) {
+      toast.error('인증이 만료되었습니다. 다시 로그인해주세요.')
+      router.push('/login')
+    } else if (error.response?.status === 403) {
+      toast.error('상태 변경 권한이 없습니다.')
+    } else {
+      toast.error('상태 변경에 실패했습니다. 다시 시도해주세요.')
+    }
   } finally {
     statusUpdateLoading.value = false
   }

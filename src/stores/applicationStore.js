@@ -175,18 +175,36 @@ export const useApplicationStore = defineStore('application', () => {
   };
 
   // 🔁 지원서 상태 업데이트
-  const updateApplicationStatus = (id, newStatus) => {
-    // Store의 현재 지원서 상태 업데이트
-    if (selectedApplication.value && selectedApplication.value.id === id) {
-      selectedApplication.value.status = newStatus
-      console.log('✅ Store: 지원서 상태 업데이트 완료:', { id, newStatus })
-    }
-    
-    // 목록에서도 해당 지원서 상태 업데이트
-    const applicationInList = applicationList.value.find(app => app.id === id)
-    if (applicationInList) {
-      applicationInList.status = newStatus
-      console.log('✅ Store: 목록의 지원서 상태 업데이트 완료')
+  const updateApplicationStatus = async (id, newStatus) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      console.log('🔄 ApplicationStore: 지원서 상태 변경 API 호출 시작:', { id, newStatus })
+      
+      // 실제 API 호출
+      const result = await updateApplicationStatusService(id, newStatus);
+      console.log('✅ ApplicationStore: 지원서 상태 변경 API 성공:', result)
+      
+      // API 호출 성공 후 Store의 상태도 업데이트
+      if (selectedApplication.value && selectedApplication.value.id === id) {
+        selectedApplication.value.status = newStatus
+        console.log('✅ Store: 지원서 상태 업데이트 완료:', { id, newStatus })
+      }
+      
+      // 목록에서도 해당 지원서 상태 업데이트
+      const applicationInList = applicationList.value.find(app => app.id === id)
+      if (applicationInList) {
+        applicationInList.status = newStatus
+        console.log('✅ Store: 목록의 지원서 상태 업데이트 완료')
+      }
+      
+      return result;
+    } catch (err) {
+      console.error('❌ ApplicationStore: 지원서 상태 변경 실패:', err)
+      error.value = err.message;
+      throw err;
+    } finally {
+      loading.value = false;
     }
   };
 
