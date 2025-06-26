@@ -901,6 +901,58 @@ const getAssignButtonText = () => {
   }
 }
 
+// 필터 관련 함수들
+const hasActiveFilters = computed(() => {
+  const result = statusFilter.value !== null && statusFilter.value !== undefined || 
+                jobtestFilter.value !== null && jobtestFilter.value !== undefined || 
+                recruitmentFilter.value !== null && recruitmentFilter.value !== undefined
+  console.log('🔍 hasActiveFilters 체크:', {
+    statusFilter: statusFilter.value,
+    jobtestFilter: jobtestFilter.value,
+    recruitmentFilter: recruitmentFilter.value,
+    hasActive: result
+  })
+  return result
+})
+
+const applyFilters = () => {
+  // computed를 통해 자동으로 Store에 연결되므로 별도 호출 불필요
+}
+
+const clearFilters = () => {
+  applicantStore.clearFilters()
+}
+
+const getStatusOptionLabel = (value) => {
+  const option = statusOptions.value.find(opt => opt.value === value)
+  return option ? option.label : ''
+}
+
+const getJobtestOptionLabel = (value) => {
+  const option = jobtestStatusOptions.value.find(opt => opt.value === value)
+  return option ? option.label : ''
+}
+
+const getRecruitmentOptionLabel = (value) => {
+  const option = recruitmentOptions.value.find(opt => opt.id === value)
+  return option ? option.title : ''
+}
+
+const getRecruitmentTitle = (recruitmentId) => {
+  const recruitment = recruitmentStore.list.find(r => r.id === recruitmentId)
+  return recruitment ? recruitment.title : null
+}
+
+const refreshList = async () => {
+  try {
+    await applicantStore.fetchApplicantFullInfoList()
+    toast.success('목록을 새로고침했습니다.')
+  } catch (error) {
+    console.error('새로고침 실패:', error)
+    toast.error('목록 새로고침에 실패했습니다.')
+  }
+}
+
 </script>
 
 <style scoped>
@@ -1021,59 +1073,6 @@ const getAssignButtonText = () => {
   }
 }
 
-// 필터 관련 함수들
-const hasActiveFilters = computed(() => {
-  const result = statusFilter.value !== null && statusFilter.value !== undefined || 
-                jobtestFilter.value !== null && jobtestFilter.value !== undefined || 
-                recruitmentFilter.value !== null && recruitmentFilter.value !== undefined
-  console.log('🔍 hasActiveFilters 체크:', {
-    statusFilter: statusFilter.value,
-    jobtestFilter: jobtestFilter.value,
-    recruitmentFilter: recruitmentFilter.value,
-    hasActive: result
-  })
-  return result
-})
-
-const applyFilters = () => {
-  // computed를 통해 자동으로 Store에 연결되므로 별도 호출 불필요
-}
-
-const clearFilters = () => {
-  applicantStore.clearFilters()
-}
-
-const getStatusOptionLabel = (value) => {
-  const option = statusOptions.value.find(opt => opt.value === value)
-  return option ? option.label : ''
-}
-
-const getJobtestOptionLabel = (value) => {
-  const option = jobtestStatusOptions.value.find(opt => opt.value === value)
-  return option ? option.label : ''
-}
-
-const getRecruitmentOptionLabel = (value) => {
-  const option = recruitmentOptions.value.find(opt => opt.id === value)
-  return option ? option.title : ''
-}
-
-const getRecruitmentTitle = (recruitmentId) => {
-  const recruitment = recruitmentStore.list.find(r => r.id === recruitmentId)
-  return recruitment ? recruitment.title : null
-}
-
-const refreshList = async () => {
-  try {
-    await applicantStore.fetchApplicantFullInfoList()
-    toast.success('목록을 새로고침했습니다.')
-  } catch (error) {
-    console.error('새로고침 실패:', error)
-    toast.error('목록 새로고침에 실패했습니다.')
-  }
-}
-
-</script>
 .center-success-text {
   font-size: 1.6rem;
   font-weight: 700;
