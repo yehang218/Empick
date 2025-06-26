@@ -14,12 +14,21 @@
                 <div class="font-weight-medium mb-2">
                   {{ item.categoryName }}
                   <span class="text-caption text-grey-darken-1">
-                    ({{ item.inputType === 0 ? '텍스트' : '기타' }} / 필수: {{ item.required ? 'O' : 'X' }})
+                    ({{ item.inputType === 0 ? '텍스트' : '기타' }})
                   </span>
+                  <v-chip 
+                    v-if="item.required" 
+                    size="x-small" 
+                    color="red" 
+                    variant="elevated"
+                    class="ml-2"
+                  >
+                    필수
+                  </v-chip>
                 </div>
                 <v-textarea
                   v-model="applicationAnswers[item.id]"
-                  :label="item.categoryName"
+                  :label="item.categoryName + (item.required ? ' *' : '')"
                   :required="item.required"
                   variant="outlined"
                   rows="4"
@@ -182,6 +191,23 @@ const handleCancel = () => {
 
 const continueWithExistingIntroduce = async () => {
   try {
+    // 필수 항목 유효성 검사 (중복 자기소개서 수정 시에도 적용)
+    const requiredItems = applicationItems.value.filter(item => item.required === true)
+    const missingRequiredItems = []
+    
+    for (const item of requiredItems) {
+      const answer = applicationAnswers.value[item.id]
+      if (!answer || answer.trim() === '') {
+        missingRequiredItems.push(item.categoryName)
+      }
+    }
+    
+    if (missingRequiredItems.length > 0) {
+      const missingItemsText = missingRequiredItems.join(', ')
+      toast.error(`다음 필수 항목을 입력해주세요: ${missingItemsText}`)
+      return
+    }
+
     const introduceId = existingIntroduceId
     const finalApplicationId = applicationId.value
     
@@ -248,6 +274,23 @@ const handleSubmit = async () => {
     // ID 유효성 검사
     if (!applicantId.value || !applicationId.value) {
       throw new Error('지원자 ID 또는 지원서 ID가 없습니다. 인적사항부터 다시 등록해주세요.')
+    }
+
+    // 필수 항목 유효성 검사
+    const requiredItems = applicationItems.value.filter(item => item.required === true)
+    const missingRequiredItems = []
+    
+    for (const item of requiredItems) {
+      const answer = applicationAnswers.value[item.id]
+      if (!answer || answer.trim() === '') {
+        missingRequiredItems.push(item.categoryName)
+      }
+    }
+    
+    if (missingRequiredItems.length > 0) {
+      const missingItemsText = missingRequiredItems.join(', ')
+      toast.error(`다음 필수 항목을 입력해주세요: ${missingItemsText}`)
+      return
     }
 
     console.log('🔄 이력서/자기소개서 등록 시작')
