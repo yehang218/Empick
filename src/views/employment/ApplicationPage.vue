@@ -175,7 +175,7 @@
                   <h4 class="text-subtitle-2 font-weight-bold">{{ evaluation.type }}</h4>
                   <div class="d-flex align-center">
                     <v-chip :color="getResultChipColor(evaluation)" size="x-small" variant="elevated">
-                      {{ evaluation.result }}
+                      {{ evaluation.type === '실무 테스트' ? getJobtestStatusLabelKor(evaluation.result) : evaluation.result }}
                     </v-chip>
                   </div>
                 </div>
@@ -184,18 +184,27 @@
                   <div class="d-flex justify-between text-body-2 mb-1">
                     <span>개인 점수</span>
                     <span class="font-weight-bold"
-                      v-if="evaluation.type === '실무 테스트' && (applicant?.jobtestGradingScore === null || applicant?.jobtestGradingScore === undefined || applicant?.jobtestGradingStatus === 0)">
-                      미수행
+                      v-if="evaluation.type === '실무 테스트' && evaluation.status === 'WAITING'">
+                      미응시
+                    </span>
+                    <span class="font-weight-bold" v-else-if="evaluation.type === '실무 테스트' && evaluation.status === 'IN_PROGRESS'">
+                      진행 중
+                    </span>
+                    <span class="font-weight-bold" v-else-if="evaluation.type === '실무 테스트' && evaluation.status === 'COMPLETED'">
+                      {{ evaluation.score }}점
                     </span>
                     <span class="font-weight-bold" v-else>
                       {{ evaluation.score }}점
                     </span>
                   </div>
                   <v-progress-linear
-                    v-if="evaluation.type !== '실무 테스트' || (applicant?.jobtestGradingScore !== null && applicant?.jobtestGradingScore !== undefined && applicant?.jobtestGradingStatus !== 0)"
+                    v-if="evaluation.type !== '실무 테스트' || evaluation.status === 'COMPLETED'"
                     :model-value="evaluation.score" color="primary" height="6" rounded class="mb-2" />
-                  <div v-else class="text-center text-grey text-caption py-2">
-                    실무테스트가 아직 수행되지 않았습니다
+                  <div v-else-if="evaluation.type === '실무 테스트' && evaluation.status === 'WAITING'" class="text-center text-grey text-caption py-2">
+                    실무테스트가 아직 응시되지 않았습니다
+                  </div>
+                  <div v-else-if="evaluation.type === '실무 테스트' && evaluation.status === 'IN_PROGRESS'" class="text-center text-grey text-caption py-2">
+                    실무테스트가 진행 중입니다
                   </div>
                 </div>
 
@@ -628,13 +637,19 @@ const introduceItems = computed(() => {
 const evaluationStats = computed(() => {
   if (!applicant.value) return []
 
-  // 실무테스트 상태 코드 추출 (0,1,2)
+  // 실무테스트 상태 코드 추출 (WAITING, IN_PROGRESS, COMPLETED)
   const jobtestStatusCode = applicant.value.jobtestGradingStatus;
   const jobtestScore = applicant.value.jobtestGradingScore;
-  const jobtestStatusLabel = getJobtestStatusLabel(jobtestStatusCode);
 
-  console.log('🔍 실무테스트 상태:', jobtestStatusLabel)
-  console.log('🔍 실무테스트 점수:', jobtestScore)
+  // 상태 코드로만 판단
+  let jobtestResult = '';
+  if (jobtestStatusCode === 'WAITING') {
+    jobtestResult = 'WAITING';
+  } else if (jobtestStatusCode === 'COMPLETED') {
+    jobtestResult = 'COMPLETED';
+  } else {
+    jobtestResult = 'IN_PROGRESS';
+  }
 
   return [
     {
@@ -645,8 +660,8 @@ const evaluationStats = computed(() => {
     {
       type: '실무 테스트',
       score: jobtestScore ?? 0,
-      result: (jobtestScore === null || jobtestScore === undefined || jobtestStatusCode === 0) ? '미수행' : jobtestStatusLabel,
-      status: jobtestStatusLabel
+      result: jobtestResult,
+      status: jobtestResult
     },
     {
       type: '면접',
@@ -698,22 +713,19 @@ const hasAnyInterviewScore = computed(() => {
 
 // 실무테스트 답안 접근 가능 여부
 const canAccessJobtestAnswer = computed(() => {
-  const score = applicant.value?.jobtestGradingScore;
-  const status = applicant.value?.jobtestGradingStatus;
-
-  // 점수가 있고 상태가 0이 아닌 경우에만 접근 가능
-  return score !== null && score !== undefined && status !== 0;
+  const jobtestStatus = applicant.value?.jobtestGradingStatus;
+  // COMPLETED 상태만 답안 접근 가능
+  return jobtestStatus === 'COMPLETED';
 })
 
 // 실무테스트 버튼 텍스트 결정
 const getJobtestButtonText = () => {
-  const score = applicant.value?.jobtestGradingScore;
-  const status = applicant.value?.jobtestGradingStatus;
-
-  if (score === null || score === undefined || status === 0) {
-    return '실무테스트 수행 전';
+  const jobtestStatus = applicant.value?.jobtestGradingStatus;
+  if (jobtestStatus === 'WAITING') {
+    return '실무테스트 응시 전';
+  } else if (jobtestStatus === 'IN_PROGRESS') {
+    return '진행 중';
   }
-
   return '답안 바로가기';
 }
 
@@ -1388,14 +1400,21 @@ const nextInterviewer = () => {
 
 function getResultChipColor(evaluation) {
   if (evaluation.type === '실무 테스트') {
-    if (evaluation.result === '미수행') return 'grey'
-    if (evaluation.result === '완료') return 'success'
-    if (evaluation.result === '진행 중') return 'info'
-    if (evaluation.result === '대기중') return 'grey'
+    if (evaluation.result === 'WAITING') return 'grey'
+    if (evaluation.result === 'COMPLETED') return 'success'
+    if (evaluation.result === 'IN_PROGRESS') return 'info'
     return 'error'
   }
   if (evaluation.result === '평가 완료' || evaluation.result === '합격') return 'success'
   return 'error'
+}
+
+// 실무테스트 상태 한글 변환 함수
+function getJobtestStatusLabelKor(status) {
+  if (status === 'WAITING') return '미응시';
+  if (status === 'IN_PROGRESS') return '진행 중';
+  if (status === 'COMPLETED') return '완료';
+  return status;
 }
 
 // goToJobtestAnswerDetail 함수 수정
