@@ -9,7 +9,8 @@ import {
   getAllIntroduceService,
   getIntroduceByApplicationIdService,
   updateIntroduceService,
-  createIntroduceService
+  createIntroduceService,
+  createIntroduceTemplateItemResponse
 } from '@/services/introduceService'
 import { createTemplate } from '@/services/introduceTemplateService'
 
@@ -173,6 +174,24 @@ export const useIntroduceStore = defineStore('introduce', () => {
     }
   }
 
+  // 자기소개서 템플릿 항목별 응답 등록
+  const createTemplateItemResponse = async (payload) => {
+    loading.value = true
+    error.value = null
+    try {
+      console.log('📝 자기소개서 템플릿 항목 응답 등록:', payload)
+      const result = await createIntroduceTemplateItemResponse(payload)
+      console.log('✅ 자기소개서 템플릿 항목 응답 등록 성공:', result)
+      return result
+    } catch (e) {
+      error.value = e.message
+      console.error('❌ 자기소개서 템플릿 항목 응답 등록 실패:', e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
       return {
     // 상태
     items,
@@ -188,7 +207,8 @@ export const useIntroduceStore = defineStore('introduce', () => {
     getIntroduceByApplicationId,
     updateIntroduce,
     createIntroduce,
-    getAllIntroduce
+    getAllIntroduce,
+    createTemplateItemResponse
   }
 })
 
