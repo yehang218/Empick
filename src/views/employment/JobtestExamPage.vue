@@ -98,6 +98,19 @@ watch(answers, (val) => {
 
 const showSubmitModal = ref(false)
 
+// 자동 제출 중복 방지 플래그
+const isAutoSubmitting = ref(false)
+
+// timeLeft가 0이 되면 자동 제출 및 이동
+watch(timeLeft, async (val) => {
+  if (val === 0 && !isAutoSubmitting.value) {
+    isAutoSubmitting.value = true
+    await saveCurrentAnswer()
+    await store.submitAnswers(examData.value.applicationJobTestId)
+    router.push({ name: 'JobtestEnter', params: { jobtestId: examData.value.jobtestId } })
+  }
+})
+
 function updateAnswer(val) {
   console.log('🔄 updateAnswer 호출:', {
     currentIndex: currentIndex.value,
