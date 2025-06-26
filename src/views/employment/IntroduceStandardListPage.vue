@@ -29,6 +29,16 @@
         </v-list-item>
       </v-list>
     </v-card>
+
+    <!-- 삭제 확인 모달 -->
+    <AlertModal 
+      v-if="deleteDialog"
+      :message="`정말로 이 기준표를 삭제하시겠습니까?\n\n${selectedStandardContent}`"
+      confirm-text="삭제"
+      cancel-text="취소"
+      @confirm="confirmDelete"
+      @cancel="deleteDialog = false"
+    />
   </v-container>
 </template>
 
@@ -36,12 +46,17 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
+import { useToast } from 'vue-toastification'
+import AlertModal from '@/components/common/AlertModal.vue'
 
 
 const router = useRouter()
 const store = useIntroduceStandardStore()
+const toast = useToast()
 
 const selectedStandardId = ref(null)
+const deleteDialog = ref(false)
+const selectedStandardContent = ref('')
 
 onMounted(() => {
   store.fetchStandards()
@@ -53,25 +68,43 @@ function goToCreate() {
   router.push('/employment/introduce-standard/create')
 }
 
-async function removeStandard(id) {
-  if (confirm('정말로 이 기준표를 삭제하시겠습니까?')) {
-    try {
-      await store.deleteStandard(id)
-    } catch (e) {
-      console.error('기준표 삭제 실패:', e)
-      console.log('에러 상세:', {
-        status: e.response?.status,
-        data: e.response?.data,
-        message: e.message
-      })
-      
-      // 500 에러이거나 FK 제약 조건 관련 에러인 경우
-      if (e.response?.status === 500 || e.response?.status === 503) {
-        alert('이미 사용 중인 기준표는 삭제할 수 없습니다.\n\n연관된 항목들이 있는 기준표입니다.')
-      } else {
-        alert('삭제에 실패했습니다.')
-      }
+function removeStandard(id) {
+  // 삭제할 기준표 정보 설정
+  selectedStandardId.value = id
+  const standard = standards.value.find(s => s.id === id)
+  selectedStandardContent.value = standard?.content || '기준표'
+  
+  // 삭제 확인 다이얼로그 열기
+  deleteDialog.value = true
+}
+
+async function confirmDelete() {
+  if (!selectedStandardId.value) return
+  
+  // 다이얼로그 닫기
+  deleteDialog.value = false
+  
+  try {
+    await store.deleteStandard(selectedStandardId.value)
+    toast.success('기준표가 성공적으로 삭제되었습니다.')
+  } catch (e) {
+    console.error('기준표 삭제 실패:', e)
+    console.log('에러 상세:', {
+      status: e.response?.status,
+      data: e.response?.data,
+      message: e.message
+    })
+    
+    // 500 에러이거나 FK 제약 조건 관련 에러인 경우
+    if (e.response?.status === 500 || e.response?.status === 503) {
+      toast.error('이미 사용 중인 기준표는 삭제할 수 없습니다. 연관된 항목들이 있는 기준표입니다.')
+    } else {
+      toast.error('삭제에 실패했습니다.')
     }
+  } finally {
+    // 상태 초기화
+    selectedStandardId.value = null
+    selectedStandardContent.value = ''
   }
 }
 

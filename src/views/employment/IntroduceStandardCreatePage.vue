@@ -42,17 +42,31 @@
       <v-btn color="primary" class="mr-3" @click="goToManage">기준표 항목 관리로 이동</v-btn>
       <v-btn color="info" variant="outlined" @click="goToCriteriaList">기준표 목록으로 이동</v-btn>
     </div>
+
+    <!-- Alert Modal -->
+    <AlertModal
+      v-if="showModal"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
   </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
 import { useMemberStore } from '@/stores/memberStore'
+import AlertModal from '@/components/common/AlertModal.vue'
 
 const router = useRouter()
+const toast = useToast()
 const standardItemStore = useIntroduceStandardItemStore()
 const standardStore = useIntroduceStandardStore()
 const memberStore = useMemberStore()
@@ -60,6 +74,13 @@ const memberStore = useMemberStore()
 const title = ref('')
 const items = computed(() => standardItemStore.items)
 const selectedItemIds = ref([])
+
+// Modal 상태 (간단한 방식)
+const showModal = ref(false)
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('확인')
+const modalCancelText = ref('취소')
 
 function goToManage() {
   router.push('/employment/introduce-standard-items/manage')
@@ -76,23 +97,45 @@ onMounted(async () => {
   ])
 })
 
-const submit = async () => {
-  if (!title.value.trim()) {
-    alert('기준표 제목을 입력해주세요.')
-    return
-  }
-  if (selectedItemIds.value.length === 0) {
-    alert('하나 이상의 기준표 항목을 선택해주세요.')
-    return
-  }
+const showConfirmModal = () => {
+  modalTitle.value = '기준표 등록'
+  modalMessage.value = '입력하신 내용으로 기준표를 등록하시겠습니까?'
+  modalConfirmText.value = '등록'
+  modalCancelText.value = '취소'
+  showModal.value = true
+}
+
+const handleConfirm = async () => {
+  showModal.value = false
+  await performSubmit()
+}
+
+const handleCancel = () => {
+  showModal.value = false
+}
+
+const performSubmit = async () => {
   try {
     await standardStore.addStandard(title.value, selectedItemIds.value)
-    alert('기준표가 성공적으로 등록되었습니다.')
+    toast.success('기준표가 성공적으로 등록되었습니다.')
     router.push('/employment/introduce-standard/list')
   } catch (error) {
     console.error('기준표 등록 실패:', error)
-    alert('기준표 등록에 실패했습니다. 서버 오류일 수 있습니다.')
+    toast.error('기준표 등록에 실패했습니다. 서버 오류일 수 있습니다.')
   }
+}
+
+const submit = async () => {
+  if (!title.value.trim()) {
+    toast.error('기준표 제목을 입력해주세요.')
+    return
+  }
+  if (selectedItemIds.value.length === 0) {
+    toast.error('하나 이상의 기준표 항목을 선택해주세요.')
+    return
+  }
+  
+  showConfirmModal()
 }
 </script>
 

@@ -42,22 +42,43 @@
       <v-btn color="primary" class="mr-3" @click="goToManage">항목 관리로 이동</v-btn>
       <v-btn color="info" variant="outlined" @click="goToTemplateList">템플릿 목록으로 이동</v-btn>
     </div>
+
+    <!-- Alert Modal -->
+    <AlertModal
+      v-if="showModal"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
   </v-container>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
 import { useIntroduceItemStore } from '@/stores/introduceItemStore'
+import AlertModal from '@/components/common/AlertModal.vue'
 
 const router = useRouter()
+const toast = useToast()
 const introduceTemplateStore = useIntroduceTemplateStore()
 const introduceItemStore = useIntroduceItemStore()
 
 const title = ref('')
 const items = computed(() => introduceItemStore.items)
 const selectedItemIds = ref([])
+
+// Modal 상태
+const showModal = ref(false)
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('확인')
+const modalCancelText = ref('취소')
 
 function goToManage() {
   router.push('/employment/introduce-items/manage')
@@ -70,30 +91,51 @@ function goToTemplateList() {
 onMounted(async () => {
   try {
     await introduceItemStore.loadItems()
-    // console.log('Fetched items for create page:', items.value) // 디버깅용
   } catch (error) {
     console.error('항목 로드 실패:', error)
-    alert('자기소개서 항목을 불러오는 데 실패했습니다.')
+    toast.error('자기소개서 항목을 불러오는 데 실패했습니다.')
   }
 })
 
-const submit = async () => {
-  if (!title.value.trim()) {
-    alert('템플릿 제목을 입력해주세요.')
-    return
-  }
-  if (selectedItemIds.value.length === 0) {
-    alert('하나 이상의 항목을 선택해주세요.')
-    return
-  }
+const showConfirmModal = () => {
+  modalTitle.value = '템플릿 등록'
+  modalMessage.value = '입력하신 내용으로 템플릿을 등록하시겠습니까?'
+  modalConfirmText.value = '등록'
+  modalCancelText.value = '취소'
+  showModal.value = true
+}
+
+const handleConfirm = async () => {
+  showModal.value = false
+  await performSubmit()
+}
+
+const handleCancel = () => {
+  showModal.value = false
+}
+
+const performSubmit = async () => {
   try {
     await introduceTemplateStore.addTemplate(title.value, 1, selectedItemIds.value)
-    alert('템플릿이 성공적으로 등록되었습니다.')
+    toast.success('템플릿이 성공적으로 등록되었습니다.')
     router.push('/employment/introduce-templates')
   } catch (error) {
     console.error('템플릿 등록 실패:', error)
-    alert('템플릿 등록에 실패했습니다. 서버 오류일 수 있습니다.')
+    toast.error('템플릿 등록에 실패했습니다. 서버 오류일 수 있습니다.')
   }
+}
+
+const submit = async () => {
+  if (!title.value.trim()) {
+    toast.error('템플릿 제목을 입력해주세요.')
+    return
+  }
+  if (selectedItemIds.value.length === 0) {
+    toast.error('하나 이상의 항목을 선택해주세요.')
+    return
+  }
+  
+  showConfirmModal()
 }
 </script>
 
