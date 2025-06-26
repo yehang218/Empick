@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { fetchIntroduceStandards, createIntroduceStandard, fetchIntroduceStandardDetail } from '@/services/introduceStandardService'
+import { fetchIntroduceStandards, createIntroduceStandard, fetchIntroduceStandardDetail, deleteIntroduceStandard } from '@/services/introduceStandardService'
 import { useMemberStore } from '@/stores/memberStore'
 
 export const useIntroduceStandardStore = defineStore('introduceStandard', {
@@ -62,6 +62,19 @@ export const useIntroduceStandardStore = defineStore('introduceStandard', {
     },
     async fetchStandardDetail(id) {
       this.standardDetail = await fetchIntroduceStandardDetail(id)
+    },
+    async deleteStandard(id) {
+      this.loading = true
+      this.error = null
+      try {
+        await deleteIntroduceStandard(id)
+        await this.fetchStandards() // 삭제 후 목록 새로고침
+      } catch (e) {
+        this.error = e
+        throw e
+      } finally {
+        this.loading = false
+      }
     }
   }
 })

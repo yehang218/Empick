@@ -70,7 +70,7 @@ import { useRoute, useRouter } from 'vue-router'
 import CareerHeader from '@/components/career/CareerHeader.vue'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
-import { createIntroduceTemplateItemResponse } from '@/services/introduceService'
+
 import { useIntroduceStore } from '@/stores/introduceStore'
 import { useApplicationItemStore } from '@/stores/applicationItemStore'
 import { useApplicationStore } from '@/stores/applicationStore'
@@ -206,7 +206,7 @@ const handleSubmit = async () => {
         const itemContent = itemAnswers.value[item.id] || ''
         console.log('📝 항목 응답 등록:', { introduceId, itemId: item.id, content: itemContent })
         
-        await createIntroduceTemplateItemResponse({
+        await introduceStore.createTemplateItemResponse({
           introduceId,
           introduceTemplateItemId: item.id,
           content: itemContent
@@ -237,7 +237,7 @@ const handleSubmit = async () => {
         const itemContent = itemAnswers.value[item.id] || ''
         console.log('📝 항목 응답 등록:', { introduceId, itemId: item.id, content: itemContent })
         
-        await createIntroduceTemplateItemResponse({
+        await introduceStore.createTemplateItemResponse({
           introduceId,
           introduceTemplateItemId: item.id,
           content: itemContent

@@ -516,7 +516,7 @@ import {
   getIntroduceRatingResultById,
   getAllIntroduceRatingResults
 } from '@/services/introduceService'
-import { updateApplicationStatusService } from '@/services/applicationService'
+
 import { STATUS_OPTIONS, getStatusByCode, getStatusInfoByString } from '@/constants/employment/applicationStatus'
 import { getStatusLabel as getJobtestStatusLabel } from '@/constants/employment/jobtestStatus'
 
@@ -875,7 +875,7 @@ const confirmStatusChange = async () => {
     })
 
     // 지원서 상태 변경 API 호출
-    const updatedApplication = await updateApplicationStatusService(
+    const updatedApplication = await applicationStore.updateApplicationStatus(
       applicant.value.id,
       selectedNewStatus.value
     )
