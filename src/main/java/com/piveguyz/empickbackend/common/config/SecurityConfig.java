@@ -58,7 +58,7 @@ public class SecurityConfig {
                                         "/api/v1/employment/jobtests/exam/**",  // 실무테스트 응시 관련
                                         "/api/v1/employment/answers/**",        // 실무테스트 답안 제출
                                         "/api/v1/employment/jobtests/*",      // 실무테스트 문제 조회
-//                                "/api/v1/**"                // 테스트용으로 모든 경로 sequrity 처리 안되게
+                                        "/api/v1/**",                // 테스트용으로 모든 경로 sequrity 처리 안되게
                                   
                                 //  Career 페이지 - 채용공고 관련
                                 "/api/v1/employment/recruitments",                           // 채용공고 목록
