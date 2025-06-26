@@ -109,7 +109,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import recruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
 import { fetchApplicationItemCategories } from '@/services/applicationItemService'
@@ -169,6 +169,18 @@ const groupedCategories = computed(() => {
         parent,
         children: categoryList.value.filter(c => c.applicationItemCategoryId === parent.id)
     }))
+})
+
+const keepPages = [
+    '/employment/recruitments/create',
+    '/employment/recruitments/edit',
+    '/employment/application-items/select'
+]
+
+onBeforeRouteLeave((to) => {
+    if (!keepPages.some(path => to.path.startsWith(path))) {
+        store.clearAllDrafts()
+    }
 })
 
 onMounted(async () => {
