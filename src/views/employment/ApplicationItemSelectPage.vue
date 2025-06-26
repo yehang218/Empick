@@ -109,7 +109,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter, onBeforeRouteLeave } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import recruitmentCreateDTO from '@/dto/employment/recruitment/recruitmentCreateDTO'
 import { fetchApplicationItemCategories } from '@/services/applicationItemService'
@@ -169,18 +169,6 @@ const groupedCategories = computed(() => {
         parent,
         children: categoryList.value.filter(c => c.applicationItemCategoryId === parent.id)
     }))
-})
-
-const keepPages = [
-    '/employment/recruitments/create',
-    '/employment/recruitments/edit',
-    '/employment/application-items/select'
-]
-
-onBeforeRouteLeave((to) => {
-    if (!keepPages.some(path => to.path.startsWith(path))) {
-        store.clearAllDrafts()
-    }
 })
 
 onMounted(async () => {
@@ -261,21 +249,17 @@ const submit = async () => {
         memberId: memberStore.form.id
     })
 
-    try {
-        if (isEditMode.value) {
-            await store.updateExistingRecruitment(router.currentRoute.value.query.id, dto)
-            toast.success('공고가 성공적으로 수정되었습니다.')
-        } else {
-            await store.submitRecruitment(dto)
-            toast.success('공고가 성공적으로 등록되었습니다.')
-        }
-        store.clearDraftRecruitment()
-        store.clearDraftApplicationItems()
-        store.clearApplicationItemCategoryList()
-        router.push('/employment/recruitments')
-    } catch (e) {
-        toast.error('공고 저장에 실패했습니다.')
+    if (isEditMode.value) {
+        await store.updateExistingRecruitment(router.currentRoute.value.query.id, dto)
+        toast.success('공고가 성공적으로 수정되었습니다.')
+    } else {
+        await store.submitRecruitment(dto)
+        toast.success('공고가 성공적으로 등록되었습니다.')
     }
+    store.clearDraftRecruitment()
+    store.clearDraftApplicationItems()
+    store.clearApplicationItemCategoryList()
+    router.push('/employment/recruitments')
 }
 </script>
 
