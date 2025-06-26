@@ -1,27 +1,27 @@
 <template>
   <v-container class="standard-detail-container">
-    <div class="header-area">
-      <h2 class="page-title">자기소개서 기준표 상세 조회</h2>
-    </div>
+    <h2 class="page-title">자기소개서 기준표 상세 조회</h2>
     
     <!-- 로딩 상태 -->
     <template v-if="loading">
-      <div class="text-center py-8">
+      <v-card class="mb-6 pa-4 text-center">
         <v-progress-circular indeterminate color="primary"></v-progress-circular>
         <p class="mt-4">기준표 정보를 불러오는 중...</p>
-      </div>
+      </v-card>
     </template>
     
     <!-- 에러 상태 -->
     <template v-else-if="error">
-      <v-alert type="error" class="mb-4">
-        데이터를 불러오는 중 오류가 발생했습니다: {{ error.message }}
-      </v-alert>
+      <v-card class="mb-6 pa-4">
+        <v-alert type="error" class="mb-4">
+          데이터를 불러오는 중 오류가 발생했습니다: {{ error.message }}
+        </v-alert>
+      </v-card>
     </template>
     
     <!-- 메인 컨텐츠 -->
     <template v-else>
-      <div class="content-card">
+      <v-card class="mb-6 pa-4">
         <div class="field-group">
           <label class="field-label">기준표 제목</label>
           <v-text-field
@@ -64,11 +64,13 @@
             ></v-textarea>
           </template>
         </div>
-      </div>
+      </v-card>
       
-      <div class="d-flex justify-end mt-8">
-        <v-btn color="grey-darken-1" variant="outlined" @click="goList">목록으로</v-btn>
-      </div>
+      <v-card class="mb-6 pa-4">
+        <div class="d-flex justify-end">
+          <v-btn color="grey-darken-1" variant="outlined" @click="goList">목록으로</v-btn>
+        </div>
+      </v-card>
     </template>
   </v-container>
 </template>
@@ -127,67 +129,73 @@ const goList = () => router.push('/employment/introduce-standard/list')
 
 <style scoped>
 .standard-detail-container {
-  max-width: 900px;
-  margin: 32px auto;
-  padding: 0 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
 }
-.header-area {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #eee;
-}
+
 .page-title {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: bold;
   color: #333;
-  margin: 0;
+  margin-bottom: 24px;
+  text-align: center;
 }
-.content-card {
-  background-color: #fff;
-  border-radius: 12px;
-  padding: 32px 40px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-}
+
 .field-group {
   margin-bottom: 24px;
 }
+
+.field-group:last-child {
+  margin-bottom: 0;
+}
+
 .field-label {
   font-size: 1.1rem;
-  font-weight: bold;
+  font-weight: 500;
   color: #555;
   margin-bottom: 8px;
   display: block;
 }
+
 .item-count {
   font-size: 0.9rem;
   font-weight: normal;
   color: #888;
   margin-left: 8px;
 }
+
 .field-value-input.v-text-field .v-input__control,
 .field-value-input.v-textarea .v-input__control {
   background-color: #f8f8f8;
   border-radius: 8px;
   box-shadow: none !important;
 }
+
 .field-value-input .v-field__outline {
   border-color: #e0e0e0 !important;
 }
+
 .field-value-input.v-text-field.v-input--density-compact .v-field--variant-outlined,
 .field-value-input.v-textarea.v-input--density-compact .v-field--variant-outlined {
   padding: 8px 12px;
 }
+
 .item-list-display .item-display {
   margin-bottom: 16px;
 }
+
 .item-list-display .item-display:last-child {
   margin-bottom: 0;
 }
+
 .no-items-textarea.v-textarea .v-input__control textarea {
   color: #888;
   font-style: italic;
+}
+
+.v-card {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 </style> 

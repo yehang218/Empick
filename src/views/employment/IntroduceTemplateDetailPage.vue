@@ -21,7 +21,10 @@
 
       <template v-if="template && template.items && template.items.length > 0">
         <div class="field-group">
-          <label class="field-label">항목 목록</label>
+          <label class="field-label">
+            항목 목록 
+            <span class="item-count">({{ template.items.length }}개)</span>
+          </label>
           <div class="item-list-display">
             <div v-for="(item, index) in template.items" :key="item.id" class="item-display">
               <v-text-field
@@ -134,6 +137,13 @@ const goList = () => router.push('/employment/introduce-templates')
   color: #555;
   margin-bottom: 8px;
   display: block;
+}
+
+.item-count {
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: #888;
+  margin-left: 8px;
 }
 
 .field-value-input.v-text-field .v-input__control,

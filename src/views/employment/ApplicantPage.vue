@@ -68,17 +68,129 @@
         </div>
       </v-card-title>
 
+      <!-- 필터 영역 -->
+      <v-card-text>
+        <v-row align="center">
+          <v-col cols="12" md="3">
+            <v-select
+              v-model="statusFilter"
+              :items="statusOptions"
+              item-title="label"
+              item-value="value"
+              label="처리 상태"
+              clearable
+              variant="outlined"
+              density="compact"
+              @update:model-value="applyFilters"
+            >
+              <template v-slot:selection="{ item }">
+                <v-chip :color="item.raw.color" variant="tonal" size="small">
+                  {{ item.raw.label }}
+                </v-chip>
+              </template>
+              <template v-slot:item="{ props, item }">
+                <v-list-item v-bind="props">
+                  <template v-slot:prepend>
+                    <v-chip :color="item.raw.color" variant="tonal" size="small">
+                      {{ item.raw.label }}
+                    </v-chip>
+                  </template>
+                </v-list-item>
+              </template>
+            </v-select>
+          </v-col>
+          
+          <v-col cols="12" md="3">
+            <v-select
+              v-model="jobtestFilter"
+              :items="jobtestStatusOptions"
+              item-title="label"
+              item-value="value"
+              label="실무테스트"
+              clearable
+              variant="outlined"
+              density="compact"
+              @update:model-value="applyFilters"
+            >
+              <template v-slot:selection="{ item }">
+                <v-chip :color="item.raw.color" variant="tonal" size="small">
+                  {{ item.raw.label }}
+                </v-chip>
+              </template>
+              <template v-slot:item="{ props, item }">
+                <v-list-item v-bind="props">
+                  <template v-slot:prepend>
+                    <v-chip :color="item.raw.color" variant="tonal" size="small">
+                      {{ item.raw.label }}
+                    </v-chip>
+                  </template>
+                </v-list-item>
+              </template>
+            </v-select>
+          </v-col>
+          
+          <v-col cols="12" md="4">
+            <v-select
+              v-model="recruitmentFilter"
+              :items="recruitmentOptions"
+              item-title="title"
+              item-value="id"
+              label="지원 공고"
+              clearable
+              variant="outlined"
+              density="compact"
+              @update:model-value="applyFilters"
+            >
+            </v-select>
+          </v-col>
+          
+          <v-col cols="12" md="2">
+            <v-btn 
+              color="grey-darken-1" 
+              variant="outlined" 
+              size="small" 
+              @click="clearFilters"
+              :disabled="!hasActiveFilters"
+              block
+            >
+              필터 초기화
+            </v-btn>
+          </v-col>
+        </v-row>
+        
+        <!-- 필터 적용 상태 표시 -->
+        <div v-if="hasActiveFilters" class="mt-2">
+          <v-chip-group>
+            <v-chip v-if="statusFilter !== null && statusFilter !== undefined" closable @click:close="applicantStore.setStatusFilter(null)" color="primary" variant="tonal" size="small">
+              상태: {{ getStatusOptionLabel(statusFilter) }}
+            </v-chip>
+            <v-chip v-if="jobtestFilter !== null && jobtestFilter !== undefined" closable @click:close="applicantStore.setJobtestFilter(null)" color="secondary" variant="tonal" size="small">
+              실무테스트: {{ getJobtestOptionLabel(jobtestFilter) }}
+            </v-chip>
+            <v-chip v-if="recruitmentFilter !== null && recruitmentFilter !== undefined" closable @click:close="applicantStore.setRecruitmentFilter(null)" color="tertiary" variant="tonal" size="small">
+              공고: {{ getRecruitmentOptionLabel(recruitmentFilter) }}
+            </v-chip>
+          </v-chip-group>
+        </div>
+      </v-card-text>
+
       <!-- 검색 결과 요약 -->
-      <v-card-text v-if="search" class="text-caption text-grey">
+      <v-card-text v-if="search || hasActiveFilters" class="text-caption text-grey pt-0">
         <span v-if="getUniqueApplicantCount() === 1">
-          검색어 "{{ search }}"에 대한 검색 결과:
+          <span v-if="search">검색어 "{{ search }}"</span>
+          <span v-if="search && hasActiveFilters"> 및 </span>
+          <span v-if="hasActiveFilters">필터 조건</span>
+          에 대한 결과:
           지원자 {{ getUniqueApplicantCount() }}명
           <span v-if="applicantStore.filteredAndSortedApplicants.length > 1">
             (지원서 {{ applicantStore.filteredAndSortedApplicants.length }}건)
           </span>
         </span>
         <span v-else>
-          검색어 "{{ search }}"에 대한 검색 결과:
+          <span v-if="search">검색어 "{{ search }}"</span>
+          <span v-if="search && hasActiveFilters"> 및 </span>
+          <span v-if="hasActiveFilters">필터 조건</span>
+          에 대한 결과:
           지원자 {{ getUniqueApplicantCount() }}명, 지원서 {{ applicantStore.filteredAndSortedApplicants.length }}건
         </span>
       </v-card-text>
@@ -141,6 +253,13 @@
         <!-- 직무 -->
         <template #item.jobName="{ item }">
           {{ item.jobName || '미지정' }}
+        </template>
+
+        <!-- 지원공고 제목 -->
+        <template #item.recruitmentTitle="{ item }">
+          <div class="text-caption">
+            {{ getRecruitmentTitle(item.recruitmentId) || '공고 정보 없음' }}
+          </div>
         </template>
 
         <!-- 지원서 확인 텍스트 버튼 -->
@@ -211,9 +330,10 @@ import { useMailStore } from '@/stores/mailStore';
 import { useMemberStore } from '@/stores/memberStore';
 import { useToast } from 'vue-toastification'
 import { useApplicantStore } from '@/stores/applicantStore'
+import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useApplicantManager } from '@/composables/useApplicantManager'
 import { debounce } from 'lodash'
-import { getStatusByCode, getStatusInfoByString } from '@/constants/employment/applicationStatus'
+import { getStatusByCode, getStatusInfoByString, STATUS_OPTIONS } from '@/constants/employment/applicationStatus'
 
 // 실무테스트 할당
 
@@ -232,6 +352,7 @@ const applicantStore = useApplicantStore();
 const applicationStore = useApplicationStore();
 const mailStore = useMailStore();
 const memberStore = useMemberStore();
+const recruitmentStore = useRecruitmentStore();
 const router = useRouter()
 
 // Composable 사용 - 비즈니스 로직 분리
@@ -257,6 +378,31 @@ const sendingEmail = ref(false);
 const emailLoadingScreen = ref(false);
 const emailSuccessModal = ref(false);
 
+// 필터 상태 (Store와 연결)
+const statusFilter = computed({
+  get: () => applicantStore.statusFilter,
+  set: (value) => {
+    console.log('🔄 statusFilter 변경됨:', value)
+    applicantStore.setStatusFilter(value)
+  }
+})
+
+const jobtestFilter = computed({
+  get: () => applicantStore.jobtestFilter,
+  set: (value) => {
+    console.log('🔄 jobtestFilter 변경됨:', value)
+    applicantStore.setJobtestFilter(value)
+  }
+})
+
+const recruitmentFilter = computed({
+  get: () => applicantStore.recruitmentFilter,
+  set: (value) => {
+    console.log('🔄 recruitmentFilter 변경됨:', value)
+    applicantStore.setRecruitmentFilter(value)
+  }
+})
+
 // ===== View 데이터 (상수) =====
 const tableHeaders = [
   { title: '', key: 'select', sortable: false, align: 'center', width: '50px' },
@@ -269,6 +415,31 @@ const tableHeaders = [
   { title: '실무테스트', key: 'jobtestStatus', sortable: true, align: 'center', width: '120px' },
   { title: '지원공고', key: 'recruitmentTitle', sortable: true, align: 'start' }
 ]
+
+// 필터 옵션들
+const statusOptions = computed(() => {
+  return [
+    ...STATUS_OPTIONS.map(status => ({
+      label: status.label,
+      value: status.code,
+      color: status.color
+    }))
+  ]
+})
+
+const jobtestStatusOptions = ref([
+  { label: '미할당', value: 'UNASSIGNED', color: 'grey' },
+  { label: '대기중', value: 'WAITING', color: 'orange' },
+  { label: '진행중', value: 'IN_PROGRESS', color: 'blue' },
+  { label: '완료', value: 'COMPLETED', color: 'green' }
+])
+
+const recruitmentOptions = computed(() => {
+  return recruitmentStore.list.map(recruitment => ({
+    title: recruitment.title,
+    id: recruitment.id
+  }))
+})
 
 // ===== ViewModel: 계산된 속성 =====
 // 상태 관련 유틸리티 함수들 (통합된 상태 관리 사용)
@@ -475,7 +646,11 @@ const toggleSelectAll = (selectAll) => {
 // ===== 생명주기 및 감시자 =====
 onMounted(async () => {
   try {
-    await applicantStore.fetchApplicantFullInfoList()
+    // 병렬로 데이터 로드
+    await Promise.all([
+      applicantStore.fetchApplicantFullInfoList(),
+      recruitmentStore.loadRecruitmentList()
+    ])
     
     // 🎯 지원자 정보 및 application_id 로그 출력
     console.log('🎉 ====== 지원자 목록 로드 완료 ======')
@@ -492,15 +667,18 @@ onMounted(async () => {
       console.log(`   📞 전화번호: ${applicant.phone || '전화번호 없음'}`)
       console.log(`   💼 직무: ${applicant.jobName || '직무 미지정'}`)
       console.log(`   📈 지원서 상태: ${applicant.status || '상태 없음'}`)
+      console.log(`   🧪 실무테스트 상태: ${applicant.jobtestStatus || '미할당'}`)
+      console.log(`   📑 지원공고 ID: ${applicant.recruitmentId || '공고ID 없음'}`)
       console.log(`   🧪 실무테스트 : ${applicant.applicationJobtestTitle || '미할당'}`)
       console.log('   ─────────────────────────────────')
     })
     
     console.log('🎉 ====== 지원자 정보 로그 출력 완료 ======')
+    console.log(`📑 채용공고 수: ${recruitmentStore.list.length}개`)
     
   } catch (error) {
-    console.error('❌ 지원자 목록 조회 실패:', error)
-    toast.error('지원자 목록을 불러오는 데 실패했습니다.')
+    console.error('❌ 데이터 로드 실패:', error)
+    toast.error('데이터를 불러오는 데 실패했습니다.')
   }
 })
 
@@ -843,6 +1021,59 @@ const getAssignButtonText = () => {
   }
 }
 
+// 필터 관련 함수들
+const hasActiveFilters = computed(() => {
+  const result = statusFilter.value !== null && statusFilter.value !== undefined || 
+                jobtestFilter.value !== null && jobtestFilter.value !== undefined || 
+                recruitmentFilter.value !== null && recruitmentFilter.value !== undefined
+  console.log('🔍 hasActiveFilters 체크:', {
+    statusFilter: statusFilter.value,
+    jobtestFilter: jobtestFilter.value,
+    recruitmentFilter: recruitmentFilter.value,
+    hasActive: result
+  })
+  return result
+})
+
+const applyFilters = () => {
+  // computed를 통해 자동으로 Store에 연결되므로 별도 호출 불필요
+}
+
+const clearFilters = () => {
+  applicantStore.clearFilters()
+}
+
+const getStatusOptionLabel = (value) => {
+  const option = statusOptions.value.find(opt => opt.value === value)
+  return option ? option.label : ''
+}
+
+const getJobtestOptionLabel = (value) => {
+  const option = jobtestStatusOptions.value.find(opt => opt.value === value)
+  return option ? option.label : ''
+}
+
+const getRecruitmentOptionLabel = (value) => {
+  const option = recruitmentOptions.value.find(opt => opt.id === value)
+  return option ? option.title : ''
+}
+
+const getRecruitmentTitle = (recruitmentId) => {
+  const recruitment = recruitmentStore.list.find(r => r.id === recruitmentId)
+  return recruitment ? recruitment.title : null
+}
+
+const refreshList = async () => {
+  try {
+    await applicantStore.fetchApplicantFullInfoList()
+    toast.success('목록을 새로고침했습니다.')
+  } catch (error) {
+    console.error('새로고침 실패:', error)
+    toast.error('목록 새로고침에 실패했습니다.')
+  }
+}
+
+</script>
 .center-success-text {
   font-size: 1.6rem;
   font-weight: 700;
@@ -850,6 +1081,7 @@ const getAssignButtonText = () => {
   margin-top: 1.2rem;
   text-align: center;
 }
+
 
 .emoji {
   font-size: 1.5rem;
