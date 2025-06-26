@@ -36,7 +36,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIntroduceStandardStore } from '@/stores/introduceStandardStore'
-import { deleteIntroduceStandard } from '@/services/introduceStandardService'
+
 
 const router = useRouter()
 const store = useIntroduceStandardStore()
@@ -56,8 +56,7 @@ function goToCreate() {
 async function removeStandard(id) {
   if (confirm('정말로 이 기준표를 삭제하시겠습니까?')) {
     try {
-      await deleteIntroduceStandard(id)
-      await store.fetchStandards()
+      await store.deleteStandard(id)
     } catch (e) {
       console.error('기준표 삭제 실패:', e)
       console.log('에러 상세:', {
