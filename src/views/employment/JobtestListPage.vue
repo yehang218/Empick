@@ -119,7 +119,6 @@ const handleDelete = async () => {
         toast.success('선택된 테스트가 성공적으로 삭제되었습니다.');
         selectedJobtests.value = []; // 선택 초기화
     } catch (error) {
-        toast.error(store.error || '테스트 삭제 중 오류가 발생했습니다.');
     }
 };
 

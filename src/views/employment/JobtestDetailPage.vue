@@ -208,7 +208,7 @@ const handleQuestionRowClick = async (event, { item }) => {
         selectedQuestionDetail.value = { ...jobtestQuestionStore.form }
         detailDialogVisible.value = true
     } catch (err) {
-        console.error('문제 상세 정보를 불러오는 중 오류가 발생했습니다:', err)
+        // console.error('문제 상세 정보를 불러오는 중 오류가 발생했습니다:', err)
     }
 }
 

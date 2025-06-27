@@ -275,7 +275,6 @@ const fetchApplicantInfo = async () => {
       }
     }
   } catch (error) {
-    console.error('Failed to fetch applicant info:', error);
   } finally {
     loadingApplicantInfo.value = false;
   }
@@ -289,7 +288,6 @@ onMounted(async () => {
       fetchApplicantInfo()
     ]);
   } catch (error) {
-    console.error('Failed to fetch data:', error);
   }
 });
 </script>

@@ -175,7 +175,7 @@ const refreshList = async () => {
         await questionStore.fetchQuestions()
         selectedQuestions.value = []
     } catch (error) {
-        toast.error('문제 목록을 새로고침하는 데 실패했습니다.');
+        // toast.error('문제 목록을 새로고침하는 데 실패했습니다.');
     }
 }
 
