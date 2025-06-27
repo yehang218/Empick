@@ -4,7 +4,7 @@
     <div class="exam-content-wrapper">
       <div class="exam-sidebar-wrap">
         <ExamSidebar
-          :testInfo="testInfo"
+          :testInfo="testInfo.testTime"
           :currentIndex="currentIndex"
           :totalQuestions="questions.length"
           :timeLeft="timeLeft"
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJobtestExamStore } from '@/stores/jobtestExamStore'
 import ExamSidebar from '@/components/employment/ExamSidebar.vue'
@@ -49,6 +49,8 @@ const examData = computed(() => store.examData)
 const questions = computed(() => examData.value?.questions ?? [])
 const testInfo = computed(() => ({
   title: examData.value?.title ?? '',
+  testTime: examData.value?.testTime ?? 0,
+  startedAt: examData.value.startedAt,
 }))
 
 const currentIndex = ref(0)
@@ -56,7 +58,22 @@ const answers = ref([])
 
 const getStorageKey = () => `jobtest-answers-${examData.value?.applicationJobTestId}`
 
+const timeLeft = ref(0)
+
+// startedAt 기준으로 남은 시간(초)을 계산해서 timeLeft에 반영
+function updateTimeLeft() {
+  if (!testInfo.value.startedAt) return
+  const startedAt = new Date(testInfo.value.startedAt).getTime()
+  const now = Date.now()
+  const total = testInfo.value.testTime * 60 // 전체 시험 시간(초)
+  const elapsed = Math.floor((now - startedAt) / 1000)
+  timeLeft.value = Math.max(total - elapsed, 0)
+}
+
+let timer = null
 onMounted(() => {
+  console.log('🧪 testInfo:', testInfo.value)
+  // 답안 복원
   const saved = localStorage.getItem(getStorageKey())
   if (saved) {
     try {
@@ -66,15 +83,33 @@ onMounted(() => {
       }
     } catch (e) { /* ignore */ }
   }
+  // 남은 시간 실시간 갱신 시작
+  updateTimeLeft()
+  timer = setInterval(updateTimeLeft, 1000)
+})
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
 })
 
 watch(answers, (val) => {
   localStorage.setItem(getStorageKey(), JSON.stringify(val))
 }, { deep: true })
 
-const timeLeft = ref(40 * 60) // 40분 (예시)
-
 const showSubmitModal = ref(false)
+
+// 자동 제출 중복 방지 플래그
+const isAutoSubmitting = ref(false)
+
+// timeLeft가 0이 되면 자동 제출 및 이동
+watch(timeLeft, async (val) => {
+  if (val === 0 && !isAutoSubmitting.value) {
+    isAutoSubmitting.value = true
+    await saveCurrentAnswer()
+    await store.submitAnswers(examData.value.applicationJobTestId)
+    router.push({ name: 'JobtestEnter', params: { jobtestId: examData.value.jobtestId } })
+  }
+})
 
 function updateAnswer(val) {
   console.log('🔄 updateAnswer 호출:', {
@@ -117,7 +152,7 @@ async function saveCurrentAnswer(idx = currentIndex.value) {
   const dto = new AnswerRequestDTO({
     content,
     applicationJobTestId: examData.value.applicationJobTestId,
-    questionId: question.questionId
+    questionId: question.questionId,
   })
   
   console.log('📤 저장할 답안 DTO:', dto.toJSON())
