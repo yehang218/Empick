@@ -63,7 +63,7 @@
                 variant="tonal" 
                 color="grey" 
                 class="cancel-btn" 
-                @click="goBack"
+                @click="showCancelModal = true"
                 prepend-icon="mdi-close"
             >
                 취소
@@ -82,7 +82,8 @@
         <SuccessModal 
             v-if="showSuccessModal" 
             :message="isEdit ? '문제 수정이 완료되었습니다.' : '문제 등록이 완료되었습니다.'"
-            @confirm="handleSuccessConfirm" 
+            @confirm="handleSuccessConfirm"
+            :showCancel="false"
         />
 
         <Modal 
@@ -178,7 +179,7 @@ async function handleSubmit() {
         showSuccessModal.value = true
     } catch (error) {
         console.error('문제 저장 실패:', error)
-        toast.error(jobtestQuestionStore.error || '저장 중 오류가 발생했습니다.')
+        // toast.error(jobtestQuestionStore.error || '저장 중 오류가 발생했습니다.')
     }
 }
 
@@ -212,7 +213,7 @@ onMounted(async () => {
         activeTab.value = form.value.type || 'MULTIPLE'
     } catch (error) {
         console.error('페이지 초기화 실패:', error)
-        toast.error('페이지 로딩 중 오류가 발생했습니다.')
+        // toast.error('페이지 로딩 중 오류가 발생했습니다.')
         router.push({ name: 'JobtestQuestionList' })
     }
 })

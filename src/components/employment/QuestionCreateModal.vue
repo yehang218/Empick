@@ -44,10 +44,10 @@
         <!-- 액션 버튼 -->
         <div class="action-buttons">
             <v-btn 
-                variant="tonal" 
-                color="grey" 
-                class="cancel-btn" 
-                @click="close"
+                variant="tonal"
+                color="grey"
+                class="cancel-btn"
+                @click="showCancelModal = true"
                 prepend-icon="mdi-close"
             >
                 취소하기
@@ -61,6 +61,7 @@
                 등록하기
             </v-btn>
         </div>
+        <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm" @cancel="showCancelModal = false" />
     </v-card-text>
 </template>
 
@@ -69,6 +70,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import MultipleQuestionForm from '@/components/employment/MultipleQuestionForm.vue'
 import SubjectiveForm from '@/components/employment/SubjectiveForm.vue'
+import Modal from '@/components/common/Modal.vue'
 
 import { useMemberStore } from '@/stores/memberStore'
 import { useJobtestQuestionStore } from '@/stores/jobtestQuestionStore'
@@ -100,7 +102,10 @@ const currentComponent = computed(() => {
     }
 })
 
-const close = () => {
+const showCancelModal = ref(false)
+
+const handleCancelConfirm = () => {
+    showCancelModal.value = false
     emit('close')
 }
 
@@ -283,8 +288,19 @@ onMounted(async () => {
     border-top: 1px solid #e0e0e0;
 }
 
-.cancel-btn,
 .submit-btn {
+    min-width: 100px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+.cancel-btn {
     min-width: 100px;
     border-radius: 8px;
     font-weight: 500;
@@ -294,11 +310,6 @@ onMounted(async () => {
 .cancel-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.submit-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
 }
 
 /* 반응형 디자인 */
@@ -321,11 +332,6 @@ onMounted(async () => {
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
-    }
-    
-    .cancel-btn,
-    .submit-btn {
-        min-width: auto;
     }
     
     .difficulty-select {
