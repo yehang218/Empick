@@ -70,10 +70,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import OneColumnList from '@/components/OneColumnList.vue'
 import Modal from '@/components/common/Modal.vue'
+import { useToast } from 'vue-toastification'
 
 import { useInterviewSheetStore } from '@/stores/interviewSheetStore'
 import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
 
+const toast = useToast()
 const sheetStore = useInterviewSheetStore()
 const criteriaStore = useInterviewCriteriaStore()
 
@@ -124,10 +126,11 @@ const confirmDelete = async () => {
         await sheetStore.deleteSheet(selectedSheet.value.id)
         selectedSheet.value = null
         criteriaStore.criteriaList = []
+        toast.success('평가표가 삭제되었습니다.')
         closeDeleteModal()
     } catch (err) {
         console.error('삭제 오류:', err)
-        alert('삭제 중 오류가 발생했습니다.')
+        toast.error('삭제 중 오류가 발생했습니다.')
     }
 }
 

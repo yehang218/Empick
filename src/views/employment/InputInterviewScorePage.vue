@@ -120,7 +120,9 @@ import { useInterviewScoreStore } from '@/stores/interviewScoreStore'
 import { useInterviewerStore } from '@/stores/interviewerStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useMemberStore } from '@/stores/memberStore'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const router = useRouter()
 const route = useRoute()
 
@@ -142,7 +144,7 @@ const totalReview = ref('')
 const goToInterviewDetailPage = () => {
     const applicationId = selectedInterview.value?.applicationId;
     if (!interviewId) {
-        alert('면접 정보가 없습니다.');
+        toast.error('면접 정보가 없습니다.');
         return;
     }
     router.push({ name: 'InterviewDetailPage', params: { applicationId } });
@@ -188,7 +190,7 @@ const fetchAll = async () => {
         }
     } catch (err) {
         console.error('로딩 중 오류:', err)
-        alert('평가 데이터를 불러오는 데 실패했습니다.')
+        toast.error('평가 데이터를 불러오는 데 실패했습니다.')
     }
 }
 
@@ -229,10 +231,11 @@ const handleEvaluationSubmit = async () => {
     try {
         await interviewerStore.updateInterviewerReview(interviewerPk, totalReview.value);
         if (!totalReview.value || totalReview.value.trim() === '') {
-            alert('총평을 입력해 주세요.');
+            toast.error ('총평을 입력해 주세요.');
             return;
         }
-        alert('평가 저장이 완료되었습니다!')
+        toast.success('평가 저장이 완료되었습니다!')
+        router.push({ name: 'InterviewDetailPage', params: { applicationId: selectedInterview.value.applicationId } })
     } catch (err) {
         console.error('총평 저장 실패:', err)
     }

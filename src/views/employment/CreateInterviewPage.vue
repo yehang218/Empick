@@ -276,7 +276,9 @@ import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
 
 import InterviewSheetModal from '@/components/employment/InterviewSheetModal.vue'
 import InterviewEvaluationCriteria from '@/components/employment/InterviewEvaluationCriteria.vue'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const route = useRoute()
 const router = useRouter()
 const selectedDate = route.query.date  // 'YYYY-MM-DD' 형식
@@ -457,14 +459,8 @@ const submitInterview = async () => {
     console.log('dto : ', dto)
 
     await interviewStore.createInterview(dto)
-    alert('면접이 등록되었습니다!')
-    // try {
-    //     await interviewStore.createInterview(dto)
-    //     alert('면접이 등록되었습니다!')
-    //     router.push('/employment/interviews')
-    // } catch (e) {
-    //     alert('등록 실패: ' + e.message)
-    // }
+    toast.success('면접이 등록되었습니다!')
+    router.push('/employment/interviews')
 }
 
 onMounted(async () => {

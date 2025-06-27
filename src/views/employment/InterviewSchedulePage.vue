@@ -79,7 +79,10 @@ import { useApplicationStore } from '@/stores/applicationStore'
 import { useApplicantStore } from '@/stores/applicantStore'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 const router = useRouter()
+const toast = useToast()
+
 
 const interviewStore = useInterviewStore()
 const applicationStore = useApplicationStore()
@@ -157,7 +160,7 @@ const goToInterviewDetail = (applicationId) => {
 
 const goToCreateInterview = () => {
     if (!selectedDate.value) {
-        alert('날짜를 먼저 선택해주세요!')
+        toast.error('날짜를 먼저 선택해주세요!')
         return
     }
     router.push({
