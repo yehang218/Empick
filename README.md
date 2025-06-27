@@ -32,22 +32,52 @@
 
 <div align="start">
 
-  <table>
-    <tr>
-     <td align="left"><img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/red.png?raw=true" width="150" height="150"/></td>
-     <td align="left"><img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/green.png?raw=true" width="150" height="150"/></td>
-     <td align="left"><img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/blue.png?raw=true" width="150" height="150"/></td>
-     <td align="left"><img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/yellow.png?raw=true" width="150" height="150"/></td>
-     <td align="left"><img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/pink.png?raw=true" width="150" height="150"/></td>
-   </tr>
-   <tr>
-     <td align="left">곽우석</td>
-     <td align="left">김석희</td>
-     <td align="left">서민종</td>
-     <td align="left">이상모</td>
-     <td align="left">최혜민</td>
-    </tr>
-  </table>
+<table>
+  <tr>
+   <td align="left">
+     <a href="https://github.com/wooseok718">
+       <img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/red.png?raw=true" width="150" height="150"/>
+     </a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/yehang218">
+       <img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/green.png?raw=true" width="150" height="150"/>
+     </a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/MJay1123">
+       <img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/blue.png?raw=true" width="150" height="150"/>
+     </a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/Morris235">
+       <img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/yellow.png?raw=true" width="150" height="150"/>
+     </a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/HMYIEN">
+       <img src="https://github.com/Pive-Guyz/ondam-backend/blob/develop/document/member/pink.png?raw=true" width="150" height="150"/>
+     </a>
+   </td>
+ </tr>
+ <tr>
+   <td align="left">
+     <a href="https://github.com/kwakuseok"><strong>곽우석</strong></a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/kimsukhee"><strong>김석희</strong></a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/seominjong"><strong>서민종</strong></a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/leesangmo"><strong>이상모</strong></a>
+   </td>
+   <td align="left">
+     <a href="https://github.com/choihyemin"><strong>최혜민</strong></a>
+   </td>
+  </tr>
+</table>
 
 </div>
 
