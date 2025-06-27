@@ -53,7 +53,8 @@ public class AnswerCommandController {
                     정답 여부, 점수 수정 가능합니다.
                     - isCorrect : WRONG, PARTIAL, CORRECT (null 가능)
                     """,
-            security = @SecurityRequirement(name = "bearerAuth")
+            security = @SecurityRequirement(name = "bearerAuth"),
+            hidden = true
     )
     @ApiResponses(value = {
     })
@@ -70,7 +71,7 @@ public class AnswerCommandController {
     @Operation(
             summary = "실무테스트 지원서별 답변 채점",
             description = """
-                    실무테스트 지원서별 답변을 수정합니다.
+                    실무테스트 지원서별 답변을 채점합니다.
                     - 시스템이 실무테스트에 해당하는 답안을 채점하고 답변 테이블에 정답 여부와 받은 점수를 기록하는 기능
                     정답 여부, 점수가 자동으로 저장(수정)됩니다.
                     채점된 답안들을 반환합니다.

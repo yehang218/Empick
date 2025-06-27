@@ -49,7 +49,8 @@ public class ApplicationJobtestCommandController {
                     지원서별 실무테스트를 수정합니다.
                     - '평가자 코멘트, 제출일, 채점 점수, 평가 점수, 채점 상태, 평가 상태, 입장코드, 평가자'를 수정할 수 있습니다.
                     """,
-            security = @SecurityRequirement(name = "bearerAuth")
+            security = @SecurityRequirement(name = "bearerAuth"),
+            hidden = true
     )
     @ApiResponses(value = {
     })
