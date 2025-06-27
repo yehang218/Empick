@@ -213,10 +213,9 @@ const difficultyOptions = [
 
 onMounted(async () => {
     await jobtestQuestionStore.fetchQuestions()
-    localQuestions.value = jobtestQuestionStore.questions.map(q => ({
-        ...q,
-        id: Number(q.id)
-    }))
+    localQuestions.value = jobtestQuestionStore.questions
+        .map(q => ({ ...q, id: Number(q.id) }))
+        .sort((a, b) => b.id - a.id)
 
     // Edit mode: pre-fill if jobtestId is present
     const jobtestId = route.query.jobtestId
@@ -386,10 +385,9 @@ function handleCancelClose() {
 const handleNewQuestion = async () => {
     dialog.value = false;
     await jobtestQuestionStore.fetchQuestions();
-    localQuestions.value = jobtestQuestionStore.questions.map(q => ({
-        ...q,
-        id: Number(q.id)
-    }));
+    localQuestions.value = jobtestQuestionStore.questions
+        .map(q => ({ ...q, id: Number(q.id) }))
+        .sort((a, b) => b.id - a.id)
 };
 
 const handleQuestionRowClick = async (event, { item }) => {
