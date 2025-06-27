@@ -158,7 +158,7 @@
 
 ### **배포된 서비스**
 
-🌐 **프로덕션**: https://www.empick.shop
+🌐 **프로덕션**: https://www.empick.shop  
 📚 **API 문서**: http://vpc2-backend-alb-1656085190.ap-northeast-2.elb.amazonaws.com/swagger-ui.html
 
 ---
