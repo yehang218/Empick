@@ -195,6 +195,6 @@ npm run dev
 
 **🏢 EMPICK** - 혁신적인 채용 관리 플랫폼
 
-Made with ❤️ by Team EMPICK
+Made with ❤️ by Team PIVEGUYZ
 
 </div>
