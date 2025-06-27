@@ -675,7 +675,8 @@ const evaluationStats = computed(() => {
 const currentInterviewer = computed(() => allInterviewerScores.value[currentInterviewerIndex.value])
 
 const currentInterviewerName = computed(() => {
-  return `익명 ${currentInterviewerIndex.value + 1}`
+  const current = allInterviewerScores.value[currentInterviewerIndex.value]
+  return current?.name ?? '면접관 이름 없음'
 })
 
 const currentInterviewerScore = computed(() => {
@@ -1371,16 +1372,16 @@ const loadInterviewData = async () => {
 
     // 5. 면접관별 점수 조회
     const scorePromises = interviewerList.map(async (interviewer) => {
+      const member = await memberStore.fetchMemberById(interviewer.memberId);
       await interviewScoreStore.fetchScoresByInterviewerId(interviewer.id)
       return {
         interviewerId: interviewer.id,
         memberId: interviewer.memberId,
-        name: interviewer.name,
+        name: member?.name ?? '이름 없음',
         review: interviewer.review,
         scores: [...interviewScoreStore.scoreList]
       }
     })
-
     allInterviewerScores.value = await Promise.all(scorePromises)
     console.log('✅ 면접관별 점수 로딩 완료:', allInterviewerScores.value)
 
