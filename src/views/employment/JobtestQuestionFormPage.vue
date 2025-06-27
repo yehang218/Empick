@@ -168,6 +168,7 @@ function handleSuccessConfirm() {
 }
 
 async function handleSubmit() {
+    if (!validateForm()) return;
     try {
         const userId = memberStore.form.id
         if (!userId) {
@@ -181,6 +182,28 @@ async function handleSubmit() {
         console.error('문제 저장 실패:', error)
         // toast.error(jobtestQuestionStore.error || '저장 중 오류가 발생했습니다.')
     }
+}
+
+function validateForm() {
+    if (!form.value.content) {
+        toast.error('문제 내용을 입력해주세요.')
+        return false
+    }
+    if (form.value.type === 'MULTIPLE') {
+        if (!form.value.questionOptions || form.value.questionOptions.length === 0) {
+            toast.error('선택지를 하나 이상 입력해주세요.')
+            return false
+        }
+        if (!form.value.questionOptions.some(opt => opt.isAnswer)) {
+            toast.error('하나 이상의 정답을 지정해주세요.')
+            return false
+        }
+    }
+    if (form.value.type === 'SUBJECTIVE' && !form.value.answer) {
+        toast.error('정답을 입력해주세요.')
+        return false
+    }
+    return true
 }
 
 function handleCancelConfirm() {

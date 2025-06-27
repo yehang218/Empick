@@ -117,7 +117,7 @@ const handleSubmit = async () => {
         toast.success('문제 등록이 완료되었습니다.')
         emit('saved')
     } catch {
-        toast.error(questionStore.error || '문제 등록 중 오류가 발생했습니다.')
+        // toast.error(questionStore.error || '문제 등록 중 오류가 발생했습니다.')
     }
 }
 
