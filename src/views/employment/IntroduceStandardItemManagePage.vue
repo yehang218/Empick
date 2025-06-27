@@ -17,7 +17,7 @@
             color="primary" 
             variant="elevated"
             prepend-icon="mdi-plus"
-            @click="addCriteria"
+            @click="showAddModal"
             :disabled="!newCriteria.trim() || addingItem"
             :loading="addingItem"
             class="px-6"
@@ -33,7 +33,7 @@
             <v-list-item>
               <v-list-item-title class="item-title-text">{{ item.content }}</v-list-item-title>
               <template v-slot:append>
-                <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeItem(item.id)">
+                <v-btn icon size="small" color="red-darken-2" variant="text" @click="showDeleteModal(item.id, item.content)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </template>
@@ -49,6 +49,17 @@
       <div class="d-flex justify-end mt-6">
         <v-btn color="secondary" @click="goToCreateStandard">기준표 생성 페이지로 이동</v-btn>
       </div>
+
+      <!-- Alert Modal -->
+      <AlertModal
+        v-if="showModal"
+        :title="modalTitle"
+        :message="modalMessage"
+        :confirm-text="modalConfirmText"
+        :cancel-text="modalCancelText"
+        @confirm="handleConfirm"
+        @cancel="handleCancel"
+      />
     </v-container>
   </template>
   
@@ -58,6 +69,7 @@ import { useRouter } from 'vue-router'
 import { useIntroduceStandardItemStore } from '@/stores/introduceStandardItemStore'
 import { useMemberStore } from '@/stores/memberStore'
 import { useToast } from 'vue-toastification'
+import AlertModal from '@/components/common/AlertModal.vue'
   
   const store = useIntroduceStandardItemStore()
 const memberStore = useMemberStore()
@@ -65,6 +77,15 @@ const toast = useToast()
 const newCriteria = ref('')
 const router = useRouter()
 const addingItem = ref(false)
+
+// Modal 상태
+const showModal = ref(false)
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('확인')
+const modalCancelText = ref('취소')
+const modalAction = ref('')
+const selectedItemId = ref(null)
   
   onMounted(async () => {
     await Promise.all([
@@ -75,31 +96,64 @@ const addingItem = ref(false)
   
   const items = computed(() => store.items)
   
-  const addCriteria = async () => {
-  if (!newCriteria.value.trim()) {
-    toast.warning('항목 내용을 입력해주세요.')
-    return
+  const showAddModal = () => {
+    if (!newCriteria.value.trim()) {
+      toast.error('항목 내용을 입력해주세요.')
+      return
+    }
+    
+    modalTitle.value = '항목 추가'
+    modalMessage.value = `"${newCriteria.value.trim()}" 항목을 추가하시겠습니까?`
+    modalConfirmText.value = '추가'
+    modalCancelText.value = '취소'
+    modalAction.value = 'add'
+    showModal.value = true
+  }
+
+  const showDeleteModal = (id, content) => {
+    selectedItemId.value = id
+    modalTitle.value = '항목 삭제'
+    modalMessage.value = `정말로 "${content}" 항목을 삭제하시겠습니까?`
+    modalConfirmText.value = '삭제'
+    modalCancelText.value = '취소'
+    modalAction.value = 'delete'
+    showModal.value = true
+  }
+
+  const handleConfirm = async () => {
+    showModal.value = false
+    
+    if (modalAction.value === 'add') {
+      await addCriteria()
+    } else if (modalAction.value === 'delete') {
+      await removeItem(selectedItemId.value)
+    }
+  }
+
+  const handleCancel = () => {
+    showModal.value = false
+    selectedItemId.value = null
   }
   
-  try {
-    addingItem.value = true
-    await store.addItem(newCriteria.value.trim())
-    toast.success('기준표 항목이 성공적으로 추가되었습니다.')
-    newCriteria.value = ''
-  } catch (error) {
-    console.error('항목 추가 실패:', error)
-    toast.error('항목 추가에 실패했습니다. 다시 시도해주세요.')
-  } finally {
-    addingItem.value = false
+  const addCriteria = async () => {
+    try {
+      addingItem.value = true
+      await store.addItem(newCriteria.value.trim())
+      toast.success('기준표 항목이 성공적으로 추가되었습니다.')
+      newCriteria.value = ''
+    } catch (error) {
+      console.error('항목 추가 실패:', error)
+      toast.error('항목 추가에 실패했습니다. 다시 시도해주세요.')
+    } finally {
+      addingItem.value = false
+    }
   }
-}
   
   const goToCreateStandard = () => {
     router.push('/employment/introduce-standard/create')
   }
   
   const removeItem = async (id) => {
-  if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
     try {
       await store.removeItem(id)
       toast.success('기준표 항목이 삭제되었습니다.')
@@ -117,9 +171,10 @@ const addingItem = ref(false)
       } else {
         toast.error('항목 삭제에 실패했습니다. 다시 시도해주세요.')
       }
+    } finally {
+      selectedItemId.value = null
     }
   }
-}
   </script>
   
   <style scoped>

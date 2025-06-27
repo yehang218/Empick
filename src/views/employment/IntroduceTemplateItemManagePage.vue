@@ -17,7 +17,7 @@
           color="primary" 
           variant="elevated"
           prepend-icon="mdi-plus"
-          @click="addItem"
+          @click="showAddModal"
           :disabled="!newContent.trim() || addingItem"
           :loading="addingItem"
           class="px-6"
@@ -33,7 +33,7 @@
           <v-list-item>
             <v-list-item-title class="item-title-text">{{ item.title }}</v-list-item-title>
             <template v-slot:append>
-              <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeItem(item.id)">
+              <v-btn icon size="small" color="red-darken-2" variant="text" @click="showDeleteModal(item.id, item.title)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </template>
@@ -49,6 +49,17 @@
     <div class="d-flex justify-end mt-6">
       <v-btn color="secondary" @click="goToCreateTemplate">템플릿 생성 페이지로 이동</v-btn>
     </div>
+
+    <!-- Alert Modal -->
+    <AlertModal
+      v-if="showModal"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
   </v-container>
 </template>
 
@@ -58,6 +69,7 @@ import { useRouter } from 'vue-router'
 import { useIntroduceItemStore } from '@/stores/introduceItemStore'
 import { useMemberStore } from '@/stores/memberStore'
 import { useToast } from 'vue-toastification'
+import AlertModal from '@/components/common/AlertModal.vue'
 
 const introduceItemStore = useIntroduceItemStore()
 const memberStore = useMemberStore()
@@ -65,6 +77,15 @@ const toast = useToast()
 const newContent = ref('')
 const router = useRouter()
 const addingItem = ref(false)
+
+// Modal 상태
+const showModal = ref(false)
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('확인')
+const modalCancelText = ref('취소')
+const modalAction = ref('')
+const selectedItemId = ref(null)
 
 const items = computed(() => introduceItemStore.items)
 
@@ -75,12 +96,46 @@ onMounted(async () => {
   ])
 })
 
-const addItem = async () => {
+const showAddModal = () => {
   if (!newContent.value.trim()) {
-    toast.warning('항목 내용을 입력해주세요.')
+    toast.error('항목 내용을 입력해주세요.')
     return
   }
 
+  modalTitle.value = '항목 추가'
+  modalMessage.value = `"${newContent.value.trim()}" 항목을 추가하시겠습니까?`
+  modalConfirmText.value = '추가'
+  modalCancelText.value = '취소'
+  modalAction.value = 'add'
+  showModal.value = true
+}
+
+const showDeleteModal = (id, title) => {
+  selectedItemId.value = id
+  modalTitle.value = '항목 삭제'
+  modalMessage.value = `정말로 "${title}" 항목을 삭제하시겠습니까?`
+  modalConfirmText.value = '삭제'
+  modalCancelText.value = '취소'
+  modalAction.value = 'delete'
+  showModal.value = true
+}
+
+const handleConfirm = async () => {
+  showModal.value = false
+  
+  if (modalAction.value === 'add') {
+    await addItem()
+  } else if (modalAction.value === 'delete') {
+    await removeItem(selectedItemId.value)
+  }
+}
+
+const handleCancel = () => {
+  showModal.value = false
+  selectedItemId.value = null
+}
+
+const addItem = async () => {
   try {
     addingItem.value = true
     await introduceItemStore.addItem({
@@ -103,25 +158,25 @@ const goToCreateTemplate = () => {
 }
 
 const removeItem = async (id) => {
-  if (confirm('정말로 이 항목을 삭제하시겠습니까?')) {
-    try {
-      await introduceItemStore.removeItem(id)
-      toast.success('템플릿 항목이 삭제되었습니다.')
-    } catch (error) {
-      console.error('항목 삭제 실패:', error)
-      console.log('에러 상세:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      })
-      
-      // 500 에러이거나 FK 제약 조건 관련 에러인 경우
-      if (error.response?.status === 500 || error.response?.status === 503) {
-        toast.error('이미 사용 중인 항목은 삭제할 수 없습니다.\n\n기준표나 템플릿에서 사용 중인 항목입니다.')
-      } else {
-        toast.error('항목 삭제에 실패했습니다. 다시 시도해주세요.')
-      }
+  try {
+    await introduceItemStore.removeItem(id)
+    toast.success('템플릿 항목이 삭제되었습니다.')
+  } catch (error) {
+    console.error('항목 삭제 실패:', error)
+    console.log('에러 상세:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    })
+    
+    // 500 에러이거나 FK 제약 조건 관련 에러인 경우
+    if (error.response?.status === 500 || error.response?.status === 503) {
+      toast.error('이미 사용 중인 항목은 삭제할 수 없습니다.\n\n기준표나 템플릿에서 사용 중인 항목입니다.')
+    } else {
+      toast.error('항목 삭제에 실패했습니다. 다시 시도해주세요.')
     }
+  } finally {
+    selectedItemId.value = null
   }
 }
 </script>

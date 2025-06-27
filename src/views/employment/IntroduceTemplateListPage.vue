@@ -14,7 +14,7 @@
               {{ template.title }}
             </v-list-item-title>
             <template v-slot:append>
-              <v-btn icon size="small" color="red-darken-2" variant="text" @click="removeTemplate(template.id)">
+              <v-btn icon size="small" color="red-darken-2" variant="text" @click="showDeleteModal(template.id, template.title)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
               <v-btn size="small" color="primary" variant="text" @click="goDetail(template.id)">
@@ -29,6 +29,17 @@
         </v-list-item>
       </v-list>
     </v-card>
+
+    <!-- Alert Modal -->
+    <AlertModal
+      v-if="showModal"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText"
+      @confirm="handleConfirm"
+      @cancel="handleCancel"
+    />
   </v-container>
 </template>
 
@@ -36,45 +47,73 @@
 import { ref, onMounted, computed } from 'vue'
 import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
+import AlertModal from '@/components/common/AlertModal.vue'
 
 const router = useRouter()
+const toast = useToast()
 const introduceTemplateStore = useIntroduceTemplateStore()
 const templates = computed(() => introduceTemplateStore.templates)
+
+// Modal 상태
+const showModal = ref(false)
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('확인')
+const modalCancelText = ref('취소')
+const selectedTemplateId = ref(null)
 
 onMounted(async () => {
   try {
     await introduceTemplateStore.loadTemplates()
-    // console.log('Fetched templates:', introduceTemplateStore.templates)
   } catch (error) {
     console.error('템플릿 목록 로드 실패:', error)
-    alert('템플릿 목록을 불러오는 데 실패했습니다.')
+    toast.error('템플릿 목록을 불러오는 데 실패했습니다.')
   }
 })
 
 const goCreate = () => router.push('/employment/introduce-templates/create')
 const goDetail = (id) => router.push(`/employment/introduce-templates/${id}`)
 
+const showDeleteModal = (id, title) => {
+  selectedTemplateId.value = id
+  modalTitle.value = '템플릿 삭제'
+  modalMessage.value = `정말로 "${title}" 템플릿을 삭제하시겠습니까? 관련 항목도 함께 삭제됩니다.`
+  modalConfirmText.value = '삭제'
+  modalCancelText.value = '취소'
+  showModal.value = true
+}
+
+const handleConfirm = async () => {
+  showModal.value = false
+  await removeTemplate(selectedTemplateId.value)
+}
+
+const handleCancel = () => {
+  showModal.value = false
+  selectedTemplateId.value = null
+}
+
 const removeTemplate = async (id) => {
-  if (confirm('정말로 이 템플릿을 삭제하시겠습니까? 관련 항목도 함께 삭제됩니다.')) {
-    try {
-      await introduceTemplateStore.removeTemplate(id)
-      alert('템플릿이 성공적으로 삭제되었습니다.')
-      // await introduceTemplateStore.loadTemplates() // store에서 이미 반영됨
-    } catch (error) {
-      console.error('템플릿 삭제 실패:', error)
-      console.log('에러 상세:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      })
-      
-      // 500 에러이거나 FK 제약 조건 관련 에러인 경우
-      if (error.response?.status === 500 || error.response?.status === 503) {
-        alert('이미 사용 중인 템플릿은 삭제할 수 없습니다.\n\n연관된 항목들이 있는 템플릿입니다.')
-      } else {
-        alert('템플릿 삭제에 실패했습니다. 서버 오류일 수 있습니다.')
-      }
+  try {
+    await introduceTemplateStore.removeTemplate(id)
+    toast.success('템플릿이 성공적으로 삭제되었습니다.')
+  } catch (error) {
+    console.error('템플릿 삭제 실패:', error)
+    console.log('에러 상세:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    })
+    
+    // 500 에러이거나 FK 제약 조건 관련 에러인 경우
+    if (error.response?.status === 500 || error.response?.status === 503) {
+      toast.error('이미 사용 중인 템플릿은 삭제할 수 없습니다.\n\n연관된 항목들이 있는 템플릿입니다.')
+    } else {
+      toast.error('템플릿 삭제에 실패했습니다. 서버 오류일 수 있습니다.')
     }
+  } finally {
+    selectedTemplateId.value = null
   }
 }
 </script>
