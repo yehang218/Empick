@@ -64,7 +64,7 @@
           </template>
 
           <div class="button-group mt-4">
-            <v-btn variant="outlined" color="success" class="mr-2">취소</v-btn>
+            <v-btn variant="outlined" color="success" class="mr-2" @click="handleGoBack">취소</v-btn>
             <v-btn color="success" class="submit-btn" @click="handleSubmit">등록</v-btn>
           </div>
         </v-col>
@@ -187,6 +187,10 @@ const handleConfirm = async () => {
 const handleCancel = () => {
   showModal.value = false
   existingIntroduceId = null
+}
+
+const handleGoBack = () => {
+  router.back()
 }
 
 const continueWithExistingIntroduce = async () => {
