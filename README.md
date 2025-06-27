@@ -62,19 +62,19 @@
  </tr>
  <tr>
    <td align="left">
-     <a href="https://github.com/kwakuseok"><strong>곽우석</strong></a>
+     <a href="https://github.com/wooseok718"><strong>곽우석</strong></a>
    </td>
    <td align="left">
-     <a href="https://github.com/kimsukhee"><strong>김석희</strong></a>
+     <a href="https://github.com/yehang218"><strong>김석희</strong></a>
    </td>
    <td align="left">
-     <a href="https://github.com/seominjong"><strong>서민종</strong></a>
+     <a href="https://github.com/MJay1123"><strong>서민종</strong></a>
    </td>
    <td align="left">
-     <a href="https://github.com/leesangmo"><strong>이상모</strong></a>
+     <a href="https://github.com/Morris235"><strong>이상모</strong></a>
    </td>
    <td align="left">
-     <a href="https://github.com/choihyemin"><strong>최혜민</strong></a>
+     <a href="https://github.com/HMYIEN"><strong>최혜민</strong></a>
    </td>
   </tr>
 </table>
