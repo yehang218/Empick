@@ -37,7 +37,7 @@
                     <div class="text-subtitle-2">{{ memberStore.form.departmentName || '부서 없음' }}</div>
                 </div>
 
-                <v-btn icon variant="text">
+                <v-btn icon variant="text" @click="goToProfile">
                     <v-icon color="white">mdi-cog</v-icon>
                 </v-btn>
             </v-app-bar>
@@ -128,6 +128,10 @@ function goToFirstChild(section) {
     } else if (section.path) {
         goTo(section.path);
     }
+}
+
+function goToProfile() {
+    router.push('/orgstructure/profile');
 }
 </script>
 

@@ -106,12 +106,10 @@ function formatDate(date) {
 }
 
 const handleDelete = async () => {
-    try {
-        await store.deleteExistingRecruitment(detail.value.recruitment.id)
-        router.push({ path: '/employment/recruitments', query: { toast: 'deleted' } })
-    } catch (e) {
-        toast.error('삭제 실패: ' + e)
-    }
+    await store.deleteExistingRecruitment(detail.value.recruitment.id)
+    toast.success('채용공고가 삭제되었습니다.');
+    router.push('/employment/recruitments')
+
 }
 
 const getStatusColor = (status) => {
@@ -227,13 +225,9 @@ const stepColor = (stepType) => {
             <v-card v-if="processList.length" class="mb-4 pa-4">
                 <div class="font-weight-bold mb-2" style="color: #2f6f3e;">채용 프로세스</div>
                 <div class="process-chip-list">
-                    <template v-for="(p, idx) in processList.slice().sort((a, b) => a.displayOrder - b.displayOrder)" :key="p.id">
-                        <v-chip
-                            :color="stepColor(p.stepType)"
-                            class="mr-2 mb-2"
-                            size="small"
-                            label
-                        >
+                    <template v-for="(p, idx) in processList.slice().sort((a, b) => a.displayOrder - b.displayOrder)"
+                        :key="p.id">
+                        <v-chip :color="stepColor(p.stepType)" class="mr-2 mb-2" size="small" label>
                             {{ getStepTypeLabel(p.stepType) }}
                         </v-chip>
                         <span v-if="idx < processList.length - 1" class="mx-1" style="font-size:1.2em;">&gt;</span>

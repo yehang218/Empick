@@ -190,4 +190,14 @@ export const useRecruitmentStore = defineStore('recruitment', () => {
 
         clearAllDrafts
     };
+}, {
+    persist: {
+        key: 'recruitment-store',
+        storage: localStorage,
+        paths: [
+            'draftRecruitment',
+            'selectedApplicationItemIds',
+            'requiredApplicationItemIds'
+        ]
+    }
 });

@@ -249,21 +249,17 @@ const submit = async () => {
         memberId: memberStore.form.id
     })
 
-    try {
-        if (isEditMode.value) {
-            await store.updateExistingRecruitment(router.currentRoute.value.query.id, dto)
-            toast.success('공고가 성공적으로 수정되었습니다.')
-        } else {
-            await store.submitRecruitment(dto)
-            toast.success('공고가 성공적으로 등록되었습니다.')
-        }
-        store.clearDraftRecruitment()
-        store.clearDraftApplicationItems()
-        store.clearApplicationItemCategoryList()
-        router.push('/employment/recruitments')
-    } catch (e) {
-        toast.error('공고 저장에 실패했습니다.')
+    if (isEditMode.value) {
+        await store.updateExistingRecruitment(router.currentRoute.value.query.id, dto)
+        toast.success('공고가 성공적으로 수정되었습니다.')
+    } else {
+        await store.submitRecruitment(dto)
+        toast.success('공고가 성공적으로 등록되었습니다.')
     }
+    store.clearDraftRecruitment()
+    store.clearDraftApplicationItems()
+    store.clearApplicationItemCategoryList()
+    router.push('/employment/recruitments')
 }
 </script>
 
