@@ -10,6 +10,7 @@ import com.piveguyz.empickbackend.employment.jobtests.question.command.applicati
 import com.piveguyz.empickbackend.facade.QuestionFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,8 @@ public class QuestionCommandController {
                     실무 테스트 문제를 등록합니다.
                     - type : MULTIPLE / SUBJECTIVE / DESCRIPTIVE,
                     - difficulty : EASY / MEDIUM / HARD
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2400", description = "유효하지 않은 난이도입니다."),
@@ -52,7 +54,8 @@ public class QuestionCommandController {
             description = """
                     실무테스트 문제를 수정합니다.
                     - updatedMemberId는 필수로 있어야 함
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2414", description = "요청한 문제를 찾을 수 없습니다."),
@@ -72,7 +75,8 @@ public class QuestionCommandController {
             summary = "실무테스트 문제 삭제",
             description = """
                     실무테스트 문제를 삭제합니다.
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "2414", description = "요청한 문제를 찾을 수 없습니다."),

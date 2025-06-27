@@ -6,13 +6,16 @@ import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.applicatio
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.CreateJobtestQuestionResponseDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.dto.UpdateJobtestQuestionCommandDTO;
 import com.piveguyz.empickbackend.employment.jobtests.jobtest.command.application.service.JobtestQuestionCommandService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Hidden
 @Tag(name = "실무테스트 API", description = "실무테스트 관련 API")
 @RestController
 @RequestMapping("/api/v1/employment/jobtest-questions")
@@ -28,7 +31,8 @@ public class JobtestQuestionCommandController {
             summary = "실무테스트별 문제 등록",
             description = """
                     실무테스트별 문제를 등록합니다.
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
     })
@@ -47,7 +51,8 @@ public class JobtestQuestionCommandController {
             description = """
                     실무테스트별 문제를 수정합니다.
                     - 점수, 문제 순서 수정 가능
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
     })
@@ -65,7 +70,8 @@ public class JobtestQuestionCommandController {
             summary = "실무테스트별 문제 삭제",
             description = """
                     실무테스트별 문제를 삭제합니다.
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
     })
