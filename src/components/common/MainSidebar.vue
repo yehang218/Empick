@@ -47,11 +47,11 @@
         </v-list>
 
         <div class="bottom-section">
-            <div class="dark-mode-toggle">
+            <!-- <div class="dark-mode-toggle">
                 <v-icon start>mdi-weather-night</v-icon>
                 Dark Mode
                 <v-switch hide-details inset v-model="darkMode" class="ml-auto" />
-            </div>
+            </div> -->
 
             <v-btn block color="#607285" class="logout-btn" prepend-icon="mdi-logout" @click="authStore.logout">
                 Logout
