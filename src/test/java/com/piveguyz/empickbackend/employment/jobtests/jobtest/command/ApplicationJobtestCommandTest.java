@@ -42,7 +42,7 @@ class ApplicationJobtestCommandTest {
     private MemberRepository memberRepository;
 
     @Test
-    @DisplayName("실무테스트를 지원서에 할당")
+    @DisplayName("실무테스트 지원서에 할당")
     void createApplicationJobtest_success() {
         // given
         int jobtestId = 1;
@@ -62,7 +62,7 @@ class ApplicationJobtestCommandTest {
     }
 
     @Test
-    @DisplayName("지원서에서 실무테스트 할당 삭제")
+    @DisplayName("지원서에서 실무테스트 할당 취소")
     void deleteApplicationJobtest_success() {
         // given
         int id = 4;
