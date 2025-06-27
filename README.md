@@ -28,7 +28,7 @@
 | **진행 기간**   | 2025.05.07 ~ 2025.06.27 (1개월 20일) |
 | **개발 방법론** | Agile, Scrum                         |
 
-## 👨‍💻 DEVELOPERS
+### 👨‍💻 DEVELOPERS
 
 <div align="start">
 
