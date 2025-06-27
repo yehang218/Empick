@@ -70,11 +70,11 @@
 | -------------------- | ---------------------------------------------- | --------------------------- |
 | 📋 **Jira**          | [프로젝트 관리](링크)                          | 이슈 트래킹, 스프린트 관리  |
 | 🐙 **GitHub**        | [소스코드](https://github.com/your-org/empick) | 코드 저장소, 협업           |
-| 🎨 **Miro**          | [협업 보드](링크)                              | 아이디어 정리, 브레인스토밍 |
-| 🗃️ **ERD Cloud**     | [데이터베이스](링크)                           | ERD, 데이터 모델링          |
-| 📊 **Google Sheets** | [문서](링크)                                   | 요구사항, 테스트 케이스     |
-| 🎨 **Figma**         | [디자인](링크)                                 | UI/UX 디자인, 프로토타입    |
-| 📚 **Swagger**       | [API 문서](링크)                               | REST API 명세서             |
+| 🎨 **Miro**          | [협업 보드](https://miro.com/app/board/uXjVI0wrEgg=/)                              | 아이디어 정리, 브레인스토밍 |
+| 🗃️ **ERD Cloud**     | [데이터베이스](https://www.erdcloud.com/d/FMTGw9LgJt79PZGRj)                           | ERD, 데이터 모델링          |
+| 📊 **Google Sheets** | [문서](https://docs.google.com/spreadsheets/d/16BIiaTgAxtfLdDFZWlu6dht0YnPJt_T_LnpSRR59XcI/edit?gid=1516354335#gid=1516354335)                                   | 요구사항, 테스트 케이스     |
+| 🎨 **Figma**         | [디자인](https://www.figma.com/design/nKDYy0NToAKWlKM0cea5JG/emPick?m=auto&t=badIvgqHzDMDS2vM-6)                                 | UI/UX 디자인, 프로토타입    |
+| 📚 **Swagger**       | [API 문서](http://vpc2-backend-alb-1656085190.ap-northeast-2.elb.amazonaws.com/swagger-ui.html)                               | REST API 명세서             |
 
 ---
 
@@ -158,8 +158,8 @@
 
 ### **배포된 서비스**
 
-🌐 **프로덕션**: https://empick.your-domain.com  
-📚 **API 문서**: https://api.empick.your-domain.com/swagger-ui.html
+🌐 **프로덕션**: https://www.empick.shop
+📚 **API 문서**: http://vpc2-backend-alb-1656085190.ap-northeast-2.elb.amazonaws.com/swagger-ui.html
 
 ---
 
