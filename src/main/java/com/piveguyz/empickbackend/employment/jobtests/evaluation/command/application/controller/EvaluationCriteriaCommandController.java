@@ -26,7 +26,7 @@ public class EvaluationCriteriaCommandController {
     @Operation(
             summary = "실무 테스트 평가 기준 등록",
             description = """
-                     실무 테스트 평가 기준를 등록합니다.
+                    실무 테스트 평가 기준를 등록합니다.
                     """
     )
     @ApiResponses(value = {
@@ -65,7 +65,7 @@ public class EvaluationCriteriaCommandController {
     @Operation(
             summary = "실무테스트 평가 기준 삭제",
             description = """
-                     실무 테스트 평가 기준을 삭제합니다.
+                    실무 테스트 평가 기준을 삭제합니다.
                     """
     )
     @ApiResponses(value = {

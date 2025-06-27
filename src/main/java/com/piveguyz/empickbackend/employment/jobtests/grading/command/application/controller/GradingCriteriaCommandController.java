@@ -27,7 +27,7 @@ public class GradingCriteriaCommandController {
     @Operation(
             summary = "실무테스트 문제 채점 기준 등록",
             description = """
-                     실무테스트 채점 기준을 등록합니다.
+                    실무테스트 채점 기준을 등록합니다.
                     """
     )
     @ApiResponses(value = {
@@ -48,7 +48,7 @@ public class GradingCriteriaCommandController {
     @Operation(
             summary = "실무테스트 문제 채점 기준 수정",
             description = """
-                     실무테스트 채점 기준을 수정합니다.
+                    실무테스트 채점 기준을 수정합니다.
                     """
     )
     @ApiResponses(value = {
@@ -68,7 +68,7 @@ public class GradingCriteriaCommandController {
     @Operation(
             summary = "실무테스트 문제 채점 기준 삭제",
             description = """
-                     실무테스트 채점 기준을 삭제합니다.
+                    실무테스트 채점 기준을 삭제합니다.
                     """
     )
     @ApiResponses(value = {

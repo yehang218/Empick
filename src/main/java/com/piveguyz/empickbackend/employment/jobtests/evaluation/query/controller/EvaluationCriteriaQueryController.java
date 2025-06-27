@@ -29,7 +29,7 @@ public class EvaluationCriteriaQueryController {
     @Operation(
             summary = "실무테스트에 대한 평가 기준 조회",
             description = """
-                    특정 실무테스트에 관한 평가 기준을 조회한다.
+                    특정 실무테스트에 관한 평가 기준을 조회합니다.
                     """
     )
     @ApiResponses(value = {
@@ -44,7 +44,7 @@ public class EvaluationCriteriaQueryController {
     @Operation(
             summary = "평가 기준 상세 조회",
             description = """
-                    특정 평가 기준을 조회한다.
+                    특정 평가 기준을 조회합니다.
                     """
     )
     @ApiResponses(value = {

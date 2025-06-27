@@ -41,7 +41,7 @@ public class GradingResultCommandController {
     @Operation(
             summary = "실무테스트 답안 채점 결과 수정",
             description = """
-                     실무테스트 답안 채점 결과를 수정합니다.
+                    실무테스트 답안 채점 결과를 수정합니다.
                     """
     )
     @ApiResponses(value = {
@@ -58,7 +58,7 @@ public class GradingResultCommandController {
     @Operation(
             summary = "실무테스트 답안 채점 결과 삭제",
             description = """
-                     실무 테스트 답안 채점 결과를 삭제합니다.
+                    실무 테스트 답안 채점 결과를 삭제합니다.
                     """
     )
     @ApiResponses(value = {

@@ -28,16 +28,15 @@ public class QuestionOptionCommandController {
     @Operation(
             summary = "실무테스트 문제 선택지 등록",
             description = """
-                     실무테스트 선택지를 등록합니다.
-                     실무테스트 당 최대 5개까지 가능합니다.
+                    실무테스트 선택지를 등록합니다.
+                    실무테스트 당 최대 5개까지 가능합니다.
                     """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "2416", description = "선택지는 최대 5개까지만 등록할 수 있습니다."),
     })
     @PostMapping
-    public ResponseEntity<CustomApiResponse<CreateQuestionOptionResponse>> createQuestion(@RequestBody @Valid CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO,
-                                                                                          @RequestBody int questionId) {
+    public ResponseEntity<CustomApiResponse<CreateQuestionOptionResponse>> createQuestion(@RequestBody @Valid CreateQuestionOptionCommandDTO createQuestionOptionCommandDTO, @RequestBody int questionId) {
         CreateQuestionOptionResponse newOptionDTO = questionOptionCommandService.createQuestionOption(createQuestionOptionCommandDTO,
                 questionId);
         return ResponseEntity.status(ResponseCode.SUCCESS.getHttpStatus())
@@ -47,7 +46,7 @@ public class QuestionOptionCommandController {
     @Operation(
             summary = "실무테스트 문제 선택지 수정",
             description = """
-                     실무테스트 선택지를 수정합니다.
+                    실무테스트 선택지를 수정합니다.
                     """
     )
     @ApiResponses(value = {
@@ -66,7 +65,7 @@ public class QuestionOptionCommandController {
     @Operation(
             summary = "실무테스트 문제 선택지 삭제",
             description = """
-                     실무테스트 선택지를 삭제합니다.
+                    실무테스트 선택지를 삭제합니다.
                     """
     )
     @ApiResponses(value = {

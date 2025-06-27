@@ -27,7 +27,7 @@ public class JobtestQuestionCommandController {
     @Operation(
             summary = "실무테스트별 문제 등록",
             description = """
-                     실무테스트별 문제를 등록합니다.
+                    실무테스트별 문제를 등록합니다.
                     """
     )
     @ApiResponses(value = {
@@ -45,8 +45,8 @@ public class JobtestQuestionCommandController {
     @Operation(
             summary = "실무테스트별 문제 수정",
             description = """
-                     실무테스트별 문제를 수정합니다.
-                     - 점수, 문제 순서 수정 가능
+                    실무테스트별 문제를 수정합니다.
+                    - 점수, 문제 순서 수정 가능
                     """
     )
     @ApiResponses(value = {
@@ -64,7 +64,7 @@ public class JobtestQuestionCommandController {
     @Operation(
             summary = "실무테스트별 문제 삭제",
             description = """
-                     실무테스트별 문제를 삭제합니다.
+                    실무테스트별 문제를 삭제합니다.
                     """
     )
     @ApiResponses(value = {

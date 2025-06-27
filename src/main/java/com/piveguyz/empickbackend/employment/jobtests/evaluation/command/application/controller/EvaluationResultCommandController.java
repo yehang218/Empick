@@ -27,7 +27,7 @@ public class EvaluationResultCommandController {
     @Operation(
             summary = "실무 테스트 평가 결과 등록",
             description = """
-                     실무 테스트 평가 결과를 등록합니다.
+                    실무 테스트 평가 결과를 등록합니다.
                     """
     )
     @ApiResponses(value = {
@@ -65,7 +65,7 @@ public class EvaluationResultCommandController {
     @Operation(
             summary = "실무테스트 평가 결과 삭제",
             description = """
-                     실무 테스트 평가 결과를 삭제합니다.
+                    실무 테스트 평가 결과를 삭제합니다.
                     """
     )
     @ApiResponses(value = {

@@ -29,7 +29,7 @@ public class EvaluationResultQueryController {
     @Operation(
             summary = "특정 지원서 평가 결과 조회",
             description = """
-                     특정 지원서에 대한 평가 결과를 조회합니다.
+                    특정 지원서에 대한 평가 결과를 조회합니다.
                     """
     )
     @ApiResponses(value = {

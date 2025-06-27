@@ -28,7 +28,7 @@ public class QuestionCommandController {
     @Operation(
             summary = "실무테스트 문제 등록",
             description = """
-                     실무 테스트 문제를 등록합니다.
+                    실무 테스트 문제를 등록합니다.
                     - type : MULTIPLE / SUBJECTIVE / DESCRIPTIVE,
                     - difficulty : EASY / MEDIUM / HARD
                     """
@@ -50,8 +50,8 @@ public class QuestionCommandController {
     @Operation(
             summary = "실무테스트 문제 수정",
             description = """
-                     실무테스트 문제를 수정합니다.
-                     - updatedMemberId는 필수로 있어야 함
+                    실무테스트 문제를 수정합니다.
+                    - updatedMemberId는 필수로 있어야 함
                     """
     )
     @ApiResponses(value = {
@@ -71,7 +71,7 @@ public class QuestionCommandController {
     @Operation(
             summary = "실무테스트 문제 삭제",
             description = """
-                     실무테스트 문제를 삭제합니다.
+                    실무테스트 문제를 삭제합니다.
                     """
     )
     @ApiResponses(value = {
