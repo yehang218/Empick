@@ -156,30 +156,6 @@
 
 ## 🚀 설치 및 실행
 
-### **로컬 개발 환경**
-
-#### 1. 저장소 클론
-
-```bash
-git clone https://github.com/your-org/empick.git
-cd empick
-```
-
-#### 2. Backend 실행
-
-```bash
-cd empick-backend
-./gradlew bootRun
-```
-
-#### 3. Frontend 실행
-
-```bash
-cd empick-frontend
-npm install
-npm run dev
-```
-
 ### **배포된 서비스**
 
 🌐 **프로덕션**: https://empick.your-domain.com  
