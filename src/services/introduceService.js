@@ -55,11 +55,61 @@ export const createIntroduceRatingResult = async (payload) => {
     const response = await api.post(IntroduceAPI.CREATE_RATING_RESULT, requestData)
     console.log('✅ 평가 결과 저장 성공:', response.data)
     
-    // 2. 저장된 평가 결과의 ID 추출
-    const ratingResultId = response.data?.data?.id || response.data?.id
-    console.log('🔍 저장된 평가 결과 ID:', ratingResultId)
+    // 2. 저장된 평가 결과의 ID 추출 (다양한 구조 시도)
+    let ratingResultId = null
+    
+    // 여러 가능한 구조에서 ID 추출 시도
+    if (response.data?.data?.id) {
+      ratingResultId = response.data.data.id
+      console.log('✅ response.data.data.id에서 ID 추출:', ratingResultId)
+    } else if (response.data?.id) {
+      ratingResultId = response.data.id
+      console.log('✅ response.data.id에서 ID 추출:', ratingResultId)
+    } else if (response.data?.data) {
+      // data 객체 전체 구조 확인
+      console.log('🔍 data 객체 전체 구조 확인:', response.data.data)
+      
+      // 가능한 ID 필드들 시도
+      ratingResultId = response.data.data.ratingResultId || 
+                      response.data.data.rating_result_id ||
+                      response.data.data.introduceRatingResultId ||
+                      response.data.data.introduce_rating_result_id ||
+                      response.data.data.resultId ||
+                      response.data.data.result_id
+      
+      if (ratingResultId) {
+        console.log('✅ 대체 필드에서 ID 추출:', ratingResultId)
+      }
+    }
+    
+    console.log('🔍 최종 추출된 평가 결과 ID:', ratingResultId)
+    console.log('🔍 전체 응답 구조 확인:', JSON.stringify(response.data, null, 2))
     
     // 3. application 테이블의 introduce_rating_result_id 업데이트
+    // ID를 찾지 못한 경우 fallback: 방금 저장한 평가 결과를 조회해서 ID 찾기
+    if (!ratingResultId && payload.applicationId) {
+      console.log('🔄 ID 추출 실패 - fallback으로 최근 평가 결과 조회 시도...')
+      try {
+        // applicationId로 방금 저장한 평가 결과 찾기
+        const recentEvaluation = await getIntroduceRatingResultByApplicationId(payload.applicationId)
+        if (recentEvaluation && recentEvaluation.id) {
+          ratingResultId = recentEvaluation.id
+          console.log('✅ fallback으로 평가 결과 ID 발견:', ratingResultId)
+        } else {
+          // introduceId로 시도
+          if (payload.introduceId) {
+            const evaluationByIntroduce = await getIntroduceRatingResultByIntroduceId(payload.introduceId)
+            if (evaluationByIntroduce && evaluationByIntroduce.id) {
+              ratingResultId = evaluationByIntroduce.id
+              console.log('✅ fallback (introduceId)으로 평가 결과 ID 발견:', ratingResultId)
+            }
+          }
+        }
+      } catch (fallbackError) {
+        console.warn('⚠️ fallback ID 조회도 실패:', fallbackError.message)
+      }
+    }
+    
     if (ratingResultId && payload.applicationId) {
       try {
         console.log('🔄 application.introduce_rating_result_id 업데이트 시작:', {
@@ -69,7 +119,7 @@ export const createIntroduceRatingResult = async (payload) => {
           applicationIdType: typeof payload.applicationId
         })
         
-        // application 업데이트 API 호출
+        // 수정된 ApplicationCommandDTO를 사용하는 업데이트 서비스 호출
         const { updateApplicationIntroduceRatingResultService } = await import('@/services/applicationService')
         const updateResult = await updateApplicationIntroduceRatingResultService(payload.applicationId, ratingResultId)
         

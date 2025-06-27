@@ -68,10 +68,19 @@
             <v-btn color="success" class="submit-btn" @click="handleSubmit">등록</v-btn>
           </div>
         </v-col>
-      </v-row>
+            </v-row>
     </v-container>
 
-
+    <!-- 제출 확인 Modal -->
+    <AlertModal
+      v-if="showSubmitModal"
+      title="지원서 제출 확인"
+      message="제출한 지원서는 수정할 수 없습니다. 정말 제출하시겠습니까?"
+      confirm-text="제출하기"
+      cancel-text="취소"
+      @confirm="handleFinalSubmit"
+      @cancel="handleCancelSubmit"
+    />
   </div>
 </template>
 
@@ -80,6 +89,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import CareerHeader from '@/components/career/CareerHeader.vue'
+import AlertModal from '@/components/common/AlertModal.vue'
 import { useRecruitmentStore } from '@/stores/recruitmentStore'
 import { useIntroduceTemplateStore } from '@/stores/introduceTemplateStore'
 import { useIntroduceStore } from '@/stores/introduceStore'
@@ -92,7 +102,8 @@ const router = useRouter()
 const toast = useToast()
 const id = Number(route.params.id)
 
-
+// 제출 확인 모달 상태
+const showSubmitModal = ref(false)
 
 // URL 파라미터 또는 로컬 스토리지에서 ID 가져오기
 console.log('🔍 ID 소스 확인:', {
@@ -153,6 +164,33 @@ const handleGoBack = () => {
   router.back()
 }
 
+// 제출 확인 모달 핸들러
+const handleSubmit = () => {
+  // 필수 항목 유효성 검사
+  const requiredItems = applicationItems.value.filter(item => item.required === true)
+  const missingRequiredItems = []
+  
+  for (const item of requiredItems) {
+    const answer = applicationAnswers.value[item.id]
+    if (!answer || answer.trim() === '') {
+      missingRequiredItems.push(item.categoryName)
+    }
+  }
+  
+  if (missingRequiredItems.length > 0) {
+    const missingItemsText = missingRequiredItems.join(', ')
+    toast.error(`다음 필수 항목을 입력해주세요: ${missingItemsText}`)
+    return
+  }
+
+  // 유효성 검사 통과 시 확인 모달 표시
+  showSubmitModal.value = true
+}
+
+const handleCancelSubmit = () => {
+  showSubmitModal.value = false
+}
+
 const processApplicationResponses = async (finalApplicationId) => {
   console.log('🔄 이력서 등록 시작')
   
@@ -177,29 +215,13 @@ const processApplicationResponses = async (finalApplicationId) => {
   console.log('✅ 이력서 등록 완료')
 }
 
-// 등록 버튼 클릭 시 introduce 테이블에 먼저 insert 후 introduceId로 항목별 응답 등록
-const handleSubmit = async () => {
+// 최종 제출 처리 함수
+const handleFinalSubmit = async () => {
+  showSubmitModal.value = false
   try {
     // ID 유효성 검사
     if (!applicantId.value || !applicationId.value) {
       throw new Error('지원자 ID 또는 지원서 ID가 없습니다. 인적사항부터 다시 등록해주세요.')
-    }
-
-    // 필수 항목 유효성 검사
-    const requiredItems = applicationItems.value.filter(item => item.required === true)
-    const missingRequiredItems = []
-    
-    for (const item of requiredItems) {
-      const answer = applicationAnswers.value[item.id]
-      if (!answer || answer.trim() === '') {
-        missingRequiredItems.push(item.categoryName)
-      }
-    }
-    
-    if (missingRequiredItems.length > 0) {
-      const missingItemsText = missingRequiredItems.join(', ')
-      toast.error(`다음 필수 항목을 입력해주세요: ${missingItemsText}`)
-      return
     }
 
     console.log('🔄 이력서/자기소개서 등록 시작')
