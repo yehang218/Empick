@@ -18,23 +18,25 @@
             <span class="question-content-label">문제 내용</span>
             <div class="question-content-text">{{ question.content }}</div>
           </div>
-          
+
           <div v-if="question.detailContent" class="info-item">
             <span class="info-label">상세 설명:</span>
             <span class="info-content">{{ question.detailContent }}</span>
           </div>
-          
+
           <div class="info-row">
             <div class="info-item">
               <span class="info-label">유형:</span>
-              <span class="info-tag" :style="getQuestionTypeStyle(question.type)">{{ getQuestionTypeLabel(question.type) }}</span>
+              <span class="info-tag" :style="getQuestionTypeStyle(question.type)">{{ getQuestionTypeLabel(question.type)
+                }}</span>
             </div>
             <div class="info-item">
               <span class="info-label">난이도:</span>
-              <span class="info-tag" :style="getDifficultyStyle(question.difficulty)">{{ getDifficultyLabel(question.difficulty) }}</span>
+              <span class="info-tag" :style="getDifficultyStyle(question.difficulty)">{{
+                getDifficultyLabel(question.difficulty) }}</span>
             </div>
           </div>
-          
+
           <div v-if="question.answer" class="info-item">
             <span class="info-label">정답:</span>
             <span class="info-content answer-content">{{ question.answer }}</span>
@@ -45,15 +47,12 @@
         <div v-if="question.type === 'MULTIPLE' && question.questionOptions?.length" class="options-section">
           <h3 class="section-title">선택지</h3>
           <div class="options-list">
-            <div v-for="(opt, i) in question.questionOptions" :key="i" 
-                 class="option-item"
-                 :class="{ 'correct-option': question.answer?.trim() === opt.content?.trim() }">
+            <div v-for="(opt, i) in question.questionOptions" :key="i" class="option-item"
+              :class="{ 'correct-option': question.answer?.trim() === opt.content?.trim() }">
               <span class="option-number">{{ opt.optionNumber ? `${opt.optionNumber}.` : `${i + 1}.` }}</span>
               <span class="option-content">{{ opt.content }}</span>
-              <v-icon v-if="question.answer?.trim() === opt.content?.trim()" 
-                      color="white" 
-                      size="small" 
-                      class="correct-icon">
+              <v-icon v-if="question.answer?.trim() === opt.content?.trim()" color="white" size="small"
+                class="correct-icon">
                 mdi-check-circle
               </v-icon>
             </div>
@@ -119,29 +118,19 @@
           닫기
         </v-btn>
         <v-spacer />
-        <v-btn v-if="props.showDelete" 
-               color="error" 
-               variant="outlined" 
-               prepend-icon="mdi-delete" 
-               @click="handleDeleteConfirm"
-               class="delete-btn">
+        <v-btn v-if="props.showDelete" color="error" variant="outlined" prepend-icon="mdi-delete"
+          @click="handleDeleteConfirm" class="delete-btn">
           삭제하기
         </v-btn>
-        <v-btn v-if="props.showEdit" 
-               color="primary" 
-               variant="elevated" 
-               @click="goEditPage" 
-               prepend-icon="mdi-pencil"
-               class="edit-btn">
+        <v-btn v-if="props.showEdit" color="primary" variant="elevated" @click="goEditPage" prepend-icon="mdi-pencil"
+          class="edit-btn">
           수정하기
         </v-btn>
       </v-card-actions>
     </v-card>
-    
-    <AlertModal v-if="showDeleteConfirm" 
-                :message="'정말 이 문제를 삭제하시겠습니까? 복구할 수 없습니다.'" 
-                @confirm="confirmDelete"
-                @cancel="showDeleteConfirm = false" />
+
+    <AlertModal v-if="showDeleteConfirm" :message="'정말 이 문제를 삭제하시겠습니까? 복구할 수 없습니다.'" @confirm="confirmDelete"
+      @cancel="showDeleteConfirm = false" />
   </v-dialog>
 </template>
 
@@ -273,6 +262,11 @@ const getQuestionTypeStyle = (type) => {
   width: 40px;
   height: 40px;
   transition: all 0.3s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .close-btn:hover {
@@ -576,6 +570,10 @@ const getQuestionTypeStyle = (type) => {
   font-weight: 500;
   text-transform: none;
   padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .cancel-btn:hover {
@@ -587,6 +585,11 @@ const getQuestionTypeStyle = (type) => {
   text-transform: none;
   padding: 8px 20px;
   border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .edit-btn {
@@ -595,6 +598,11 @@ const getQuestionTypeStyle = (type) => {
   padding: 8px 20px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(74, 124, 89, 0.3);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .edit-btn:hover {
@@ -606,31 +614,31 @@ const getQuestionTypeStyle = (type) => {
   .modal-content {
     padding: 20px;
   }
-  
+
   .modal-header {
     padding: 20px;
   }
-  
+
   .modal-actions {
     padding: 20px;
     flex-direction: column;
   }
-  
+
   .info-row {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .info-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .info-label {
     min-width: auto;
   }
-  
+
   .info-tag {
     font-size: 0.75rem;
     padding: 4px 10px;
