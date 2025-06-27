@@ -110,7 +110,7 @@ class AnswerCommandTest {
     }
 
     @Test
-    @DisplayName("답안 삭제 - ID로 삭제하면 DB에 존재하지 않아야 함")
+    @DisplayName("답안 삭제")
     void deleteAnswer_success() {
         // given: 먼저 답안을 하나 저장
         AnswerEntity answer = AnswerEntity.builder()
