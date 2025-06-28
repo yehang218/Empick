@@ -408,15 +408,18 @@ export const useAttendanceStore = defineStore('attendance', () => {
         return formatterParseTimeString(timeString);
     };
 
-    // 목표 근무시간 계산
+    // 🔥 FIX: 목표 근무시간 계산 (법적 기준에 맞게 수정)
     const calculateTargetHours = async (year, month) => {
         const { WORK_TIME_CONFIG } = await import('@/config/attendance');
-        const workDaysInMonth = await getWorkDaysInMonth(year, month);
-        const targetMinutes = workDaysInMonth * WORK_TIME_CONFIG.STANDARD_WORK_MINUTES;
+
+        // 🔥 NEW: 주말 제외한 근무일 기준으로 계산 (근로기준법 제50조)
+        const workDaysInMonth = await getWorkDaysInMonth(year, month); // 주말 제외한 근무일
+        const weeksInMonth = workDaysInMonth / 5; // 주 5일 근무 기준으로 주수 계산
+        const weeklyStandardHours = WORK_TIME_CONFIG.WEEKLY_STANDARD_HOURS; // 40시간
+
+        const targetMinutes = Math.round(weeksInMonth * weeklyStandardHours * WORK_TIME_CONFIG.MINUTES_PER_HOUR);
         const hours = Math.floor(targetMinutes / WORK_TIME_CONFIG.MINUTES_PER_HOUR);
         const minutes = targetMinutes % WORK_TIME_CONFIG.MINUTES_PER_HOUR;
-
-
 
         return { hours, minutes };
     };

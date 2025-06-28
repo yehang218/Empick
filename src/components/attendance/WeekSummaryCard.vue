@@ -6,15 +6,18 @@
             <div class="header-cell time-cell">업무시작</div>
             <div class="header-cell time-cell">업무종료</div>
             <div class="header-cell duration-cell">근무시간</div>
-            <div class="header-cell status-cell">승인요청</div>
+            <div class="header-cell status-cell">근무상태</div>
+            <!-- <div class="header-cell status-cell">승인요청</div> -->
         </div>
 
         <!-- 테이블 데이터 -->
         <div class="table-body">
             <div v-for="(day, index) in weekData" :key="index" class="table-row" :class="{ 'selected': day.selected }">
                 <div class="data-cell date-cell">
-                    <span class="date-number">{{ day.date }}</span>
-                    <span class="date-label">일</span>
+                    <div class="date-info">
+                        <span class="date-number">{{ day.date }}</span>
+                        <span class="date-label">일</span>
+                    </div>
                 </div>
 
                 <div class="data-cell time-cell">
@@ -36,11 +39,41 @@
                     </div>
                 </div>
 
+                <!-- 🔥 NEW: 근무상태 컬럼 -->
                 <div class="data-cell status-cell">
+                    <div class="work-status-badges">
+                        <v-chip v-if="getDailyValidation(day).exceedsLimit" color="error" size="small" variant="flat">
+                            <v-icon start size="small">mdi-alert-circle</v-icon>
+                            한도초과
+                        </v-chip>
+                        <v-chip
+                            v-else-if="getDailyValidation(day).hasOvertime && getDailyValidation(day).overtimeHours > 0"
+                            color="info" size="small" variant="flat">
+                            <v-icon start size="small">mdi-clock-plus-outline</v-icon>
+                            연장근무 {{ getDailyValidation(day).overtimeHours }}h
+                        </v-chip>
+                        <v-chip v-else-if="getDailyValidation(day).isFullDay" color="success" size="small"
+                            variant="flat">
+                            <v-icon start size="small">mdi-check-circle</v-icon>
+                            적정근무
+                        </v-chip>
+                        <v-chip v-else-if="getDailyValidation(day).isInsufficient" color="warning" size="small"
+                            variant="flat">
+                            <v-icon start size="small">mdi-clock-minus-outline</v-icon>
+                            시간부족
+                        </v-chip>
+                        <v-chip v-else color="grey" size="small" variant="flat">
+                            <v-icon start size="small">mdi-minus</v-icon>
+                            데이터없음
+                        </v-chip>
+                    </div>
+                </div>
+
+                <!-- <div class="data-cell status-cell">
                     <v-btn v-if="day.needsApproval" size="small" color="primary" @click="requestApproval(day)">
                         승인요청
                     </v-btn>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -126,6 +159,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useWorkTimeValidation } from '@/composables/useWorkTimeValidation'
 
 // Props
 const props = defineProps({
@@ -163,6 +197,14 @@ const latestDay = computed(() => {
 
     return sortedDays[0] // 가장 최신일 반환
 })
+
+// Composables
+const { validateDailyWorkTime } = useWorkTimeValidation()
+
+// 🔥 REFACTORED: 일별 근무시간 검증 함수 (휴게시간 포함)
+const getDailyValidation = (day) => {
+    return validateDailyWorkTime(day)
+}
 
 // 현재 시간을 주기적으로 업데이트하기 위한 reactive 변수
 const currentTime = ref(new Date())
@@ -255,8 +297,6 @@ const getOngoingWorkBarStyle = (day) => {
     }
 }
 
-
-
 // 타임라인 마우스 이동 처리 (배경 - 실시간 시간 표시)
 const onTimelineMouseMove = (event) => {
     const rect = event.currentTarget.getBoundingClientRect()
@@ -305,13 +345,13 @@ const hideWorkBarTooltip = () => {
     workBarTooltip.value.show = false
 }
 
-// 승인 요청 처리
-const requestApproval = (day) => {
-    console.log('승인 요청:', day)
-}
+// 승인 요청 처리 (주석 처리)
+// const requestApproval = (day) => {
+//     console.log('승인 요청:', day)
+// }
 
 // Emits
-defineEmits(['requestApproval', 'editTime'])
+defineEmits([/* 'requestApproval', */ 'editTime'])
 </script>
 
 <style lang="scss" scoped>
@@ -354,8 +394,8 @@ defineEmits(['requestApproval', 'editTime'])
         }
 
         &.status-cell {
-            width: 100px;
-            min-width: 100px;
+            width: 120px;
+            min-width: 120px;
         }
     }
 }
@@ -387,6 +427,14 @@ defineEmits(['requestApproval', 'editTime'])
                 width: 80px;
                 min-width: 80px;
                 justify-content: center;
+                flex-direction: column;
+                gap: 4px;
+
+                .date-info {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
 
                 .date-number {
                     font-size: 16px;
@@ -430,9 +478,17 @@ defineEmits(['requestApproval', 'editTime'])
             }
 
             &.status-cell {
-                width: 100px;
-                min-width: 100px;
+                width: 120px;
+                min-width: 120px;
                 justify-content: center;
+
+                // 🔥 NEW: 근무상태 배지 스타일
+                .work-status-badges {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                }
             }
         }
     }
