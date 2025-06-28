@@ -29,9 +29,21 @@
               ({{ selectedItemIds.length }}개 선택됨)
             </span>
           </h2>
+          <div class="search-container">
+            <v-text-field
+              v-model="searchQuery"
+              label="항목 검색"
+              variant="outlined"
+              prepend-inner-icon="mdi-magnify"
+              clearable
+              hide-details
+              class="search-field"
+              placeholder="항목 내용을 입력하여 검색하세요"
+            />
+          </div>
           <div class="items-container">
-            <div v-if="items.length > 0" class="items-list">
-              <div v-for="(item, index) in items" :key="item.id || index" class="item-card">
+            <div v-if="filteredItems.length > 0" class="items-list">
+              <div v-for="(item, index) in filteredItems" :key="item.id || index" class="item-card">
                 <div class="item-content">
                   <v-checkbox 
                     v-model="selectedItemIds" 
@@ -42,6 +54,10 @@
                   <div class="item-text">{{ item.title }}</div>
                 </div>
               </div>
+            </div>
+            <div v-else-if="searchQuery && items.length > 0" class="empty-state">
+              <v-icon size="large" color="grey">mdi-magnify</v-icon>
+              <p>"{{ searchQuery }}"에 대한 검색 결과가 없습니다.</p>
             </div>
             <div v-else class="empty-state">
               <v-icon size="large" color="grey">mdi-format-list-bulleted</v-icon>
@@ -99,6 +115,14 @@ const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('확인')
 const modalCancelText = ref('취소')
+
+const searchQuery = ref('')
+const filteredItems = computed(() => {
+  if (!searchQuery.value) {
+    return items.value
+  }
+  return items.value.filter(item => item.title.toLowerCase().includes(searchQuery.value.toLowerCase()))
+})
 
 function goToManage() {
   router.push('/employment/introduce-items/manage')
@@ -251,6 +275,27 @@ const submit = async () => {
   border-color: #3b82f6;
 }
 
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-field {
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.search-field :deep(.v-field) {
+  border-radius: 8px;
+}
+
+.search-field :deep(.v-field__outline) {
+  border-color: #e2e8f0;
+}
+
+.search-field :deep(.v-field--focused .v-field__outline) {
+  border-color: #3b82f6;
+}
+
 .items-container {
   background: #f8fafc;
   border-radius: 12px;
@@ -383,6 +428,7 @@ const submit = async () => {
   
   .items-container {
     padding: 20px;
+    max-height: 300px;
   }
   
   .action-buttons {
@@ -413,6 +459,7 @@ const submit = async () => {
   
   .items-container {
     padding: 16px;
+    max-height: 250px;
   }
   
   .item-card {
