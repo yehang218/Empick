@@ -110,7 +110,6 @@
                     <!-- 🔥 NEW: 휴게시간 정보 추가 -->
                     <div class="stat-item" v-if="breakTimeHours > 0">
                         <span class="label">
-                            <v-icon size="small" class="mr-1">mdi-coffee</v-icon>
                             월간 총 휴게시간:
                         </span>
                         <span class="value info-text">{{ breakTimeHours }}h {{ breakTimeMinutes }}m</span>
