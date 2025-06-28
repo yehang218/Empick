@@ -46,6 +46,9 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
     const currentPath = router.currentRoute.value.path;
     const isLoginPage = currentPath === '/login';
 
+    // 지원자용 경로인지 확인
+    const isCareerPath = currentPath.startsWith('/career') || currentPath.startsWith('/employment/jobtest/exam/');
+
     if (redirect && error.response) {
         switch (error.response.status) {
             case 401: {
@@ -66,12 +69,28 @@ export const handleApiError = (error, options = { showToast: true, redirect: tru
             }
             case 403:
                 // 인가 오류 → 권한 없음 페이지로 이동
-                if (router.currentRoute.value.name !== 'Forbidden') {
-                    router.push({ name: 'Forbidden' });
+                if (isCareerPath) {
+                    // 지원자용 경로에서는 지원자용 에러 페이지로 이동
+                    if (router.currentRoute.value.name !== 'CareerError') {
+                        router.push({ name: 'CareerError' });
+                    }
+                } else {
+                    // 관리자용 경로에서는 기존 Forbidden 페이지로 이동
+                    if (router.currentRoute.value.name !== 'Forbidden') {
+                        router.push({ name: 'Forbidden' });
+                    }
                 }
                 break;
             case 404:
-                router.push({ name: 'NotFound' });
+                if (isCareerPath) {
+                    // 지원자용 경로에서는 지원자용 에러 페이지로 이동
+                    if (router.currentRoute.value.name !== 'CareerError') {
+                        router.push({ name: 'CareerError' });
+                    }
+                } else {
+                    // 관리자용 경로에서는 기존 NotFound 페이지로 이동
+                    router.push({ name: 'NotFound' });
+                }
                 break;
         }
     }

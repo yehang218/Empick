@@ -8,6 +8,9 @@ export const authGuard = async (to, from, next) => {
     const isAuthenticated = authStore.isAuthenticated;
     const userRoles = authStore.userInfo?.roles || [];
 
+    // 지원자용 경로인지 확인
+    const isCareerPath = to.path.startsWith('/career') || to.path.startsWith('/employment/jobtest/exam/');
+
     // 🔐 인증 체크
     if (requiresAuth && !isAuthenticated) {
         console.warn('로그인이 필요합니다.');
@@ -21,7 +24,14 @@ export const authGuard = async (to, from, next) => {
         const hasRequiredRole = requiredRoles.some(role => userRoles.includes(role));
         if (!hasRequiredRole) {
             console.warn('접근 권한이 없습니다. 필요 권한:', requiredRoles, '사용자 권한:', userRoles);
-            return next({ name: 'Forbidden' });
+            
+            // 지원자용 경로에서는 지원자용 에러 페이지로 이동
+            if (isCareerPath) {
+                return next({ name: 'CareerError' });
+            } else {
+                // 관리자용 경로에서는 기존 Forbidden 페이지로 이동
+                return next({ name: 'Forbidden' });
+            }
         }
     }
 
