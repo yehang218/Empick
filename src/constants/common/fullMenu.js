@@ -23,22 +23,21 @@ export const fullMenu = {
         }
     ],
     인사: [
-        {
-            label: '조직 관리',
-            roles: [RoleCode.HR_ACCESS],
-            children: [
-                { label: '부서 관리', path: '/orgstructure/dept-manage' },
-                { label: '직무 관리', path: '/orgstructure/job-manage' },
-                { label: '직급 관리', path: '/orgstructure/rank-manage' },
-                { label: '직책 관리', path: '/orgstructure/position-manage' }
-            ]
-        },
+        // {
+        //     label: '조직 관리',
+        //     roles: [RoleCode.HR_ACCESS],
+        //     children: [
+        //         { label: '부서 관리', path: '/orgstructure/dept-manage' },
+        //         { label: '직무 관리', path: '/orgstructure/job-manage' },
+        //         { label: '직급 관리', path: '/orgstructure/rank-manage' },
+        //         { label: '직책 관리', path: '/orgstructure/position-manage' }
+        //     ]
+        // },
         {
             label: '사원 관리',
             roles: [RoleCode.HR_ACCESS],
             children: [
                 { label: "신규 사원 등록", path: "/orgstructure/member-register" },
-                { label: "사원 목록", path: "/attendance/all" },
                 { label: "사원정보변경 요청", path: "/orgstructure/members/edit-request" }
             ]
         }
