@@ -75,7 +75,7 @@ const userRoles = computed(() => authStore.userInfo?.roles || [])
 
 // 현재 경로에 따라 헤더 메뉴 결정
 const headerTitle = computed(() => {
-    if (route.path.startsWith('/hr')) return '인사'
+    if (route.path.startsWith('/orgstructure')) return '인사'
     if (route.path.startsWith('/attendance')) return '근태'
     if (route.path.startsWith('/approval')) return '결재'
     if (route.path.startsWith('/employment')) return '채용'
