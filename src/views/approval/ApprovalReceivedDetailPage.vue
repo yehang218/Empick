@@ -27,10 +27,10 @@
                 >
                     {{ isAlreadyLinked ? '연동 완료' : '채용 요청서 연동' }}
                 </v-btn>
-                <button class="btn approve" @click="handleApprove" :disabled="!canApprove">
+                <button class="btn approve" @click="showApproveModal" :disabled="!canApprove">
                     승인
                 </button>
-                <button class="btn reject" @click="handleReject" :disabled="!canApprove">
+                <button class="btn reject" @click="showRejectModal" :disabled="!canApprove">
                     반려
                 </button>
             </div>
@@ -104,6 +104,43 @@
             </div>
         </div>
     </div>
+
+    <!-- 승인 확인 모달 -->
+    <AlertModal
+        v-if="showApproveConfirm"
+        :message="'정말 승인하시겠습니까?'"
+        :show-cancel="true"
+        confirm-text="승인"
+        cancel-text="취소"
+        @confirm="handleApproveConfirm"
+        @cancel="showApproveConfirm = false"
+    />
+
+    <!-- 반려 사유 입력 모달 -->
+    <div v-if="showRejectInput" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-content">
+                <div class="modal-icon">
+                    <i class="mdi mdi-alert-circle-outline"></i>
+                </div>
+                <p class="modal-message">반려 사유를 입력해주세요.</p>
+                <textarea 
+                    v-model="rejectReason"
+                    placeholder="반려 사유를 입력하세요..."
+                    class="reject-reason-input"
+                    rows="3"
+                ></textarea>
+                <div class="modal-buttons">
+                    <button class="cancel" @click="showRejectInput = false">
+                        취소
+                    </button>
+                    <button class="confirm" @click="handleRejectConfirm" :disabled="!rejectReason.trim()">
+                        반려
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup>
@@ -116,6 +153,8 @@ import { useDepartmentStore } from '@/stores/departmentStore';
 import { useJobStore } from '@/stores/jobStore';
 import { useRecruitmentRequestStore } from '@/stores/recruitmentRequestStore';
 import RecruitmentRequestCreateDTO from '@/dto/employment/recruitment/RecruitmentRequestCreateDTO';
+import AlertModal from '@/components/common/AlertModal.vue';
+import { useToast } from 'vue-toastification';
 
 defineProps({
     id: { type: String, required: true }
@@ -128,6 +167,7 @@ const memberStore = useMemberStore();
 const departmentStore = useDepartmentStore();
 const jobStore = useJobStore();
 const recruitmentRequestStore = useRecruitmentRequestStore();
+const toast = useToast();
 
 const { approvalDetail, loading, error } = storeToRefs(approvalStore);
 const { departmentList } = storeToRefs(departmentStore);
@@ -141,6 +181,11 @@ const linking = ref(false);
 const isAlreadyLinked = ref(false);
 const isRecruitmentRequest = ref(false);
 const isApproved = ref(false);
+
+// 모달 상태 변수들
+const showApproveConfirm = ref(false);
+const showRejectInput = ref(false);
+const rejectReason = ref('');
 
 const LINKED_APPROVALS_KEY = 'empick-linked-approvals';
 
@@ -288,28 +333,37 @@ const getInitials = (name) => {
     return name.substring(1, 3).toUpperCase();
 };
 
-const handleApprove = async () => {
-    if (confirm('정말 승인하시겠습니까?')) {
-        try {
-            await approveDocument(approvalDetail.value.approvalId);
-            alert('성공적으로 승인 처리되었습니다.');
-            router.push('/approval/inbox');
-        } catch (err) {
-            alert('승인 처리 중 오류가 발생했습니다.');
-        }
+const showApproveModal = () => {
+    showApproveConfirm.value = true;
+};
+
+const showRejectModal = () => {
+    showRejectInput.value = true;
+};
+
+const handleApproveConfirm = async () => {
+    try {
+        await approveDocument(approvalDetail.value.approvalId);
+        showApproveConfirm.value = false;
+        toast.success('성공적으로 승인 처리되었습니다.');
+        // 승인 후 상세 데이터 다시 불러오기
+        await fetchReceivedApprovalDetail(approvalDetail.value.approvalId, memberStore.form.id);
+    } catch (err) {
+        toast.error('승인 처리 중 오류가 발생했습니다.');
     }
 };
 
-const handleReject = async () => {
-    const reason = prompt('반려 사유를 입력해주세요.');
-    if (reason) {
-        try {
-            await rejectDocument(approvalDetail.value.approvalId, reason);
-            alert('성공적으로 반려 처리되었습니다.');
-            router.push('/approval/inbox');
-        } catch (err) {
-            alert('반려 처리 중 오류가 발생했습니다.');
-        }
+const handleRejectConfirm = async () => {
+    if (!rejectReason.value.trim()) return;
+    try {
+        await rejectDocument(approvalDetail.value.approvalId, rejectReason.value);
+        showRejectInput.value = false;
+        rejectReason.value = '';
+        toast.success('성공적으로 반려 처리되었습니다.');
+        // 반려 후 상세 데이터 다시 불러오기
+        await fetchReceivedApprovalDetail(approvalDetail.value.approvalId, memberStore.form.id);
+    } catch (err) {
+        toast.error('반려 처리 중 오류가 발생했습니다.');
     }
 };
 
@@ -340,12 +394,12 @@ const handleLinkRecruitmentRequest = async () => {
         localStorage.setItem(LINKED_APPROVALS_KEY, JSON.stringify(linkedApprovals));
         isAlreadyLinked.value = true;
         
-        alert('채용 요청서가 성공적으로 생성되었습니다.');
+        toast.success('채용 요청서가 성공적으로 생성되었습니다.');
         router.push('/employment/recruitment-requests');
 
     } catch (err) {
         console.error("Failed to create recruitment request:", err);
-        alert(`채용 요청서 생성에 실패했습니다: ${err.message}`);
+        toast.error(`채용 요청서 생성에 실패했습니다: ${err.message}`);
     } finally {
         linking.value = false;
     }
@@ -638,5 +692,139 @@ h3 {
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+/* 반려 사유 입력 모달 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-box {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    min-width: 400px;
+    max-width: 90%;
+    animation: slideIn 0.3s ease-out;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.modal-icon {
+    font-size: 3rem;
+    color: #e74c3c;
+    margin-bottom: 0.5rem;
+}
+
+.modal-message {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin: 0;
+    font-weight: 500;
+}
+
+.reject-reason-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.reject-reason-input:focus {
+    outline: none;
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.modal-buttons button {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+}
+
+.modal-buttons button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.modal-buttons button:active {
+    transform: translateY(0);
+}
+
+.modal-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal-buttons button.cancel {
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+.modal-buttons button.cancel:hover {
+    background-color: #e0e0e0;
+}
+
+.modal-buttons button.confirm {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.modal-buttons button.confirm:hover:not(:disabled) {
+    background-color: #c0392b;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 </style>
