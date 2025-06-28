@@ -68,6 +68,8 @@ public class SecurityConfig {
 
                                 //  Career 페이지 - 지원자/지원서 관련
                                 "/api/v1/employment/applicant/create",                      // 지원자 생성
+                                "/api/v1/employment/applicant",                             // 지원자 전체 조회
+                                "/api/v1/employment/applicant/**",                          // 지원자 관련 모든 경로 (단건 조회, 검색 등)
                                 "/api/v1/employment/application",                           // 지원서 생성
                                 "/api/v1/employment/application-response",                  // 이력서 응답 저장
                                 "/api/v1/employment/applications/items/**",                 // 지원서 항목 조회
