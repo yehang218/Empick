@@ -6,7 +6,6 @@ import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequested
 import com.piveguyz.empickbackend.approvals.approval.query.service.ApprovalQueryService;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

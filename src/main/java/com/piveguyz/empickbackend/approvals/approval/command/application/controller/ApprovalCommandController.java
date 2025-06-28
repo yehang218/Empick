@@ -27,7 +27,8 @@ public class ApprovalCommandController {
             summary = "결재 문서 생성",
             description = """
                     결재 문서를 생성합니다.
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
     })
@@ -42,7 +43,8 @@ public class ApprovalCommandController {
             summary = "결재 문서 승인",
             description = """
                     결재 문서를 승인합니다.
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
     })
@@ -60,7 +62,8 @@ public class ApprovalCommandController {
             summary = "결재 문서 반려",
             description = """
                     결재 문서를 반려합니다.
-                    """
+                    """,
+            security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponses(value = {
     })
