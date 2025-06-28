@@ -58,19 +58,21 @@ public class SecurityConfig {
                                         "/api/v1/employment/jobtests/exam/**",  // 실무테스트 응시 관련
                                         "/api/v1/employment/answers/**",        // 실무테스트 답안 제출
                                         "/api/v1/employment/jobtests/*",      // 실무테스트 문제 조회
-//                                "/api/v1/**"                // 테스트용으로 모든 경로 sequrity 처리 안되게
+//                                        "/api/v1/**",                // 테스트용으로 모든 경로 sequrity 처리 안되게
 
-                                        //  Career 페이지 - 채용공고 관련
-                                        "/api/v1/employment/recruitments",                           // 채용공고 목록
-                                        "/api/v1/employment/recruitments/**",                       // 채용공고 상세 및 하위 경로
-                                        "/api/v1/employment/recruitments/requests/**",              // 채용 요청서
-                                        "/api/v1/employment/recruitments/processes/**",             // 채용 프로세스
+                                //  Career 페이지 - 채용공고 관련
+                                "/api/v1/employment/recruitments",                           // 채용공고 목록
+                                "/api/v1/employment/recruitments/**",                       // 채용공고 상세 및 하위 경로
+                                "/api/v1/employment/recruitments/requests/**",              // 채용 요청서
+                                "/api/v1/employment/recruitments/processes/**",             // 채용 프로세스
 
-                                        //  Career 페이지 - 지원자/지원서 관련
-                                        "/api/v1/employment/applicant/create",                      // 지원자 생성
-                                        "/api/v1/employment/application",                           // 지원서 생성
-                                        "/api/v1/employment/application-response",                  // 이력서 응답 저장
-                                        "/api/v1/employment/applications/items/**",                 // 지원서 항목 조회
+                                //  Career 페이지 - 지원자/지원서 관련
+                                "/api/v1/employment/applicant/create",                      // 지원자 생성
+                                "/api/v1/employment/applicant",                             // 지원자 전체 조회
+                                "/api/v1/employment/applicant/**",                          // 지원자 관련 모든 경로 (단건 조회, 검색 등)
+                                "/api/v1/employment/application",                           // 지원서 생성
+                                "/api/v1/employment/application-response",                  // 이력서 응답 저장
+                                "/api/v1/employment/applications/items/**",                 // 지원서 항목 조회
 
                                         //  Career 페이지 - 자기소개서 관련
                                         "/api/v1/employment/introduce",                             // 자기소개서 생성/조회
