@@ -49,6 +49,12 @@ const routes = [
         component: () => import('@/views/errors/ForbiddenPage.vue'),
     },
     {
+        path: '/career-error',
+        name: 'CareerError',
+        component: () => import('@/views/errors/CareerErrorPage.vue'),
+        meta: { requiresAuth: false, hideHeader: true, hideSidebar: true }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'NotFound',
         component: () => import('@/views/errors/NotFoundPage.vue'),
