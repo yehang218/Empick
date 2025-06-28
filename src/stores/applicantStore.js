@@ -112,10 +112,11 @@ export const useApplicantStore = defineStore('applicant', () => {
         // 실무테스트 상태 필터링
         if (jobtestFilter.value !== null && jobtestFilter.value !== undefined) {
             if (jobtestFilter.value === 'UNASSIGNED') {
-                // "미할당" 선택 시
-                result = result.filter(applicant => !applicant.jobtestStatus)
-            } else {
-                result = result.filter(applicant => applicant.jobtestStatus === jobtestFilter.value)
+                // "할당안됨" 선택 시 - applicationJobtestTitle이 없는 경우
+                result = result.filter(applicant => !applicant.applicationJobtestTitle)
+            } else if (jobtestFilter.value === 'ASSIGNED') {
+                // "할당됨" 선택 시 - applicationJobtestTitle이 있는 경우
+                result = result.filter(applicant => applicant.applicationJobtestTitle)
             }
         }
 

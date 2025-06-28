@@ -18,6 +18,20 @@
                     </v-col>
                 </v-row>
 
+                <!-- 필터 섹션 -->
+                <v-row class="mt-4">
+                    <v-col cols="12" md="4">
+                        <v-select
+                            v-model="assignmentFilter"
+                            :items="assignmentFilterOptions"
+                            label="할당 상태"
+                            variant="outlined"
+                            density="compact"
+                            clearable
+                        ></v-select>
+                    </v-col>
+                </v-row>
+
                 <v-overlay :model-value="store.loading" class="align-center justify-center">
                     <v-progress-circular indeterminate size="64" color="primary"></v-progress-circular>
                 </v-overlay>
@@ -26,7 +40,7 @@
                     {{ store.error }}
                 </v-alert>
 
-                <v-data-table :headers="tableHeaders" :items="store.jobtests" :items-per-page="10" item-key="id"
+                <v-data-table :headers="tableHeaders" :items="filteredJobtests" :items-per-page="10" item-key="id"
                     class="elevation-1 mt-4" return-object @click:row="handleRowClick">
 
                     <!-- 전체 선택 체크박스 헤더 -->
@@ -74,7 +88,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { useJobtestListStore } from '@/stores/jobtestListStore';
@@ -85,6 +99,31 @@ const router = useRouter();
 const store = useJobtestListStore();
 const toast = useToast();
 const selectedJobtests = ref([]);
+
+// 필터 관련
+const assignmentFilter = ref(null);
+const assignmentFilterOptions = [
+    { title: '할당됨', value: 'assigned' },
+    { title: '할당안됨', value: 'unassigned' }
+];
+
+// 필터링된 실무테스트 목록
+const filteredJobtests = computed(() => {
+    let filtered = store.jobtests;
+    
+    if (assignmentFilter.value) {
+        filtered = filtered.filter(jobtest => {
+            if (assignmentFilter.value === 'assigned') {
+                return jobtest.isAssigned; // 할당됨
+            } else if (assignmentFilter.value === 'unassigned') {
+                return !jobtest.isAssigned; // 할당안됨
+            }
+            return true;
+        });
+    }
+    
+    return filtered;
+});
 
 const tableHeaders = [
     { title: '', key: 'select', sortable: false, width: '50px' },
@@ -129,6 +168,11 @@ const refreshList = async () => {
 
 onMounted(refreshList);
 
+// 필터 변경시 선택 초기화
+watch(assignmentFilter, () => {
+    selectedJobtests.value = [];
+});
+
 // --- v-data-table 선택 관련 로직 ---
 
 const isSelected = (item) => {
@@ -145,7 +189,7 @@ const toggleSelection = (item) => {
 }
 
 const isAllSelected = computed(() => {
-    const totalVisibleItems = store.jobtests.length;
+    const totalVisibleItems = filteredJobtests.value.length;
     return totalVisibleItems > 0 && selectedJobtests.value.length === totalVisibleItems;
 });
 
@@ -155,7 +199,7 @@ const isIndeterminate = computed(() => {
 
 const toggleSelectAll = (selectAll) => {
     if (selectAll) {
-        selectedJobtests.value = [...store.jobtests];
+        selectedJobtests.value = [...filteredJobtests.value];
     } else {
         selectedJobtests.value = [];
     }
