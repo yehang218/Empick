@@ -13,14 +13,8 @@
             새 항목 추가
           </h2>
           <div class="add-item-container">
-            <v-text-field
-              v-model="newCriteria"
-              label="새 기준표 항목 내용"
-              variant="outlined"
-              class="form-field"
-              prepend-inner-icon="mdi-format-list-bulleted"
-              @keyup.enter="addCriteria"
-            />
+            <v-text-field v-model="newCriteria" label="새 기준표 항목 내용" variant="outlined" class="form-field"
+              prepend-inner-icon="mdi-format-list-bulleted" @keyup.enter="addCriteria" />
           </div>
         </div>
 
@@ -35,14 +29,7 @@
                 <div class="item-content">
                   <div class="item-number">{{ index + 1 }}</div>
                   <div class="item-text">{{ item.content }}</div>
-                  <v-btn 
-                    icon 
-                    size="small" 
-                    color="error" 
-                    variant="text" 
-                    @click="removeItem(item.id)"
-                    class="delete-btn"
-                  >
+                  <v-btn icon size="small" color="error" variant="text" @click="removeItem(item.id)" class="delete-btn">
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
                 </div>
@@ -290,35 +277,35 @@ const removeItem = async (id) => {
   .standard-item-create-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .section-title {
     font-size: 18px;
   }
-  
+
   .add-item-container,
   .items-container {
     padding: 20px;
   }
-  
+
   .item-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .delete-btn {
     align-self: flex-end;
   }
@@ -328,23 +315,23 @@ const removeItem = async (id) => {
   .standard-item-create-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .add-item-container,
   .items-container {
     padding: 16px;
   }
-  
+
   .item-card {
     padding: 12px;
   }
 }
-</style> 
+</style>

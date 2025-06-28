@@ -117,28 +117,28 @@ export default {
     .standard-item-page {
         padding: 32px 0;
     }
-    
+
     .content-wrapper {
         margin: 0;
         padding: 32px 40px;
     }
-    
+
     .page-title {
         font-size: 28px;
     }
-    
+
     .page-subtitle {
         font-size: 15px;
     }
-    
+
     .coming-soon-section {
         padding: 40px 16px;
     }
-    
+
     .coming-soon-title {
         font-size: 20px;
     }
-    
+
     .coming-soon-description {
         font-size: 15px;
     }
@@ -148,20 +148,20 @@ export default {
     .standard-item-page {
         padding: 24px 0;
     }
-    
+
     .content-wrapper {
         margin: 0;
         padding: 24px 20px;
     }
-    
+
     .page-title {
         font-size: 24px;
     }
-    
+
     .coming-soon-section {
         padding: 32px 12px;
     }
-    
+
     .coming-soon-title {
         font-size: 18px;
     }

@@ -14,23 +14,10 @@
           </h2>
           <div class="add-item-container">
             <div class="input-group">
-              <v-text-field
-                v-model="newCriteria"
-                label="새 기준표 항목 내용"
-                variant="outlined"
-                class="form-field"
-                placeholder="예: 지원동기, 성장과정, 성격의 장단점 등"
-                prepend-inner-icon="mdi-format-list-bulleted"
-              />
-              <v-btn 
-                color="primary" 
-                variant="elevated"
-                prepend-icon="mdi-plus"
-                @click="showAddModal"
-                :disabled="!newCriteria.trim() || addingItem"
-                :loading="addingItem"
-                class="add-btn"
-              >
+              <v-text-field v-model="newCriteria" label="새 기준표 항목 내용" variant="outlined" class="form-field"
+                placeholder="예: 지원동기, 성장과정, 성격의 장단점 등" prepend-inner-icon="mdi-format-list-bulleted" />
+              <v-btn color="primary" variant="elevated" prepend-icon="mdi-plus" @click="showAddModal"
+                :disabled="!newCriteria.trim() || addingItem" :loading="addingItem" class="add-btn">
                 추가하기
               </v-btn>
             </div>
@@ -48,14 +35,8 @@
                 <div class="item-content">
                   <div class="item-number">{{ index + 1 }}</div>
                   <div class="item-text">{{ item.content }}</div>
-                  <v-btn 
-                    icon 
-                    size="small" 
-                    color="error" 
-                    variant="text" 
-                    @click="showDeleteModal(item.id, item.content)"
-                    class="delete-btn"
-                  >
+                  <v-btn icon size="small" color="error" variant="text" @click="showDeleteModal(item.id, item.content)"
+                    class="delete-btn">
                     <v-icon>mdi-delete</v-icon>
                   </v-btn>
                 </div>
@@ -78,15 +59,8 @@
     </div>
 
     <!-- Alert Modal -->
-    <AlertModal
-      v-if="showModal"
-      :title="modalTitle"
-      :message="modalMessage"
-      :confirm-text="modalConfirmText"
-      :cancel-text="modalCancelText"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
-    />
+    <AlertModal v-if="showModal" :title="modalTitle" :message="modalMessage" :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText" @confirm="handleConfirm" @cancel="handleCancel" />
   </div>
 </template>
 
@@ -128,7 +102,7 @@ const showAddModal = () => {
     toast.error('항목 내용을 입력해주세요.')
     return
   }
-  
+
   modalTitle.value = '항목 추가'
   modalMessage.value = `"${newCriteria.value.trim()}" 항목을 추가하시겠습니까?`
   modalConfirmText.value = '추가'
@@ -149,7 +123,7 @@ const showDeleteModal = (id, content) => {
 
 const handleConfirm = async () => {
   showModal.value = false
-  
+
   if (modalAction.value === 'add') {
     await addCriteria()
   } else if (modalAction.value === 'delete') {
@@ -191,7 +165,7 @@ const removeItem = async (id) => {
       data: error.response?.data,
       message: error.message
     })
-    
+
     // 500 에러이거나 FK 제약 조건 관련 에러인 경우
     if (error.response?.status === 500 || error.response?.status === 503) {
       toast.error('이미 사용 중인 항목은 삭제할 수 없습니다.\n\n기준표나 템플릿에서 사용 중인 항목입니다.')
@@ -406,45 +380,45 @@ const removeItem = async (id) => {
   .standard-item-manage-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .section-title {
     font-size: 18px;
   }
-  
+
   .add-item-container,
   .items-container {
     padding: 20px;
   }
-  
+
   .input-group {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
-  
+
   .add-btn {
     width: 100%;
   }
-  
+
   .item-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .delete-btn {
     align-self: flex-end;
   }
@@ -454,23 +428,23 @@ const removeItem = async (id) => {
   .standard-item-manage-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .add-item-container,
   .items-container {
     padding: 16px;
   }
-  
+
   .item-card {
     padding: 12px;
   }
 }
-</style> 
+</style>

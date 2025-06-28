@@ -12,13 +12,8 @@
             <v-icon class="section-icon">mdi-format-title</v-icon>
             기준표 제목
           </h2>
-          <v-text-field
-            v-model="title"
-            label="기준표 제목을 입력하세요"
-            variant="outlined"
-            class="form-field"
-            prepend-inner-icon="mdi-format-title"
-          />
+          <v-text-field v-model="title" label="기준표 제목을 입력하세요" variant="outlined" class="form-field"
+            prepend-inner-icon="mdi-format-title" />
         </div>
 
         <div class="form-section">
@@ -29,19 +24,22 @@
               ({{ selectedItemIds.length }}개 선택됨)
             </span>
           </h2>
+          <div class="search-container">
+            <v-text-field v-model="searchQuery" label="항목 검색" variant="outlined" prepend-inner-icon="mdi-magnify"
+              clearable hide-details class="search-field" placeholder="항목 내용을 입력하여 검색하세요" />
+          </div>
           <div class="items-container">
-            <div v-if="items.length > 0" class="items-list">
-              <div v-for="(item, index) in items" :key="item.id || index" class="item-card">
+            <div v-if="filteredItems.length > 0" class="items-list">
+              <div v-for="(item, index) in filteredItems" :key="item.id || index" class="item-card">
                 <div class="item-content">
-                  <v-checkbox 
-                    v-model="selectedItemIds" 
-                    :value="item.id" 
-                    hide-details 
-                    class="item-checkbox"
-                  />
+                  <v-checkbox v-model="selectedItemIds" :value="item.id" hide-details class="item-checkbox" />
                   <div class="item-text">{{ item.content }}</div>
                 </div>
               </div>
+            </div>
+            <div v-else-if="searchQuery && items.length > 0" class="empty-state">
+              <v-icon size="large" color="grey">mdi-magnify</v-icon>
+              <p>"{{ searchQuery }}"에 대한 검색 결과가 없습니다.</p>
             </div>
             <div v-else class="empty-state">
               <v-icon size="large" color="grey">mdi-format-list-bulleted</v-icon>
@@ -64,15 +62,8 @@
     </div>
 
     <!-- Alert Modal -->
-    <AlertModal
-      v-if="showModal"
-      :title="modalTitle"
-      :message="modalMessage"
-      :confirm-text="modalConfirmText"
-      :cancel-text="modalCancelText"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
-    />
+    <AlertModal v-if="showModal" :title="modalTitle" :message="modalMessage" :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText" @confirm="handleConfirm" @cancel="handleCancel" />
   </div>
 </template>
 
@@ -94,6 +85,7 @@ const memberStore = useMemberStore()
 const title = ref('')
 const items = computed(() => standardItemStore.items)
 const selectedItemIds = ref([])
+const searchQuery = ref('')
 
 // Modal 상태 (간단한 방식)
 const showModal = ref(false)
@@ -141,7 +133,7 @@ const performSubmit = async () => {
     router.push('/employment/introduce-standard/list')
   } catch (error) {
     console.error('기준표 등록 실패:', error)
-    toast.error('기준표 등록에 실패했습니다. 서버 오류일 수 있습니다.')
+    toast.error('기준표 등록에 실패했습니다.')
   }
 }
 
@@ -154,9 +146,16 @@ const submit = async () => {
     toast.error('하나 이상의 기준표 항목을 선택해주세요.')
     return
   }
-  
+
   showConfirmModal()
 }
+
+const filteredItems = computed(() => {
+  if (!searchQuery.value) {
+    return items.value
+  }
+  return items.value.filter(item => item.content.toLowerCase().includes(searchQuery.value.toLowerCase()))
+})
 </script>
 
 <style scoped>
@@ -248,6 +247,27 @@ const submit = async () => {
 }
 
 .form-field :deep(.v-field--focused .v-field__outline) {
+  border-color: #3b82f6;
+}
+
+.search-container {
+  margin-bottom: 24px;
+}
+
+.search-field {
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.search-field :deep(.v-field) {
+  border-radius: 8px;
+}
+
+.search-field :deep(.v-field__outline) {
+  border-color: #e2e8f0;
+}
+
+.search-field :deep(.v-field--focused .v-field__outline) {
   border-color: #3b82f6;
 }
 
@@ -363,34 +383,34 @@ const submit = async () => {
   .standard-create-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .section-title {
     font-size: 18px;
   }
-  
+
   .items-container {
     padding: 20px;
     max-height: 300px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .manage-btn,
   .submit-btn {
     width: 100%;
@@ -402,23 +422,23 @@ const submit = async () => {
   .standard-create-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .items-container {
     padding: 16px;
     max-height: 250px;
   }
-  
+
   .item-card {
     padding: 12px;
   }
 }
-</style> 
+</style>

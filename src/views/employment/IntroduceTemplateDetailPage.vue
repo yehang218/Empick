@@ -12,32 +12,22 @@
             <v-icon class="section-icon">mdi-format-title</v-icon>
             템플릿 제목
           </h2>
-          <v-text-field
-            :model-value="template?.title"
-            variant="outlined"
-            readonly
-            hide-details
-            class="detail-field"
-          ></v-text-field>
+          <v-text-field :model-value="template?.title" variant="outlined" readonly hide-details
+            class="detail-field"></v-text-field>
         </div>
 
         <template v-if="template && template.items && template.items.length > 0">
           <div class="detail-section">
             <h2 class="section-title">
               <v-icon class="section-icon">mdi-format-list-bulleted</v-icon>
-              항목 목록 
+              항목 목록
               <span class="item-count">({{ template.items.length }}개)</span>
             </h2>
             <div class="items-display">
               <div v-for="(item, index) in template.items" :key="item.id" class="item-display-card">
                 <div class="item-number">{{ index + 1 }}</div>
-                <v-text-field
-                  :model-value="item.title"
-                  variant="outlined"
-                  readonly
-                  hide-details
-                  class="item-field"
-                ></v-text-field>
+                <v-text-field :model-value="item.title" variant="outlined" readonly hide-details
+                  class="item-field"></v-text-field>
               </div>
             </div>
           </div>
@@ -261,30 +251,30 @@ const goList = () => router.push('/employment/introduce-templates')
   .template-detail-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .section-title {
     font-size: 18px;
   }
-  
+
   .item-display-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .item-field {
     width: 100%;
   }
@@ -294,20 +284,20 @@ const goList = () => router.push('/employment/introduce-templates')
   .template-detail-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .item-display-card {
     padding: 12px;
   }
-  
+
   .empty-state {
     padding: 32px 16px;
   }

@@ -22,24 +22,13 @@
                 <div class="template-title">{{ template.title }}</div>
               </div>
               <div class="template-actions">
-                <v-btn 
-                  size="small" 
-                  color="primary" 
-                  variant="outlined" 
-                  @click="goDetail(template.id)"
-                  class="detail-btn"
-                >
+                <v-btn size="small" color="primary" variant="outlined" @click="goDetail(template.id)"
+                  class="detail-btn">
                   <v-icon left>mdi-eye</v-icon>
                   상세보기
                 </v-btn>
-                <v-btn 
-                  icon 
-                  size="small" 
-                  color="error" 
-                  variant="text" 
-                  @click="showDeleteModal(template.id, template.title)"
-                  class="delete-btn"
-                >
+                <v-btn icon size="small" color="error" variant="text"
+                  @click="showDeleteModal(template.id, template.title)" class="delete-btn">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </div>
@@ -58,15 +47,8 @@
     </div>
 
     <!-- Alert Modal -->
-    <AlertModal
-      v-if="showModal"
-      :title="modalTitle"
-      :message="modalMessage"
-      :confirm-text="modalConfirmText"
-      :cancel-text="modalCancelText"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
-    />
+    <AlertModal v-if="showModal" :title="modalTitle" :message="modalMessage" :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText" @confirm="handleConfirm" @cancel="handleCancel" />
   </div>
 </template>
 
@@ -132,7 +114,7 @@ const removeTemplate = async (id) => {
       data: error.response?.data,
       message: error.message
     })
-    
+
     // 500 에러이거나 FK 제약 조건 관련 에러인 경우
     if (error.response?.status === 500 || error.response?.status === 503) {
       toast.error('이미 사용 중인 템플릿은 삭제할 수 없습니다.\n\n연관된 항목들이 있는 템플릿입니다.')
@@ -324,34 +306,34 @@ const removeTemplate = async (id) => {
   .template-list-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .action-section {
     padding: 20px;
   }
-  
+
   .list-section {
     padding: 20px;
   }
-  
+
   .template-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .template-actions {
     width: 100%;
     justify-content: flex-end;
@@ -362,27 +344,27 @@ const removeTemplate = async (id) => {
   .template-list-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .action-section,
   .list-section {
     padding: 16px;
   }
-  
+
   .template-card {
     padding: 16px;
   }
-  
+
   .empty-state {
     padding: 40px 16px;
   }
 }
-</style> 
+</style>

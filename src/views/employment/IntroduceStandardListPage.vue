@@ -22,24 +22,13 @@
                 <div class="standard-title">{{ standard.content }}</div>
               </div>
               <div class="standard-actions">
-                <v-btn 
-                  size="small" 
-                  color="primary" 
-                  variant="outlined" 
-                  @click="goToDetail(standard.id)"
-                  class="detail-btn"
-                >
+                <v-btn size="small" color="primary" variant="outlined" @click="goToDetail(standard.id)"
+                  class="detail-btn">
                   <v-icon left>mdi-eye</v-icon>
                   상세보기
                 </v-btn>
-                <v-btn 
-                  icon 
-                  size="small" 
-                  color="error" 
-                  variant="text" 
-                  @click="removeStandard(standard.id)"
-                  class="delete-btn"
-                >
+                <v-btn icon size="small" color="error" variant="text" @click="removeStandard(standard.id)"
+                  class="delete-btn">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </div>
@@ -58,14 +47,8 @@
     </div>
 
     <!-- 삭제 확인 모달 -->
-    <AlertModal 
-      v-if="deleteDialog"
-      :message="`정말로 이 기준표를 삭제하시겠습니까?\n\n${selectedStandardContent}`"
-      confirm-text="삭제"
-      cancel-text="취소"
-      @confirm="confirmDelete"
-      @cancel="deleteDialog = false"
-    />
+    <AlertModal v-if="deleteDialog" :message="`정말로 이 기준표를 삭제하시겠습니까?\n\n${selectedStandardContent}`" confirm-text="삭제"
+      cancel-text="취소" @confirm="confirmDelete" @cancel="deleteDialog = false" />
   </div>
 </template>
 
@@ -100,17 +83,17 @@ function removeStandard(id) {
   selectedStandardId.value = id
   const standard = standards.value.find(s => s.id === id)
   selectedStandardContent.value = standard?.content || '기준표'
-  
+
   // 삭제 확인 다이얼로그 열기
   deleteDialog.value = true
 }
 
 async function confirmDelete() {
   if (!selectedStandardId.value) return
-  
+
   // 다이얼로그 닫기
   deleteDialog.value = false
-  
+
   try {
     await store.deleteStandard(selectedStandardId.value)
     toast.success('기준표가 성공적으로 삭제되었습니다.')
@@ -121,7 +104,7 @@ async function confirmDelete() {
       data: e.response?.data,
       message: e.message
     })
-    
+
     // 500 에러이거나 FK 제약 조건 관련 에러인 경우
     if (e.response?.status === 500 || e.response?.status === 503) {
       toast.error('이미 사용 중인 기준표는 삭제할 수 없습니다. 연관된 항목들이 있는 기준표입니다.')
@@ -319,34 +302,34 @@ function goToDetail(id) {
   .standard-list-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .action-section {
     padding: 20px;
   }
-  
+
   .list-section {
     padding: 20px;
   }
-  
+
   .standard-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .standard-actions {
     width: 100%;
     justify-content: flex-end;
@@ -357,27 +340,27 @@ function goToDetail(id) {
   .standard-list-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .action-section,
   .list-section {
     padding: 16px;
   }
-  
+
   .standard-card {
     padding: 16px;
   }
-  
+
   .empty-state {
     padding: 40px 16px;
   }
 }
-</style> 
+</style>

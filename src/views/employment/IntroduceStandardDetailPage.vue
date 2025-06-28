@@ -5,7 +5,7 @@
         <h1 class="page-title">자기소개서 기준표 상세 조회</h1>
         <p class="page-subtitle">기준표의 상세 정보를 확인합니다</p>
       </div>
-      
+
       <!-- 로딩 상태 -->
       <template v-if="loading">
         <div class="loading-state">
@@ -13,7 +13,7 @@
           <p>기준표 정보를 불러오는 중...</p>
         </div>
       </template>
-      
+
       <!-- 에러 상태 -->
       <template v-else-if="error">
         <div class="error-state">
@@ -23,7 +23,7 @@
           </v-alert>
         </div>
       </template>
-      
+
       <!-- 메인 컨텐츠 -->
       <template v-else>
         <div class="detail-sections">
@@ -32,37 +32,27 @@
               <v-icon class="section-icon">mdi-format-title</v-icon>
               기준표 제목
             </h2>
-            <v-text-field
-              :model-value="standard?.content || '제목 없음'"
-              variant="outlined"
-              readonly
-              hide-details
-              class="detail-field"
-            ></v-text-field>
+            <v-text-field :model-value="standard?.content || '제목 없음'" variant="outlined" readonly hide-details
+              class="detail-field"></v-text-field>
           </div>
-          
+
           <div class="detail-section">
             <h2 class="section-title">
               <v-icon class="section-icon">mdi-format-list-bulleted</v-icon>
-              항목 목록 
+              항목 목록
               <span class="item-count">({{ items.length }}개)</span>
             </h2>
-            
+
             <template v-if="items.length > 0">
               <div class="items-display">
                 <div v-for="(item, index) in items" :key="item.id" class="item-display-card">
                   <div class="item-number">{{ index + 1 }}</div>
-                  <v-text-field
-                    :model-value="item.title || item.content || '항목 내용 없음'"
-                    variant="outlined"
-                    readonly
-                    hide-details
-                    class="item-field"
-                  ></v-text-field>
+                  <v-text-field :model-value="item.title || item.content || '항목 내용 없음'" variant="outlined" readonly
+                    hide-details class="item-field"></v-text-field>
                 </div>
               </div>
             </template>
-            
+
             <template v-else>
               <div class="empty-state">
                 <v-icon size="large" color="grey">mdi-format-list-bulleted</v-icon>
@@ -71,7 +61,7 @@
             </template>
           </div>
         </div>
-        
+
         <div class="action-buttons">
           <v-btn color="grey darken-1" variant="outlined" @click="goList" size="large" class="back-btn">
             <v-icon left>mdi-arrow-left</v-icon>
@@ -112,18 +102,18 @@ onMounted(async () => {
   try {
     loading.value = true
     error.value = null
-    
+
     const standardId = route.params.id
     console.log('🔍 기준표 ID:', standardId)
-    
+
     // 기준표 상세 정보 조회
     await standardStore.fetchStandardDetail(standardId)
     console.log('✅ 기준표 상세 조회 완료:', standardStore.standardDetail)
-    
+
     // 해당 기준표의 항목들만 조회
     await standardItemStore.fetchItemsByStandardId(standardId)
     console.log('✅ 기준표별 항목 조회 완료. 항목 수:', standardItemStore.items.length)
-    
+
   } catch (e) {
     console.error('❌ 페이지 초기화 실패:', e)
     error.value = e
@@ -321,30 +311,30 @@ const goList = () => router.push('/employment/introduce-standard/list')
   .standard-detail-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .section-title {
     font-size: 18px;
   }
-  
+
   .item-display-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .item-field {
     width: 100%;
   }
@@ -354,22 +344,22 @@ const goList = () => router.push('/employment/introduce-standard/list')
   .standard-detail-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .item-display-card {
     padding: 12px;
   }
-  
+
   .empty-state {
     padding: 32px 16px;
   }
 }
-</style> 
+</style>

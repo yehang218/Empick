@@ -12,13 +12,8 @@
             <v-icon class="section-icon">mdi-format-title</v-icon>
             템플릿 제목
           </h2>
-          <v-text-field
-            v-model="title"
-            label="템플릿 제목을 입력하세요"
-            variant="outlined"
-            class="form-field"
-            prepend-inner-icon="mdi-format-title"
-          />
+          <v-text-field v-model="title" label="템플릿 제목을 입력하세요" variant="outlined" class="form-field"
+            prepend-inner-icon="mdi-format-title" />
         </div>
 
         <div class="form-section">
@@ -30,27 +25,14 @@
             </span>
           </h2>
           <div class="search-container">
-            <v-text-field
-              v-model="searchQuery"
-              label="항목 검색"
-              variant="outlined"
-              prepend-inner-icon="mdi-magnify"
-              clearable
-              hide-details
-              class="search-field"
-              placeholder="항목 내용을 입력하여 검색하세요"
-            />
+            <v-text-field v-model="searchQuery" label="항목 검색" variant="outlined" prepend-inner-icon="mdi-magnify"
+              clearable hide-details class="search-field" placeholder="항목 내용을 입력하여 검색하세요" />
           </div>
           <div class="items-container">
             <div v-if="filteredItems.length > 0" class="items-list">
               <div v-for="(item, index) in filteredItems" :key="item.id || index" class="item-card">
                 <div class="item-content">
-                  <v-checkbox 
-                    v-model="selectedItemIds" 
-                    :value="item.id" 
-                    hide-details 
-                    class="item-checkbox"
-                  />
+                  <v-checkbox v-model="selectedItemIds" :value="item.id" hide-details class="item-checkbox" />
                   <div class="item-text">{{ item.title }}</div>
                 </div>
               </div>
@@ -80,15 +62,8 @@
     </div>
 
     <!-- Alert Modal -->
-    <AlertModal
-      v-if="showModal"
-      :title="modalTitle"
-      :message="modalMessage"
-      :confirm-text="modalConfirmText"
-      :cancel-text="modalCancelText"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
-    />
+    <AlertModal v-if="showModal" :title="modalTitle" :message="modalMessage" :confirm-text="modalConfirmText"
+      :cancel-text="modalCancelText" @confirm="handleConfirm" @cancel="handleCancel" />
   </div>
 </template>
 
@@ -178,7 +153,7 @@ const submit = async () => {
     toast.error('하나 이상의 항목을 선택해주세요.')
     return
   }
-  
+
   showConfirmModal()
 }
 </script>
@@ -408,34 +383,34 @@ const submit = async () => {
   .template-create-container {
     padding: 32px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 32px 40px;
   }
-  
+
   .page-title {
     font-size: 28px;
   }
-  
+
   .page-subtitle {
     font-size: 15px;
   }
-  
+
   .section-title {
     font-size: 18px;
   }
-  
+
   .items-container {
     padding: 20px;
     max-height: 300px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .manage-btn,
   .submit-btn {
     width: 100%;
@@ -447,23 +422,23 @@ const submit = async () => {
   .template-create-container {
     padding: 24px 0;
   }
-  
+
   .content-wrapper {
     margin: 0;
     padding: 24px 20px;
   }
-  
+
   .page-title {
     font-size: 24px;
   }
-  
+
   .items-container {
     padding: 16px;
     max-height: 250px;
   }
-  
+
   .item-card {
     padding: 12px;
   }
 }
-</style> 
+</style>
