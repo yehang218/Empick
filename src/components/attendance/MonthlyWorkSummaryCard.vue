@@ -2,19 +2,11 @@
     <div class="monthly-work-summary-card">
         <!-- 헤더 -->
         <div class="card-header">
-            <div class="title-section">
-                <h3 class="title">선택된 근무시간대</h3>
-                <span class="time-range">06:00:00 ~ 22:00:00</span>
-                <v-icon class="info-icon" size="small" color="grey">mdi-information-outline</v-icon>
-            </div>
-            <!-- <div class="action-buttons">
-                <v-btn variant="outlined" size="small" prepend-icon="mdi-calendar-month">
-                    월별근무상세
-                </v-btn>
-                <v-btn variant="outlined" size="small" prepend-icon="mdi-download">
+            <div class="action-buttons">
+                <v-btn variant="outlined" size="small" prepend-icon="mdi-download" @click="downloadExcel">
                     엑셀 다운로드
                 </v-btn>
-            </div> -->
+            </div>
         </div>
 
         <!-- 메인 콘텐츠 -->
@@ -223,7 +215,19 @@ const breakTimeHours = computed(() => Math.floor(props.totalBreakMinutes / 60))
 const breakTimeMinutes = computed(() => props.totalBreakMinutes % 60)
 
 // Emits
-defineEmits(['downloadExcel', 'viewMonthlyDetail'])
+const emit = defineEmits(['downloadExcel', 'viewMonthlyDetail'])
+
+// 엑셀 다운로드 함수
+const downloadExcel = () => {
+    emit('downloadExcel', {
+        month: props.month,
+        workingHours: props.workingHours,
+        targetHours: props.targetHours,
+        overtimeHours: props.overtimeHours,
+        nightHours: props.nightHours,
+        totalBreakMinutes: props.totalBreakMinutes
+    })
+}
 </script>
 
 <style scoped>

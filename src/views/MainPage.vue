@@ -16,7 +16,7 @@
 
                         <div class="date-display">
                             <span class="year-month">{{ currentYear }}.{{ currentMonth.toString().padStart(2, '0')
-                                }}</span>
+                            }}</span>
                         </div>
 
                         <v-btn icon size="small" variant="text" @click="nextMonth">
@@ -50,7 +50,7 @@
                 <MonthlyWorkSummaryCard :month="`${currentMonth.toString().padStart(2, '0')}월`"
                     :working-hours="workingHours" :target-hours="targetHours" :remaining-work-days="remainingWorkDays"
                     :weekly-records="weeklyRecords" :overtime-hours="overtimeHours" :night-hours="nightHours"
-                    :total-break-minutes="totalBreakMinutes" />
+                    :total-break-minutes="totalBreakMinutes" @download-excel="handleExcelDownload" />
 
                 <!-- 주차별 근태 상세 -->
                 <div class="week-section">
@@ -72,6 +72,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useMemberStore } from '@/stores/memberStore'
 import { useAttendanceData } from '@/composables/useAttendanceData'
 import { useDateNavigation } from '@/composables/useDateNavigation'
+import { downloadAttendanceExcel } from '@/utils/excelUtils'
 
 // Stores
 const attendanceStore = useAttendanceStore()
@@ -169,6 +170,19 @@ const handleApprovalRequest = (dayData) => {
 const handleTimeEdit = (dayData) => {
     console.log('시간 수정:', dayData)
 }
+
+// 엑셀 다운로드 처리
+const handleExcelDownload = async (summaryData) => {
+    try {
+        await downloadAttendanceExcel(rawAttendanceRecords.value, summaryData, currentYear.value, currentMonth.value)
+    } catch (error) {
+        console.error('엑셀 다운로드 실패:', error)
+        alert('엑셀 다운로드에 실패했습니다. 다시 시도해주세요.')
+    }
+}
+
+
+
 </script>
 
 <style scoped>
