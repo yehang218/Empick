@@ -12,11 +12,24 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
+import { onMounted } from 'vue';
 
 const router = useRouter();
+const route = useRoute();
 
 const goHome = () => {
     router.push('/');
 };
+
+// 컴포넌트가 마운트될 때 경로 확인하여 지원자용 경로면 CareerError로 리다이렉트
+onMounted(() => {
+    const currentPath = route.path;
+    const isCareerPath = currentPath.startsWith('/career') || currentPath.startsWith('/employment/jobtest/exam/');
+    
+    if (isCareerPath) {
+        console.log('지원자용 경로에서 404 발생, CareerError 페이지로 리다이렉트');
+        router.replace({ name: 'CareerError' });
+    }
+});
 </script>
