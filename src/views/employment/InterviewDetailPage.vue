@@ -246,6 +246,7 @@ import { useInterviewScoreStore } from '@/stores/interviewScoreStore';
 import { useMemberStore } from '@/stores/memberStore';
 import { useRecruitmentStore } from '@/stores/recruitmentStore';
 import { useRouter, useRoute } from 'vue-router'; // useRoute 추가
+import { useToast } from 'vue-toastification';
 
 const interviewStore = useInterviewStore();
 const criteriaStore = useInterviewCriteriaStore();
@@ -259,6 +260,7 @@ const recruitmentStore = useRecruitmentStore();
 
 const router = useRouter(); // 페이지 이동용
 const route = useRoute();   // 현재 라우트 정보용
+const toast = useToast();
 
 const applicationId = route.params.applicationId;
 const selectedApplication = ref(null)
@@ -283,7 +285,7 @@ const error = computed(() => interviewStore.error || criteriaStore.error);
 const goToInputInterviewScorePage = () => {
     const interviewId = selectedInterview.value?.id;
     if (!interviewId) {
-        alert('면접 정보가 없습니다.');
+        toast.error('면접 정보가 없습니다.');
         return;
     }
 
@@ -418,7 +420,7 @@ const saveChanges = async () => {
 
         await interviewStore.fetchInterviewById(selectedInterview.value.id);
 
-        alert('면접 정보가 성공적으로 수정되었습니다.');
+        toast.success('면접 정보가 성공적으로 수정되었습니다.');
         dialog.value = false;
     } catch (err) {
         console.error('면접 정보 수정 실패:', err);
