@@ -12,7 +12,7 @@ import { formatMinutesToDuration } from './attendanceFormatter.js'
 export { formatMinutesToDuration } from './attendanceFormatter.js'
 
 /**
- * 시간 차이 계산 (분 단위)
+ * 시간 차이 계산 (분 단위) - 총 재실시간
  * @param {string} startTime - 시작 시간 (HH:MM:SS)
  * @param {string} endTime - 종료 시간 (HH:MM:SS)
  * @returns {number} 시간 차이 (분)
@@ -30,6 +30,43 @@ export const calculateTimeDifferenceInMinutes = (startTime, endTime) => {
 
     // 소수점 버리기 (Math.floor 사용)
     return Math.max(0, Math.floor((end - start) / (1000 * 60)));
+};
+
+/**
+ * 한국 근로기준법에 따른 휴게시간 계산
+ * @param {number} totalMinutes - 총 재실시간 (분)
+ * @returns {number} 휴게시간 (분)
+ */
+export const calculateBreakTime = (totalMinutes) => {
+    if (totalMinutes < 4 * 60) {
+        // 4시간 미만: 휴게시간 없음
+        return 0;
+    } else if (totalMinutes < 8 * 60) {
+        // 4시간 이상 8시간 미만: 30분 휴게시간
+        return 30;
+    } else {
+        // 8시간 이상: 1시간 휴게시간
+        return 60;
+    }
+};
+
+/**
+ * 실제 근무시간 계산 (휴게시간 제외)
+ * @param {string} startTime - 시작 시간 (HH:MM:SS)
+ * @param {string} endTime - 종료 시간 (HH:MM:SS)
+ * @returns {number} 실제 근무시간 (분)
+ */
+export const calculateActualWorkMinutes = (startTime, endTime) => {
+    if (!startTime || !endTime) return 0;
+
+    // 총 재실시간 계산
+    const totalMinutes = calculateTimeDifferenceInMinutes(startTime, endTime);
+
+    // 휴게시간 계산
+    const breakTime = calculateBreakTime(totalMinutes);
+
+    // 실제 근무시간 = 총 재실시간 - 휴게시간
+    return Math.max(0, totalMinutes - breakTime);
 };
 
 /**
@@ -68,7 +105,7 @@ export const calculateNightWorkHours = (startTime, endTime) => {
 };
 
 /**
- * 근무시간 분류 계산
+ * 근무시간 분류 계산 (휴게시간 포함)
  * @param {string} startTime - 시작 시간 (HH:MM:SS)
  * @param {string} endTime - 종료 시간 (HH:MM:SS)
  * @returns {Object} 근무시간 분류 결과
@@ -79,25 +116,35 @@ export const categorizeWorkHours = (startTime, endTime) => {
     if (totalMinutes === 0) {
         return {
             total: '0h 0m',
+            actual: '0h 0m',
+            breakTime: '0h 0m',
             regular: '0h 0m',
             overtime: '0h 0m',
             night: '0h 0m'
         };
     }
 
-    // 기본 근무시간 (설정에서 가져옴)
-    const regularLimit = WORK_TIME_CONFIG.STANDARD_WORK_MINUTES;
-    const regularMinutes = Math.min(totalMinutes, regularLimit);
-    const overtimeMinutes = Math.max(0, totalMinutes - regularLimit);
+    // 휴게시간 계산
+    const breakTime = calculateBreakTime(totalMinutes);
 
-    // 야간 근무 계산 (22:00-06:00)
+    // 실제 근무시간 = 총 재실시간 - 휴게시간
+    const actualWorkMinutes = totalMinutes - breakTime;
+
+    // 기본 근무시간 (8시간 = 480분)
+    const regularLimit = WORK_TIME_CONFIG.STANDARD_WORK_MINUTES;
+    const regularMinutes = Math.min(actualWorkMinutes, regularLimit);
+    const overtimeMinutes = Math.max(0, actualWorkMinutes - regularLimit);
+
+    // 야간 근무 계산 (22:00-06:00) - 총 재실시간 기준
     const nightMinutes = calculateNightWorkHours(startTime, endTime);
 
     return {
-        total: formatMinutesToDuration(totalMinutes),
-        regular: formatMinutesToDuration(regularMinutes),
-        overtime: formatMinutesToDuration(overtimeMinutes),
-        night: formatMinutesToDuration(nightMinutes)
+        total: formatMinutesToDuration(totalMinutes), // 총 재실시간
+        actual: formatMinutesToDuration(actualWorkMinutes), // 실제 근무시간
+        breakTime: formatMinutesToDuration(breakTime), // 휴게시간
+        regular: formatMinutesToDuration(regularMinutes), // 기본 근무시간
+        overtime: formatMinutesToDuration(overtimeMinutes), // 연장근무시간
+        night: formatMinutesToDuration(nightMinutes) // 야간근무시간
     };
 };
 

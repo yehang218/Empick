@@ -31,13 +31,70 @@
                     <span class="unit">h</span>
                     <span class="minutes">{{ workingHours.minutes }}</span>
                     <span class="unit">m</span>
+                    <!-- 📊 직관적 상태 배지 -->
+                    <div class="status-badges">
+                        <!-- 🚨 법적 위험: 주 52시간 초과 -->
+                        <v-chip v-if="workTimeValidation.exceedsWeeklyLimit" color="error" size="small" variant="flat"
+                            class="ml-2">
+                            <v-icon start size="small">mdi-alert-circle</v-icon>
+                            법정한도 초과 (+{{ workTimeValidation.weeklyExcessHours }}h)
+                        </v-chip>
+
+                        <!-- ⚠️ 연장근무 한도 초과: 12시간 초과 -->
+                        <v-chip v-else-if="workTimeValidation.exceedsOvertimeLimit" color="warning" size="small"
+                            variant="flat" class="ml-2">
+                            <v-icon start size="small">mdi-clock-alert-outline</v-icon>
+                            연장한도 초과 (+{{ workTimeValidation.overtimeHours - workTimeValidation.maxOvertimeHours }}h)
+                        </v-chip>
+
+                        <!-- 📘 정상 연장근무: 12시간 이내 -->
+                        <v-chip v-else-if="workTimeValidation.hasOvertimeHours" color="info" size="small" variant="flat"
+                            class="ml-2">
+                            <v-icon start size="small">mdi-clock-plus-outline</v-icon>
+                            연장근무 {{ workTimeValidation.overtimeHours }}h
+                        </v-chip>
+
+                        <!-- 🌙 야간근무 -->
+                        <v-chip v-if="workTimeValidation.hasNightHours" color="deep-purple" size="small" variant="flat"
+                            class="ml-1">
+                            <v-icon start size="small">mdi-weather-night</v-icon>
+                            야간근무 {{ workTimeValidation.nightHours }}h
+                        </v-chip>
+
+                        <!-- ✅ 기본시간 초과 (정상 범위) -->
+                        <v-chip
+                            v-if="workTimeValidation.exceedsBasicHours && !workTimeValidation.hasOvertimeHours && !workTimeValidation.exceedsWeeklyLimit"
+                            color="success" size="small" variant="flat" class="ml-1">
+                            <v-icon start size="small">mdi-check-circle-outline</v-icon>
+                            기본시간 완료
+                        </v-chip>
+                    </div>
                 </div>
 
                 <!-- 진행률 바 -->
                 <div class="progress-container">
-                    <v-progress-linear :model-value="progressPercentage" height="8" color="success"
-                        bg-color="grey-lighten-3" rounded></v-progress-linear>
-                    <span class="progress-text">{{ formattedProgressPercentage }}</span>
+                    <!-- 🔥 FIX: 단일 progress bar로 전체 진행률 표시 -->
+                    <div class="custom-progress-bar">
+                        <!-- 기본 근무시간 부분 (100%까지) -->
+                        <div class="progress-segment basic-segment" :style="{
+                            width: progressPercentage > 100 ?
+                                `${(100 / progressPercentage) * 100}%` :
+                                `${progressPercentage}%`,
+                            backgroundColor: progressColor === 'success' ? '#4CAF50' :
+                                progressColor === 'warning' ? '#FF9800' :
+                                    progressColor === 'error' ? '#F44336' : '#2196F3'
+                        }">
+                        </div>
+
+                        <!-- 연장근무 부분 (100% 초과분) -->
+                        <div v-if="progressPercentage > 100" class="progress-segment overtime-segment" :style="{
+                            width: `${((progressPercentage - 100) / progressPercentage) * 100}%`,
+                            backgroundColor: '#2196F3'
+                        }">
+                        </div>
+                    </div>
+
+                    <span class="progress-text" :class="progressTextClass">{{ formattedProgressPercentage }}</span>
                 </div>
 
                 <!-- 통계 정보 -->
@@ -50,6 +107,14 @@
                         <span class="label">할당된 {{ month }} 근무시간:</span>
                         <span class="value">{{ targetHours.hours }}h {{ targetHours.minutes }}m</span>
                     </div>
+                    <!-- 🔥 NEW: 휴게시간 정보 추가 -->
+                    <div class="stat-item" v-if="breakTimeHours > 0">
+                        <span class="label">
+                            <v-icon size="small" class="mr-1">mdi-coffee</v-icon>
+                            월간 총 휴게시간:
+                        </span>
+                        <span class="value info-text">{{ breakTimeHours }}h {{ breakTimeMinutes }}m</span>
+                    </div>
                     <div class="stat-item">
                         <span class="label">일일 예상 필요 평균:</span>
                         <span class="value">{{ dailyAverageNeeded }} 평균 (남은 근무일: {{ remainingWorkDays }} 일)</span>
@@ -61,7 +126,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, toRef } from 'vue'
+import { useWorkTimeValidation } from '@/composables/useWorkTimeValidation'
+import { useWorkTimeCalculation } from '@/composables/useWorkTimeCalculation'
 
 // Props
 const props = defineProps({
@@ -86,74 +153,75 @@ const props = defineProps({
     remainingWorkDays: {
         type: Number,
         default: 0
+    },
+    // 🔥 NEW: 주간 근무 기록 데이터 (workTimeValidator 사용을 위해)
+    weeklyRecords: {
+        type: Array,
+        default: () => []
+    },
+    overtimeHours: {
+        type: Number,
+        default: 0
+    },
+    nightHours: {
+        type: Number,
+        default: 0
+    },
+    // 🔥 NEW: 휴게시간 관련 props
+    totalBreakMinutes: {
+        type: Number,
+        default: 0
     }
 })
 
-// 진행률 계산
-const progressPercentage = computed(() => {
-    // 안전한 값 추출
-    const currentHours = props.workingHours?.hours || 0
-    const currentMins = props.workingHours?.minutes || 0
-    const targetHours = props.targetHours?.hours || 0
-    const targetMins = props.targetHours?.minutes || 0
+// Composables
+const { validateMonthlyWorkTime } = useWorkTimeValidation()
+const {
+    useProgressPercentage,
+    useFormattedProgressPercentage,
+    getProgressColor,
+    getProgressTextClass,
+    useRemainingTimeRange,
+    useDailyAverageNeeded
+} = useWorkTimeCalculation()
 
-    const currentMinutes = currentHours * 60 + currentMins
-    const targetMinutes = targetHours * 60 + targetMins
+// Reactive refs for composables
+const workingHoursRef = toRef(props, 'workingHours')
+const targetHoursRef = toRef(props, 'targetHours')
+const remainingWorkDaysRef = toRef(props, 'remainingWorkDays')
 
-    if (targetMinutes === 0) return 0
+// 🔥 REFACTORED: 근무시간 검증 로직 (composable 사용)
+const workTimeValidation = computed(() =>
+    validateMonthlyWorkTime(props.workingHours, props.targetHours, props.nightHours)
+)
 
-    const percentage = (currentMinutes / targetMinutes) * 100
-    return isNaN(percentage) ? 0 : percentage
-})
+// 🔥 REFACTORED: 진행률 계산 (composable 사용)
+const progressPercentage = useProgressPercentage(workingHoursRef, targetHoursRef)
+const formattedProgressPercentage = useFormattedProgressPercentage(progressPercentage)
 
-// 포맷팅된 진행률
-const formattedProgressPercentage = computed(() => {
-    const percentage = progressPercentage.value
-    return `${percentage.toFixed(1)}%`
-})
+// 🔥 REFACTORED: 진행률 색상 및 텍스트 클래스 (composable 사용)
+const progressColor = computed(() =>
+    getProgressColor(
+        workTimeValidation.value.hasLegalIssues,
+        workTimeValidation.value.exceedsWeeklyLimit,
+        progressPercentage.value
+    )
+)
 
-// 남은 근무시간 범위 계산
-const remainingTimeRange = computed(() => {
-    // 안전한 값 추출
-    const currentHours = props.workingHours?.hours || 0
-    const currentMins = props.workingHours?.minutes || 0
-    const targetHours = props.targetHours?.hours || 0
-    const targetMins = props.targetHours?.minutes || 0
+const progressTextClass = computed(() =>
+    getProgressTextClass(
+        workTimeValidation.value.hasLegalIssues,
+        workTimeValidation.value.exceedsWeeklyLimit
+    )
+)
 
-    const currentMinutes = currentHours * 60 + currentMins
-    const targetMinutes = targetHours * 60 + targetMins
-    const remainingMinutes = Math.max(0, targetMinutes - currentMinutes)
+// 🔥 REFACTORED: 남은 시간 범위 및 일일 평균 (composable 사용)
+const remainingTimeRange = useRemainingTimeRange(workingHoursRef, targetHoursRef)
+const dailyAverageNeeded = useDailyAverageNeeded(workingHoursRef, targetHoursRef, remainingWorkDaysRef)
 
-    // 최소: 남은 시간 그대로, 최대: 남은 시간 + 여유시간(5시간)
-    const minHours = Math.floor(remainingMinutes / 60)
-    const minMins = remainingMinutes % 60
-    const maxTotalMinutes = remainingMinutes + (5 * 60) // 5시간 여유
-    const maxHours = Math.floor(maxTotalMinutes / 60)
-    const maxMins = maxTotalMinutes % 60
-
-    return `최소 ${minHours}h ${minMins}m ~ 최대 ${maxHours}h ${maxMins}m`
-})
-
-// 일일 평균 필요 시간 계산
-const dailyAverageNeeded = computed(() => {
-    if (!props.remainingWorkDays || props.remainingWorkDays === 0) return '0h 0m'
-
-    // 안전한 값 추출
-    const currentHours = props.workingHours?.hours || 0
-    const currentMins = props.workingHours?.minutes || 0
-    const targetHours = props.targetHours?.hours || 0
-    const targetMins = props.targetHours?.minutes || 0
-
-    const currentMinutes = currentHours * 60 + currentMins
-    const targetMinutes = targetHours * 60 + targetMins
-    const remainingMinutes = Math.max(0, targetMinutes - currentMinutes)
-
-    const avgMinutesPerDay = Math.ceil(remainingMinutes / props.remainingWorkDays)
-    const hours = Math.floor(avgMinutesPerDay / 60)
-    const minutes = avgMinutesPerDay % 60
-
-    return `${hours}h ${minutes}m`
-})
+// 🔥 NEW: 휴게시간 계산
+const breakTimeHours = computed(() => Math.floor(props.totalBreakMinutes / 60))
+const breakTimeMinutes = computed(() => props.totalBreakMinutes % 60)
 
 // Emits
 defineEmits(['downloadExcel', 'viewMonthlyDetail'])
@@ -230,6 +298,7 @@ defineEmits(['downloadExcel', 'viewMonthlyDetail'])
     display: flex;
     align-items: baseline;
     margin-bottom: 16px;
+    flex-wrap: wrap;
 }
 
 .hours,
@@ -246,6 +315,15 @@ defineEmits(['downloadExcel', 'viewMonthlyDetail'])
     margin-right: 8px;
 }
 
+/* 🔥 NEW: 상태 배지 스타일 */
+.status-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 8px;
+    gap: 4px;
+}
+
 .progress-container {
     display: flex;
     align-items: center;
@@ -253,8 +331,31 @@ defineEmits(['downloadExcel', 'viewMonthlyDetail'])
     margin-bottom: 20px;
 }
 
-.progress-container .v-progress-linear {
+.custom-progress-bar {
     flex: 1;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-segment {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.basic-segment {
+    border-radius: 4px 0 0 4px;
+}
+
+.overtime-segment {
+    border-radius: 0 4px 4px 0;
+}
+
+.progress-segment:only-child {
+    border-radius: 4px;
 }
 
 .progress-text {
@@ -262,6 +363,15 @@ defineEmits(['downloadExcel', 'viewMonthlyDetail'])
     font-weight: 600;
     color: #4CAF50;
     min-width: 50px;
+}
+
+/* 🔥 NEW: 진행률 텍스트 색상 클래스 */
+.progress-text.warning-text {
+    color: #FF9800 !important;
+}
+
+.progress-text.error-text {
+    color: #F44336 !important;
 }
 
 .stats-info {
@@ -273,18 +383,37 @@ defineEmits(['downloadExcel', 'viewMonthlyDetail'])
 .stat-item {
     display: flex;
     gap: 8px;
+    align-items: center;
 }
 
 .label {
     font-size: 14px;
     color: #666;
     min-width: 140px;
+    display: flex;
+    align-items: center;
 }
 
 .value {
     font-size: 14px;
     color: #333;
     font-weight: 500;
+    flex: 1;
+}
+
+/* 🔥 NEW: 상태별 텍스트 색상 */
+.warning-text {
+    color: #FF9800 !important;
+    font-weight: 600;
+}
+
+.error-text {
+    color: #F44336 !important;
+    font-weight: 600;
+}
+
+.info-text {
+    color: #2196F3 !important;
 }
 
 .detail-section {

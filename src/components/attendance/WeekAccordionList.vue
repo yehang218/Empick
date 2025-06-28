@@ -8,6 +8,38 @@
                         {{ week.expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
                     </v-icon>
                     <span class="week-title">{{ week.weekNumber }}주차</span>
+
+                    <!-- 🔥 NEW: 주차별 법정 한도 초과 배지 -->
+                    <div class="week-status-badges">
+                        <v-chip v-if="getWeeklyValidation(week).exceedsSpecialLimit" color="error" size="small"
+                            variant="flat" class="ml-2">
+                            <v-icon start size="small">mdi-alert-circle</v-icon>
+                            특별한도 초과 (+{{ getWeeklyValidation(week).specialExcessHours }}h)
+                        </v-chip>
+                        <v-chip v-else-if="getWeeklyValidation(week).exceedsNormalLimit" color="warning" size="small"
+                            variant="flat" class="ml-2">
+                            <v-icon start size="small">mdi-alert</v-icon>
+                            주간한도 초과 (+{{ getWeeklyValidation(week).normalExcessHours }}h)
+                        </v-chip>
+                        <v-chip v-else-if="getWeeklyValidation(week).hasOvertimeWork" color="info" size="small"
+                            variant="flat" class="ml-2">
+                            <v-icon start size="small">mdi-clock-plus-outline</v-icon>
+                            연장근무 {{ getWeeklyValidation(week).overtimeHours }}h
+                        </v-chip>
+                        <v-chip v-else-if="getWeeklyValidation(week).meetsBasicHours" color="success" size="small"
+                            variant="flat" class="ml-2">
+                            <v-icon start size="small">mdi-check-circle</v-icon>
+                            기본시간 완료
+                        </v-chip>
+
+                        <!-- 🔥 NEW: 휴게시간 정보 배지 -->
+                        <v-chip v-if="getWeeklyValidation(week).totalHours > getWeeklyValidation(week).actualHours"
+                            color="purple" size="small" variant="outlined" class="ml-2">
+                            <v-icon start size="small">mdi-coffee</v-icon>
+                            휴게 {{ formatBreakTime(getWeeklyValidation(week).totalHours -
+                                getWeeklyValidation(week).actualHours) }}
+                        </v-chip>
+                    </div>
                 </div>
 
                 <div class="week-summary">
@@ -30,9 +62,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
 import WeekSummaryCard from './WeekSummaryCard.vue'
 import { useAttendanceStore } from '@/stores/attendanceStore'
+import { useWorkTimeValidation } from '@/composables/useWorkTimeValidation'
+import { useWeekManagement } from '@/composables/useWeekManagement'
 
 // Props
 const props = defineProps({
@@ -52,88 +85,30 @@ const props = defineProps({
 
 const attendanceStore = useAttendanceStore()
 
-// 아코디언 상태를 관리하는 반응형 데이터
-const weekList = ref([])
+// Composables
+const { validateWeeklyWorkTime } = useWorkTimeValidation()
+const { formatWeekRange, useWeekListState } = useWeekManagement()
 
-// 현재 주차 계산
-const getCurrentWeekNumber = () => {
-    const today = new Date()
+// 🔥 REFACTORED: 주차 관리 로직 (composable 사용)
+const { weekList, toggleWeek } = useWeekListState(props, attendanceStore)
 
-    // 현재 월이 아니면 -1 반환 (아무 주차도 열지 않음)
-    if (today.getFullYear() !== props.year || today.getMonth() + 1 !== props.month) {
-        return -1
+// 🔥 REFACTORED: 주차별 근무시간 검증 함수 (composable 사용)
+const getWeeklyValidation = (week) => validateWeeklyWorkTime(week)
+
+// 휴게시간 포맷팅 함수
+const formatBreakTime = (hours) => {
+    if (hours <= 0) return '0h'
+
+    const wholeHours = Math.floor(hours)
+    const minutes = Math.round((hours - wholeHours) * 60)
+
+    if (minutes === 0) {
+        return `${wholeHours}h`
+    } else if (wholeHours === 0) {
+        return `${minutes}m`
+    } else {
+        return `${wholeHours}h ${minutes}m`
     }
-
-    const currentDate = today.getDate()
-    const firstDay = new Date(props.year, props.month - 1, 1)
-    const firstDayOfWeek = firstDay.getDay()
-
-    // 첫 주의 시작을 월요일로 맞추기
-    let weekStart = 1
-    if (firstDayOfWeek !== 1) {
-        weekStart = 1 - (firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1)
-    }
-
-    // 현재 날짜가 속한 주차 계산
-    let weekNumber = 1
-    while (weekStart <= currentDate) {
-        const weekEnd = weekStart + 6
-        if (currentDate >= weekStart && currentDate <= weekEnd) {
-            return weekNumber
-        }
-        weekStart += 7
-        weekNumber++
-    }
-
-    return 1 // 기본값
-}
-
-// Store에서 주차별 데이터 가져와서 상태 업데이트
-const updateWeekList = () => {
-    if (!props.rawAttendanceRecords.length) {
-        weekList.value = []
-        return
-    }
-
-    const newWeekData = attendanceStore.groupAttendanceByWeek(
-        props.year,
-        props.month,
-        props.rawAttendanceRecords
-    )
-
-    const currentWeek = getCurrentWeekNumber()
-
-    // 기존 expanded 상태 보존하면서 업데이트
-    weekList.value = newWeekData.map((newWeek, index) => {
-        const existingWeek = weekList.value[index]
-
-        // 기존 상태가 있으면 보존, 없으면 현재 주차인지 확인
-        const shouldExpand = existingWeek
-            ? existingWeek.expanded
-            : newWeek.weekNumber === currentWeek
-
-        return {
-            ...newWeek,
-            expanded: shouldExpand
-        }
-    })
-}
-
-// Props 변경 감지
-watch([() => props.year, () => props.month, () => props.rawAttendanceRecords], () => {
-    updateWeekList()
-}, { immediate: true, deep: true })
-
-// 주차 범위 포맷팅
-const formatWeekRange = (startDate, endDate) => {
-    const start = startDate.getDate()
-    const end = endDate.getDate()
-    return `${start}일 ~ ${end}일`
-}
-
-// 주차 토글
-const toggleWeek = (index) => {
-    weekList.value[index].expanded = !weekList.value[index].expanded
 }
 
 // 승인 요청 처리
@@ -199,6 +174,14 @@ const emit = defineEmits(['approval-request', 'time-edit'])
             font-size: 16px;
             font-weight: 600;
             color: #333;
+        }
+
+        // 🔥 NEW: 주차별 배지 스타일
+        .week-status-badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
     }
 
