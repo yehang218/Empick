@@ -510,7 +510,6 @@ const handleAssignClick = async () => {
     jobtestModal.value = true
   } catch (error) {
     console.error('실무 테스트 목록 조회 실패:', error)
-    toast.error('실무 테스트 목록을 불러오는 데 실패했습니다.')
   }
 }
 
@@ -580,7 +579,6 @@ const handleJobtestSelected = async (jobtest) => {
     await applicantStore.fetchApplicantFullInfoList()
   } catch (error) {
     console.error('실무테스트 할당 실패:', error)
-    toast.error(applicationJobtestStore.errorMessage || '실무테스트 할당에 실패했습니다.')
   }
 }
 

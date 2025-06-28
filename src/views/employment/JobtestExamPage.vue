@@ -1,6 +1,5 @@
 <template>
   <div class="exam-layout">
-    <CareerHeader />
     <div class="exam-content-wrapper">
       <div class="exam-sidebar-wrap">
         <ExamSidebar
@@ -39,7 +38,6 @@ import QuestionView from '@/components/employment/QuestionView.vue'
 import { QUESTION_TYPES } from '@/constants/employment/questionTypes'
 import AnswerRequestDTO from '@/dto/employment/jobtest/answerRequestDTO'
 import Modal from '@/components/common/Modal.vue'
-import CareerHeader from '@/components/career/CareerHeader.vue'
 
 const store = useJobtestExamStore()
 const route = useRoute()

@@ -42,7 +42,7 @@ export const useJobtestDetailStore = defineStore('jobtestDetail', () => {
         try {
             await createJobtestService(dto);
         } catch (e) {
-            error.value = e.message || '실무테스트 등록 실패';
+            // error.value = e.message || '실무테스트 등록 실패';
             throw e;
         } finally {
             loading.value = false;

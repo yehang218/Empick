@@ -1,11 +1,10 @@
 <template>
-    <CareerHeader />
-    
+
     <v-container v-if="loading" class="d-flex justify-center align-center" style="height: 300px;">
         <v-progress-circular indeterminate color="primary" size="60" />
     </v-container>
 
-    <v-container v-else-if="jobtest" fluid class="py-12" max-width="800px">
+    <v-container v-else-if="jobtest" fluid class="py-0" max-width="800px">
         <v-card>
             <v-card-text>
                 <h2 class="text-h5 font-weight-bold mb-6">입장 코드 입력</h2>
@@ -68,7 +67,6 @@ import { useRouter } from 'vue-router'
 import { useJobtestDetailStore } from '@/stores/jobtestDetailStore'
 import { useJobtestExamStore } from '@/stores/jobtestExamStore';
 import AlertModal from '@/components/common/AlertModal.vue'
-import CareerHeader from '@/components/career/CareerHeader.vue'
 
 const router = useRouter()
 

@@ -146,7 +146,7 @@
         </v-dialog>
 
         <SuccessModal v-if="showSuccessModal" message="실무 테스트가 등록되었습니다." @confirm="handleSuccessConfirm"
-            @cancel="showSuccessModal = false" />
+            :showCancel="false" />
 
         <Modal v-if="showCancelModal" message="정말 취소하시겠습니까?<br>입력한 내용이 모두 사라집니다." @confirm="handleCancelConfirm"
             @cancel="handleCancelClose" />
@@ -213,10 +213,9 @@ const difficultyOptions = [
 
 onMounted(async () => {
     await jobtestQuestionStore.fetchQuestions()
-    localQuestions.value = jobtestQuestionStore.questions.map(q => ({
-        ...q,
-        id: Number(q.id)
-    }))
+    localQuestions.value = jobtestQuestionStore.questions
+        .map(q => ({ ...q, id: Number(q.id) }))
+        .sort((a, b) => b.id - a.id)
 
     // Edit mode: pre-fill if jobtestId is present
     const jobtestId = route.query.jobtestId
@@ -239,7 +238,7 @@ onMounted(async () => {
                 return found ? { ...q, score: found.score } : q
             })
         } catch (e) {
-            toast.error("데이터를 불러오는데 실패했습니다.")
+            // toast.error("데이터를 불러오는데 실패했습니다.")
         }
     }
 })
@@ -386,10 +385,9 @@ function handleCancelClose() {
 const handleNewQuestion = async () => {
     dialog.value = false;
     await jobtestQuestionStore.fetchQuestions();
-    localQuestions.value = jobtestQuestionStore.questions.map(q => ({
-        ...q,
-        id: Number(q.id)
-    }));
+    localQuestions.value = jobtestQuestionStore.questions
+        .map(q => ({ ...q, id: Number(q.id) }))
+        .sort((a, b) => b.id - a.id)
 };
 
 const handleQuestionRowClick = async (event, { item }) => {
@@ -398,7 +396,7 @@ const handleQuestionRowClick = async (event, { item }) => {
         selectedQuestionDetail.value = { ...jobtestQuestionStore.form }
         detailDialogVisible.value = true
     } catch (err) {
-        toast.error('문제 상세 정보를 불러오는 중 오류가 발생했습니다.')
+        // toast.error('문제 상세 정보를 불러오는 중 오류가 발생했습니다.')
     }
 }
 
