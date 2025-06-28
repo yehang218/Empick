@@ -6,6 +6,7 @@ import com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequested
 import com.piveguyz.empickbackend.approvals.approval.query.service.ApprovalQueryService;
 import com.piveguyz.empickbackend.common.response.CustomApiResponse;
 import com.piveguyz.empickbackend.common.response.ResponseCode;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/approval/documents")
+@SecurityRequirement(name = "bearerAuth")
 public class ApprovalQueryController {
 	private final ApprovalQueryService service;
 
