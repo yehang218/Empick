@@ -25,6 +25,52 @@ export const createIntroduceRatingResult = async (payload) => {
     isUndefined: payload.introduceId === undefined
   })
   
+  // 🔒 중복 방지: introduce_id로 기존 평가 결과 확인
+  let existingRatingResult = null
+  if (!payload.introduceId) {
+    throw new Error('introduceId가 필요합니다. 자기소개서 정보를 확인해주세요.')
+  }
+
+  try {
+    console.log('🔍 introduce_id로 기존 평가 결과 조회:', payload.introduceId)
+    
+    // 최대 3번 재시도로 안정성 확보
+    let retryCount = 0
+    const maxRetries = 3
+    
+    while (retryCount < maxRetries) {
+      try {
+        existingRatingResult = await getIntroduceRatingResultByIntroduceId(payload.introduceId)
+        break // 성공하면 반복 종료
+      } catch (retryError) {
+        retryCount++
+        console.warn(`⚠️ 평가 결과 조회 실패 (${retryCount}/${maxRetries}):`, retryError.message)
+        
+        if (retryCount >= maxRetries) {
+          console.error('❌ 최대 재시도 횟수 초과')
+          break
+        }
+        
+        // 100ms 대기 후 재시도
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+    }
+    
+    if (existingRatingResult) {
+      console.log('✅ 기존 평가 결과 발견 - UPDATE 모드:', {
+        id: existingRatingResult.id,
+        introduce_id: existingRatingResult.introduce_id,
+        rating_score: existingRatingResult.rating_score,
+        member_id: existingRatingResult.member_id
+      })
+    } else {
+      console.log('ℹ️ 기존 평가 결과 없음 - CREATE 모드')
+    }
+  } catch (error) {
+    console.warn('⚠️ 기존 평가 결과 조회 전체 실패:', error.message)
+    existingRatingResult = null
+  }
+  
   // 백엔드가 기대하는 필드명으로 변환 (snake_case와 camelCase 모두 시도)
   const requestData = {
     content: payload.content,
@@ -51,15 +97,127 @@ export const createIntroduceRatingResult = async (payload) => {
   }
   
   try {
-    // 1. 평가 결과 저장
-    const response = await api.post(IntroduceAPI.CREATE_RATING_RESULT, requestData)
-    console.log('✅ 평가 결과 저장 성공:', response.data)
+    let response
+    let isUpdated = false
+    
+    // 기존 평가 결과가 있으면 UPDATE 시도
+    if (existingRatingResult && existingRatingResult.id) {
+      console.log('🔄 기존 평가 결과 업데이트 시도... (ID:', existingRatingResult.id, ')')
+      
+      try {
+        response = await api.patch(IntroduceAPI.UPDATE_RATING_RESULT(existingRatingResult.id), requestData)
+        console.log('✅ 평가 결과 업데이트 성공:', response.data)
+        isUpdated = true
+      } catch (updateError) {
+        console.warn('⚠️ 평가 결과 업데이트 실패, CREATE로 fallback:', updateError.message)
+        console.log('🔄 기존 평가 결과 삭제 후 새로 생성...')
+        
+        // 기존 평가 결과 삭제 시도
+        try {
+          await api.delete(IntroduceAPI.DELETE_RATING_RESULT(existingRatingResult.id))
+          console.log('✅ 기존 평가 결과 삭제 성공:', existingRatingResult.id)
+        } catch (deleteError) {
+          console.warn('⚠️ 기존 평가 결과 삭제 실패:', deleteError.message)
+        }
+        
+        // 새로 생성
+        response = await api.post(IntroduceAPI.CREATE_RATING_RESULT, requestData)
+        console.log('✅ 평가 결과 새로 생성 성공:', response.data)
+        isUpdated = false
+      }
+    } else {
+      // CREATE 전에 한 번 더 중복 체크 (race condition 방지)
+      console.log('🔍 CREATE 직전 중복 재확인...')
+      const lastCheckResult = await getIntroduceRatingResultByIntroduceId(payload.introduceId)
+      
+      if (lastCheckResult && lastCheckResult.id) {
+        console.log('⚠️ CREATE 직전에 다른 평가 결과 발견! UPDATE로 전환:', lastCheckResult.id)
+        
+        try {
+          response = await api.patch(IntroduceAPI.UPDATE_RATING_RESULT(lastCheckResult.id), requestData)
+          console.log('✅ 긴급 UPDATE 성공:', response.data)
+          isUpdated = true
+          existingRatingResult = lastCheckResult // 나중에 ID 추출용
+        } catch (emergencyUpdateError) {
+          console.warn('⚠️ 긴급 UPDATE 실패, 기존 결과 삭제 후 CREATE:', emergencyUpdateError.message)
+          
+          // 기존 결과 삭제 후 CREATE
+          try {
+            await api.delete(IntroduceAPI.DELETE_RATING_RESULT(lastCheckResult.id))
+            console.log('✅ 중복 평가 결과 삭제 성공:', lastCheckResult.id)
+          } catch (deleteError) {
+            console.warn('⚠️ 중복 평가 결과 삭제 실패:', deleteError.message)
+          }
+          
+          response = await api.post(IntroduceAPI.CREATE_RATING_RESULT, requestData)
+          console.log('✅ 삭제 후 새로운 평가 결과 생성 성공:', response.data)
+          isUpdated = false
+        }
+      } else {
+        console.log('🔄 중복 없음 확인 - 새로운 평가 결과 생성 시도...')
+        response = await api.post(IntroduceAPI.CREATE_RATING_RESULT, requestData)
+        console.log('✅ 평가 결과 생성 성공:', response.data)
+        isUpdated = false
+      }
+    }
     
     // 2. 저장된 평가 결과의 ID 추출
-    const ratingResultId = response.data?.data?.id || response.data?.id
-    console.log('🔍 저장된 평가 결과 ID:', ratingResultId)
+    let ratingResultId = null
+    
+    if (isUpdated && existingRatingResult?.id) {
+      // UPDATE의 경우: 기존 평가 결과 ID 사용
+      ratingResultId = existingRatingResult.id
+      console.log('✅ UPDATE - 기존 평가 결과 ID 사용:', ratingResultId)
+    } else {
+      // CREATE의 경우: 응답에서 ID 추출
+      console.log('🔍 CREATE - 응답에서 ID 추출 시도...')
+      
+      // 여러 가능한 구조에서 ID 추출 시도
+      if (response.data?.data?.id) {
+        ratingResultId = response.data.data.id
+        console.log('✅ response.data.data.id에서 ID 추출:', ratingResultId)
+      } else if (response.data?.id) {
+        ratingResultId = response.data.id
+        console.log('✅ response.data.id에서 ID 추출:', ratingResultId)
+      } else if (response.data?.data) {
+        // data 객체 전체 구조 확인
+        console.log('🔍 data 객체 전체 구조 확인:', response.data.data)
+        
+        // 가능한 ID 필드들 시도
+        ratingResultId = response.data.data.ratingResultId || 
+                        response.data.data.rating_result_id ||
+                        response.data.data.introduceRatingResultId ||
+                        response.data.data.introduce_rating_result_id ||
+                        response.data.data.resultId ||
+                        response.data.data.result_id
+        
+        if (ratingResultId) {
+          console.log('✅ 대체 필드에서 ID 추출:', ratingResultId)
+        }
+      }
+    }
+    
+    console.log('🔍 최종 추출된 평가 결과 ID:', ratingResultId)
+    console.log('🔍 전체 응답 구조 확인:', JSON.stringify(response.data, null, 2))
     
     // 3. application 테이블의 introduce_rating_result_id 업데이트
+    // ID를 찾지 못한 경우에만 fallback으로 재조회
+    if (!ratingResultId && payload.introduceId) {
+      console.log('🔄 ID 추출 실패 - fallback으로 최근 평가 결과 재조회 시도...')
+      try {
+        // introduceId로 방금 저장한 평가 결과 재조회
+        const recentEvaluation = await getIntroduceRatingResultByIntroduceId(payload.introduceId)
+        if (recentEvaluation && recentEvaluation.id) {
+          ratingResultId = recentEvaluation.id
+          console.log('✅ fallback으로 평가 결과 ID 발견:', ratingResultId)
+        } else {
+          console.warn('⚠️ fallback 재조회에서도 평가 결과를 찾을 수 없습니다.')
+        }
+      } catch (fallbackError) {
+        console.warn('⚠️ fallback 재조회 실패:', fallbackError.message)
+      }
+    }
+    
     if (ratingResultId && payload.applicationId) {
       try {
         console.log('🔄 application.introduce_rating_result_id 업데이트 시작:', {
@@ -69,7 +227,7 @@ export const createIntroduceRatingResult = async (payload) => {
           applicationIdType: typeof payload.applicationId
         })
         
-        // application 업데이트 API 호출
+        // 수정된 ApplicationCommandDTO를 사용하는 업데이트 서비스 호출
         const { updateApplicationIntroduceRatingResultService } = await import('@/services/applicationService')
         const updateResult = await updateApplicationIntroduceRatingResultService(payload.applicationId, ratingResultId)
         
@@ -175,13 +333,80 @@ export const getAllIntroduceRatingResults = async () => {
   }
 }
 
+// 🧹 전체 시스템 중복 데이터 정리 (introduce_id 기준)
+export const cleanupDuplicateRatingResults = async () => {
+  try {
+    console.log('🧹 시스템 전체 중복 평가 결과 정리 시작...')
+    
+    const allResults = await getAllIntroduceRatingResults()
+    console.log('📊 전체 평가 결과 개수:', allResults.length)
+    
+    // introduce_id별로 그룹화
+    const groupedByIntroduceId = {}
+    allResults.forEach(result => {
+      const introduceId = result.introduce_id || result.introduceId
+      if (introduceId) {
+        if (!groupedByIntroduceId[introduceId]) {
+          groupedByIntroduceId[introduceId] = []
+        }
+        groupedByIntroduceId[introduceId].push(result)
+      }
+    })
+    
+    let totalDuplicatesRemoved = 0
+    
+    // 각 introduce_id별로 중복 제거
+    for (const [introduceId, results] of Object.entries(groupedByIntroduceId)) {
+      if (results.length > 1) {
+        console.log(`🔍 introduce_id ${introduceId}에서 ${results.length}개 중복 발견`)
+        
+        // ID 기준 내림차순 정렬 (최신 데이터 우선)
+        const sortedResults = results.sort((a, b) => b.id - a.id)
+        const latestResult = sortedResults[0]
+        const duplicates = sortedResults.slice(1)
+        
+        console.log(`✅ 최신 결과 유지: ID ${latestResult.id}`)
+        console.log(`🗑️ 삭제 대상: ${duplicates.map(d => d.id).join(', ')}`)
+        
+        // 중복 데이터 삭제
+        for (const duplicate of duplicates) {
+          try {
+            await api.delete(IntroduceAPI.DELETE_RATING_RESULT(duplicate.id))
+            console.log(`✅ 중복 데이터 삭제 성공: ID ${duplicate.id}`)
+            totalDuplicatesRemoved++
+          } catch (deleteError) {
+            console.warn(`⚠️ 중복 데이터 삭제 실패: ID ${duplicate.id}`, deleteError.message)
+          }
+        }
+      }
+    }
+    
+    console.log(`🎉 중복 데이터 정리 완료! 총 ${totalDuplicatesRemoved}개 삭제됨`)
+    
+    return {
+      success: true,
+      totalChecked: allResults.length,
+      duplicatesRemoved: totalDuplicatesRemoved,
+      groupCount: Object.keys(groupedByIntroduceId).length
+    }
+    
+  } catch (error) {
+    console.error('❌ 중복 데이터 정리 실패:', error.message)
+    return {
+      success: false,
+      error: error.message
+    }
+  }
+}
+
 // introduceId로 평가 결과 조회 (전체 조회 후 필터링)
 export const getIntroduceRatingResultByIntroduceId = async (introduceId) => {
   try {
-    console.log('🔍 자기소개서 평가 결과 조회 (introduceId):', introduceId)
+    console.log('🔍 자기소개서 평가 결과 조회 (introduceId):', introduceId, '타입:', typeof introduceId)
     
     // 전체 평가 결과 조회
     const allResults = await getAllIntroduceRatingResults()
+    console.log('🔍 전체 평가 결과 개수:', allResults.length)
     console.log('🔍 전체 평가 결과 목록:', allResults.map(item => ({
       id: item.id,
       introduce_id: item.introduce_id,
@@ -189,45 +414,87 @@ export const getIntroduceRatingResultByIntroduceId = async (introduceId) => {
       content: item.content?.substring(0, 30) + '...'
     })))
     
-    // introduceId로 필터링 (더 엄격한 매칭)
+    // introduceId로 필터링 (다양한 형태로 매칭 시도)
     const matchingResults = allResults.filter(item => {
-      const match = item.introduce_id == introduceId || 
-                   item.introduceId == introduceId ||
-                   String(item.introduce_id) === String(introduceId) ||
-                   String(item.introduceId) === String(introduceId)
+      const itemIntroduceId1 = item.introduce_id
+      const itemIntroduceId2 = item.introduceId
+      const targetId = introduceId
+      
+      // 숫자/문자열 변환하여 비교
+      const match = 
+        itemIntroduceId1 == targetId || 
+        itemIntroduceId2 == targetId ||
+        String(itemIntroduceId1) === String(targetId) ||
+        String(itemIntroduceId2) === String(targetId) ||
+        Number(itemIntroduceId1) === Number(targetId) ||
+        Number(itemIntroduceId2) === Number(targetId)
       
       if (match) {
-        console.log('🎯 매칭 후보 평가 결과:', {
+        console.log('🎯 매칭된 평가 결과:', {
           id: item.id,
-          introduce_id: item.introduce_id,
-          introduceId: item.introduceId,
+          introduce_id: itemIntroduceId1,
+          introduceId: itemIntroduceId2,
           rating_score: item.rating_score,
-          content: item.content?.substring(0, 50) + '...'
+          content: item.content?.substring(0, 50) + '...',
+          매칭조건: {
+            'item.introduce_id == targetId': itemIntroduceId1 == targetId,
+            'item.introduceId == targetId': itemIntroduceId2 == targetId,
+            'String 비교1': String(itemIntroduceId1) === String(targetId),
+            'String 비교2': String(itemIntroduceId2) === String(targetId)
+          }
         })
       }
       
       return match
     })
     
+    console.log('🔍 매칭된 평가 결과 개수:', matchingResults.length)
+    
     if (matchingResults.length > 1) {
-      console.warn('⚠️ 여러 개의 평가 결과가 매칭됨. 가장 최근 것을 선택:', matchingResults.length, '개')
-      // 가장 최근 것 선택 (ID가 큰 것)
-      const result = matchingResults.reduce((latest, current) => 
-        current.id > latest.id ? current : latest
-      )
-      console.log('✅ 최근 평가 결과 선택:', result)
-      return result
+      console.warn('⚠️ 여러 개의 평가 결과가 매칭됨:', matchingResults.length, '개')
+      console.log('⚠️ 중복 평가 결과들:', matchingResults.map(item => ({
+        id: item.id,
+        introduce_id: item.introduce_id,
+        rating_score: item.rating_score,
+        content: item.content?.substring(0, 30)
+      })))
+      
+      // 🗑️ 중복 제거: 가장 최근 것만 남기고 나머지는 삭제
+      const sortedResults = matchingResults.sort((a, b) => b.id - a.id) // ID 내림차순 정렬
+      const latestResult = sortedResults[0] // 가장 최근 결과
+      const duplicateResults = sortedResults.slice(1) // 중복된 결과들
+      
+      console.log('🗑️ 중복 평가 결과 삭제 시작...', duplicateResults.length, '개')
+      
+      // 중복된 평가 결과들 삭제
+      for (const duplicate of duplicateResults) {
+        try {
+          console.log('🗑️ 중복 평가 결과 삭제 시도:', duplicate.id)
+          await api.delete(IntroduceAPI.DELETE_RATING_RESULT(duplicate.id))
+          console.log('✅ 중복 평가 결과 삭제 성공:', duplicate.id)
+        } catch (deleteError) {
+          console.warn('⚠️ 중복 평가 결과 삭제 실패:', duplicate.id, deleteError.message)
+        }
+      }
+      
+      console.log('✅ 최신 평가 결과 선택:', latestResult.id)
+      return latestResult
+      
     } else if (matchingResults.length === 1) {
       const result = matchingResults[0]
-      console.log('✅ 평가 결과 조회 성공:', result)
+      console.log('✅ 평가 결과 조회 성공:', result.id)
       return result
     } else {
       console.log('ℹ️ 해당 introduceId의 평가 결과가 없습니다:', introduceId)
-      console.log('🔍 확인된 introduce_id 값들:', allResults.map(item => item.introduce_id || item.introduceId))
+      console.log('🔍 확인된 introduce_id 값들:', allResults.map(item => ({
+        id: item.id,
+        introduce_id: item.introduce_id,
+        introduceId: item.introduceId
+      })))
       return null
     }
   } catch (error) {
-    console.warn('⚠️ 평가 결과 조회 실패:', error.message)
+    console.error('❌ 평가 결과 조회 실패:', error.message)
     return null
   }
 }
@@ -566,4 +833,109 @@ export const getIntroduceWithTemplateResponses = async (applicationId) => {
   }
 }
 
+// 🔍 디버깅: 평가 저장 과정 상세 분석
+export const debugIntroduceRatingProcess = async (introduceId) => {
+  console.log('🔍 === 평가 저장 과정 디버깅 시작 ===')
+  console.log('🔍 대상 introduce_id:', introduceId)
+  
+  try {
+    // 1. 전체 평가 결과 조회
+    const allResults = await getAllIntroduceRatingResults()
+    console.log('📊 전체 평가 결과 개수:', allResults.length)
+    
+    // 2. 해당 introduce_id의 평가 결과들 찾기
+    const targetResults = allResults.filter(result => {
+      const itemIntroduceId = result.introduce_id || result.introduceId
+      return itemIntroduceId == introduceId || String(itemIntroduceId) === String(introduceId)
+    })
+    
+    console.log(`🎯 introduce_id ${introduceId}의 평가 결과:`, targetResults.length, '개')
+    
+    if (targetResults.length === 0) {
+      console.log('✅ 중복 없음 - CREATE 해야 함')
+      return { 
+        duplicates: [],
+        shouldCreate: true,
+        shouldUpdate: false
+      }
+    } else if (targetResults.length === 1) {
+      console.log('✅ 기존 평가 1개 발견 - UPDATE 해야 함')
+      console.log('📋 기존 평가 정보:', {
+        id: targetResults[0].id,
+        introduce_id: targetResults[0].introduce_id,
+        rating_score: targetResults[0].rating_score,
+        content: targetResults[0].content?.substring(0, 50) + '...'
+      })
+      return {
+        duplicates: [],
+        existing: targetResults[0],
+        shouldCreate: false,
+        shouldUpdate: true
+      }
+    } else {
+      console.warn('⚠️ 중복 평가 결과 발견:', targetResults.length, '개')
+      targetResults.forEach((result, index) => {
+        console.log(`📋 중복 ${index + 1}:`, {
+          id: result.id,
+          introduce_id: result.introduce_id,
+          rating_score: result.rating_score,
+          created_at: result.created_at || '알 수 없음'
+        })
+      })
+      
+      // 최신 것 선택
+      const sorted = targetResults.sort((a, b) => b.id - a.id)
+      const latest = sorted[0]
+      const duplicates = sorted.slice(1)
+      
+      console.log('✅ 최신 평가 결과 선택:', latest.id)
+      console.log('🗑️ 삭제할 중복 평가:', duplicates.map(d => d.id))
+      
+      return {
+        duplicates: duplicates,
+        existing: latest,
+        shouldCreate: false,
+        shouldUpdate: true
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ 디버깅 과정 중 오류:', error.message)
+    return {
+      error: error.message,
+      duplicates: [],
+      shouldCreate: true,
+      shouldUpdate: false
+    }
+  }
+}
 
+// 🧪 간단한 평가 저장 테스트 (실제 저장 안함)
+export const testIntroduceRatingProcess = async (introduceId) => {
+  console.log('🧪 === 평가 저장 테스트 (실제 저장 안함) ===')
+  
+  const debugResult = await debugIntroduceRatingProcess(introduceId)
+  
+  console.log('🔍 디버깅 결과:', debugResult)
+  
+  if (debugResult.shouldUpdate && debugResult.existing) {
+    console.log('📝 UPDATE 시뮬레이션:')
+    console.log('- URL:', IntroduceAPI.UPDATE_RATING_RESULT(debugResult.existing.id))
+    console.log('- 기존 ID:', debugResult.existing.id)
+    console.log('- introduce_id:', debugResult.existing.introduce_id)
+    
+    // 중복 삭제 시뮬레이션
+    if (debugResult.duplicates.length > 0) {
+      console.log('🗑️ 중복 삭제 시뮬레이션:')
+      debugResult.duplicates.forEach(duplicate => {
+        console.log('- 삭제 URL:', IntroduceAPI.DELETE_RATING_RESULT(duplicate.id))
+        console.log('- 삭제 ID:', duplicate.id)
+      })
+    }
+  } else if (debugResult.shouldCreate) {
+    console.log('📝 CREATE 시뮬레이션:')
+    console.log('- URL:', IntroduceAPI.CREATE_RATING_RESULT)
+  }
+  
+  return debugResult
+}

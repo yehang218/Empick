@@ -47,13 +47,13 @@ export default class ApplicationResponseDTO {
             recruitmentId: this.recruitmentId,
             createdAt: this.createdAt,
             status: this.status,
-            profileUrl: this.applicantId,
+            applicantId: this.applicantId,
             introduceRatingResultId: this.introduceRatingResultId,
             updatedAt: this.updatedAt,
             updatedBy: this.updatedBy,
             applicationJobtestId: this.applicationJobtestId,
-jobtestGradingScore: this.jobtestGradingScore,
-jobtestGradingStatus: this.jobtestGradingStatus
+            jobtestGradingScore: this.jobtestGradingScore,
+            jobtestGradingStatus: this.jobtestGradingStatus
         };
     }
 }

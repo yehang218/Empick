@@ -26,7 +26,7 @@ export default class ApplicantResponseDTO {
         return {
             id: this.id,
             name: this.name,
-            phone: this.interviewephonerId,
+            phone: this.phone,
             email: this.email,
             profileUrl: this.profileUrl,
             birth: this.birth,

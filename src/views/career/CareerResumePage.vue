@@ -64,22 +64,22 @@
           </template>
 
           <div class="button-group mt-4">
-            <v-btn variant="outlined" color="success" class="mr-2">취소</v-btn>
+            <v-btn variant="outlined" color="success" class="mr-2" @click="handleGoBack">취소</v-btn>
             <v-btn color="success" class="submit-btn" @click="handleSubmit">등록</v-btn>
           </div>
         </v-col>
-      </v-row>
+            </v-row>
     </v-container>
 
-    <!-- Alert Modal -->
+    <!-- 제출 확인 Modal -->
     <AlertModal
-      v-if="showModal"
-      :title="modalTitle"
-      :message="modalMessage"
-      :confirm-text="modalConfirmText"
-      :cancel-text="modalCancelText"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
+      v-if="showSubmitModal"
+      title="지원서 제출 확인"
+      message="제출한 지원서는 수정할 수 없습니다. 정말 제출하시겠습니까?"
+      confirm-text="제출하기"
+      cancel-text="취소"
+      @confirm="handleFinalSubmit"
+      @cancel="handleCancelSubmit"
     />
   </div>
 </template>
@@ -102,14 +102,8 @@ const router = useRouter()
 const toast = useToast()
 const id = Number(route.params.id)
 
-// Modal 상태
-const showModal = ref(false)
-const modalTitle = ref('')
-const modalMessage = ref('')
-const modalConfirmText = ref('확인')
-const modalCancelText = ref('취소')
-const modalAction = ref('')
-let existingIntroduceId = null
+// 제출 확인 모달 상태
+const showSubmitModal = ref(false)
 
 // URL 파라미터 또는 로컬 스토리지에서 ID 가져오기
 console.log('🔍 ID 소스 확인:', {
@@ -166,82 +160,35 @@ onMounted(async () => {
   }
 })
 
-const showDuplicateModal = (duplicateIntroduce) => {
-  existingIntroduceId = duplicateIntroduce.id
-  modalTitle.value = '중복 자기소개서 확인'
-  modalMessage.value = '이미 해당 지원자에 대한 자기소개서가 존재합니다. 기존 자기소개서를 수정하시겠습니까?'
-  modalConfirmText.value = '수정하기'
-  modalCancelText.value = '취소'
-  modalAction.value = 'update_existing'
-  showModal.value = true
+const handleGoBack = () => {
+  router.back()
 }
 
-const handleConfirm = async () => {
-  showModal.value = false
+// 제출 확인 모달 핸들러
+const handleSubmit = () => {
+  // 필수 항목 유효성 검사
+  const requiredItems = applicationItems.value.filter(item => item.required === true)
+  const missingRequiredItems = []
   
-  if (modalAction.value === 'update_existing') {
-    await continueWithExistingIntroduce()
+  for (const item of requiredItems) {
+    const answer = applicationAnswers.value[item.id]
+    if (!answer || answer.trim() === '') {
+      missingRequiredItems.push(item.categoryName)
+    }
   }
+  
+  if (missingRequiredItems.length > 0) {
+    const missingItemsText = missingRequiredItems.join(', ')
+    toast.error(`다음 필수 항목을 입력해주세요: ${missingItemsText}`)
+    return
+  }
+
+  // 유효성 검사 통과 시 확인 모달 표시
+  showSubmitModal.value = true
 }
 
-const handleCancel = () => {
-  showModal.value = false
-  existingIntroduceId = null
-}
-
-const continueWithExistingIntroduce = async () => {
-  try {
-    // 필수 항목 유효성 검사 (중복 자기소개서 수정 시에도 적용)
-    const requiredItems = applicationItems.value.filter(item => item.required === true)
-    const missingRequiredItems = []
-    
-    for (const item of requiredItems) {
-      const answer = applicationAnswers.value[item.id]
-      if (!answer || answer.trim() === '') {
-        missingRequiredItems.push(item.categoryName)
-      }
-    }
-    
-    if (missingRequiredItems.length > 0) {
-      const missingItemsText = missingRequiredItems.join(', ')
-      toast.error(`다음 필수 항목을 입력해주세요: ${missingItemsText}`)
-      return
-    }
-
-    const introduceId = existingIntroduceId
-    const finalApplicationId = applicationId.value
-    
-    // 2단계로 바로 이동 - 자기소개서 항목별 응답 등록
-    console.log('🔄 자기소개서 항목별 응답 등록 시작')
-    for (const item of templateItems.value) {
-      const itemContent = itemAnswers.value[item.id] || ''
-      console.log('📝 항목 응답 등록:', { introduceId, itemId: item.id, content: itemContent })
-      
-      await introduceStore.createTemplateItemResponse({
-        introduceId,
-        introduceTemplateItemId: item.id,
-        content: itemContent
-      })
-    }
-    console.log('✅ 자기소개서 항목별 응답 등록 완료')
-    
-    // 3. application_response(이력서) 등록
-    await processApplicationResponses(finalApplicationId)
-    
-    // 4. Application 테이블의 introduce_rating_result_id 업데이트
-    console.log('🔄 지원서에 자기소개서 연결')
-    await applicationStore.updateApplicationStatus(finalApplicationId, {
-      introduceRatingResultId: introduceId
-    })
-    console.log('✅ 지원서에 자기소개서 연결 완료')
-
-    toast.success('자기소개서와 이력서가 성공적으로 등록되었습니다.')
-    router.push('/career/recruitments/')
-    
-  } catch (e) {
-    console.error('❌ 등록 실패:', e)
-    toast.error('등록 실패: ' + e.message)
-  }
+const handleCancelSubmit = () => {
+  showSubmitModal.value = false
 }
 
 const processApplicationResponses = async (finalApplicationId) => {
@@ -268,29 +215,13 @@ const processApplicationResponses = async (finalApplicationId) => {
   console.log('✅ 이력서 등록 완료')
 }
 
-// 등록 버튼 클릭 시 introduce 테이블에 먼저 insert 후 introduceId로 항목별 응답 등록
-const handleSubmit = async () => {
+// 최종 제출 처리 함수
+const handleFinalSubmit = async () => {
+  showSubmitModal.value = false
   try {
     // ID 유효성 검사
     if (!applicantId.value || !applicationId.value) {
       throw new Error('지원자 ID 또는 지원서 ID가 없습니다. 인적사항부터 다시 등록해주세요.')
-    }
-
-    // 필수 항목 유효성 검사
-    const requiredItems = applicationItems.value.filter(item => item.required === true)
-    const missingRequiredItems = []
-    
-    for (const item of requiredItems) {
-      const answer = applicationAnswers.value[item.id]
-      if (!answer || answer.trim() === '') {
-        missingRequiredItems.push(item.categoryName)
-      }
-    }
-    
-    if (missingRequiredItems.length > 0) {
-      const missingItemsText = missingRequiredItems.join(', ')
-      toast.error(`다음 필수 항목을 입력해주세요: ${missingItemsText}`)
-      return
     }
 
     console.log('🔄 이력서/자기소개서 등록 시작')
@@ -318,75 +249,38 @@ const handleSubmit = async () => {
     
     console.log('🔧 최종 사용할 ID들:', { finalApplicantId, finalApplicationId, introduceTemplateId })
     
-    // 기존 자기소개서 존재 여부 확인
-    console.log('🔍 기존 자기소개서 확인 중...')
-    const existingIntroduce = await introduceStore.getIntroduceByApplicationId(finalApplicationId)
-    
-    // applicationId로 찾지 못했다면 applicantId + templateId 조합으로도 확인
-    let duplicateCheck = existingIntroduce
-    if (!duplicateCheck) {
-      console.log('🔍 applicantId + templateId 조합으로 중복 확인...')
-      try {
-        // Store를 통해 전체 자기소개서 목록 조회
-        const allIntroduces = await introduceStore.getAllIntroduce()
-        console.log('📋 중복 체크용 전체 자기소개서:', allIntroduces)
-        
-        duplicateCheck = allIntroduces.find(item => 
-          item.applicantId == finalApplicantId && item.introduceTemplateId == introduceTemplateId
-        )
-        console.log('🔍 applicantId + templateId 조합 결과:', duplicateCheck)
-      } catch (e) {
-        console.warn('⚠️ 중복 체크 실패:', e)
-      }
+    // 1. 새로운 자기소개서 생성
+    const introducePayload = {
+      applicantId: finalApplicantId,
+      applicationId: finalApplicationId,
+      introduceTemplateId,
+      content: '' // 템플릿 기반이므로 content는 비워둠
     }
     
-    let introduceId = null
+    console.log('📤 자기소개서 생성 최종 페이로드:', introducePayload)
     
-    if (duplicateCheck) {
-      console.log('⚠️ 이미 자기소개서가 존재합니다:', duplicateCheck)
-      showDuplicateModal(duplicateCheck)
-      return // 모달에서 사용자 선택을 기다림
-    } else {
-      // 새로 생성
-      const introducePayload = {
-        applicantId: finalApplicantId,
-        applicationId: finalApplicationId,
-        introduceTemplateId,
-        content: '' // 템플릿 기반이므로 content는 비워둠
-      }
-      
-      console.log('📤 자기소개서 생성 최종 페이로드:', introducePayload)
-      
-      const newIntroduce = await introduceStore.createIntroduce(introducePayload)
-      introduceId = newIntroduce.id || newIntroduce
-      
-      if (!introduceId) throw new Error('자기소개서 생성 실패')
-      console.log('✅ 자기소개서 생성 성공:', introduceId)
+    const newIntroduce = await introduceStore.createIntroduce(introducePayload)
+    const introduceId = newIntroduce.id || newIntroduce
+    
+    if (!introduceId) throw new Error('자기소개서 생성 실패')
+    console.log('✅ 자기소개서 생성 성공:', introduceId)
 
-      // 2. introduce_template_item_response에 항목별 응답 등록
-      console.log('🔄 자기소개서 항목별 응답 등록 시작')
-      for (const item of templateItems.value) {
-        const itemContent = itemAnswers.value[item.id] || ''
-        console.log('📝 항목 응답 등록:', { introduceId, itemId: item.id, content: itemContent })
-        
-        await introduceStore.createTemplateItemResponse({
-          introduceId,
-          introduceTemplateItemId: item.id,
-          content: itemContent
-        })
-      }
-      console.log('✅ 자기소개서 항목별 응답 등록 완료')
+    // 2. introduce_template_item_response에 항목별 응답 등록
+    console.log('🔄 자기소개서 항목별 응답 등록 시작')
+    for (const item of templateItems.value) {
+      const itemContent = itemAnswers.value[item.id] || ''
+      console.log('📝 항목 응답 등록:', { introduceId, itemId: item.id, content: itemContent })
+      
+      await introduceStore.createTemplateItemResponse({
+        introduceId,
+        introduceTemplateItemId: item.id,
+        content: itemContent
+      })
     }
+    console.log('✅ 자기소개서 항목별 응답 등록 완료')
 
     // 3. application_response(이력서) 등록
     await processApplicationResponses(finalApplicationId)
-
-    // 4. Application 테이블의 introduce_rating_result_id 업데이트
-    console.log('🔄 지원서에 자기소개서 연결')
-    await applicationStore.updateApplicationStatus(finalApplicationId, {
-      introduceRatingResultId: introduceId
-    })
-    console.log('✅ 지원서에 자기소개서 연결 완료')
 
     toast.success('자기소개서와 이력서가 성공적으로 등록되었습니다.')
     

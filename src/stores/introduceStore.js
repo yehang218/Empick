@@ -63,12 +63,75 @@ export const useIntroduceStore = defineStore('introduce', () => {
     }
   }
 
+  // 🧹 시스템 전체 중복 데이터 정리
+  const cleanupAllDuplicates = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      console.log('🧹 사용자 요청으로 전체 중복 데이터 정리 시작...')
+      const { cleanupDuplicateRatingResults } = await import('@/services/introduceService')
+      const result = await cleanupDuplicateRatingResults()
+      
+      if (result.success) {
+        console.log('🎉 중복 데이터 정리 완료:', result)
+        return result
+      } else {
+        throw new Error(result.error || '중복 데이터 정리 실패')
+      }
+    } catch (e) {
+      error.value = e.message
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   // 자기소개서 평가 결과 저장
   const saveIntroduceRatingResult = async (payload) => {
     loading.value = true
     error.value = null
     try {
-      return await createIntroduceRatingResult(payload)
+      // 💡 저장 전 해당 introduce_id의 중복 데이터 미리 정리
+      if (payload.introduceId) {
+        try {
+          console.log('🧹 저장 전 중복 데이터 사전 정리...')
+          const { getIntroduceRatingResultByIntroduceId } = await import('@/services/introduceService')
+          await getIntroduceRatingResultByIntroduceId(payload.introduceId) // 이 함수 안에서 중복 제거 로직이 실행됨
+        } catch (cleanupError) {
+          console.warn('⚠️ 사전 중복 정리 실패 (계속 진행):', cleanupError.message)
+        }
+      }
+      
+      const result = await createIntroduceRatingResult(payload)
+      
+      // 저장 성공 후 관련 스토어들 데이터 새로고침
+      try {
+        console.log('🔄 평가 결과 저장 후 데이터 새로고침...')
+        
+        // applicationStore에서 현재 지원서 정보 새로고침
+        if (payload.applicationId) {
+          const { useApplicationStore } = await import('@/stores/applicationStore')
+          const applicationStore = useApplicationStore()
+          if (applicationStore.fetchApplicationById) {
+            await applicationStore.fetchApplicationById(payload.applicationId)
+            console.log('✅ 지원서 정보 새로고침 완료')
+          }
+        }
+        
+        // 최신 평가 결과 재조회하여 캐시 업데이트
+        if (payload.introduceId) {
+          const { getIntroduceRatingResultByIntroduceId } = await import('@/services/introduceService')
+          const latestEvaluation = await getIntroduceRatingResultByIntroduceId(payload.introduceId)
+          if (latestEvaluation) {
+            console.log('✅ 최신 평가 결과 캐시 업데이트:', latestEvaluation.id)
+          }
+        }
+        
+      } catch (refreshError) {
+        console.warn('⚠️ 데이터 새로고침 실패 (평가 저장은 성공):', refreshError.message)
+      }
+      
+      return result
     } catch (e) {
       error.value = e.message
       throw e
@@ -202,6 +265,7 @@ export const useIntroduceStore = defineStore('introduce', () => {
     fetchItems,
     addItem,
     removeItem,
+    cleanupAllDuplicates,
     saveIntroduceRatingResult,
     fetchIntroduceById,
     getIntroduceByApplicationId,

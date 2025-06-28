@@ -123,27 +123,79 @@ export const updateApplicationStatusService = async (id, statusCode, options = {
 // application의 introduce_rating_result_id 업데이트 전용 서비스
 export const updateApplicationIntroduceRatingResultService = async (applicationId, ratingResultId, options = {}) => {
   return withErrorHandling(async () => {
-    console.log('🔄 application introduce_rating_result_id 업데이트:', {
+    console.log('🔄 application introduce_rating_result_id 업데이트 시도:', {
       applicationId,
       ratingResultId
     });
     
-    // 업데이트 데이터 준비 (snake_case와 camelCase 모두 포함)
-    const updateData = {
-      introduceRatingResultId: ratingResultId,
-      introduce_rating_result_id: ratingResultId
-    };
-    
-    // PATCH 요청으로 application 업데이트
-    const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(applicationId), updateData);
-    const apiResponse = ApiResponseDTO.fromJSON(response.data);
+    // 방법 1: 단순 필드 업데이트 시도
+    try {
+      const updateData = {
+        introduceRatingResultId: ratingResultId,
+        introduce_rating_result_id: ratingResultId
+      };
+      
+      console.log('📤 방법 1 - 단순 필드 업데이트:', updateData);
+      const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(applicationId), updateData);
+      const apiResponse = ApiResponseDTO.fromJSON(response.data);
 
-    if (!apiResponse.success) {
-      throwCustomApiError(apiResponse.code, apiResponse.message);
+      if (apiResponse.success) {
+        console.log('✅ 방법 1 성공 - application introduce_rating_result_id 업데이트 완료:', apiResponse.data);
+        return ApplicationResponseDTO.fromJSON(apiResponse.data);
+      }
+    } catch (method1Error) {
+      console.warn('⚠️ 방법 1 실패:', method1Error.message);
     }
 
-    console.log('✅ application introduce_rating_result_id 업데이트 성공:', apiResponse.data);
-    return ApplicationResponseDTO.fromJSON(apiResponse.data);
+    // 방법 2: 현재 상태 포함한 업데이트 시도
+    try {
+      const currentApp = await getApplicationByIdService(applicationId);
+      const updateData = {
+        id: applicationId,
+        status: currentApp.status,
+        introduceRatingResultId: ratingResultId,
+        introduce_rating_result_id: ratingResultId
+      };
+      
+      console.log('📤 방법 2 - 전체 정보 포함 업데이트:', updateData);
+      const response = await api.patch(ApplicationAPI.UPDATE_APPLICATION_STATUS(applicationId), updateData);
+      const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+      if (apiResponse.success) {
+        console.log('✅ 방법 2 성공 - application introduce_rating_result_id 업데이트 완료:', apiResponse.data);
+        return ApplicationResponseDTO.fromJSON(apiResponse.data);
+      }
+    } catch (method2Error) {
+      console.warn('⚠️ 방법 2 실패:', method2Error.message);
+    }
+
+    // 방법 3: PUT 요청 시도
+    try {
+      const currentApp = await getApplicationByIdService(applicationId);
+      const updateData = {
+        ...currentApp,
+        introduceRatingResultId: ratingResultId,
+        introduce_rating_result_id: ratingResultId
+      };
+      
+      console.log('📤 방법 3 - PUT 요청:', updateData);
+      const response = await api.put(ApplicationAPI.UPDATE_APPLICATION_STATUS(applicationId), updateData);
+      const apiResponse = ApiResponseDTO.fromJSON(response.data);
+
+      if (apiResponse.success) {
+        console.log('✅ 방법 3 성공 - application introduce_rating_result_id 업데이트 완료:', apiResponse.data);
+        return ApplicationResponseDTO.fromJSON(apiResponse.data);
+      }
+    } catch (method3Error) {
+      console.warn('⚠️ 방법 3 실패:', method3Error.message);
+    }
+
+    // 모든 방법 실패 시 에러 로깅
+    console.error('❌ 모든 업데이트 방법 실패 - introduce_rating_result_id 업데이트 불가');
+    console.error('🔍 백엔드 API 스키마 확인 필요');
+    
+    // 실패해도 예외를 던지지 않고 null 반환 (평가 저장은 성공했으므로)
+    return null;
   }, options);
 };
 
