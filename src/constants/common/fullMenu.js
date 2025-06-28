@@ -76,6 +76,13 @@ export const fullMenu = {
     ],
     채용: [
         {
+            label: '지원자',
+            roles: [RoleCode.HR_ACCESS],
+            children: [
+                { label: '지원자 목록', path: routeMap.ApplicantPage }
+            ]
+        },
+        {
             label: '채용 공고',
             roles: [RoleCode.HR_ACCESS],
             children: [
@@ -92,13 +99,6 @@ export const fullMenu = {
             children: [
                 { label: '실무테스트', path: routeMap.JobtestList },
                 { label: '실무테스트 문제', path: routeMap.JobtestQuestionList },
-            ]
-        },
-        {
-            label: '지원자',
-            roles: [RoleCode.HR_ACCESS],
-            children: [
-                { label: '지원자 목록', path: routeMap.ApplicantPage }
             ]
         },
         {
