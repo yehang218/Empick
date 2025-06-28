@@ -35,6 +35,7 @@ public class ApprovalCategoryItemQueryController {
 //	}
 
 	// 카테고리 내 단일 항목
+	@Operation(summary = "카테고리 내 단일 항목", description = "카테고리 내 단일 항목을 조회합니다.")
 	@GetMapping("{itemId}")
 	public ResponseEntity<CustomApiResponse<ApprovalCategoryItemQueryDTO>> findById(
 					@PathVariable("categoryId") Integer categoryId,
@@ -46,6 +47,7 @@ public class ApprovalCategoryItemQueryController {
 	}
 
 	// 카테고리별 전체 항목
+	@Operation(summary = "카테고리별 전체 항목", description = "카테고리별 전체 항목을 조회합니다.")
 	@GetMapping
 	public ResponseEntity<CustomApiResponse<List<ApprovalCategoryItemQueryDTO>>> findByCategoryId(@PathVariable("categoryId") Integer categoryId) {
 		List<ApprovalCategoryItemQueryDTO> dtoList = service.findByCategoryId(categoryId);

@@ -26,6 +26,7 @@ import java.util.List;
 public class ApprovalContentQueryController {
 	private final ApprovalContentQueryService service;
 
+	@Operation(summary = "결재 문서 내용 전체 조회", description = "결재 문서 내용을 전체 조회합니다.")
 	@GetMapping
 	public ResponseEntity<CustomApiResponse<List<ApprovalContentQueryDTO>>> findAll() {
 		List<ApprovalContentQueryDTO> dtoList = service.findAll();
@@ -34,6 +35,7 @@ public class ApprovalContentQueryController {
 			.body(CustomApiResponse.of(result, dtoList));
 	}
 
+	@Operation(summary = "결재 문서 내용 상세 조회", description = "결재 문서 내용을 id로 상세 조회합니다.")
 	@GetMapping("{id}")
 	public ResponseEntity<CustomApiResponse<ApprovalContentQueryDTO>> findById(@PathVariable("id") Integer id) {
 		ApprovalContentQueryDTO dto = service.findById(id);
@@ -42,6 +44,7 @@ public class ApprovalContentQueryController {
 				.body(CustomApiResponse.of(result, dto));
 	}
 
+	@Operation(summary = "결재 문서 별 내용 조회", description = "결재 문서 별 내용을 조회합니다.")
 	@GetMapping("/approval/{approvalId}")
 	public  ResponseEntity<CustomApiResponse<List<ApprovalContentQueryDTO>>> findByApprovalId(@PathVariable("approvalId") Integer approvalId) {
 		List<ApprovalContentQueryDTO> dtoList = service.findByApprovalId(approvalId);
