@@ -2,21 +2,22 @@
   <div>
     <CareerHeader />
     <div class="welfare-container">
-      <h2 class="section-title">복지 제도</h2>
-      <v-divider class="my-4" />
+      <div class="page-header">
+        <h1 class="page-title">복지 제도</h1>
+        <p class="page-subtitle">EMPICK과 함께 성장하는 당신을 위한 다양한 복지 혜택을 제공합니다</p>
+      </div>
 
-      <v-row class="mt-6" dense>
-        <v-col
-          v-for="(item, index) in welfares"
-          :key="index"
-          cols="12" sm="6" md="4" lg="3"
-          class="welfare-card"
-        >
-          <div class="icon-box">
-            <img :src="item.icon" alt="" class="icon" />
+      <v-row class="welfare-grid" dense>
+        <v-col v-for="(item, index) in welfares" :key="index" cols="12" sm="6" md="4" lg="4" class="welfare-card-col">
+          <div class="welfare-card">
+            <div class="icon-container">
+              <img :src="item.icon" alt="" class="welfare-icon" />
+            </div>
+            <div class="welfare-content">
+              <h3 class="welfare-title">{{ item.title }}</h3>
+              <p class="welfare-description">{{ item.description }}</p>
+            </div>
           </div>
-          <div class="title">{{ item.title }}</div>
-          <div class="desc">{{ item.description }}</div>
         </v-col>
       </v-row>
     </div>
@@ -68,40 +69,170 @@ const welfares = [
 
 <style scoped>
 .welfare-container {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 40px 32px;
+  max-width: none;
+  margin: 0;
+  padding: 60px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
 }
 
-.section-title {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 24px;
+.page-header {
+  text-align: center;
+  margin-bottom: 60px;
+  padding: 0 24px;
+}
+
+.page-title {
+  font-size: 42px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 16px;
+  letter-spacing: -0.025em;
+}
+
+.page-subtitle {
+  font-size: 18px;
+  color: #64748b;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.welfare-grid {
+  margin-top: 0;
+  padding: 0 24px;
+}
+
+.welfare-card-col {
+  padding: 16px;
 }
 
 .welfare-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px 24px;
+  height: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.welfare-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.welfare-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.welfare-card:hover::before {
+  transform: scaleX(1);
+}
+
+.icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  height: 80px;
+}
+
+.welfare-icon {
+  height: 64px;
+  width: auto;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.welfare-card:hover .welfare-icon {
+  transform: scale(1.1);
+}
+
+.welfare-content {
   text-align: center;
-  padding: 24px;
 }
 
-.icon-box {
-  height: 120px;
-  margin-bottom: 20px;
-}
-
-.icon {
-  height: 140px;
-}
-
-.title {
-  font-weight: 700;
+.welfare-title {
   font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
   margin-bottom: 12px;
+  line-height: 1.3;
 }
 
-.desc {
-  font-size: 16px;
-  color: #444;
+.welfare-description {
+  font-size: 15px;
+  color: #64748b;
   line-height: 1.6;
+  margin: 0;
+  font-weight: 400;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .welfare-container {
+    padding: 40px 0;
+  }
+
+  .page-header {
+    padding: 0 16px;
+  }
+
+  .welfare-grid {
+    padding: 0 16px;
+  }
+
+  .page-title {
+    font-size: 32px;
+  }
+
+  .page-subtitle {
+    font-size: 16px;
+  }
+
+  .welfare-card {
+    padding: 24px 20px;
+  }
+
+  .welfare-title {
+    font-size: 18px;
+  }
+
+  .welfare-description {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welfare-container {
+    padding: 32px 0;
+  }
+
+  .page-header {
+    padding: 0 12px;
+  }
+
+  .welfare-grid {
+    padding: 0 12px;
+  }
+
+  .page-title {
+    font-size: 28px;
+  }
+
+  .welfare-card-col {
+    padding: 12px;
+  }
 }
 </style>

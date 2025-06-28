@@ -67,19 +67,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useInterviewSheetStore } from '@/stores/interviewSheetStore'
 import { useInterviewCriteriaStore } from '@/stores/interviewCriteriaStore'
-import { useAuthStore } from '@/stores/authStore'
+import { useMemberStore } from '@/stores/memberStore'
 import { useToast } from 'vue-toastification'
 
 const toast = useToast()
 const sheetStore = useInterviewSheetStore()
 const criteriaStore = useInterviewCriteriaStore()
-const authStore = useAuthStore()
-const memberId = authStore.userInfo?.id
+const memberStore = useMemberStore()
+const memberId = ref(null)
 
 const router = useRouter()
 
@@ -87,6 +87,18 @@ const sheetName = ref('')
 const criteria = ref([
     { title: '', content: '', weight: 0 }
 ])
+
+// 페이지 로드 시 myInfo 가져오기
+onMounted(async () => {
+    try {
+        await memberStore.getMyInfo()
+        memberId.value = memberStore.form.id
+        console.log('memberId loaded:', memberId.value)
+    } catch (error) {
+        console.error('myInfo 로드 실패:', error)
+        toast.error('사용자 정보를 불러오는데 실패했습니다.')
+    }
+})
 
 const addCriterion = () => {
     criteria.value.push({ title: '', content: '', weight: 0 })
@@ -124,7 +136,7 @@ const submitSheet = async () => {
     }
 
     const timestamp = new Date().toISOString()
-    console.log('userInfo:', authStore.userInfo)
+    console.log('userInfo:', memberStore.form)
 
     try {
         // ✅ 1. Store 통해 평가표 생성
@@ -132,7 +144,7 @@ const submitSheet = async () => {
             id: null,
             name: sheetName.value,
             isDeleted: false,
-            memberId: memberId,
+            memberId: memberId.value,
             updatedAt: timestamp
         }
         const sheetResponse = await sheetStore.createSheet(sheetDTO)
@@ -147,7 +159,7 @@ const submitSheet = async () => {
                 content: c.content,
                 weight: c.weight / 100, // 0~1 로 변환
                 isDeleted: 'N',
-                memberId: memberId,
+                memberId: memberId.value,
                 updatedAt: timestamp
             }
             await criteriaStore.createCriteria(criteriaDTO)
