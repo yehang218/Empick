@@ -25,9 +25,9 @@
                     summary.closed }}</div>
                 <div class="text-caption">종료 된 공고</div>
             </v-col>
-            <v-col cols="12" md="4" class="d-flex justify-end">
+            <!-- <v-col cols="12" md="4" class="d-flex justify-end">
                 <v-btn color="success" dark @click="goToCreate">+ 채용 공고 작성하기</v-btn>
-            </v-col>
+            </v-col> -->
         </v-row>
 
         <!-- 채용 공고 목록 -->

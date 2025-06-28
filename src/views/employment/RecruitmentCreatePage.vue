@@ -79,13 +79,15 @@
                 </v-col>
 
                 <!-- 유형 선택 -->
+                <v-col cols="12">
                 <v-select v-model="form.recruitType" :items="recruitTypeOptions" item-title="label" item-value="value"
                     label="채용 유형" />
-
-                <!-- 이미지 URL -->
-                <v-col cols="12" md="6">
-                    <v-text-field v-model="form.imageUrl" label="이미지 URL (선택)" />
                 </v-col>
+                
+                <!-- 이미지 URL -->
+                <!-- <v-col cols="12" md="6">
+                    <v-text-field v-model="form.imageUrl" label="이미지 URL (선택)" />
+                </v-col> -->
 
                 <!-- 모집 시작일 -->
                 <v-col cols="12" md="6">
