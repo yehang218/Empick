@@ -24,7 +24,7 @@
                         </template>
 
                         <v-list-item v-for="(subItem, j) in section.children" :key="j" :title="subItem.label"
-                            :to="subItem.path" link :active="route.path === subItem.path || route.path.startsWith(subItem.path)" class="menu-item"
+                            :to="subItem.path" link :active="isMenuItemActive(subItem)" class="menu-item"
                             active-class="active-item" />
                     </v-list-group>
                 </template>
@@ -84,11 +84,26 @@ const headerTitle = computed(() => {
     return '내정보'
 })
 
+// 메뉴 항목 활성화 확인 함수
+function isMenuItemActive(item) {
+    // 기본 경로 확인
+    if (route.path === item.path || route.path.startsWith(item.path)) {
+        return true
+    }
+    
+    // activePaths가 있는 경우 추가 확인
+    if (item.activePaths && Array.isArray(item.activePaths)) {
+        return item.activePaths.some(activePath => 
+            route.path === activePath || route.path.startsWith(activePath)
+        )
+    }
+    
+    return false
+}
+
 // 현재 경로에 포함된 하위 항목이 있는 그룹만 열림
 function isGroupOpen(section) {
-    return section.children.some((item) =>
-        route.path === item.path || route.path.startsWith(item.path)
-    )
+    return section.children.some((item) => isMenuItemActive(item))
 }
 
 const menu = computed(() => filterMenuByRoles(fullMenu, userRoles.value))

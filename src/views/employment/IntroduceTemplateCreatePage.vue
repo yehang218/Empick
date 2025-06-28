@@ -50,6 +50,10 @@
       </div>
 
       <div class="action-buttons">
+        <v-btn color="grey darken-1" variant="outlined" @click="goToTemplateList" size="large" class="back-btn">
+          <v-icon left>mdi-arrow-left</v-icon>
+          목록으로
+        </v-btn>
         <v-btn color="grey darken-1" variant="outlined" @click="goToManage" size="large" class="manage-btn">
           <v-icon left>mdi-cog</v-icon>
           항목 관리
@@ -355,6 +359,13 @@ const submit = async () => {
   border-top: 1px solid #e2e8f0;
 }
 
+.back-btn {
+  border-radius: 12px;
+  font-weight: 600;
+  height: 48px;
+  min-width: 120px;
+}
+
 .manage-btn {
   border-radius: 12px;
   font-weight: 600;
@@ -411,6 +422,7 @@ const submit = async () => {
     align-items: center;
   }
 
+  .back-btn,
   .manage-btn,
   .submit-btn {
     width: 100%;
