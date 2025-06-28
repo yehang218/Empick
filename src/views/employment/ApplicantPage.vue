@@ -428,10 +428,8 @@ const statusOptions = computed(() => {
 })
 
 const jobtestStatusOptions = ref([
-  { label: '미할당', value: 'UNASSIGNED', color: 'grey' },
-  { label: '대기중', value: 'WAITING', color: 'orange' },
-  { label: '진행중', value: 'IN_PROGRESS', color: 'blue' },
-  { label: '완료', value: 'COMPLETED', color: 'green' }
+  { label: '할당안됨', value: 'UNASSIGNED', color: 'grey' },
+  { label: '할당됨', value: 'ASSIGNED', color: 'primary' }
 ])
 
 const recruitmentOptions = computed(() => {
