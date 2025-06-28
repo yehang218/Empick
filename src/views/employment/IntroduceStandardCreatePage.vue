@@ -1,46 +1,66 @@
 <template>
-  <v-container class="criteria-create-container">
-    <div class="d-flex justify-space-between align-center mb-6">
-      <h2 class="page-title">자기소개서 기준표 생성</h2>
-      <v-btn color="success" @click="submit">기준표 등록</v-btn>
-    </div>
+  <div class="standard-create-container">
+    <div class="content-wrapper">
+      <div class="page-header">
+        <h1 class="page-title">자기소개서 기준표 생성</h1>
+        <p class="page-subtitle">채용에 사용할 자기소개서 기준표를 생성합니다</p>
+      </div>
 
-    <v-card class="mb-6 pa-4">
-      <v-card-title class="card-title">기준표 제목</v-card-title>
-      <v-card-text>
-        <v-text-field
-          v-model="title"
-          label="기준표 제목을 입력하세요"
-          variant="outlined"
-          density="compact"
-          hide-details
-        />
-      </v-card-text>
-    </v-card>
+      <div class="form-sections">
+        <div class="form-section">
+          <h2 class="section-title">
+            <v-icon class="section-icon">mdi-format-title</v-icon>
+            기준표 제목
+          </h2>
+          <v-text-field
+            v-model="title"
+            label="기준표 제목을 입력하세요"
+            variant="outlined"
+            class="form-field"
+            prepend-inner-icon="mdi-format-title"
+          />
+        </div>
 
-    <v-card class="mb-6">
-      <v-card-title class="card-title">기준표 항목 선택</v-card-title>
-      <v-card-text class="pa-0">
-        <v-list lines="two">
-          <template v-for="(item, index) in items" :key="item.id || index">
-            <v-list-item>
-              <template v-slot:prepend>
-                <v-checkbox v-model="selectedItemIds" :value="item.id" hide-details density="compact" />
-              </template>
-              <v-list-item-title class="item-title-text">{{ item.content }}</v-list-item-title>
-            </v-list-item>
-            <v-divider v-if="index < items.length - 1" inset></v-divider>
-          </template>
-          <v-list-item v-if="items.length === 0">
-            <v-list-item-title>등록된 기준표 항목이 없습니다.</v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-card-text>
-    </v-card>
+        <div class="form-section">
+          <h2 class="section-title">
+            <v-icon class="section-icon">mdi-format-list-bulleted</v-icon>
+            기준표 항목 선택
+            <span class="selection-count" v-if="selectedItemIds.length > 0">
+              ({{ selectedItemIds.length }}개 선택됨)
+            </span>
+          </h2>
+          <div class="items-container">
+            <div v-if="items.length > 0" class="items-list">
+              <div v-for="(item, index) in items" :key="item.id || index" class="item-card">
+                <div class="item-content">
+                  <v-checkbox 
+                    v-model="selectedItemIds" 
+                    :value="item.id" 
+                    hide-details 
+                    class="item-checkbox"
+                  />
+                  <div class="item-text">{{ item.content }}</div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="empty-state">
+              <v-icon size="large" color="grey">mdi-format-list-bulleted</v-icon>
+              <p>등록된 기준표 항목이 없습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <div class="d-flex justify-end mt-6">
-      <v-btn color="primary" class="mr-3" @click="goToManage">기준표 항목 관리로 이동</v-btn>
-      <v-btn color="info" variant="outlined" @click="goToCriteriaList">기준표 목록으로 이동</v-btn>
+      <div class="action-buttons">
+        <v-btn color="grey darken-1" variant="outlined" @click="goToManage" size="large" class="manage-btn">
+          <v-icon left>mdi-cog</v-icon>
+          기준표 항목 관리
+        </v-btn>
+        <v-btn color="primary" @click="submit" size="large" class="submit-btn">
+          <v-icon left>mdi-check</v-icon>
+          기준표 등록
+        </v-btn>
+      </div>
     </div>
 
     <!-- Alert Modal -->
@@ -53,7 +73,7 @@
       @confirm="handleConfirm"
       @cancel="handleCancel"
     />
-  </v-container>
+  </div>
 </template>
 
 <script setup>
@@ -140,40 +160,265 @@ const submit = async () => {
 </script>
 
 <style scoped>
-.criteria-create-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.standard-create-container {
+  max-width: none;
+  margin: 0;
+  padding: 40px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+}
+
+.content-wrapper {
+  background: white;
+  border-radius: 0;
+  padding: 40px 60px;
+  box-shadow: none;
+  margin: 0;
+  max-width: none;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 2px solid #f1f5f9;
 }
 
 .page-title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #333;
+  font-size: 32px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 16px;
+  letter-spacing: -0.025em;
 }
 
-.card-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #444;
-  padding-bottom: 0;
+.page-subtitle {
+  font-size: 16px;
+  color: #64748b;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
-.item-title-text {
-  font-size: 1rem;
+.form-sections {
+  margin-bottom: 40px;
+}
+
+.form-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.section-icon {
+  color: #3b82f6;
+}
+
+.selection-count {
+  font-size: 14px;
   font-weight: 500;
-  color: #555;
+  color: #059669;
+  background: #d1fae5;
+  padding: 4px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
 }
 
-.v-list-item {
-  padding: 8px 16px;
-}
-
-.v-card {
+.form-field {
+  background: #f8fafc;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.form-field :deep(.v-field) {
+  border-radius: 8px;
+}
+
+.form-field :deep(.v-field__outline) {
+  border-color: #e2e8f0;
+}
+
+.form-field :deep(.v-field--focused .v-field__outline) {
+  border-color: #3b82f6;
+}
+
+.items-container {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.items-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.items-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.items-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.items-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item-card {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.item-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.item-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.item-checkbox {
+  flex-shrink: 0;
+}
+
+.item-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #64748b;
+}
+
+.empty-state p {
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 32px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.manage-btn {
+  border-radius: 12px;
+  font-weight: 600;
+  height: 48px;
+  min-width: 180px;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  height: 48px !important;
+  min-width: 140px !important;
+  text-transform: none !important;
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4) !important;
+  transition: all 0.3s ease !important;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5) !important;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .standard-create-container {
+    padding: 32px 0;
+  }
+  
+  .content-wrapper {
+    margin: 0;
+    padding: 32px 40px;
+  }
+  
+  .page-title {
+    font-size: 28px;
+  }
+  
+  .page-subtitle {
+    font-size: 15px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+  }
+  
+  .items-container {
+    padding: 20px;
+    max-height: 300px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .manage-btn,
+  .submit-btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .standard-create-container {
+    padding: 24px 0;
+  }
+  
+  .content-wrapper {
+    margin: 0;
+    padding: 24px 20px;
+  }
+  
+  .page-title {
+    font-size: 24px;
+  }
+  
+  .items-container {
+    padding: 16px;
+    max-height: 250px;
+  }
+  
+  .item-card {
+    padding: 12px;
+  }
 }
 </style> 
