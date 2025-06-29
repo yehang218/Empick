@@ -274,7 +274,7 @@ public class MailCommandServiceImpl implements MailCommandService {
                     "\n" +
                     "본 메일은 발신 전용입니다.\n" +
                     "면접 관련 문의는 채용 담당자에게 연락 부탁드립니다.\n";
-            sendedDTO.setContent(htmlContent);
+            sendedDTO.setContent(content);
             sendedDTO.setSenderId(senderId);
             sendedDTO.setSendedAt(LocalDateTime.now());
             return sendedDTO;
