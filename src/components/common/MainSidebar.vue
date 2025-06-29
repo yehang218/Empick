@@ -61,26 +61,35 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { fullMenu } from '@/constants/common/fullMenu.js'
 import { useAuthStore } from '@/stores/authStore'
 import { filterMenuByRoles } from '@/utils/menuAccess'
 
 const route = useRoute()
-const darkMode = ref(true)
 const authStore = useAuthStore()
 
 const userRoles = computed(() => authStore.userInfo?.roles || [])
 
 // 현재 경로에 따라 헤더 메뉴 결정
 const headerTitle = computed(() => {
-    if (route.path.startsWith('/orgstructure')) return '인사'
+    console.log('🧭 MainSidebar headerTitle 계산:', route.path)
+
+    if (route.path.startsWith('/myinfo')) {
+        console.log('✅ 내정보 메뉴 선택됨')
+        return '내정보'
+    }
+    if (route.path.startsWith('/orgstructure')) {
+        console.log('✅ 인사 메뉴 선택됨')
+        return '인사'
+    }
     if (route.path.startsWith('/attendance')) return '근태'
     if (route.path.startsWith('/approval')) return '결재'
     if (route.path.startsWith('/employment')) return '채용'
     if (route.path.startsWith('/schedule')) return '일정'
-    if (route.path.startsWith('/myinfo')) return '내정보'
+
+    console.log('⚠️ 기본값으로 내정보 메뉴 선택됨')
     return '내정보'
 })
 
@@ -90,14 +99,14 @@ function isMenuItemActive(item) {
     if (route.path === item.path || route.path.startsWith(item.path)) {
         return true
     }
-    
+
     // activePaths가 있는 경우 추가 확인
     if (item.activePaths && Array.isArray(item.activePaths)) {
-        return item.activePaths.some(activePath => 
+        return item.activePaths.some(activePath =>
             route.path === activePath || route.path.startsWith(activePath)
         )
     }
-    
+
     return false
 }
 

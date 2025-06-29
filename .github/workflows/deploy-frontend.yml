@@ -2,7 +2,7 @@ name: Deploy Frontend Direct to VPC1
 
 on:
   push:
-    branches: [main]
+    branches: [release]
     paths:
       - "src/**"
       - "public/**"

@@ -63,7 +63,7 @@
                 </div>
 
                 <!-- 액션 버튼들 -->
-                <div class="flex-0" style="min-width: 150px;">
+                <!-- <div class="flex-0" style="min-width: 150px;">
                     <h4 class="text-subtitle-1 font-weight-bold mb-3 text-primary">액션</h4>
                     <div class="d-flex flex-column" style="gap: 8px;">
                         <v-btn color="primary" variant="outlined" size="small" @click="$emit('view-detail', member)">
@@ -80,7 +80,7 @@
                             메일 발송
                         </v-btn>
                     </div>
-                </div>
+                </div> -->
             </div>
         </v-card-text>
     </v-card>

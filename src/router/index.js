@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { handleApiError } from '@/utils/errorHandler';
 
 import { authRoutes } from './auth.routes';
 import { employmentRoutes } from './employment.routes';
 import { orgstructureRoutes } from './orgstructure.routes';
+import { myinfoRoutes } from './myinfo.routes';
 import { testRoutes } from './test.routes';
 import { approvalRoutes } from './approval.routes';
 import { attendanceRoutes } from './attendance.routes';
@@ -14,6 +14,7 @@ const allRouteModules = [
     ...authRoutes,
     ...employmentRoutes,
     ...orgstructureRoutes,
+    ...myinfoRoutes,
     ...approvalRoutes,
     ...attendanceRoutes,
     ...careerRoutes,
