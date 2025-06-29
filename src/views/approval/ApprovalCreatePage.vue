@@ -106,7 +106,13 @@
 
                     <!-- 제출 버튼 -->
                     <div class="d-flex justify-end mt-6">
-                        <v-btn color="success" class="approval-btn" @click="handleSubmit">등록</v-btn>
+                        <v-btn 
+                            :class="['approval-btn', { 'approval-btn--disabled': !isFormValid }]" 
+                            @click="handleSubmit" 
+                            :disabled="!isFormValid"
+                        >
+                            등록
+                        </v-btn>
                     </div>
                 </div>
             </v-col>
@@ -160,6 +166,21 @@ const jobOptions = computed(() =>
 const filteredCategoryList = computed(() =>
     categoryList.value.filter(category => category.approvalCategoryId === null)
 );
+
+// 폼 유효성 검사
+const isFormValid = computed(() => {
+    // 결재 유형이 선택되어 있는지 확인
+    if (!form.value.categoryId) {
+        return false;
+    }
+    
+    // 모든 결재 항목이 입력되어 있는지 확인
+    if (!form.value.contents || form.value.contents.length === 0) {
+        return false;
+    }
+    
+    return form.value.contents.every(c => c.content !== null && c.content !== '');
+});
 
 onMounted(async () => {
     approvalStore.resetForm();
@@ -307,6 +328,14 @@ onBeforeUnmount(() => {
     border: 1.5px solid #7BAE6C !important;
     color: #fff !important;
     background: #7BAE6C !important;
+}
+
+.approval-btn--disabled {
+    background: #B8D4B0 !important;
+    border-color: #B8D4B0 !important;
+    color: #fff !important;
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .approval-guide {
