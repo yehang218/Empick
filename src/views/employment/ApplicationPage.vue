@@ -1671,7 +1671,7 @@ function handleJobtestButtonClick() {
     goToJobtestAnswerDetail()
   } else {
     // 실무테스트 미응시인 경우 토스트 메시지 표시
-    toast.info('실무테스트가 아직 수행되지 않았습니다.')
+    // toast.info('실무테스트가 아직 수행되지 않았습니다.')
   }
 }
 

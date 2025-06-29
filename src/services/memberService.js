@@ -142,34 +142,54 @@ export const profileImageFetchService = async (memberId) => {
     }
 };
 
-export const profileImageUploadService = async (memberId, profileImage) => {
+export const profileImageUploadService = async (memberId, formDataOrFile) => {
     try {
-        // 파일 검증
-        if (!profileImage) {
+        let formData;
+        let fileInfo = {};
+
+        // FormData 또는 File 객체 처리
+        if (formDataOrFile instanceof FormData) {
+            formData = formDataOrFile;
+            // FormData에서 파일 정보 추출 (로깅용)
+            const file = formData.get('file');
+            if (file && file instanceof File) {
+                fileInfo = {
+                    fileName: file.name,
+                    size: file.size,
+                    type: file.type
+                };
+            }
+        } else if (formDataOrFile instanceof File) {
+            // File 객체인 경우 FormData 생성
+            const file = formDataOrFile;
+
+            // 파일 타입 검증
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                throw new Error('JPG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.');
+            }
+
+            // 파일 크기 검증 (5MB 이하)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSize) {
+                throw new Error('프로필 이미지는 5MB 이하만 업로드 가능합니다.');
+            }
+
+            formData = new FormData();
+            formData.append('file', file);
+
+            fileInfo = {
+                fileName: file.name,
+                size: file.size,
+                type: file.type
+            };
+        } else {
             throw new Error('프로필 이미지는 필수입니다.');
         }
 
-        // 파일 타입 검증
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        if (!allowedTypes.includes(profileImage.type)) {
-            throw new Error('JPG, PNG, WEBP 형식의 이미지만 업로드 가능합니다.');
-        }
-
-        // 파일 크기 검증 (5MB 이하)
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (profileImage.size > maxSize) {
-            throw new Error('프로필 이미지는 5MB 이하만 업로드 가능합니다.');
-        }
-
-        // FormData 생성 (fileName 파라미터 제거)
-        const formData = new FormData();
-        formData.append('file', profileImage); // 기존 'file' 파라미터명 유지
-
         console.log('프로필 이미지 업로드 API 호출:', {
             memberId,
-            fileName: profileImage.name,
-            size: profileImage.size,
-            type: profileImage.type
+            ...fileInfo
         });
 
         const response = await api.put(API.MEMBER.PROFILE_IMAGE(memberId), formData, {

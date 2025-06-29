@@ -1,267 +1,269 @@
 <template>
     <v-container class="create-interview-page" fluid>
-        <!-- 헤더 섹션 -->
-        <div class="page-header mb-6">
-            <div class="header-content">
-                <h1 class="page-title">
-                    <v-icon class="mr-3" color="primary" size="32">mdi-calendar-plus</v-icon>
-                    면접 일정 등록
-                </h1>
-                <p class="page-subtitle">새로운 면접 일정을 등록하고 관리하세요</p>
+        <div class="interview-form">
+            <!-- 헤더 섹션 -->
+            <div class="page-header mb-6">
+                <div class="header-content">
+                    <h1 class="page-title">
+                        <v-icon class="mr-3" color="primary" size="32">mdi-calendar-plus</v-icon>
+                        면접 일정 등록
+                    </h1>
+                    <p class="page-subtitle">새로운 면접 일정을 등록하고 관리하세요</p>
+                </div>
             </div>
-        </div>
 
-        <v-form @submit.prevent="submitInterview" class="interview-form">
-            <!-- 지원서 선택 섹션 -->
-            <v-card class="form-section mb-6" elevation="0">
-                <div class="section-header">
-                    <v-icon color="primary" class="mr-2">mdi-file-document-outline</v-icon>
-                    <h2 class="section-title">지원서 선택</h2>
-                </div>
-                
-                <v-row>
-                    <v-col cols="12" lg="6">
-                        <v-select 
-                            v-model="selectedApplicationId" 
-                            :items="applicationOptions" 
-                            item-title="label"
-                            item-value="id" 
-                            label="지원서를 선택해주세요" 
-                            variant="outlined"
-                            prepend-inner-icon="mdi-account-search"
-                            class="custom-select"
-                        />
-                    </v-col>
-                </v-row>
-            </v-card>
+            <v-form @submit.prevent="submitInterview" class="interview-form">
+                <!-- 지원서 선택 섹션 -->
+                <v-card class="form-section mb-6" elevation="0">
+                    <div class="section-header">
+                        <v-icon color="primary" class="mr-2">mdi-file-document-outline</v-icon>
+                        <h2 class="section-title">지원서 선택</h2>
+                    </div>
+                    
+                    <v-row>
+                        <v-col cols="12" lg="6">
+                            <v-select 
+                                v-model="selectedApplicationId" 
+                                :items="applicationOptions" 
+                                item-title="label"
+                                item-value="id" 
+                                label="지원서를 선택해주세요" 
+                                variant="outlined"
+                                prepend-inner-icon="mdi-account-search"
+                                class="custom-select"
+                            />
+                        </v-col>
+                    </v-row>
+                </v-card>
 
-            <!-- 지원서 정보 섹션 -->
-            <v-card class="form-section mb-6" elevation="0">
-                <div class="section-header">
-                    <v-icon color="primary" class="mr-2">mdi-account-details</v-icon>
-                    <h2 class="section-title">지원자 정보</h2>
-                </div>
-                
-                <v-row>
-                    <v-col cols="12">
-                        <div v-if="selectedApplication" class="applicant-info-card">
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <v-icon size="16" class="mr-1">mdi-briefcase</v-icon>
-                                        채용 공고
+                <!-- 지원서 정보 섹션 -->
+                <v-card class="form-section mb-6" elevation="0">
+                    <div class="section-header">
+                        <v-icon color="primary" class="mr-2">mdi-account-details</v-icon>
+                        <h2 class="section-title">지원자 정보</h2>
+                    </div>
+                    
+                    <v-row>
+                        <v-col cols="12">
+                            <div v-if="selectedApplication" class="applicant-info-card">
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <v-icon size="16" class="mr-1">mdi-briefcase</v-icon>
+                                            채용 공고
+                                        </div>
+                                        <div class="info-value">{{ selectedApplication.recruitment.title }}</div>
                                     </div>
-                                    <div class="info-value">{{ selectedApplication.recruitment.title }}</div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <v-icon size="16" class="mr-1">mdi-account</v-icon>
+                                            지원자 이름
+                                        </div>
+                                        <div class="info-value">{{ selectedApplication.applicant.name }}</div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <v-icon size="16" class="mr-1">mdi-email</v-icon>
+                                            이메일
+                                        </div>
+                                        <div class="info-value">{{ selectedApplication.applicant.email }}</div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <v-icon size="16" class="mr-1">mdi-phone</v-icon>
+                                            전화번호
+                                        </div>
+                                        <div class="info-value">{{ selectedApplication.applicant.phone }}</div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <v-icon size="16" class="mr-1">mdi-calendar</v-icon>
+                                            제출일
+                                        </div>
+                                        <div class="info-value">{{ selectedApplication.application.createdAt }}</div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <v-icon size="16" class="mr-1">mdi-star</v-icon>
+                                            자기소개서 점수
+                                        </div>
+                                        <div class="info-value score-value">
+                                            {{ selectedApplication.application.coverLetterScore ?? '미평가' }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <v-icon size="16" class="mr-1">mdi-account</v-icon>
-                                        지원자 이름
-                                    </div>
-                                    <div class="info-value">{{ selectedApplication.applicant.name }}</div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <v-icon size="16" class="mr-1">mdi-email</v-icon>
-                                        이메일
-                                    </div>
-                                    <div class="info-value">{{ selectedApplication.applicant.email }}</div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <v-icon size="16" class="mr-1">mdi-phone</v-icon>
-                                        전화번호
-                                    </div>
-                                    <div class="info-value">{{ selectedApplication.applicant.phone }}</div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <v-icon size="16" class="mr-1">mdi-calendar</v-icon>
-                                        제출일
-                                    </div>
-                                    <div class="info-value">{{ selectedApplication.application.createdAt }}</div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <v-icon size="16" class="mr-1">mdi-star</v-icon>
-                                        자기소개서 점수
-                                    </div>
-                                    <div class="info-value score-value">
-                                        {{ selectedApplication.application.coverLetterScore ?? '미평가' }}
-                                    </div>
+                                <div class="action-buttons">
+                                    <v-btn 
+                                        color="primary" 
+                                        variant="outlined"
+                                        prepend-icon="mdi-eye"
+                                        @click="goToApplicationDetail(selectedApplication.id)"
+                                        class="detail-btn"
+                                    >
+                                        지원서 상세보기
+                                    </v-btn>
                                 </div>
                             </div>
+                            <div v-else class="empty-state">
+                                <v-icon size="48" color="grey-lighten-1" class="mb-3">mdi-account-question</v-icon>
+                                <p class="empty-text">지원서를 선택하면 지원자 정보가 표시됩니다</p>
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-card>
+
+                <!-- 평가표 선택 섹션 -->
+                <v-card class="form-section mb-6" elevation="0">
+                    <div class="section-header">
+                        <v-icon color="primary" class="mr-2">mdi-clipboard-list</v-icon>
+                        <h2 class="section-title">평가표 선택</h2>
+                    </div>
+                    
+                    <v-row>
+                        <v-col cols="12" lg="6">
+                            <v-btn 
+                                @click="openSheetModal" 
+                                color="primary" 
+                                variant="outlined"
+                                prepend-icon="mdi-clipboard-plus"
+                                class="sheet-select-btn"
+                            >
+                                평가표 선택하기
+                            </v-btn>
                             
-                            <div class="action-buttons">
-                                <v-btn 
-                                    color="primary" 
-                                    variant="outlined"
-                                    prepend-icon="mdi-eye"
-                                    @click="goToApplicationDetail(selectedApplication.id)"
-                                    class="detail-btn"
-                                >
-                                    지원서 상세보기
-                                </v-btn>
+                            <div v-if="selectedSheet" class="selected-sheet-info">
+                                <v-chip color="success" variant="tonal" class="mt-3">
+                                    <v-icon start>mdi-check-circle</v-icon>
+                                    선택된 평가표: {{ selectedSheet.name }}
+                                </v-chip>
                             </div>
-                        </div>
-                        <div v-else class="empty-state">
-                            <v-icon size="48" color="grey-lighten-1" class="mb-3">mdi-account-question</v-icon>
-                            <p class="empty-text">지원서를 선택하면 지원자 정보가 표시됩니다</p>
-                        </div>
-                    </v-col>
-                </v-row>
-            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-card>
 
-            <!-- 평가표 선택 섹션 -->
-            <v-card class="form-section mb-6" elevation="0">
-                <div class="section-header">
-                    <v-icon color="primary" class="mr-2">mdi-clipboard-list</v-icon>
-                    <h2 class="section-title">평가표 선택</h2>
-                </div>
-                
-                <v-row>
-                    <v-col cols="12" lg="6">
-                        <v-btn 
-                            @click="openSheetModal" 
-                            color="primary" 
-                            variant="outlined"
-                            prepend-icon="mdi-clipboard-plus"
-                            class="sheet-select-btn"
-                        >
-                            평가표 선택하기
-                        </v-btn>
-                        
-                        <div v-if="selectedSheet" class="selected-sheet-info">
-                            <v-chip color="success" variant="tonal" class="mt-3">
-                                <v-icon start>mdi-check-circle</v-icon>
-                                선택된 평가표: {{ selectedSheet.name }}
-                            </v-chip>
-                        </div>
-                    </v-col>
-                </v-row>
-            </v-card>
-
-            <!-- 평가 기준 섹션 -->
-            <v-card class="form-section mb-6" elevation="0">
-                <div class="section-header">
-                    <v-icon color="primary" class="mr-2">mdi-criteria</v-icon>
-                    <h2 class="section-title">평가 기준</h2>
-                </div>
-                
-                <div class="criteria-container">
-                    <template v-if="criteriaList.length > 0">
-                        <InterviewEvaluationCriteria v-model:criteriaList="criteriaList" />
-                    </template>
-                    <template v-else>
-                        <div class="empty-state">
-                            <v-icon size="48" color="grey-lighten-1" class="mb-3">mdi-clipboard-text</v-icon>
-                            <p class="empty-text">평가표를 선택하면 평가 기준이 표시됩니다</p>
-                        </div>
-                    </template>
-                </div>
-            </v-card>
-
-            <!-- 면접 일정 섹션 -->
-            <v-card class="form-section mb-6" elevation="0">
-                <div class="section-header">
-                    <v-icon color="primary" class="mr-2">mdi-clock-outline</v-icon>
-                    <h2 class="section-title">면접 일정</h2>
-                </div>
-                
-                <v-row>
-                    <v-col cols="12" lg="3">
-                        <v-select 
-                            v-model="selectedHour" 
-                            :items="hours" 
-                            label="시 선택" 
-                            variant="outlined"
-                            prepend-inner-icon="mdi-clock"
-                        />
-                    </v-col>
-                    <v-col cols="12" lg="3">
-                        <v-select 
-                            v-model="selectedMinute" 
-                            :items="minutes" 
-                            label="분 선택" 
-                            variant="outlined"
-                            prepend-inner-icon="mdi-timer"
-                        />
-                    </v-col>
-                    <v-col cols="12" lg="6">
-                        <div class="availability-status">
-                            <div v-if="isDatetimeAvailable === true" class="status-available">
-                                <v-icon color="success" class="mr-2">mdi-check-circle</v-icon>
-                                <span>예약 가능한 시간입니다</span>
+                <!-- 평가 기준 섹션 -->
+                <v-card class="form-section mb-6" elevation="0">
+                    <div class="section-header">
+                        <v-icon color="primary" class="mr-2">mdi-criteria</v-icon>
+                        <h2 class="section-title">평가 기준</h2>
+                    </div>
+                    
+                    <div class="criteria-container">
+                        <template v-if="criteriaList.length > 0">
+                            <InterviewEvaluationCriteria v-model:criteriaList="criteriaList" />
+                        </template>
+                        <template v-else>
+                            <div class="empty-state">
+                                <v-icon size="48" color="grey-lighten-1" class="mb-3">mdi-clipboard-text</v-icon>
+                                <p class="empty-text">평가표를 선택하면 평가 기준이 표시됩니다</p>
                             </div>
-                            <div v-else-if="isDatetimeAvailable === false" class="status-unavailable">
-                                <v-icon color="error" class="mr-2">mdi-close-circle</v-icon>
-                                <span>해당 시간대는 예약이 불가능합니다</span>
-                            </div>
-                            <div v-else class="status-neutral">
-                                <v-icon color="grey" class="mr-2">mdi-clock-outline</v-icon>
-                                <span>시간을 선택해주세요</span>
-                            </div>
-                        </div>
-                    </v-col>
-                </v-row>
-            </v-card>
+                        </template>
+                    </div>
+                </v-card>
 
-            <!-- 면접 장소 섹션 -->
-            <v-card class="form-section mb-6" elevation="0">
-                <div class="section-header">
-                    <v-icon color="primary" class="mr-2">mdi-map-marker</v-icon>
-                    <h2 class="section-title">면접 장소</h2>
+                <!-- 면접 일정 섹션 -->
+                <v-card class="form-section mb-6" elevation="0">
+                    <div class="section-header">
+                        <v-icon color="primary" class="mr-2">mdi-clock-outline</v-icon>
+                        <h2 class="section-title">면접 일정</h2>
+                    </div>
+                    
+                    <v-row>
+                        <v-col cols="12" lg="3">
+                            <v-select 
+                                v-model="selectedHour" 
+                                :items="hours" 
+                                label="시 선택" 
+                                variant="outlined"
+                                prepend-inner-icon="mdi-clock"
+                            />
+                        </v-col>
+                        <v-col cols="12" lg="3">
+                            <v-select 
+                                v-model="selectedMinute" 
+                                :items="minutes" 
+                                label="분 선택" 
+                                variant="outlined"
+                                prepend-inner-icon="mdi-timer"
+                            />
+                        </v-col>
+                        <v-col cols="12" lg="6">
+                            <div class="availability-status">
+                                <div v-if="isDatetimeAvailable === true" class="status-available">
+                                    <v-icon color="success" class="mr-2">mdi-check-circle</v-icon>
+                                    <span>예약 가능한 시간입니다</span>
+                                </div>
+                                <div v-else-if="isDatetimeAvailable === false" class="status-unavailable">
+                                    <v-icon color="error" class="mr-2">mdi-close-circle</v-icon>
+                                    <span>해당 시간대는 예약이 불가능합니다</span>
+                                </div>
+                                <div v-else class="status-neutral">
+                                    <v-icon color="grey" class="mr-2">mdi-clock-outline</v-icon>
+                                    <span>시간을 선택해주세요</span>
+                                </div>
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-card>
+
+                <!-- 면접 장소 섹션 -->
+                <v-card class="form-section mb-6" elevation="0">
+                    <div class="section-header">
+                        <v-icon color="primary" class="mr-2">mdi-map-marker</v-icon>
+                        <h2 class="section-title">면접 장소</h2>
+                    </div>
+                    
+                    <v-row>
+                        <v-col cols="12" lg="6">
+                            <v-text-field 
+                                v-model="address" 
+                                label="Zoom 주소 또는 면접 장소" 
+                                variant="outlined"
+                                prepend-inner-icon="mdi-video"
+                                placeholder="https://zoom.us/j/..."
+                            />
+                        </v-col>
+                    </v-row>
+                </v-card>
+
+                <!-- 액션 버튼 섹션 -->
+                <div class="action-section">
+                    <v-row>
+                        <v-col cols="12" class="d-flex justify-space-between align-center">
+                            <v-btn 
+                                color="secondary" 
+                                variant="outlined"
+                                prepend-icon="mdi-arrow-left"
+                                @click="goToInterviewPage"
+                                class="back-btn"
+                            >
+                                뒤로 가기
+                            </v-btn>
+                            
+                            <v-btn 
+                                type="submit" 
+                                color="success" 
+                                size="large"
+                                :disabled="isDatetimeAvailable !== true"
+                                prepend-icon="mdi-calendar-check"
+                                class="submit-btn"
+                            >
+                                면접 등록하기
+                            </v-btn>
+                        </v-col>
+                    </v-row>
                 </div>
-                
-                <v-row>
-                    <v-col cols="12" lg="6">
-                        <v-text-field 
-                            v-model="address" 
-                            label="Zoom 주소 또는 면접 장소" 
-                            variant="outlined"
-                            prepend-inner-icon="mdi-video"
-                            placeholder="https://zoom.us/j/..."
-                        />
-                    </v-col>
-                </v-row>
-            </v-card>
+            </v-form>
 
-            <!-- 액션 버튼 섹션 -->
-            <div class="action-section">
-                <v-row>
-                    <v-col cols="12" class="d-flex justify-space-between align-center">
-                        <v-btn 
-                            color="secondary" 
-                            variant="outlined"
-                            prepend-icon="mdi-arrow-left"
-                            @click="goToInterviewPage"
-                            class="back-btn"
-                        >
-                            뒤로 가기
-                        </v-btn>
-                        
-                        <v-btn 
-                            type="submit" 
-                            color="success" 
-                            size="large"
-                            :disabled="isDatetimeAvailable !== true"
-                            prepend-icon="mdi-calendar-check"
-                            class="submit-btn"
-                        >
-                            면접 등록하기
-                        </v-btn>
-                    </v-col>
-                </v-row>
-            </div>
-        </v-form>
-
-        <!-- 평가표 모달 -->
-        <InterviewSheetModal v-model="showSheetModal" @select-sheet="onSheetSelected" @close="closeSheetModal" />
+            <!-- 평가표 모달 -->
+            <InterviewSheetModal v-model="showSheetModal" @select-sheet="onSheetSelected" @close="closeSheetModal" />
+        </div>
     </v-container>
 </template>
 

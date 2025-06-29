@@ -9,9 +9,9 @@
                     <p class="text-body-2 text-grey-darken-1 ma-0">상세 정보 및 근태 기록을 확인하세요</p>
                 </div>
             </div>
-            <v-chip color="primary" variant="outlined" size="large" prepend-icon="mdi-file-document-edit-outline">
+            <!-- <v-chip color="primary" variant="outlined" size="large" prepend-icon="mdi-file-document-edit-outline">
                 수정요청서 확인
-            </v-chip>
+            </v-chip> -->
         </div>
 
         <v-row>
@@ -193,67 +193,67 @@
 
                         <!-- 근태 기록 테이블 -->
                         <div>
-                            <h4 class="text-subtitle-1 font-weight-bold mb-4 text-grey-darken-2">
+                            <!-- <h4 class="text-subtitle-1 font-weight-bold mb-4 text-grey-darken-2">
                                 <v-icon icon="mdi-table" size="small" class="mr-1" />
                                 상세 근태 기록
-                            </h4>
-                            <v-data-table :headers="attendanceHeaders" :items="attendanceRecords"
+                            </h4> -->
+                            <!-- <v-data-table :headers="attendanceHeaders" :items="attendanceRecords"
                                 :loading="attendanceLoading" item-key="id" class="attendance-table" :items-per-page="15"
-                                :sort-by="[{ key: 'workDate', order: 'desc' }]">
+                                :sort-by="[{ key: 'workDate', order: 'desc' }]"> -->
 
-                                <template #item.workDate="{ item }">
+                            <!-- <template #item.workDate="{ item }">
                                     <div class="d-flex align-center">
                                         <v-icon icon="mdi-calendar" size="small" class="mr-2 text-grey-darken-1" />
                                         {{ formatDate(item.workDate) }}
                                     </div>
-                                </template>
+                                </template> -->
 
-                                <template #item.checkInTime="{ item }">
+                            <!-- <template #item.checkInTime="{ item }">
                                     <div class="d-flex align-center">
                                         <v-icon icon="mdi-login" size="small" class="mr-2 text-green-darken-1" />
                                         {{ formatTime(item.checkInTime) }}
                                     </div>
-                                </template>
+                                </template> -->
 
-                                <template #item.checkOutTime="{ item }">
+                            <!-- <template #item.checkOutTime="{ item }">
                                     <div class="d-flex align-center">
                                         <v-icon icon="mdi-logout" size="small" class="mr-2 text-red-darken-1" />
                                         {{ formatTime(item.checkOutTime) }}
                                     </div>
-                                </template>
+                                </template> -->
 
-                                <template #item.status="{ item }">
+                            <!-- <template #item.status="{ item }">
                                     <v-chip :color="getAttendanceStatusColor(item.status)" variant="flat" size="small"
                                         class="font-weight-medium">
                                         {{ getAttendanceStatusLabel(item.status) }}
                                     </v-chip>
-                                </template>
+                                </template> -->
 
-                                <template #item.workHours="{ item }">
+                            <!-- <template #item.workHours="{ item }">
                                     <div class="d-flex align-center">
                                         <v-icon icon="mdi-clock" size="small" class="mr-2 text-blue-darken-1" />
                                         <span class="font-weight-medium">{{ formatWorkHours(item.workHours) }}</span>
                                     </div>
-                                </template>
+                                </template> -->
 
-                                <template #item.note="{ item }">
+                            <!-- <template #item.note="{ item }">
                                     <span class="text-grey-darken-1">{{ item.note || '-' }}</span>
-                                </template>
+                                </template> -->
 
-                                <!-- 로딩 상태 -->
-                                <template #loading>
+                            <!-- 로딩 상태 -->
+                            <!-- <template #loading>
                                     <v-skeleton-loader type="table-row@5" />
-                                </template>
+                                </template> -->
 
-                                <!-- 데이터 없음 -->
-                                <template #no-data>
+                            <!-- 데이터 없음 -->
+                            <!-- <template #no-data>
                                     <div class="text-center py-8">
                                         <v-icon size="64" color="grey-lighten-2">mdi-clock-outline</v-icon>
                                         <div class="text-h6 mt-2 text-grey-darken-1">근태 기록이 없습니다</div>
                                         <div class="text-body-2 text-grey-darken-1">선택한 기간에 등록된 근태 기록이 없습니다</div>
                                     </div>
-                                </template>
-                            </v-data-table>
+                                </template> -->
+                            <!-- </v-data-table> -->
                         </div>
                     </v-card-text>
                 </v-card>
@@ -262,10 +262,10 @@
 
         <!-- 하단 액션 버튼 -->
         <div class="d-flex justify-center mt-8">
-            <v-btn color="primary" size="large" min-width="150" prepend-icon="mdi-pencil" @click="handleEdit"
+            <!-- <v-btn color="primary" size="large" min-width="150" prepend-icon="mdi-pencil" @click="handleEdit"
                 class="action-button">
                 정보 수정
-            </v-btn>
+            </v-btn> -->
         </div>
     </v-container>
 </template>

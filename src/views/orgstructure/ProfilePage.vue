@@ -8,10 +8,10 @@
                     <p class="text-body-2 text-medium-emphasis">기본정보 및 소속정보 조회/수정</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <v-btn color="grey-darken-1" variant="outlined" size="small"
+                    <!-- <v-btn color="grey-darken-1" variant="outlined" size="small"
                         prepend-icon="mdi-file-document-outline" @click="goToResult">
                         수정요청 결과
-                    </v-btn>
+                    </v-btn> -->
                     <v-btn v-if="!isEditing" color="primary" size="small" prepend-icon="mdi-pencil"
                         @click="startEditing">
                         정보 수정
@@ -55,7 +55,7 @@
                                 <div class="text-subtitle-2 font-weight-bold mb-1">{{ memberStore.form.name || '사용자명' }}
                                 </div>
                                 <div class="text-caption text-grey-darken-1 mb-2">사번: {{ memberStore.form.employeeNumber
-                                }}
+                                    }}
                                 </div>
                                 <v-chip :color="getStatusColor(memberStore.form.status)" size="x-small" variant="flat"
                                     class="status-chip">
@@ -189,7 +189,7 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useMemberStore } from '@/stores/memberStore'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 
 // Composables
 import { useProfileForm } from '@/composables/useProfileForm'
@@ -200,7 +200,7 @@ import { useToast } from '@/composables/useToast'
 import { getStatusColor, getStatusText, formatHireDate } from '@/utils/memberUtils'
 
 const memberStore = useMemberStore()
-const router = useRouter()
+// const router = useRouter()
 
 // Composables 사용
 const {
@@ -248,18 +248,27 @@ const handleImageChange = async (event) => {
     const file = event.target.files?.[0]
     if (!file) return
 
+    console.log('📷 프로필 이미지 변경 시작:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        employeeNumber: memberStore.form.employeeNumber,
+        memberId: memberStore.form.id
+    })
+
     try {
         await uploadProfileImage(file, memberStore.form.employeeNumber, memberStore.form.id)
+        console.log('✅ 프로필 이미지 업로드 성공')
         showSuccess('프로필 이미지가 성공적으로 업로드되었습니다')
     } catch (error) {
-        console.error('프로필 이미지 업로드 실패:', error)
+        console.error('❌ 프로필 이미지 업로드 실패:', error)
         showError(error.message || '프로필 이미지 업로드에 실패했습니다')
     }
 }
 
-const goToResult = () => {
-    router.push('/orgstructure/profile/result')
-}
+// const goToResult = () => {
+//     router.push('/orgstructure/profile/result')
+// }
 
 // 생명주기 훅
 onMounted(async () => {

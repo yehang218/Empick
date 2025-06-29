@@ -46,9 +46,12 @@ export function useProfileImage() {
         const newFile = new File([file], fileName, { type: file.type })
 
         formData.append('file', newFile)
-        formData.append('fileName', fileName)
+        // fileName 매개변수 제거 (백엔드에서 UUID로 자동 생성)
 
         await memberStore.uploadProfileImage(memberId, formData)
+
+        // 업로드 성공 후 프로필 이미지 다시 로드
+        await loadProfileImage(memberId)
 
         // 파일 입력 초기화
         if (fileInputRef.value) {

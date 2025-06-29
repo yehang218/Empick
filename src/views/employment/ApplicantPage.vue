@@ -577,6 +577,7 @@ const handleJobtestSelected = async (jobtest) => {
     await applicantStore.fetchApplicantFullInfoList()
   } catch (error) {
     console.error('실무테스트 할당 실패:', error)
+    toast.error('해당 지원서에 이미 실무테스트가 할당되어 있습니다.');
   }
 }
 

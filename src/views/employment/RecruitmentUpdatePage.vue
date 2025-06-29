@@ -257,16 +257,22 @@ const goToApplicationItem = () => {
 
 const addStep = () => {
     if (!newStep.value.stepType) return;
-    const nextOrder = form.value.recruitmentProcesses.length + 1;
     form.value.recruitmentProcesses.push({
-        stepType: newStep.value.stepType,
-        displayOrder: nextOrder
+        stepType: newStep.value.stepType
+    });
+    // displayOrder를 1부터 재정렬
+    form.value.recruitmentProcesses.forEach((step, idx) => {
+        step.displayOrder = idx + 1;
     });
     newStep.value = { stepType: '' };
 };
 
 const removeStep = (index) => {
     form.value.recruitmentProcesses.splice(index, 1);
+    // 삭제 후에도 displayOrder를 1부터 재정렬
+    form.value.recruitmentProcesses.forEach((step, idx) => {
+        step.displayOrder = idx + 1;
+    });
 };
 
 const cancel = () => {
