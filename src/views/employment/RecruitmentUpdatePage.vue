@@ -258,8 +258,7 @@ const goToApplicationItem = () => {
 const addStep = () => {
     if (!newStep.value.stepType) return;
     form.value.recruitmentProcesses.push({
-        stepType: newStep.value.stepType,
-        displayOrder: 0 // 임시
+        stepType: newStep.value.stepType
     });
     // displayOrder를 1부터 재정렬
     form.value.recruitmentProcesses.forEach((step, idx) => {
