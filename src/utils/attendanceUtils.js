@@ -2,12 +2,12 @@ import dayjs from 'dayjs'
 
 // 근태 테이블 헤더 정의
 export const ATTENDANCE_HEADERS = [
-    { title: '부서명', key: 'departmentName', sortable: false },
-    { title: '근무 시작일', key: 'checkInTime', sortable: true },
-    { title: '근무 종료일', key: 'checkOutTime', sortable: true },
-    { title: '직급', key: 'position', sortable: false },
-    { title: '직책', key: 'role', sortable: false },
-    { title: '직무', key: 'job', sortable: false }
+    { title: '근무 날짜', key: 'workDate', sortable: true },
+    { title: '출근 시간', key: 'checkInTime', sortable: true },
+    { title: '퇴근 시간', key: 'checkOutTime', sortable: true },
+    { title: '근무 시간', key: 'workHours', sortable: true },
+    { title: '상태', key: 'status', sortable: true },
+    { title: '비고', key: 'note', sortable: false }
 ]
 
 // 근태 상태 색상 매핑
@@ -43,7 +43,12 @@ export const formatTime = (time) => {
 // 근무 시간 포맷팅 함수
 export const formatWorkHours = (hours) => {
     if (!hours) return '-'
-    return `${hours}시간`
+    if (typeof hours === 'string') {
+        const numHours = parseFloat(hours)
+        if (isNaN(numHours)) return '-'
+        return `${numHours.toFixed(1)}시간`
+    }
+    return `${hours.toFixed(1)}시간`
 }
 
 // 근태 상태 색상 반환 함수

@@ -350,6 +350,16 @@ onMounted(async () => {
     background-color: #f44336;
 }
 
+.status-weekend {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    border: 1px solid #bbdefb;
+}
+
+.status-weekend .status-dot {
+    background-color: #2196f3;
+}
+
 .status-no-record {
     background-color: #fff3e0;
     color: #ef6c00;

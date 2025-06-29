@@ -57,20 +57,30 @@ export const useMemberList = () => {
 
                         let status = -1 // 기본값: 기록없음
 
-                        if (attendanceRecords && attendanceRecords.length > 0) {
-                            // 오늘 날짜 기준으로 출근 기록 확인 (근태 카테고리 ID 1=출근)
-                            const today = new Date().toISOString().split('T')[0]
-                            const todayAttendance = attendanceRecords.filter(record => {
-                                const recordDate = new Date(record.createdAt)
-                                return recordDate.toDateString() === today.toDateString()
-                            })
+                        const today = new Date()
+                        const dayOfWeek = today.getDay() // 0=일요일, 6=토요일
 
-                            // 출근 기록이 있으면 출근 상태 (멤버 출근 상태: 1=출근)
-                            if (todayAttendance.some(record => record.attendanceCategoryId === 1)) {
-                                status = 1
-                                // 기록은 있지만 오늘 출근 기록이 없으면 미출근 (멤버 출근 상태: 0=미출근)
-                            } else if (todayAttendance.length > 0) {
-                                status = 0
+                        // 주말인 경우 무조건 "휴무일" 상태
+                        if (dayOfWeek === 0 || dayOfWeek === 6) {
+                            status = 2 // 휴무일
+                        } else {
+                            // 평일인 경우에만 출근/미출근 판단
+                            if (attendanceRecords && attendanceRecords.length > 0) {
+                                const todayAttendance = attendanceRecords.filter(record => {
+                                    const recordDate = new Date(record.createdAt)
+                                    return recordDate.toDateString() === today.toDateString()
+                                })
+
+                                // 출근 기록이 있으면 출근 상태
+                                if (todayAttendance.some(record => record.attendanceCategoryId === 1)) {
+                                    status = 1 // 출근
+                                } else {
+                                    // 평일인데 출근 기록이 없으면 미출근
+                                    status = 0 // 미출근
+                                }
+                            } else {
+                                // 평일인데 근태 기록이 전혀 없으면 미출근
+                                status = 0 // 미출근
                             }
                         }
 
@@ -135,6 +145,7 @@ export const useMemberList = () => {
             const stats = {
                 출근: membersWithAttendance.filter(m => m.status === 1).length,      // 멤버 출근 상태 1=출근
                 미출근: membersWithAttendance.filter(m => m.status === 0).length,    // 멤버 출근 상태 0=미출근
+                휴무일: membersWithAttendance.filter(m => m.status === 2).length,    // 멤버 출근 상태 2=휴무일
                 기록없음: membersWithAttendance.filter(m => m.status === -1).length,  // 멤버 출근 상태 -1=기록없음
                 전체: members.value.length
             }

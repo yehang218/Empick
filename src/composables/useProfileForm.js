@@ -62,8 +62,9 @@ export function useProfileForm() {
             throw new Error('입력된 정보를 확인해주세요')
         }
 
-        await memberStore.updateMyInfo()
+        const result = await memberStore.updateMyInfo()
         isEditing.value = false
+        return result
     }
 
     return {

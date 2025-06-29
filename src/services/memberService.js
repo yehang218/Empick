@@ -113,6 +113,62 @@ export const getMyInfoService = async () => {
     }
 };
 
+// 사원 정보 수정 요청 생성 (승인 시스템)
+export const createMemberEditProposalService = async (proposalData) => {
+    try {
+        console.log('🔄 사원 정보 수정 요청 생성 API 호출 시작:', {
+            memberId: proposalData.memberId,
+            targetField: proposalData.targetField,
+            originalValue: proposalData.originalValue,
+            requestedValue: proposalData.requestedValue,
+            reason: proposalData.reason
+        })
+
+        const response = await api.post(API.MEMBER.EDIT_PROPOSALS, proposalData);
+
+        console.log('✅ 사원 정보 수정 요청 생성 API 응답:', response.data)
+        return response.data;
+    } catch (error) {
+        console.error('❌ 사원 정보 수정 요청 생성 API 오류:', {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            targetField: proposalData.targetField
+        })
+
+        // 409 에러(중복 요청) 처리
+        if (error.response && error.response.status === 409) {
+            const errorMessage = error.response.data?.message || '같은 필드에 대해 이미 대기중인 수정 요청이 존재합니다.';
+            const fieldName = {
+                'NAME': '이름',
+                'PHONE': '연락처',
+                'EMAIL': '이메일',
+                'ADDRESS': '주소'
+            }[proposalData.targetField] || proposalData.targetField;
+
+            throw new Error(`${fieldName} 수정 요청 실패: ${errorMessage}`);
+        }
+
+        throw error;
+    }
+};
+
+// 대기중인 사원 정보 수정 요청 조회
+export const getMemberEditProposalsService = async (memberId) => {
+    try {
+        console.log('사원 정보 수정 요청 조회 API 호출 시작:', memberId)
+        const response = await api.get(API.MEMBER.EDIT_PROPOSALS, {
+            params: { memberId }
+        });
+        console.log('사원 정보 수정 요청 조회 API 응답:', response.data)
+        return response.data;
+    } catch (error) {
+        console.error('사원 정보 수정 요청 조회 API 오류:', error)
+        throw error;
+    }
+};
+
+// 내 정보 직접 수정 (승인 시스템 우회)
 export const updateMyInfoService = async (memberData) => {
     try {
         console.log('내 정보 수정 API 호출 시작:', memberData)
