@@ -239,123 +239,34 @@ export const getApplicationResponsesByApplicationIdService = async (applicationI
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    console.log('✅ 이력서 응답 조회 성공:', apiResponse.data);
+    console.log('✅ 원본 API 응답 데이터:', apiResponse.data);
     
     // 배열 형태의 이력서 응답 데이터를 DTO로 변환
     if (Array.isArray(apiResponse.data)) {
       const responses = apiResponse.data
-        .map(item => ApplicationItemResponseDTO.fromJSON(item))
+        .map(item => {
+          console.log('🔍 개별 응답 원본 데이터:', item);
+          return ApplicationItemResponseDTO.fromJSON(item);
+        })
         .filter(item => item !== null); // null 값 제거
       
-      // 1. 먼저 application 정보를 조회해서 recruitmentId를 얻기
-      let recruitmentId = null;
-      try {
-        const appResponse = await api.get(ApplicationAPI.GET_APPLICATION_BY_ID(applicationId));
-        const appApiResponse = ApiResponseDTO.fromJSON(appResponse.data);
-        if (appApiResponse.success && appApiResponse.data) {
-          recruitmentId = appApiResponse.data.recruitmentId;
-          console.log('✅ 채용공고 ID 조회 성공:', recruitmentId);
-        }
-      } catch (appError) {
-        console.warn('⚠️ application 정보 조회 실패:', appError.message);
-      }
+      console.log('📋 DTO 변환 후 데이터:', responses);
       
-      // 2. application_item_category 정보를 미리 조회 (캐시)
-      let categoryCache = {};
-      try {
-        const categories = await fetchApplicationItemCategories();
-        categoryCache = categories.reduce((acc, category) => {
-          acc[category.id] = category;
-          return acc;
-        }, {});
-        console.log('✅ 항목 카테고리 캐시 로드 완료:', Object.keys(categoryCache).length, '개');
-      } catch (categoryError) {
-        console.warn('⚠️ 항목 카테고리 조회 실패:', categoryError.message);
-      }
+      // 백엔드에서 이미 categoryName이 올바르게 설정되어 있다면 그대로 사용
+      // 매핑 로직 없이 원본 데이터 그대로 반환
+      responses.forEach((response, index) => {
+        console.log(`📋 응답 ${index + 1}:`, {
+          id: response.id,
+          applicationItemId: response.applicationItemId,
+          categoryName: response.categoryName,
+          content: response.content?.substring(0, 50) + (response.content?.length > 50 ? '...' : ''),
+          inputType: response.inputType,
+          required: response.required
+        });
+      });
       
-      // 3. 채용공고별 지원서 항목들 조회 (캐시)
-      let itemCache = {};
-      if (recruitmentId) {
-        try {
-          const items = await fetchApplicationItemsByRecruitment(recruitmentId);
-          itemCache = items.reduce((acc, item) => {
-            acc[item.id] = item;
-            return acc;
-          }, {});
-          console.log('✅ 지원서 항목 캐시 로드 완료:', Object.keys(itemCache).length, '개');
-        } catch (itemError) {
-          console.warn('⚠️ 지원서 항목 조회 실패:', itemError.message);
-        }
-      }
-      
-      // 4. 각 응답에 대해 항목 정보 추가
-      const enrichedResponses = [];
-      
-      for (const response of responses) {
-        if (response.applicationItemId) {
-          // 기본값 설정
-          response.categoryName = '항목 정보 조회 중...';
-          
-          try {
-            // 방법 1: itemCache에서 직접 찾기
-            const item = itemCache[response.applicationItemId];
-            if (item && item.applicationItemCategoryId) {
-              const category = categoryCache[item.applicationItemCategoryId];
-              if (category) {
-                response.categoryName = category.name;
-                response.inputType = item.inputType || category.inputType;
-                response.isRequired = item.isRequired;
-                console.log('✅ 항목 정보 매칭 성공:', {
-                  applicationItemId: response.applicationItemId,
-                  categoryName: response.categoryName
-                });
-              } else {
-                response.categoryName = `카테고리 ID: ${item.applicationItemCategoryId}`;
-              }
-            } else {
-              // 방법 2: applicationItemId를 직접 categoryCache에서 찾아보기
-              const directCategory = categoryCache[response.applicationItemId];
-              if (directCategory) {
-                response.categoryName = directCategory.name;
-                response.inputType = directCategory.inputType;
-                response.isRequired = true;
-                console.log('✅ 직접 카테고리 매칭 성공:', response.categoryName);
-              } else {
-                // 방법 3: 일반적인 카테고리명 추정
-                const categoryNames = {
-                  1: '기본 인적사항',
-                  2: '학력',
-                  3: '경력',
-                  4: '자격증',
-                  5: '어학',
-                  6: '수상 내역',
-                  7: '기타',
-                };
-                
-                response.categoryName = categoryNames[response.applicationItemId] || `항목 ${response.applicationItemId}`;
-                response.inputType = 'TEXT';
-                response.isRequired = true;
-                console.log('🔄 추정 카테고리명 사용:', response.categoryName);
-              }
-            }
-            
-          } catch (itemError) {
-            console.warn('⚠️ 항목 정보 조회 실패:', response.applicationItemId, itemError.message);
-            response.categoryName = `항목 ${response.applicationItemId}`;
-            response.inputType = 'TEXT';
-            response.isRequired = true;
-          }
-        } else {
-          response.categoryName = 'applicationItemId 없음';
-          response.inputType = 'TEXT';
-          response.isRequired = false;
-        }
-        
-        enrichedResponses.push(response);
-      }
-      
-      console.log('🎯 최종 enriched responses:', enrichedResponses);
-      return enrichedResponses;
+      console.log('🎯 최종 반환 데이터 (매핑 로직 없음):', responses);
+      return responses;
     }
     
     return [];
