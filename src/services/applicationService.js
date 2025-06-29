@@ -252,8 +252,39 @@ export const getApplicationResponsesByApplicationIdService = async (applicationI
       
       console.log('📋 DTO 변환 후 데이터:', responses);
       
-      // 백엔드에서 이미 categoryName이 올바르게 설정되어 있다면 그대로 사용
-      // 매핑 로직 없이 원본 데이터 그대로 반환
+      // categoryName이 없는 경우 applicationItemId를 통해 항목 정보 매핑
+      try {
+        // 1. 먼저 지원서 정보를 통해 recruitmentId 확인
+        const applicationResponse = await api.get(ApplicationAPI.GET_APPLICATION_BY_ID(applicationId));
+        const applicationData = ApiResponseDTO.fromJSON(applicationResponse.data);
+        
+        if (applicationData.success && applicationData.data.recruitmentId) {
+          const recruitmentId = applicationData.data.recruitmentId;
+          console.log('🔍 recruitmentId 확인:', recruitmentId);
+          
+          // 2. 해당 채용공고의 모든 항목 정보 조회
+          const { fetchApplicationItemsByRecruitment } = await import('./applicationItemService');
+          const applicationItems = await fetchApplicationItemsByRecruitment(recruitmentId);
+          console.log('📋 채용공고 항목들:', applicationItems);
+          
+                     // 3. applicationItemId를 통해 항목명 매핑
+           responses.forEach(response => {
+             if (!response.categoryName && response.applicationItemId) {
+               const matchedItem = applicationItems.find(item => item.id === response.applicationItemId);
+               if (matchedItem && matchedItem.categoryName) {
+                 response.categoryName = matchedItem.categoryName;
+                 console.log(`🔗 항목명 매핑 성공: ${response.applicationItemId} -> ${response.categoryName}`);
+               } else {
+                 console.warn(`⚠️ 매칭되는 항목을 찾을 수 없거나 categoryName이 없음: applicationItemId=${response.applicationItemId}`, matchedItem);
+               }
+             }
+           });
+        }
+      } catch (mappingError) {
+        console.warn('⚠️ 항목명 매핑 실패, 원본 데이터 사용:', mappingError.message);
+      }
+      
+      // 최종 데이터 로깅
       responses.forEach((response, index) => {
         console.log(`📋 응답 ${index + 1}:`, {
           id: response.id,
@@ -265,7 +296,7 @@ export const getApplicationResponsesByApplicationIdService = async (applicationI
         });
       });
       
-      console.log('🎯 최종 반환 데이터 (매핑 로직 없음):', responses);
+      console.log('🎯 최종 반환 데이터 (항목명 매핑 완료):', responses);
       return responses;
     }
     
