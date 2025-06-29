@@ -1,20 +1,18 @@
 <template>
     <v-container class="create-bg" fluid>
-        <!-- 헤더 -->
-        <v-row align="center" class="mb-6">
-            <v-col cols="12" md="8">
-                <div class="sheet-header">
-                    <v-icon size="40" class="mr-3 sheet-header__icon">mdi-clipboard-plus-outline</v-icon>
-                    <div>
-                        <h2 class="font-weight-bold sheet-header__title">평가표 등록</h2>
-                        <div class="sheet-header__subtitle">새로운 면접 평가표와 기준을 등록하세요</div>
-                    </div>
-                </div>
-            </v-col>
-        </v-row>
-
         <v-row justify="center">
             <v-col cols="12" md="10" lg="8">
+                <!-- 헤더 -->
+                <div class="sheet-header mb-6">
+                    <div class="d-flex align-center justify-center">
+                        <v-icon size="40" class="mr-3 sheet-header__icon">mdi-clipboard-plus-outline</v-icon>
+                        <div class="text-center">
+                            <h2 class="font-weight-bold sheet-header__title">평가표 등록</h2>
+                            <div class="sheet-header__subtitle">새로운 면접 평가표와 기준을 등록하세요</div>
+                        </div>
+                    </div>
+                </div>
+
                 <v-card class="pa-8 create-card" elevation="4" rounded="xl">
                     <!-- 평가표 이름 입력 -->
                     <div class="mb-6">

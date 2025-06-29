@@ -1,17 +1,17 @@
 <template>
     <v-container class="input-interview-score-page" fluid>
-        <!-- 헤더 섹션 -->
-        <div class="page-header mb-6">
-            <div class="header-content">
-                <h1 class="page-title">
-                    <v-icon class="mr-3" color="primary" size="32">mdi-clipboard-check</v-icon>
-                    면접 평가 입력
-                </h1>
-                <p class="page-subtitle">지원자의 면접 성과를 평가하고 점수를 입력하세요</p>
-            </div>
-        </div>
-
         <div class="evaluation-container">
+            <!-- 헤더 섹션 -->
+            <div class="page-header mb-6">
+                <div class="header-content">
+                    <h1 class="page-title">
+                        <v-icon class="mr-3" color="primary" size="32">mdi-clipboard-check</v-icon>
+                        면접 평가 입력
+                    </h1>
+                    <p class="page-subtitle">지원자의 면접 성과를 평가하고 점수를 입력하세요</p>
+                </div>
+            </div>
+
             <!-- 평가 입력 폼 -->
             <v-card class="evaluation-form-card" elevation="0">
                 <div class="form-header">
