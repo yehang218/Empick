@@ -27,16 +27,28 @@
                         <v-icon class="label-icon">mdi-calendar-start</v-icon>
                         시험 시작 일정
                     </div>
-                    <v-text-field v-model="startedAt" type="datetime-local" variant="outlined" density="comfortable"
-                        hide-details />
+                    <v-text-field 
+                        v-model="startedAt" 
+                        type="datetime-local" 
+                        variant="outlined" 
+                        density="comfortable"
+                        :min="getCurrentDateTime()"
+                        hide-details 
+                    />
                 </v-col>
                 <v-col cols="12" md="3" class="mb-4 mb-md-0">
                     <div class="form-label">
                         <v-icon class="label-icon">mdi-calendar-end</v-icon>
                         시험 종료 일정
                     </div>
-                    <v-text-field v-model="endedAt" type="datetime-local" variant="outlined" density="comfortable"
-                        hide-details />
+                    <v-text-field 
+                        v-model="endedAt" 
+                        type="datetime-local" 
+                        variant="outlined" 
+                        density="comfortable"
+                        :min="startedAt || getCurrentDateTime()"
+                        hide-details 
+                    />
                 </v-col>
                 <v-col cols="12" md="2" class="mb-4 mb-md-0">
                     <div class="form-label">
@@ -322,13 +334,31 @@ const register = async () => {
     }
 
     try {
+        // 날짜를 안전하게 변환
+        const startDate = new Date(startedAt.value);
+        const endDate = new Date(endedAt.value);
+        
+        // 날짜 유효성 검사
+        if (isNaN(startDate.getTime())) {
+            toast.error('시험 시작 일정이 올바르지 않습니다.');
+            return;
+        }
+        if (isNaN(endDate.getTime())) {
+            toast.error('시험 종료 일정이 올바르지 않습니다.');
+            return;
+        }
+        if (startDate >= endDate) {
+            toast.error('시험 종료 일정은 시작 일정보다 늦어야 합니다.');
+            return;
+        }
+
         if (isEdit.value && editingJobtestId.value) {
             const updateDto = new UpdateJobtestRequestDTO(
                 jobtestTitle.value,
                 difficulty.value,
                 testTime.value,
-                new Date(startedAt.value),
-                new Date(endedAt.value),
+                startDate,
+                endDate,
                 memberStore.form.id,
                 selected.map(q => ({
                     questionId: q.id,
@@ -343,8 +373,8 @@ const register = async () => {
                 jobtestTitle.value,
                 difficulty.value,
                 testTime.value,
-                new Date(startedAt.value),
-                new Date(endedAt.value),
+                startDate,
+                endDate,
                 memberStore.form.id,
                 selected.map(q => ({
                     questionId: q.id,
@@ -355,7 +385,7 @@ const register = async () => {
             showSuccessModal.value = true
         }
     } catch (e) {
-        // toast.error('등록 중 오류가 발생했습니다.')
+        toast.error('등록 중 오류가 발생했습니다.')
     }
 }
 
@@ -419,6 +449,17 @@ const handleSearch = (value) => {
 
 const goToList = () => {
     router.push({ name: 'JobtestList' });
+}
+
+const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
 onMounted(async () => {
