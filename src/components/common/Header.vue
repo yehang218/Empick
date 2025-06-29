@@ -24,7 +24,7 @@
                     prepend-inner-icon="mdi-magnify" class="search-box mr-4"
                     style="max-width: 250px; background-color: white; border-radius: 20px;"
                     @update:modelValue="onSearchSelect" @update:search="onSearchInput" @blur="onSearchBlur" clearable
-                    auto-select-first :menu-props="{ maxHeight: '300px', closeOnContentClick: true }" />
+                    auto-select-first :menu-props="{ maxHeight: '300px', closeOnContentClick: true, zIndex: 10000 }" />
 
                 <!-- 프로필 영역 (클릭 가능) -->
                 <div class="d-flex align-center profile-area" @click="goToProfile">
@@ -232,7 +232,16 @@ function goToProfile() {
 }
 
 // 🖼️ memberStore 전체를 watch하여 변경사항 감지
-watch(() => [memberStore.form.id, memberStore.profileImageUrl], async ([newId, newProfileUrl], [oldId, oldProfileUrl]) => {
+watch(() => [memberStore.form?.id, memberStore.profileImageUrl], async (newValues, oldValues) => {
+    // 값이 배열이 아니거나 undefined인 경우 처리
+    if (!Array.isArray(newValues) || !Array.isArray(oldValues)) {
+        console.warn('Header watch: 값이 배열이 아님', { newValues, oldValues })
+        return
+    }
+
+    const [newId, newProfileUrl] = newValues
+    const [oldId, oldProfileUrl] = oldValues || [null, null]
+
     console.log('🔍 Header watch 실행:', {
         newId,
         oldId,
