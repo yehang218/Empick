@@ -147,14 +147,20 @@ export function useApplicantManager(applicantStore, router, toast) {
     }, 300)
 
     const handleSort = (options) => {
-        console.log('정렬 옵션:', options)
+        console.log('🔄 handleSort 호출됨:', options)
+        console.log('🔍 정렬 키:', options.sortBy)
+        console.log('🔍 정렬 방향:', options.sortDesc)
         
         if (options.sortBy && options.sortBy.length > 0) {
+            const isJobtestSort = options.sortBy[0] === 'jobtestStatus';
+            console.log('🎯 실무테스트 정렬인가?', isJobtestSort);
+            
             applicantStore.setSort({
                 sortBy: options.sortBy,
                 sortDesc: options.sortDesc || [false]
             })
         } else {
+            console.log('🔄 정렬 초기화');
             applicantStore.setSort({
                 sortBy: [],
                 sortDesc: []

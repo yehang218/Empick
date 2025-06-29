@@ -488,26 +488,12 @@ const handleAssignClick = async () => {
     return
   }
 
-  // 이미 실무테스트가 할당된 지원자 확인
-  const alreadyAssignedApplicants = selectedApplicants.value.filter(
-    applicant => applicant.jobtestStatus && applicant.jobtestStatus !== 'WAITING'
-  )
-
-  if (alreadyAssignedApplicants.length > 0) {
-    const names = alreadyAssignedApplicants.map(a => a.name).join(', ')
-    const confirmed = confirm(
-      `다음 지원자들은 이미 실무테스트가 할당되어 있습니다:\n${names}\n\n계속 진행하시겠습니까?`
-    )
-    if (!confirmed) {
-      return
-    }
-  }
-
   try {
     await jobtestListStore.fetchJobtests()
     jobtestModal.value = true
   } catch (error) {
     console.error('실무 테스트 목록 조회 실패:', error)
+    toast.error('실무테스트 목록을 불러오는데 실패했습니다.')
   }
 }
 
@@ -577,7 +563,17 @@ const handleJobtestSelected = async (jobtest) => {
     await applicantStore.fetchApplicantFullInfoList()
   } catch (error) {
     console.error('실무테스트 할당 실패:', error)
-    toast.error('해당 지원서에 이미 실무테스트가 할당되어 있습니다.');
+    
+    // 에러 메시지 분석하여 적절한 토스트 표시
+    const errorMessage = error.message || error.toString();
+    
+    if (errorMessage.includes('Authentication failed') || errorMessage.includes('BadCredentials')) {
+      toast.error('이메일 서버 인증 실패로 인해 실무테스트 할당에 실패했습니다.');
+    } else if (errorMessage.includes('이미 할당')) {
+      toast.error('해당 지원서에 이미 실무테스트가 할당되어 있습니다.');
+    } else {
+      toast.error('실무테스트 할당에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
   }
 }
 
