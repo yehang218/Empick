@@ -220,7 +220,7 @@
 
                 <v-btn v-if="evaluation.type === '실무 테스트'" variant="tonal" size="small" block
                   :color="selectedEvaluation === evaluation.type ? 'primary' : 'grey'" prepend-icon="mdi-eye"
-                  @click.stop="handleJobtestButtonClick">
+                  @click="handleJobtestButtonClick">
                   {{ getJobtestButtonText() }}
                 </v-btn>
                 <v-btn v-else variant="tonal" size="small" block
@@ -1677,8 +1677,16 @@ function handleJobtestButtonClick() {
 
 // 실무테스트 카드 클릭 핸들러
 function handleJobtestCardClick() {
-  // 실무테스트 선택만 수행 (토스트는 버튼 클릭에서만 표시)
+  // 실무테스트 선택
   selectEvaluation('실무 테스트')
+
+  // 접근 가능한 경우에만 답안 페이지로 이동
+  if (canAccessJobtestAnswer.value) {
+    goToJobtestAnswerDetail()
+  } else {
+    // 실무테스트 미응시인 경우 토스트 메시지 표시
+    toast.info('실무테스트가 아직 수행되지 않았습니다.')
+  }
 }
 </script>
 
