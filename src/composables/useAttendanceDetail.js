@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { useMemberStore } from '@/stores/memberStore'
 import { useAttendanceStore } from '@/stores/attendanceStore'
 import { useToast } from '@/composables/useToast'
+import { WORK_TIME_CONFIG, BUSINESS_RULES } from '@/config/attendance'
 import dayjs from 'dayjs'
 
 export const useAttendanceDetail = (memberId) => {
@@ -9,7 +10,106 @@ export const useAttendanceDetail = (memberId) => {
     const attendanceStore = useAttendanceStore()
     const { showToast } = useToast()
 
+    // 근태 상태 결정 함수
+    const determineAttendanceStatus = (workDate, checkIn, checkOut) => {
+        const date = dayjs(workDate)
+        const dayOfWeek = date.day()
 
+        // 주말인지 확인 (일요일: 0, 토요일: 6)
+        const isWeekend = WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayOfWeek)
+
+        // 평일인데 출근 기록이 없으면 결근
+        if (!isWeekend && !checkIn) {
+            return 'absent'
+        }
+
+        // 출근 기록이 있으면 시간 기준으로 판단 (주말/평일 관계없이)
+        if (checkIn) {
+            // 출근 시간 확인
+            const checkInTime = dayjs(checkIn.time, 'HH:mm:ss')
+            const workStartTime = dayjs(WORK_TIME_CONFIG.WORK_START_TIME, 'HH:mm:ss')
+            const lateThreshold = workStartTime.add(BUSINESS_RULES.TARDINESS_RULES.LATE_THRESHOLD_MINUTES, 'minute')
+
+            // 지각 확인 (09:00 + 1분 = 09:01 이후)
+            if (checkInTime.isAfter(lateThreshold)) {
+                return 'late'
+            }
+
+            // 퇴근 기록이 있으면 조퇴 확인
+            if (checkOut) {
+                const checkOutTime = dayjs(checkOut.time, 'HH:mm:ss')
+                const workEndTime = dayjs(WORK_TIME_CONFIG.WORK_END_TIME, 'HH:mm:ss')
+                const earlyLeaveThreshold = workEndTime.subtract(BUSINESS_RULES.TARDINESS_RULES.EARLY_LEAVE_THRESHOLD_MINUTES, 'minute')
+
+                // 조퇴 확인 (18:00 - 1분 = 17:59 이전)
+                if (checkOutTime.isBefore(earlyLeaveThreshold)) {
+                    return 'early'
+                }
+            }
+
+            // 정상 출근 (주말 출근도 포함)
+            return 'present'
+        }
+
+        // 주말이면서 출근 기록이 없으면 표시하지 않음 (이 경우는 workDays에 포함되지 않아야 함)
+        return 'weekend'
+    }
+
+    // 월별 전체 근무일 생성 함수 (오늘까지만, 주말 제외하되 출근 기록이 있으면 포함)
+    const generateWorkDaysForMonth = (year, month, apiRecords = []) => {
+        const startDate = dayjs(`${year}-${month}-01`)
+        const endDate = startDate.endOf('month')
+        const today = dayjs().startOf('day') // 오늘 00:00:00
+
+        // 오늘과 월말 중 더 빠른 날짜까지만 처리
+        const actualEndDate = today.isBefore(endDate) ? today : endDate
+
+        console.log('📅 날짜 범위:', {
+            startDate: startDate.format('YYYY-MM-DD'),
+            endDate: endDate.format('YYYY-MM-DD'),
+            today: today.format('YYYY-MM-DD'),
+            actualEndDate: actualEndDate.format('YYYY-MM-DD')
+        })
+
+        const workDays = []
+
+        // 주말에 출근 기록이 있는 날짜들 찾기
+        const weekendWorkDays = new Set()
+        if (apiRecords && apiRecords.length > 0) {
+            apiRecords.forEach(record => {
+                const recordDate = dayjs(record.recordTime || record.createdAt)
+                if (recordDate.isValid()) {
+                    const recordDateStr = recordDate.format('YYYY-MM-DD')
+                    const dayOfWeek = recordDate.day()
+
+                    // 주말이지만 출근 기록이 있는 경우
+                    if (WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayOfWeek)) {
+                        weekendWorkDays.add(recordDateStr)
+                    }
+                }
+            })
+        }
+
+        let currentDate = startDate
+        while (currentDate.diff(actualEndDate, 'day') <= 0) { // 오늘까지 포함
+            const currentDateStr = currentDate.format('YYYY-MM-DD')
+            const dayOfWeek = currentDate.day()
+
+            console.log('📅 처리 중인 날짜:', currentDateStr, '요일:', dayOfWeek, 'diff:', currentDate.diff(actualEndDate, 'day'))
+
+            // 평일이거나, 주말이지만 출근 기록이 있는 경우 포함
+            if (!WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayOfWeek) || weekendWorkDays.has(currentDateStr)) {
+                workDays.push(currentDateStr)
+                console.log('📅 근무일 추가:', currentDateStr)
+            }
+
+            currentDate = currentDate.add(1, 'day')
+        }
+
+        console.log('📅 생성된 근무일:', workDays.length, '일 (오늘까지, 주말 출근 포함)')
+        console.log('📅 마지막 근무일:', workDays[workDays.length - 1])
+        return workDays
+    }
 
     // 상태
     const memberData = ref({})
@@ -120,6 +220,10 @@ export const useAttendanceDetail = (memberId) => {
             const apiRecords = await attendanceStore.fetchMemberAttendanceRecords(memberId.value)
             console.log('📊 API에서 받은 원본 데이터:', apiRecords?.length || 0, '건')
 
+            // 해당 월의 모든 근무일 생성 (오늘까지만, 주말 출근 기록 있으면 포함)
+            const workDays = generateWorkDaysForMonth(year, month, apiRecords || [])
+            console.log('📅 해당 월 전체 근무일:', workDays.length, '일')
+
             if (apiRecords && apiRecords.length > 0) {
                 console.log('📊 API 데이터 샘플:', apiRecords.slice(0, 3))
 
@@ -140,50 +244,31 @@ export const useAttendanceDetail = (memberId) => {
                 const dailyData = attendanceStore.groupAttendanceByDate(filteredRecords)
                 console.log('📊 날짜별 그룹핑 결과:', Object.keys(dailyData).length, '일')
 
-                // 테이블용 데이터 변환
-                attendanceRecords.value = Object.values(dailyData).map(dayData => {
-                    const { checkIn, checkOut } = dayData
-                    const workDate = dayData.date
+                // 모든 근무일에 대해 근태 데이터 생성
+                attendanceRecords.value = workDays.map(workDate => {
+                    const dayData = dailyData[workDate]
+                    const { checkIn, checkOut } = dayData || {}
 
                     // 출근/퇴근 시간
                     const checkInTime = checkIn ? `${workDate}T${checkIn.time}` : null
                     const checkOutTime = checkOut ? `${workDate}T${checkOut.time}` : null
 
-                    // 근무 시간 계산 (기존 함수 사용)
+                    // 근무 시간 계산
                     let workHours = 0
                     if (checkIn && checkOut) {
                         const workMinutes = attendanceStore.calculateTimeDifferenceInMinutes(checkIn.time, checkOut.time)
                         workHours = Math.round((workMinutes / 60) * 10) / 10
                     }
 
-                    // 근태 상태 결정
-                    let status = 'absent'
-                    if (checkIn) {
-                        const checkInHour = dayjs(checkInTime).hour()
-                        const checkInMinute = dayjs(checkInTime).minute()
-                        const checkInTotalMinutes = checkInHour * 60 + checkInMinute
-
-                        // 10시 이후 출근 → 지각
-                        if (checkInTotalMinutes > 600) { // 10시 = 600분
-                            status = 'late'
-                        } else if (checkOut) {
-                            const checkOutHour = dayjs(checkOutTime).hour()
-                            // 17시 이전 퇴근 → 조퇴
-                            if (checkOutHour < 17) {
-                                status = 'early'
-                            } else {
-                                status = 'present' // 정상출근
-                            }
-                        } else {
-                            status = 'present' // 출근만 있는 경우
-                        }
-                    }
+                    // 정확한 근태 상태 결정
+                    const status = determineAttendanceStatus(workDate, checkIn, checkOut)
 
                     console.log(`📊 ${workDate} 근태 상태:`, {
                         checkInTime: checkInTime ? dayjs(checkInTime).format('HH:mm:ss') : null,
                         checkOutTime: checkOutTime ? dayjs(checkOutTime).format('HH:mm:ss') : null,
                         workHours,
-                        status
+                        status,
+                        isWeekend: WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayjs(workDate).day())
                     })
 
                     return {
@@ -195,12 +280,38 @@ export const useAttendanceDetail = (memberId) => {
                         workHours,
                         note: ''
                     }
-                }).sort((a, b) => dayjs(b.workDate).diff(dayjs(a.workDate))) // 최신순 정렬
+                })
+                    .filter(record => {
+                        const isWeekend = WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayjs(record.workDate).day())
+                        // 주말은 출근 기록이 있는 경우만 포함, 평일은 모두 포함
+                        return !isWeekend || (isWeekend && record.checkInTime)
+                    })
+                    .sort((a, b) => dayjs(b.workDate).diff(dayjs(a.workDate))) // 최신순 정렬
 
                 console.log('📊 최종 처리된 근태 데이터:', attendanceRecords.value.length, '건')
             } else {
                 console.log('📊 API 데이터가 없음')
-                attendanceRecords.value = []
+
+                // 데이터가 없어도 근무일 기준으로 결근 처리 (오늘까지만, 주말 제외)
+                attendanceRecords.value = workDays.map(workDate => {
+                    const status = determineAttendanceStatus(workDate, null, null)
+
+                    return {
+                        id: `${workDate}_${memberId.value}`,
+                        workDate,
+                        checkInTime: null,
+                        checkOutTime: null,
+                        status,
+                        workHours: 0,
+                        note: ''
+                    }
+                })
+                    .filter(record => {
+                        const isWeekend = WORK_TIME_CONFIG.WEEKEND_DAYS.includes(dayjs(record.workDate).day())
+                        // 주말은 표시하지 않음 (데이터가 없으므로 출근 기록도 없음)
+                        return !isWeekend
+                    })
+                    .sort((a, b) => dayjs(b.workDate).diff(dayjs(a.workDate))) // 최신순 정렬
             }
 
         } catch (error) {
