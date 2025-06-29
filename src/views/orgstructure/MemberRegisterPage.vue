@@ -2,7 +2,7 @@
     <v-container class="py-8 modern-container" style="max-width: 1200px;">
         <v-row>
             <v-col cols="12">
-                <PageHeader icon="mdi-account-plus-outline" title="신규 사원 정보 등록" subtitle="지원자 정보를 기반으로 새로운 사원을 등록합니다" />
+                <PageHeader icon="mdi-account-plus-outline" :title="pageTitle" :subtitle="pageSubtitle" />
             </v-col>
         </v-row>
 
@@ -37,7 +37,7 @@
                 <div class="register-section">
                     <v-btn class="register-btn" color="success" size="large" variant="flat" @click="onRegister">
                         <v-icon size="18" class="mr-2">mdi-check-circle</v-icon>
-                        {{ currentApplicant?.name || '지원자' }} 등록
+                        {{ registerButtonText }}
                     </v-btn>
 
                     <div v-if="selectedApplicants.length > 1" class="progress-info">
@@ -83,7 +83,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useMemberRegisterStore } from '@/stores/memberRegisterStore'
 import { useOrganizationStore } from '@/stores/organizationStore'
 import { useToast } from 'vue-toastification'
@@ -114,6 +114,36 @@ const pendingNavigation = ref(null)
 const loadingMessage = ref('')
 const loadingSubMessage = ref('')
 const isBulkRegistering = ref(false) // 일괄 등록 중인지 확인하는 플래그
+
+// 등록 버튼 텍스트 (진입 방식에 따라 다르게 표시)
+const registerButtonText = computed(() => {
+    // 지원자 데이터가 있는 경우 (지원자 목록에서 진입)
+    if (selectedApplicants.value.length > 0) {
+        return `${currentApplicant.value?.name || '지원자'} 등록`
+    }
+    // 지원자 데이터가 없는 경우 (신규 사원 정보 등록 메뉴에서 직접 진입)
+    return '사원 등록'
+})
+
+// 페이지 제목 (진입 방식에 따라 다르게 표시)
+const pageTitle = computed(() => {
+    // 지원자 데이터가 있는 경우 (지원자 목록에서 진입)
+    if (selectedApplicants.value.length > 0) {
+        return '지원자 → 사원 등록'
+    }
+    // 지원자 데이터가 없는 경우 (신규 사원 정보 등록 메뉴에서 직접 진입)
+    return '신규 사원 정보 등록'
+})
+
+// 페이지 부제목 (진입 방식에 따라 다르게 표시)
+const pageSubtitle = computed(() => {
+    // 지원자 데이터가 있는 경우 (지원자 목록에서 진입)
+    if (selectedApplicants.value.length > 0) {
+        return '지원자 정보를 기반으로 새로운 사원을 등록합니다'
+    }
+    // 지원자 데이터가 없는 경우 (신규 사원 정보 등록 메뉴에서 직접 진입)
+    return '새로운 사원의 정보를 입력하여 등록합니다'
+})
 
 // Composables 사용
 const {
@@ -211,6 +241,7 @@ onMounted(() => {
     console.log('🔍 route.query:', route.query)
 
     if (route.query.applicants) {
+        // 지원자 목록에서 진입한 경우
         try {
             const applicantsData = JSON.parse(route.query.applicants)
             console.log('📋 파싱된 지원자 데이터:', applicantsData)
@@ -227,8 +258,62 @@ onMounted(() => {
             console.error('❌ 지원자 데이터 파싱 실패:', error)
             toast.error('지원자 데이터를 불러오는데 실패했습니다.')
         }
+    } else {
+        // 신규 사원 정보 등록 메뉴에서 직접 진입한 경우
+        console.log('📝 신규 사원 등록 모드로 초기화')
+
+        // 폼을 기본값으로 초기화
+        regStore.resetForm()
+
+        // 기본값 설정
+        regStore.form.departmentId = 1 // 인사 부서
+        regStore.form.positionId = 0   // 미지정
+        regStore.form.jobId = 0        // 미지정  
+        regStore.form.rankId = 0       // 사원
+
+        console.log('✅ 신규 사원 등록 폼 초기화 완료')
     }
 })
+
+// 라우트 변경 감지 (헤더 메뉴에서 같은 페이지로 이동할 때 처리)
+watch(() => route.query, (newQuery, oldQuery) => {
+    console.log('🔄 라우트 쿼리 변경 감지:', { newQuery, oldQuery })
+
+    // 지원자 데이터가 있던 상태에서 없어진 경우 (헤더 메뉴에서 신규 사원 등록 클릭)
+    if (oldQuery?.applicants && !newQuery?.applicants) {
+        console.log('📝 지원자 모드 → 신규 사원 모드로 전환')
+
+        // 폼 초기화 및 기본값 설정
+        regStore.resetForm()
+        regStore.form.departmentId = 1 // 인사 부서
+        regStore.form.positionId = 0   // 미지정
+        regStore.form.jobId = 0        // 미지정  
+        regStore.form.rankId = 0       // 사원
+
+        // 지원자 목록 초기화
+        selectedApplicants.value = []
+
+        console.log('✅ 신규 사원 등록 모드로 전환 완료')
+    }
+    // 지원자 데이터가 없던 상태에서 생긴 경우 (다른 페이지에서 지원자 모드로 진입)
+    else if (!oldQuery?.applicants && newQuery?.applicants) {
+        console.log('📋 신규 사원 모드 → 지원자 모드로 전환')
+
+        try {
+            const applicantsData = JSON.parse(newQuery.applicants)
+            console.log('📋 새로운 지원자 데이터:', applicantsData)
+
+            if (Array.isArray(applicantsData) && applicantsData.length > 0) {
+                initializeApplicants(applicantsData)
+                loadApplicantToForm(applicantsData[0])
+                console.log('✅ 지원자 모드로 전환 완료:', selectedApplicants.value.length, '명')
+            }
+        } catch (error) {
+            console.error('❌ 지원자 데이터 파싱 실패:', error)
+            toast.error('지원자 데이터를 불러오는데 실패했습니다.')
+        }
+    }
+}, { deep: true })
 
 // 지원자 데이터를 폼에 로드하는 함수
 const loadApplicantToForm = (applicant) => {
@@ -442,35 +527,61 @@ const onProfileImageChange = (event) => {
 const onRegister = async () => {
     try {
         // 로딩 메시지 설정
-        const currentName = currentApplicant.value?.name || '지원자'
+        const currentName = currentApplicant.value?.name || regStore.form.name || '사원'
         loadingMessage.value = '사원 등록 중...'
-        loadingSubMessage.value = `${currentName}님의 정보를 등록하고 있습니다.`
+        loadingSubMessage.value = selectedApplicants.value.length > 0
+            ? `${currentName}님의 정보를 등록하고 있습니다.`
+            : '새로운 사원 정보를 등록하고 있습니다.'
 
-        // 현재 폼 데이터 저장
-        saveCurrentFormData(getCurrentFormData())
+        // 지원자 모드일 때만 현재 폼 데이터 저장
+        if (selectedApplicants.value.length > 0) {
+            saveCurrentFormData(getCurrentFormData())
+        }
 
         const result = await regStore.registerMember(regStore.form, regStore.profileImageFile)
         if (result) {
-            const currentName = currentApplicant.value?.name || '지원자'
-            toast.success(`${currentName}의 사원 등록이 완료되었습니다!`)
+            const successName = currentApplicant.value?.name || regStore.form.name || '사원'
 
-            // 등록 완료된 지원자의 저장된 데이터 삭제
-            if (currentApplicant.value) {
-                deleteSavedFormData(currentApplicant.value.applicantId)
-            }
+            if (selectedApplicants.value.length > 0) {
+                // 지원자 → 사원 등록 모드
+                toast.success(`${successName}의 사원 등록이 완료되었습니다!`)
 
-            // 다중 선택 시 다음 지원자로 이동
-            if (selectedApplicants.value.length > 1 && currentApplicantIndex.value < selectedApplicants.value.length - 1) {
-                handleNextApplicant()
-                regStore.resetForm() // 폼 초기화 (이미지 상태 포함)
-                restoreFormData(currentApplicant.value)
-            } else {
-                // 모든 지원자 등록 완료 또는 단일 선택 시
-                regStore.resetForm()
-                if (selectedApplicants.value.length > 1) {
-                    toast.success('모든 지원자의 사원 등록이 완료되었습니다!')
-                    router.push('/employment/applicants')
+                // 등록 완료된 지원자의 저장된 데이터 삭제
+                if (currentApplicant.value) {
+                    deleteSavedFormData(currentApplicant.value.applicantId)
                 }
+
+                // 다중 선택 시 다음 지원자로 이동
+                if (selectedApplicants.value.length > 1 && currentApplicantIndex.value < selectedApplicants.value.length - 1) {
+                    handleNextApplicant()
+                    regStore.resetForm() // 폼 초기화 (이미지 상태 포함)
+                    restoreFormData(currentApplicant.value)
+                } else {
+                    // 모든 지원자 등록 완료 또는 단일 선택 시
+                    regStore.resetForm()
+                    if (selectedApplicants.value.length > 1) {
+                        toast.success('모든 지원자의 사원 등록이 완료되었습니다!')
+                    }
+                    // 3초 후 지원자 목록으로 이동
+                    globalThis.setTimeout(() => {
+                        router.push('/employment/applicants')
+                    }, 3000)
+                }
+            } else {
+                // 신규 사원 정보 등록 모드
+                toast.success(`${successName}의 사원 등록이 완료되었습니다!`)
+
+                // 폼 초기화 후 기본값 재설정
+                regStore.resetForm()
+                regStore.form.departmentId = 1 // 인사 부서
+                regStore.form.positionId = 0   // 미지정
+                regStore.form.jobId = 0        // 미지정  
+                regStore.form.rankId = 0       // 사원
+
+                // 3초 후 사원 목록 또는 대시보드로 이동
+                globalThis.setTimeout(() => {
+                    router.push('/')
+                }, 3000)
             }
         }
     } catch (error) {
@@ -484,10 +595,43 @@ const onRegister = async () => {
 
 // 페이지를 나가기 전에 확인
 onBeforeRouteLeave((to, from, next) => {
-    // 입력값이 있는지 확인
-    const hasInput = Object.values(regStore.form).some(value => value !== null && value !== '') || regStore.profileImageFile
+    // 실제로 사용자가 입력한 값만 체크 (기본값 제외)
+    const userInputFields = [
+        'name', 'birth', 'phone', 'email', 'address', 'password', 'hireAt'
+    ]
 
-    if (hasInput) {
+    const hasUserInput = userInputFields.some(field => {
+        const value = regStore.form[field]
+        return value !== null && value !== '' && value !== undefined
+    })
+
+    // 선택 필드 체크 (기본값이 아닌 값이 선택됨)
+    // 기본값: departmentId=1(인사부서), positionId=0(미지정), jobId=0(미지정), rankId=0(사원)
+    const hasSelections = (regStore.form.departmentId !== null && regStore.form.departmentId !== 1) ||
+        (regStore.form.positionId !== null && regStore.form.positionId !== 0) ||
+        (regStore.form.jobId !== null && regStore.form.jobId !== 0) ||
+        (regStore.form.rankId !== null && regStore.form.rankId !== 0)
+
+    // 프로필 이미지 업로드 여부 체크
+    const hasProfileImage = regStore.profileImageFile !== null
+
+    // 디버깅을 위한 로그
+    console.log('🔍 페이지 나가기 체크:', {
+        hasUserInput,
+        hasSelections,
+        hasProfileImage,
+        formValues: {
+            name: regStore.form.name,
+            email: regStore.form.email,
+            departmentId: regStore.form.departmentId,
+            positionId: regStore.form.positionId,
+            jobId: regStore.form.jobId,
+            rankId: regStore.form.rankId
+        }
+    })
+
+    // 위 조건 중 하나라도 해당되면 확인 모달 표시
+    if (hasUserInput || hasSelections || hasProfileImage) {
         pendingNavigation.value = next
         showConfirmDialog.value = true
     } else {

@@ -6,7 +6,7 @@ export const fullMenu = {
         {
             label: '기본 정보',
             roles: [RoleCode.USER, RoleCode.HR_ACCESS],
-            path: '/orgstructure/profile',
+            path: '/myinfo/profile',
             children: []
         },
         // {
@@ -15,12 +15,12 @@ export const fullMenu = {
         //     path: '/myinfo/attendance',
         //     children: []
         // },
-        {
-            label: '일정 확인',
-            roles: [RoleCode.USER, RoleCode.HR_ACCESS],
-            path: '/myinfo/schedule',
-            children: []
-        }
+        // {
+        //     label: '일정 확인',
+        //     roles: [RoleCode.USER, RoleCode.HR_ACCESS],
+        //     path: '/myinfo/schedule',
+        //     children: []
+        // }
     ],
     인사: [
         // {
@@ -38,7 +38,7 @@ export const fullMenu = {
             roles: [RoleCode.HR_ACCESS],
             children: [
                 { label: "신규 사원 등록", path: "/orgstructure/member-register" },
-                { label: "사원정보변경 요청", path: "/orgstructure/members/edit-request" }
+                // { label: "사원정보변경 요청", path: "/orgstructure/members/edit-request" }
             ]
         }
     ],
