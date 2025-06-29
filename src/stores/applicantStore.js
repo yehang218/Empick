@@ -28,15 +28,28 @@ export const useApplicantStore = defineStore('applicant', () => {
 
     // 각 지원서에 고유 키 추가 함수
     const addUniqueKeys = (applicants) => {
-        return applicants.map((applicant, index) => ({
-            ...applicant,
-            // applicantId 또는 applicationId를 기반으로 한 고유 키 생성
-            uniqueKey: applicant.applicationId
-                ? `app_${applicant.applicationId}`
-                : applicant.applicantId
-                    ? `applicant_${applicant.applicantId}_${index}`
-                    : `temp_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
-        }));
+        console.log('🏷️ addUniqueKeys 실행, 지원자 수:', applicants.length);
+        return applicants.map((applicant, index) => {
+            const jobtestStatus = applicant.applicationJobtestTitle ? 'ASSIGNED' : 'UNASSIGNED';
+            if (index < 3) { // 처음 3명만 로그 출력
+                console.log(`🏷️ ${applicant.name}:`, {
+                    applicationJobtestTitle: applicant.applicationJobtestTitle,
+                    jobtestStatus
+                });
+            }
+            
+            return {
+                ...applicant,
+                // applicantId 또는 applicationId를 기반으로 한 고유 키 생성
+                uniqueKey: applicant.applicationId
+                    ? `app_${applicant.applicationId}`
+                    : applicant.applicantId
+                        ? `applicant_${applicant.applicantId}_${index}`
+                        : `temp_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
+                // 실무테스트 상태 가상 필드 추가 (정렬용)
+                jobtestStatus
+            };
+        });
     };
 
     // 🔍 전체 지원자 조회
@@ -111,13 +124,7 @@ export const useApplicantStore = defineStore('applicant', () => {
 
         // 실무테스트 상태 필터링
         if (jobtestFilter.value !== null && jobtestFilter.value !== undefined) {
-            if (jobtestFilter.value === 'UNASSIGNED') {
-                // "할당안됨" 선택 시 - applicationJobtestTitle이 없는 경우
-                result = result.filter(applicant => !applicant.applicationJobtestTitle)
-            } else if (jobtestFilter.value === 'ASSIGNED') {
-                // "할당됨" 선택 시 - applicationJobtestTitle이 있는 경우
-                result = result.filter(applicant => applicant.applicationJobtestTitle)
-            }
+            result = result.filter(applicant => applicant.jobtestStatus === jobtestFilter.value)
         }
 
         // 지원공고 필터링
@@ -127,9 +134,35 @@ export const useApplicantStore = defineStore('applicant', () => {
 
         // 정렬
         if (sortKey.value) {
+            console.log('🔄 정렬 시작:', {
+                sortKey: sortKey.value,
+                sortOrder: sortOrder.value,
+                totalItems: result.length,
+                firstItem: result[0] ? {
+                    name: result[0].name,
+                    jobtestStatus: result[0].jobtestStatus,
+                    applicationJobtestTitle: result[0].applicationJobtestTitle
+                } : null
+            });
+            
             result.sort((a, b) => {
-                let aValue = a[sortKey.value];
-                let bValue = b[sortKey.value];
+                let aValue, bValue;
+
+                // 실무테스트 상태 정렬 특별 처리
+                if (sortKey.value === 'jobtestStatus') {
+                    // jobtestStatus 필드를 기반으로 정렬
+                    // UNASSIGNED: 0, ASSIGNED: 1 (할당안됨이 먼저 오도록)
+                    aValue = a.jobtestStatus === 'ASSIGNED' ? 1 : 0;
+                    bValue = b.jobtestStatus === 'ASSIGNED' ? 1 : 0;
+                    console.log('🔄 실무테스트 정렬 비교:', {
+                        aName: a.name, aJobtestStatus: a.jobtestStatus, aValue,
+                        bName: b.name, bJobtestStatus: b.jobtestStatus, bValue,
+                        sortOrder: sortOrder.value
+                    });
+                } else {
+                    aValue = a[sortKey.value];
+                    bValue = b[sortKey.value];
+                }
 
                 // null/undefined 처리
                 if (aValue == null && bValue == null) return 0;
@@ -163,6 +196,17 @@ export const useApplicantStore = defineStore('applicant', () => {
                     String(aValue).localeCompare(String(bValue)) :
                     String(bValue).localeCompare(String(aValue));
             });
+            
+            if (sortKey.value === 'jobtestStatus') {
+                console.log('✅ 실무테스트 정렬 완료:', {
+                    sortOrder: sortOrder.value,
+                    정렬결과: result.slice(0, 10).map(item => ({
+                        name: item.name,
+                        jobtestStatus: item.jobtestStatus,
+                        applicationJobtestTitle: !!item.applicationJobtestTitle
+                    }))
+                });
+            }
         }
 
         return result;
@@ -173,15 +217,19 @@ export const useApplicantStore = defineStore('applicant', () => {
     };
 
     const setSort = (options) => {
-        console.log('setSort 호출됨:', options);
+        console.log('🔄 setSort 호출됨:', options);
         if (options.sortBy && options.sortBy.length > 0) {
             sortKey.value = options.sortBy[0];
             sortOrder.value = options.sortDesc && options.sortDesc[0] ? 'desc' : 'asc';
+            console.log('✅ 정렬 설정:', { 
+                sortKey: sortKey.value, 
+                sortOrder: sortOrder.value,
+                isJobtestSort: sortKey.value === 'jobtestStatus'
+            });
         } else {
             sortKey.value = '';
             sortOrder.value = 'asc';
         }
-        console.log('정렬 설정:', { sortKey: sortKey.value, sortOrder: sortOrder.value });
     };
 
     // 필터 설정 함수들
@@ -358,6 +406,8 @@ export const useApplicantStore = defineStore('applicant', () => {
                 application.jobtestId = result.jobtestId;
                 application.jobtestAssignedAt = result.assignedAt;
                 application.hasJobtest = true;
+                // jobtestStatus 필드도 업데이트
+                application.jobtestStatus = 'ASSIGNED';
             }
         });
     };
