@@ -157,7 +157,7 @@ export const useMemberStore = defineStore('member', {
             }
         },
 
-        // ✏️ 내 정보 수정
+        // ✏️ 내 정보 수정 (직접 수정)
         async updateMyInfo() {
             this.loading = true;
             this.error = '';
@@ -173,7 +173,15 @@ export const useMemberStore = defineStore('member', {
                     throw new Error('올바른 이메일 형식이 아닙니다.');
                 }
 
-                const result = await updateMyInfoService(this.form);
+                // 사용자가 수정 가능한 필드만 전송 (UI에서 편집 가능한 필드만)
+                const updateData = {
+                    name: this.form.name?.trim(),
+                    phone: this.form.phone?.trim(),
+                    email: this.form.email?.trim()
+                };
+
+                console.log('전송할 데이터:', updateData);
+                const result = await updateMyInfoService(updateData);
                 if (result) {
                     Object.assign(this.form, result);
                 }

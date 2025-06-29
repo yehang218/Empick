@@ -55,7 +55,7 @@
                                 <div class="text-subtitle-2 font-weight-bold mb-1">{{ memberStore.form.name || '사용자명' }}
                                 </div>
                                 <div class="text-caption text-grey-darken-1 mb-2">사번: {{ memberStore.form.employeeNumber
-                                    }}
+                                }}
                                 </div>
                                 <v-chip :color="getStatusColor(memberStore.form.status)" size="x-small" variant="flat"
                                     class="status-chip">
