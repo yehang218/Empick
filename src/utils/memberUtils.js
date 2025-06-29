@@ -81,6 +81,7 @@ export const getStatusClass = (status) => {
     switch (status) {
         case 1: return 'status-present'     // 출근
         case 0: return 'status-absent'      // 미출근
+        case 2: return 'status-weekend'     // 휴무일
         case -1: return 'status-no-record'  // 기록없음
         default: return 'status-unknown'
     }
@@ -90,6 +91,7 @@ export const getStatusLabel = (status) => {
     switch (status) {
         case 1: return '출근'               // 출근
         case 0: return '미출근'             // 미출근
+        case 2: return '휴무일'             // 휴무일 (주말)
         case -1: return '기록없음'          // 기록없음
         default: return '알 수 없음'
     }
@@ -117,5 +119,6 @@ export const STATUS_OPTIONS = [
     { title: '전체', value: '전체' },
     { title: '출근', value: 1 },
     { title: '미출근', value: 0 },
+    { title: '휴무일', value: 2 },
     { title: '기록없음', value: -1 }
 ] 
