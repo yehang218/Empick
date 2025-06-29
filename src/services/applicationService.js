@@ -239,123 +239,65 @@ export const getApplicationResponsesByApplicationIdService = async (applicationI
       throwCustomApiError(apiResponse.code, apiResponse.message);
     }
 
-    console.log('✅ 이력서 응답 조회 성공:', apiResponse.data);
+    console.log('✅ 원본 API 응답 데이터:', apiResponse.data);
     
     // 배열 형태의 이력서 응답 데이터를 DTO로 변환
     if (Array.isArray(apiResponse.data)) {
       const responses = apiResponse.data
-        .map(item => ApplicationItemResponseDTO.fromJSON(item))
+        .map(item => {
+          console.log('🔍 개별 응답 원본 데이터:', item);
+          return ApplicationItemResponseDTO.fromJSON(item);
+        })
         .filter(item => item !== null); // null 값 제거
       
-      // 1. 먼저 application 정보를 조회해서 recruitmentId를 얻기
-      let recruitmentId = null;
+      console.log('📋 DTO 변환 후 데이터:', responses);
+      
+      // categoryName이 없는 경우 applicationItemId를 통해 항목 정보 매핑
       try {
-        const appResponse = await api.get(ApplicationAPI.GET_APPLICATION_BY_ID(applicationId));
-        const appApiResponse = ApiResponseDTO.fromJSON(appResponse.data);
-        if (appApiResponse.success && appApiResponse.data) {
-          recruitmentId = appApiResponse.data.recruitmentId;
-          console.log('✅ 채용공고 ID 조회 성공:', recruitmentId);
-        }
-      } catch (appError) {
-        console.warn('⚠️ application 정보 조회 실패:', appError.message);
-      }
-      
-      // 2. application_item_category 정보를 미리 조회 (캐시)
-      let categoryCache = {};
-      try {
-        const categories = await fetchApplicationItemCategories();
-        categoryCache = categories.reduce((acc, category) => {
-          acc[category.id] = category;
-          return acc;
-        }, {});
-        console.log('✅ 항목 카테고리 캐시 로드 완료:', Object.keys(categoryCache).length, '개');
-      } catch (categoryError) {
-        console.warn('⚠️ 항목 카테고리 조회 실패:', categoryError.message);
-      }
-      
-      // 3. 채용공고별 지원서 항목들 조회 (캐시)
-      let itemCache = {};
-      if (recruitmentId) {
-        try {
-          const items = await fetchApplicationItemsByRecruitment(recruitmentId);
-          itemCache = items.reduce((acc, item) => {
-            acc[item.id] = item;
-            return acc;
-          }, {});
-          console.log('✅ 지원서 항목 캐시 로드 완료:', Object.keys(itemCache).length, '개');
-        } catch (itemError) {
-          console.warn('⚠️ 지원서 항목 조회 실패:', itemError.message);
-        }
-      }
-      
-      // 4. 각 응답에 대해 항목 정보 추가
-      const enrichedResponses = [];
-      
-      for (const response of responses) {
-        if (response.applicationItemId) {
-          // 기본값 설정
-          response.categoryName = '항목 정보 조회 중...';
-          
-          try {
-            // 방법 1: itemCache에서 직접 찾기
-            const item = itemCache[response.applicationItemId];
-            if (item && item.applicationItemCategoryId) {
-              const category = categoryCache[item.applicationItemCategoryId];
-              if (category) {
-                response.categoryName = category.name;
-                response.inputType = item.inputType || category.inputType;
-                response.isRequired = item.isRequired;
-                console.log('✅ 항목 정보 매칭 성공:', {
-                  applicationItemId: response.applicationItemId,
-                  categoryName: response.categoryName
-                });
-              } else {
-                response.categoryName = `카테고리 ID: ${item.applicationItemCategoryId}`;
-              }
-            } else {
-              // 방법 2: applicationItemId를 직접 categoryCache에서 찾아보기
-              const directCategory = categoryCache[response.applicationItemId];
-              if (directCategory) {
-                response.categoryName = directCategory.name;
-                response.inputType = directCategory.inputType;
-                response.isRequired = true;
-                console.log('✅ 직접 카테고리 매칭 성공:', response.categoryName);
-              } else {
-                // 방법 3: 일반적인 카테고리명 추정
-                const categoryNames = {
-                  1: '기본 인적사항',
-                  2: '학력',
-                  3: '경력',
-                  4: '자격증',
-                  5: '어학',
-                  6: '수상 내역',
-                  7: '기타',
-                };
-                
-                response.categoryName = categoryNames[response.applicationItemId] || `항목 ${response.applicationItemId}`;
-                response.inputType = 'TEXT';
-                response.isRequired = true;
-                console.log('🔄 추정 카테고리명 사용:', response.categoryName);
-              }
-            }
-            
-          } catch (itemError) {
-            console.warn('⚠️ 항목 정보 조회 실패:', response.applicationItemId, itemError.message);
-            response.categoryName = `항목 ${response.applicationItemId}`;
-            response.inputType = 'TEXT';
-            response.isRequired = true;
-          }
-        } else {
-          response.categoryName = 'applicationItemId 없음';
-          response.inputType = 'TEXT';
-          response.isRequired = false;
-        }
+        // 1. 먼저 지원서 정보를 통해 recruitmentId 확인
+        const applicationResponse = await api.get(ApplicationAPI.GET_APPLICATION_BY_ID(applicationId));
+        const applicationData = ApiResponseDTO.fromJSON(applicationResponse.data);
         
-        enrichedResponses.push(response);
+        if (applicationData.success && applicationData.data.recruitmentId) {
+          const recruitmentId = applicationData.data.recruitmentId;
+          console.log('🔍 recruitmentId 확인:', recruitmentId);
+          
+          // 2. 해당 채용공고의 모든 항목 정보 조회
+          const { fetchApplicationItemsByRecruitment } = await import('./applicationItemService');
+          const applicationItems = await fetchApplicationItemsByRecruitment(recruitmentId);
+          console.log('📋 채용공고 항목들:', applicationItems);
+          
+                     // 3. applicationItemId를 통해 항목명 매핑
+           responses.forEach(response => {
+             if (!response.categoryName && response.applicationItemId) {
+               const matchedItem = applicationItems.find(item => item.id === response.applicationItemId);
+               if (matchedItem && matchedItem.categoryName) {
+                 response.categoryName = matchedItem.categoryName;
+                 console.log(`🔗 항목명 매핑 성공: ${response.applicationItemId} -> ${response.categoryName}`);
+               } else {
+                 console.warn(`⚠️ 매칭되는 항목을 찾을 수 없거나 categoryName이 없음: applicationItemId=${response.applicationItemId}`, matchedItem);
+               }
+             }
+           });
+        }
+      } catch (mappingError) {
+        console.warn('⚠️ 항목명 매핑 실패, 원본 데이터 사용:', mappingError.message);
       }
       
-      console.log('🎯 최종 enriched responses:', enrichedResponses);
-      return enrichedResponses;
+      // 최종 데이터 로깅
+      responses.forEach((response, index) => {
+        console.log(`📋 응답 ${index + 1}:`, {
+          id: response.id,
+          applicationItemId: response.applicationItemId,
+          categoryName: response.categoryName,
+          content: response.content?.substring(0, 50) + (response.content?.length > 50 ? '...' : ''),
+          inputType: response.inputType,
+          required: response.required
+        });
+      });
+      
+      console.log('🎯 최종 반환 데이터 (항목명 매핑 완료):', responses);
+      return responses;
     }
     
     return [];

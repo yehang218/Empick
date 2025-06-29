@@ -134,9 +134,19 @@
           <v-card-text>
             <!-- 이력서 응답 섹션 -->
             <div class="resume-section" v-if="applicationResponses && applicationResponses.length > 0">
+              <!-- 디버깅: 실제 데이터 구조 확인 -->
+              <div v-if="$route.query.debug === 'true'" class="mb-4 pa-3 bg-yellow-lighten-5 border-l-4 border-yellow">
+                <p class="text-caption font-weight-bold mb-2">🐛 디버깅 정보:</p>
+                <pre class="text-caption">{{ JSON.stringify(applicationResponses, null, 2) }}</pre>
+              </div>
+              
               <div v-for="response in applicationResponses" :key="response.id" class="mb-4">
                 <h4 class="text-subtitle-1 font-weight-bold mb-2 text-primary">
                   {{ response.itemName || response.categoryName || response.applicationItemCategoryName || '항목명 없음' }}
+                  <!-- 디버깅: 사용 가능한 모든 항목명 필드 표시 -->
+                  <span v-if="$route.query.debug === 'true'" class="text-caption text-grey ml-2">
+                    (itemName: {{ response.itemName }}, categoryName: {{ response.categoryName }}, applicationItemCategoryName: {{ response.applicationItemCategoryName }})
+                  </span>
                 </h4>
                 <p class="text-body-2 line-height-1-6">
                   {{ response.content || response.answer || response.responseContent || '응답 내용 없음' }}
@@ -1670,8 +1680,11 @@ function handleJobtestCardClick() {
   // 실무테스트 선택
   selectEvaluation('실무 테스트')
 
-  // 실무테스트 미응시인 경우 토스트 메시지 표시
-  if (!canAccessJobtestAnswer.value) {
+  // 접근 가능한 경우에만 답안 페이지로 이동
+  if (canAccessJobtestAnswer.value) {
+    goToJobtestAnswerDetail()
+  } else {
+    // 실무테스트 미응시인 경우 토스트 메시지 표시
     toast.info('실무테스트가 아직 수행되지 않았습니다.')
   }
 }

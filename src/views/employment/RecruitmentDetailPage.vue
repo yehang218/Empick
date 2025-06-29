@@ -254,12 +254,22 @@ const stepColor = (stepType) => {
                 <v-card-title class="text-h6 font-weight-bold">지원서 항목 미리보기</v-card-title>
                 <v-divider />
                 <v-card-text>
+                    <!-- 디버깅: 실제 데이터 구조 확인 -->
+                    <div v-if="$route.query.debug === 'true'" class="mb-4 pa-3 bg-blue-lighten-5 border-l-4 border-blue">
+                        <p class="text-caption font-weight-bold mb-2">🐛 디버깅 정보 (지원서 항목 템플릿):</p>
+                        <pre class="text-caption">{{ JSON.stringify(applicationItemStore.items, null, 2) }}</pre>
+                    </div>
+                    
                     <v-card v-for="(item, index) in applicationItemStore.items" :key="index" class="mb-4 pa-4"
                         elevation="2">
                         <div class="font-weight-medium mb-2">
                             {{ item.categoryName }}
                             <span class="text-caption text-grey-darken-1">
                                 ({{ getInputTypeLabel(item.inputType) }} / 필수: {{ item.required ? 'O' : 'X' }})
+                            </span>
+                            <!-- 디버깅: 추가 정보 표시 -->
+                            <span v-if="$route.query.debug === 'true'" class="text-caption text-grey ml-2 d-block">
+                                ID: {{ item.id }}, CategoryID: {{ item.applicationItemCategoryId }}
                             </span>
                         </div>
                         <component :is="getInputComponent(item.inputType)" :label="item.categoryName" :readonly="true"
