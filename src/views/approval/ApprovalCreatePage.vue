@@ -224,18 +224,18 @@ const onCategoryChange = async (categoryId) => {
 const handleSubmit = async () => {
     try {
         if (!form.value.categoryId) {
-            alert('결재 유형을 선택해주세요.');
+            toast.error('결재 유형을 선택해주세요.');
             return;
         }
         if (!form.value.contents.every(c => c.content !== null && c.content !== '')) {
-            alert('모든 결재 항목을 입력해주세요.');
+            toast.error('모든 결재 항목을 입력해주세요.');
             return;
         }
         await approvalStore.submitApproval(memberId.value);
-        alert('결재 요청이 등록되었습니다.');
+        toast.success('결재 요청이 등록되었습니다.');
         router.push('/approval/sent');
     } catch (error) {
-        alert(error.message || '결재 요청 중 오류가 발생했습니다.');
+        toast.error(error.message || '결재 요청 중 오류가 발생했습니다.');
     }
 };
 
