@@ -205,18 +205,8 @@ EMPICK은 Employee와 Pick의 합성어로, 기업이 필요한 인재를 ‘선
 
 ### **Multi-VPC 클라우드 아키텍처**
 
-프론트 + 백엔드까지 포함한 예쁜걸로 바꿀 예정
+<img width="776" alt="KakaoTalk_Photo_2025-06-30-11-04-59" src="https://github.com/user-attachments/assets/7c41c949-6530-4790-8e0d-3c178b39164c" />
 
-```
-┌─────────────────┐    ┌─────────────────┐
-│   VPC1 Frontend │    │   VPC2 Backend  │
-│  (172.16.0.0/16)│◄──►│  (10.0.0.0/16)  │
-├─────────────────┤    ├─────────────────┤
-│ • ALB + Nginx   │    │ • ALB + Spring  │
-│ • Vue.js SPA    │    │ • RDS MariaDB   │
-│ • Blue/Green    │    │ • Redis Cache   │
-└─────────────────┘    └─────────────────┘
-```
 
 ### **주요 설계 원칙**
 
