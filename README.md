@@ -127,7 +127,7 @@ EMPICK은 Employee와 Pick의 합성어로, 기업이 필요한 인재를 ‘선
 
 ## 📋 목차
 
-- [위키 바로가기](#-위키-바로가기)
+- [위키 바로가기](https://github.com/Pive-Guyz/be-14-fin-PiveGuyz-Empick/wiki)
 - [주요 기능](#-주요-기능)
 - [기술 스택](#-기술-스택)
 - [아키텍처](#-아키텍처)
