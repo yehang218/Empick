@@ -20,10 +20,10 @@
                         <div class="jobtest-info">
                             <div class="jobtest-title">{{ jobtest.title }}</div>
                             <div class="jobtest-meta">
-                                <span class="meta-item">
+                                <!-- <span class="meta-item">
                                     <v-icon class="meta-icon">mdi-clock-outline</v-icon>
                                     {{ jobtest.testTime }}분
-                                </span>
+                                </span> -->
                                 <span class="meta-item">
                                     <v-icon class="meta-icon">mdi-trending-up</v-icon>
                                     {{ getDifficultyLabel(jobtest.difficulty) }}
