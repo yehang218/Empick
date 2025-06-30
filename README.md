@@ -55,6 +55,12 @@ EMPICK은 Employee와 Pick의 합성어로, 기업이 필요한 인재를 ‘선
 
 ## ℹ️ 프로젝트 정보
 
+### 📂 프로젝트 히스토리
+
+- [Frontend Repository](https://github.com/Pive-Guyz/be14-fin-Empick-FE/tree/develop)
+- [Backend Repository](https://github.com/Pive-Guyz/be14-fin-Empick-BE)
+
+
 ### 📅 진행 기간 및 팀 구성
 
 | 항목            | 내용                                 |
