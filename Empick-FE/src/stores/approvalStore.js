@@ -1,0 +1,216 @@
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { getReceivedApprovals, getApprovalsByWriterId, getRequestedApprovals, getReceivedApprovalDetail, getRequestedApprovalDetail, approve, reject } from '@/services/approvalService';
+import { useMemberStore } from '@/stores/memberStore';
+
+export const useApprovalStore = defineStore('approval', () => {
+    // State
+    const receivedList = ref([]);
+    const loadingReceived = ref(false);
+    const errorReceived = ref(null);
+
+    const sentList = ref([]);
+    const loadingSent = ref(false);
+    const errorSent = ref(null);
+
+    const requestedList = ref([]);
+    const loadingRequested = ref(false);
+    const errorRequested = ref(null);
+
+    const approvalDetail = ref(null);
+
+    const loading = ref(false);
+    const error = ref(null);
+
+    // Actions
+    const loadReceivedApprovals = async (memberId) => {
+        loadingReceived.value = true;
+        errorReceived.value = null;
+        try {
+            const response = await getReceivedApprovals(memberId);
+            receivedList.value = response || [];
+        } catch (e) {
+            // 404 Not Found는 에러가 아닌 빈 목록으로 처리
+            if (e.response && e.response.status === 404) {
+                receivedList.value = [];
+            } else {
+                console.error('받은 결재 목록 조회 실패:', e);
+                errorReceived.value = e;
+            }
+        } finally {
+            loadingReceived.value = false;
+        }
+    };
+
+    const loadSentApprovals = async (writerId) => {
+        loadingSent.value = true;
+        errorSent.value = null;
+        try {
+            const response = await getApprovalsByWriterId(writerId);
+            sentList.value = response;
+        } catch (e) {
+            errorSent.value = e;
+        } finally {
+            loadingSent.value = false;
+        }
+    };
+
+    const loadRequestedApprovals = async (memberId) => {
+        loadingRequested.value = true;
+        errorRequested.value = null;
+        try {
+            const response = await getRequestedApprovals(memberId);
+            requestedList.value = response;
+        } catch (e) {
+            errorRequested.value = e;
+        } finally {
+            loadingRequested.value = false;
+        }
+    };
+
+    const fetchReceivedApprovalDetail = async (approvalId, memberId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const detailData = await getReceivedApprovalDetail(approvalId, memberId);
+
+            // [수정] myTurn 값을 결재선 기준으로 프론트에서 직접 계산하여 보정
+            if (detailData && detailData.approvers && detailData.status === 'IN_PROGRESS') {
+                const sortedApprovers = [...detailData.approvers].sort((a, b) => a.stepOrder - b.stepOrder);
+                const nextApprover = sortedApprovers.find(approver => !approver.approvedAt);
+
+                if (nextApprover && nextApprover.memberId == memberId) {
+                    if (detailData.myTurn === false) {
+                        detailData.myTurn = true;
+                    }
+                }
+            }
+
+            approvalDetail.value = detailData;
+        } catch (err) {
+            error.value = err;
+            console.error('요청받은 결재문서 상세 조회 실패:', err);
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const fetchRequestedApprovalDetail = async (approvalId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const data = await getRequestedApprovalDetail(approvalId);
+            if (data && data.status === 'PROCEED') {
+                data.approvers = data.approvers.map(approver => {
+                    if (approver.approved === false && !approver.approvedAt) {
+                        return { ...approver, approved: null };
+                    }
+                    return approver;
+                });
+            }
+            approvalDetail.value = data;
+        } catch (err) {
+            error.value = err;
+            console.error('요청한 결재문서 상세 조회 실패:', err);
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const approveDocument = async (approvalId) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const memberStore = useMemberStore();
+            if (!memberStore.form.id) {
+                await memberStore.getMyInfo();
+            }
+            const memberId = memberStore.form.id;
+            
+            await approve(approvalId, memberId);
+            await loadReceivedApprovals(memberId); // 목록 새로고침
+        } catch(err) {
+            error.value = err;
+            console.error('승인 처리 실패:', err);
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const rejectDocument = async (approvalId, reason) => {
+        loading.value = true;
+        error.value = null;
+        try {
+            const memberStore = useMemberStore();
+            if (!memberStore.form.id) {
+                await memberStore.getMyInfo();
+            }
+            const memberId = memberStore.form.id;
+
+            await reject(approvalId, memberId, reason);
+            await loadReceivedApprovals(memberId); // 목록 새로고침
+        } catch(err) {
+            error.value = err;
+            console.error('반려 처리 실패:', err);
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    };
+
+    const clearApprovalDetail = () => {
+        approvalDetail.value = null;
+    };
+
+    // 데이터 초기화
+    const reset = () => {
+        receivedList.value = [];
+        loadingReceived.value = false;
+        errorReceived.value = null;
+        
+        sentList.value = [];
+        loadingSent.value = false;
+        errorSent.value = null;
+        
+        requestedList.value = [];
+        loadingRequested.value = false;
+        errorRequested.value = null;
+        localStorage.removeItem('approval-store');
+    };
+
+    return {
+        // List state
+        receivedList,
+        sentList,
+        requestedList,
+        
+        // Detail state
+        approvalDetail,
+        
+        // Common state
+        loading,
+        error,
+
+        // List actions
+        loadReceivedApprovals,
+        loadSentApprovals,
+        loadRequestedApprovals,
+
+        // Detail actions
+        fetchReceivedApprovalDetail,
+        fetchRequestedApprovalDetail,
+        approveDocument,
+        rejectDocument,
+        clearApprovalDetail,
+
+        // General actions
+        reset
+    };
+}, {
+    persist: {
+        key: 'approval-store',
+        storage: localStorage,
+        paths: ['receivedList', 'sentList', 'requestedList']
+    }
+});
