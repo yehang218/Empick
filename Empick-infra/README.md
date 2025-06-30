@@ -259,7 +259,6 @@ rds_instance_class = "db.t3.small"
 
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [AWS VPC Peering](https://docs.aws.amazon.com/vpc/latest/peering/)
-- [Spring Boot on AWS](https://aws.amazon.com/spring/)
 - [Vue.js Deployment](https://vuejs.org/guide/best-practices/production-deployment.html)
 
 ## 📄 라이선스
