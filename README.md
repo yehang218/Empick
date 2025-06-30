@@ -58,9 +58,9 @@ EMPICK은 Employee와 Pick의 합성어로, 기업이 필요한 인재를 ‘선
 ### 📂 프로젝트 히스토리
 해당 프로젝트는 초기에 프론트엔드와 백엔드가 분리된 레포지토리에서 관리되었으며,  
 이후 통합하여 하나의 저장소에서 관리되고 있습니다.
-| 🌐 Frontend | 🧩 Backend |
-|------------|------------|
-| [github.com/Pive-Guyz/be14-fin-Empick-FE](https://github.com/Pive-Guyz/be14-fin-Empick-FE) | [github.com/Pive-Guyz/be14-fin-Empick-BE](https://github.com/Pive-Guyz/be14-fin-Empick-BE) |
+| 🌐 Frontend | 🧩 Backend | 🏗 Infra
+|------------|------------|------------|
+| [github.com/Pive-Guyz/be14-fin-Empick-FE](https://github.com/Pive-Guyz/be14-fin-Empick-FE) | [github.com/Pive-Guyz/be14-fin-Empick-BE](https://github.com/Pive-Guyz/be14-fin-Empick-BE) | [github.com/Pive-Guyz/be-14-fin-PiveGuyz-Empick-infra](https://github.com/Pive-Guyz/be-14-fin-PiveGuyz-Empick-infra)
 
 
 ### 📅 진행 기간 및 팀 구성
@@ -205,18 +205,8 @@ EMPICK은 Employee와 Pick의 합성어로, 기업이 필요한 인재를 ‘선
 
 ### **Multi-VPC 클라우드 아키텍처**
 
-프론트 + 백엔드까지 포함한 예쁜걸로 바꿀 예정
+<img width="776" alt="KakaoTalk_Photo_2025-06-30-11-04-59" src="https://github.com/user-attachments/assets/7c41c949-6530-4790-8e0d-3c178b39164c" />
 
-```
-┌─────────────────┐    ┌─────────────────┐
-│   VPC1 Frontend │    │   VPC2 Backend  │
-│  (172.16.0.0/16)│◄──►│  (10.0.0.0/16)  │
-├─────────────────┤    ├─────────────────┤
-│ • ALB + Nginx   │    │ • ALB + Spring  │
-│ • Vue.js SPA    │    │ • RDS MariaDB   │
-│ • Blue/Green    │    │ • Redis Cache   │
-└─────────────────┘    └─────────────────┘
-```
 
 ### **주요 설계 원칙**
 
