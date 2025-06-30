@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.jobtests.evaluation.query.mapper.EvaluationCriteriaMapper">
+
+    <resultMap id="EvaluationCriteriaMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.evaluation.query.dto.EvaluationCriteriaQueryDTO">
+        <id property="id" column="id"/>
+        <result property="content" column="content"/>
+        <result property="detailContent" column="detail_content"/>
+        <result property="scoreWeight" column="score_weight"/>
+        <result property="jobtestId" column="job_test_id"/>
+    </resultMap>
+
+    <!-- 특정 실무테스트에 대한 평가 기준 -->
+    <select id="findByJobtestId" resultMap="EvaluationCriteriaMap">
+        SELECT id,
+               content,
+               detail_content,
+               score_weight,
+               job_test_id
+        FROM job_test_evaluation_criteria
+        WHERE job_test_id = #{jobtestId}
+    </select>
+
+    <select id="findById" resultMap="EvaluationCriteriaMap">
+        SELECT id,
+               content,
+               detail_content,
+               score_weight,
+               job_test_id
+        FROM job_test_evaluation_criteria
+        WHERE id = #{id}
+    </select>
+
+</mapper>

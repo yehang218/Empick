@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.recruitment.query.mapper.RecruitmentQueryMapper">
+
+    <resultMap id="RecruitmentResultMap" type="com.piveguyz.empickbackend.employment.recruitment.query.dto.RecruitmentQueryDTO">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="recruit_type" property="recruitType"
+                typeHandler="com.piveguyz.empickbackend.common.handler.RecruitTypeHandler"/>
+        <result column="status" property="status"
+                typeHandler="com.piveguyz.empickbackend.common.handler.RecruitmentStatusHandler"/>
+        <result column="image_url" property="imageUrl"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="ended_at" property="endedAt"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted_at" property="deletedAt"/>
+        <result column="member_id" property="memberId"/>
+        <result column="member_name" property="memberName"/>
+        <result column="department_name" property="departmentName"/>
+        <result column="recruitment_template_id" property="recruitmentTemplateId"/>
+        <result column="introduce_template_id" property="introduceTemplateId"/>
+        <result column="recruitment_request_id" property="recruitmentRequestId"/>
+    </resultMap>
+    <resultMap id="ApplicationResultMap" type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationQueryDTO">
+        <id column="id" property="id"/>
+        <result column="recruitment_id" property="recruitmentId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="status" property="status"
+                typeHandler="com.piveguyz.empickbackend.common.handler.ApplicationStatusHandler"/>
+        <result column="applicant_id" property="applicantId"/>
+        <result column="introduce_rating_result_id" property="introduceRatingResultId"/>
+        <result column="interview_id" property="interviewId"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="updated_by" property="updatedBy"/>
+    </resultMap>
+
+    <!-- 채용 공고 목록 조회 -->
+    <select id="findRecruitments" resultMap="RecruitmentResultMap">
+        SELECT
+        r.id,
+        r.title,
+        r.content,
+        r.recruit_type,
+        r.status,
+        r.image_url,
+        r.started_at,
+        r.ended_at,
+        r.created_at,
+        r.updated_at,
+        r.deleted_at,
+        r.member_id,
+        m.name AS member_name,
+        d.name AS department_name,
+        r.recruitment_template_id,
+        r.introduce_template_id,
+        r.recruitment_request_id
+        FROM recruitment r
+        JOIN member m ON r.member_id = m.id
+        LEFT JOIN department d ON m.department_id = d.id
+        WHERE r.deleted_at IS NULL
+        <if test="condition.keyword != null and condition.keyword != ''">
+            AND r.title LIKE CONCAT('%', #{condition.keyword}, '%')
+        </if>
+        <if test="condition.recruitType != null">
+            AND r.recruit_type = #{condition.recruitType}
+        </if>
+        <if test="condition.departmentName != null and condition.departmentName != ''">
+            AND d.name = #{condition.departmentName}
+        </if>
+        <if test="condition.status != null">
+            AND r.status = #{condition.status}
+        </if>
+        <if test="condition.startFrom != null">
+            AND r.started_at &gt;= #{condition.startFrom}
+        </if>
+        <if test="condition.endTo != null">
+            AND r.ended_at &lt;= #{condition.endTo}
+        </if>
+        ORDER BY r.created_at DESC
+    </select>
+
+    <!-- 채용 공고 상세 조회 -->
+    <select id="findById" resultMap="RecruitmentResultMap">
+        SELECT
+            r.id,
+            r.title,
+            r.content,
+            r.recruit_type,
+            r.status,
+            r.image_url,
+            r.started_at,
+            r.ended_at,
+            r.created_at,
+            r.updated_at,
+            r.deleted_at,
+            r.member_id,
+            m.name AS member_name,
+            d.name AS department_name,
+            r.recruitment_template_id,
+            r.introduce_template_id,
+            r.recruitment_request_id
+        FROM recruitment r
+                 LEFT JOIN member m ON r.member_id = m.id
+                 LEFT JOIN department d ON m.department_id = d.id
+        WHERE r.id = #{id}
+    </select>
+
+    <!-- 채용공고별 지원서 조회 -->
+    <select id="selectApplicationsByRecruitmentId"
+            resultMap="ApplicationResultMap">
+        SELECT
+            a.id,
+            a.recruitment_id,
+            a.created_at,
+            a.status,
+            a.applicant_id,
+            a.introduce_rating_result_id,
+            a.updated_at,
+            a.updated_by
+        FROM application a
+        WHERE a.recruitment_id = #{recruitmentId}
+    </select>
+</mapper>

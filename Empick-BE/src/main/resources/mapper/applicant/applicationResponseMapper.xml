@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.applicant.query.mapper.ApplicationResponseMapper">
+
+    <resultMap id="ApplicationResponseResultMap" type="com.piveguyz.empickbackend.employment.applicant.query.dto.ApplicationResponseQueryDTO">
+        <id property="id" column="id"/>
+        <result property="applicationId" column="application_id"/>
+        <result property="applicationItemId" column="application_item_id"/>
+        <result property="content" column="content"/>
+    </resultMap>
+
+    <select id="findAllApplicationResponse" resultMap="ApplicationResponseResultMap">
+        SELECT
+            id,
+            application_id,
+            application_item_id,
+            content
+        FROM application_response
+        ORDER BY id
+    </select>
+
+    <select id="findApplicationResponsesByApplicationId" parameterType="int" resultMap="ApplicationResponseResultMap">
+        SELECT
+            id,
+            application_id,
+            application_item_id,
+            content
+        FROM application_response
+        WHERE application_id = #{applicationId}
+        ORDER BY id
+    </select>
+
+</mapper>

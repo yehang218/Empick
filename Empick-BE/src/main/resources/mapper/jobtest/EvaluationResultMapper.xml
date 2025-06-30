@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.piveguyz.empickbackend.employment.jobtests.evaluation.query.mapper.EvaluationResultMapper">
+
+    <resultMap id="EvaluationResultMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.evaluation.query.dto.EvaluationResultQueryDTO">
+        <result property="criteriaContent" column="criteria_content"/>
+        <result property="criteriaDetailContent" column="criteria_detail_content"/>
+        <result property="criteriaScoreWeight" column="criteria_score_weight"/>
+        <result property="resultEvaluatorComment" column="result_evaluator_comment"/>
+        <result property="resultScore" column="result_score"/>
+    </resultMap>
+
+    <resultMap id="JobTestEvaluationMap"
+               type="com.piveguyz.empickbackend.employment.jobtests.evaluation.query.dto.JobTestEvaluationDetailDTO">
+        <result property="evaluationComment" column="evaluation_comment"/>
+        <result property="evaluationScore" column="evaluation_score"/>
+        <result property="gradingTotalScore" column="grading_total_score"/>
+        <result property="evaluatorName" column="evaluator_name"/>
+
+        <collection property="evaluationResults"
+                    ofType="com.piveguyz.empickbackend.employment.jobtests.evaluation.query.dto.EvaluationResultQueryDTO"
+                    resultMap="EvaluationResultMap"/>
+    </resultMap>
+
+    <select id="findEvaluationByApplicationId" resultMap="JobTestEvaluationMap">
+        SELECT ajt.evaluator_comment AS evaluation_comment,
+               ajt.evaluation_score,
+               ajt.grading_total_score,
+               m.name                AS evaluator_name,
+
+               c.content             AS criteria_content,
+               c.detail_content      AS criteria_detail_content,
+               c.score_weight        AS criteria_score_weight,
+
+               r.evaluator_comment   AS result_evaluator_comment,
+               r.score               AS result_score
+
+        FROM application_job_test ajt
+                 JOIN member m ON ajt.evaluation_member_id = m.id
+                 JOIN job_test jt ON ajt.job_test_id = jt.id
+                 JOIN job_test_evaluation_criteria c ON jt.id = c.job_test_id
+                 LEFT JOIN job_test_evaluation_result r ON r.application_job_test_id = ajt.id
+            AND r.job_test_evaluation_criteria_id = c.id
+
+        WHERE ajt.application_id = #{applicationId}
+    </select>
+
+
+</mapper>

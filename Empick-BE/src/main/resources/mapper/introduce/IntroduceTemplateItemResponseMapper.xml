@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.employment.introduce.query.mapper.IntroduceTemplateItemResponseQueryMapper">
+
+    <!-- ResultMap -->
+    <resultMap id="IntroduceTemplateItemResponseResultMap" type="com.piveguyz.empickbackend.employment.introduce.query.dto.IntroduceTemplateItemResponseQueryDTO">
+        <id property="id" column="id"/>
+        <result property="introduceId" column="introduce_id"/>
+        <result property="introduceTemplateItemId" column="introduce_template_item_id"/>
+        <result property="content" column="content"/>
+    </resultMap>
+
+    <!-- 전체 조회 -->
+    <select id="findAllIntroduceTemplateItemResponse" resultMap="IntroduceTemplateItemResponseResultMap">
+        SELECT
+            id,
+            introduce_id,
+            introduce_template_item_id,
+            content
+        FROM introduce_template_item_response
+    </select>
+
+    <!-- 단일 자소서 ID에 대한 항목별 응답 조회 -->
+    <select id="findByIntroduceId" resultMap="IntroduceTemplateItemResponseResultMap">
+        SELECT
+            id,
+            introduce_id,
+            introduce_template_item_id,
+            content
+        FROM introduce_template_item_response
+        WHERE introduce_id = #{introduceId}
+    </select>
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.piveguyz.empickbackend.approvals.approval.query.mapper.ApprovalQueryMapper">
+    <resultMap id="ApprovalResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalQueryDTO">
+        <id column="id" property="id"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="writer_id" property="writerId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="status" property="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+        <result column="first_approver_id" property="firstApproverId"/>
+        <result column="second_approver_id" property="secondApproverId"/>
+        <result column="third_approver_id" property="thirdApproverId"/>
+        <result column="fourth_approver_id" property="fourthApproverId"/>
+        <result column="first_approved_at" property="firstApprovedAt"/>
+        <result column="second_approved_at" property="secondApprovedAt"/>
+        <result column="third_approved_at" property="thirdApprovedAt"/>
+        <result column="fourth_approved_at" property="fourthApprovedAt"/>
+    </resultMap>
+
+<!--    요청받은 결재 목록 조회-->
+    <resultMap id="ApprovalReceivedResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalReceivedQueryDTO">
+        <result column="approval_id" property="approvalId" />
+        <result column="category_name" property="categoryName" />
+        <result column="writer_name" property="writerName" />
+        <result column="created_at" property="createdAt" />
+        <result column="status" property="status"
+                typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler" />
+        <result column="my_approval_step" property="myApprovalStep" />
+    </resultMap>
+
+<!--    요청한 결재 목록 조회-->
+    <resultMap id="ApprovalRequestedListResultMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalRequestedListQueryDTO">
+        <id column="approval_id" property="approvalId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="status" property="status" typeHandler="com.piveguyz.empickbackend.common.handler.ApprovalStatusTypeHandler"/>
+    </resultMap>
+
+<!--    결재 라인 조회-->
+    <resultMap id="ApprovalLinePreviewMap" type="com.piveguyz.empickbackend.approvals.approval.query.dto.ApprovalLineQueryDTO">
+        <result property="order"          column="order" />
+        <result property="positionId"     column="positionId" />
+        <result property="positionName"   column="positionName" />
+        <result property="memberId"       column="memberId" />
+        <result property="memberName"     column="memberName" />
+        <result property="departmentName" column="departmentName" />
+    </resultMap>
+
+    <select id="findAll" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval;
+    </select>
+
+    <select id="findById" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval
+        WHERE id = #{id};
+    </select>
+
+    <select id="findByCategoryId" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval
+        WHERE category_id = #{categoryId};
+    </select>
+
+    <select id="findByWriterId" resultMap="ApprovalResultMap">
+        SELECT
+            id,
+            category_id,
+            writer_id,
+            created_at,
+            status,
+            first_approver_id,
+            second_approver_id,
+            third_approver_id,
+            fourth_approver_id,
+            first_approved_at,
+            second_approved_at,
+            third_approved_at,
+            fourth_approved_at
+        FROM approval
+        WHERE writer_id = #{writerId};
+    </select>
+
+    <select id="findReceivedApprovals"
+            resultMap="ApprovalReceivedResultMap">
+        SELECT
+            a.id AS approvalId,
+            c.name AS categoryName,
+            m.name AS writerName,
+            a.created_at AS createdAt,
+            a.status,
+
+            -- 내가 몇 번째 결재자인지
+            CASE
+                WHEN a.first_approver_id = #{memberId} THEN 1
+                WHEN a.second_approver_id = #{memberId} THEN 2
+                WHEN a.third_approver_id = #{memberId} THEN 3
+                WHEN a.fourth_approver_id = #{memberId} THEN 4
+                ELSE NULL
+                END AS myApprovalStep,
+
+            -- 내가 결재해야 하는 순서인지 여부
+            CASE
+                WHEN a.first_approver_id = #{memberId} AND a.first_approved_at IS NULL THEN 1
+                WHEN a.second_approver_id = #{memberId} AND a.first_approved_at IS NOT NULL AND a.second_approved_at IS NULL THEN 1
+                WHEN a.third_approver_id = #{memberId} AND a.second_approved_at IS NOT NULL AND a.third_approved_at IS NULL THEN 1
+                WHEN a.fourth_approver_id = #{memberId} AND a.third_approved_at IS NOT NULL AND a.fourth_approved_at IS NULL THEN 1
+                ELSE 0
+                END AS isMyTurn
+
+        FROM approval a
+                 JOIN member m ON a.writer_id = m.id
+                 JOIN approval_category c ON a.category_id = c.id
+        WHERE
+            a.first_approver_id = #{memberId}
+           OR a.second_approver_id = #{memberId}
+           OR a.third_approver_id = #{memberId}
+           OR a.fourth_approver_id = #{memberId}
+        ORDER BY a.created_at DESC
+    </select>
+
+<!--    요청한 결재 목록 조회-->
+    <select id="findRequestedApprovals" resultMap="ApprovalRequestedListResultMap">
+        SELECT
+            a.id AS approval_id,
+            ac.name AS category_name,
+            a.created_at,
+            a.status
+        FROM approval a
+                 JOIN approval_category ac ON a.category_id = ac.id
+        WHERE a.writer_id = #{memberId}
+        ORDER BY a.created_at DESC
+    </select>
+
+    <!--    결재라인 조회-->
+    <select id="selectApprovalLinePreview"
+            resultMap="ApprovalLinePreviewMap">
+        SELECT al.step_order  AS `order`,
+               al.position_id AS positionId,
+               p.name         AS positionName,
+               m.id           AS memberId,
+               m.name         AS memberName,
+               d.name         AS departmentName
+        FROM approval_line al
+                 JOIN position p ON al.position_id = p.id
+                 JOIN member writer ON writer.id = #{writerId}
+                 LEFT JOIN member m
+                           ON m.department_id = writer.department_id AND m.position_id = al.position_id
+                 LEFT JOIN department d ON d.id = m.department_id
+        WHERE al.approval_category_id = #{categoryId}
+        ORDER BY al.step_order ASC
+    </select>
+
+
+</mapper>
