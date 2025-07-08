@@ -229,7 +229,8 @@ EMPICK은 Employee와 Pick의 합성어로, 기업이 필요한 인재를 ‘선
 ---
 
 ## 📱 주요 기능 시연 영상
-[📺 EMPICK 시연 영상 바로가기](https://youtu.be/nECCdrsjwns)
+[📺 EMPICK 시연 영상 바로가기](https://youtu.be/nECCdrsjwns)<br>
+<img src="https://img.youtube.com/vi/nECCdrsjwns/0.jpg"/>
 
 ---
 
